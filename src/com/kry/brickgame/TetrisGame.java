@@ -144,14 +144,11 @@ public class TetrisGame extends Game {
 		// фигуры находился у границы не показываемых строк #UNSHOWED_LINES
 		curY = BOARD_HEIGHT - (UNSHOWED_LINES - nextPiece.maxY());
 
-		// Logger.getAnonymousLogger().info(nextPiece.toString()); // TODO
-		// удалить
-		// логер
-
 		// Попытка поместить фигуру на доску
 		if (!tryMove(nextPiece, curX, curY)) {
 			timer.stop();
 			setStatus(Status.GameOver);
+			animatedClearBoard();
 		} else { // если попытка удалась
 			// готовим следующую фигуру и помещаем ее в предпросмотр
 			nextPiece.setRandomShapeAndRotate();

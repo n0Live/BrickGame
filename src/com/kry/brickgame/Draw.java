@@ -49,7 +49,7 @@ public class Draw extends JPanel implements IGameListener {
 
 			for (int i = 0; i < height; ++i) {
 				for (int j = 0; j < width; ++j) {
-					Cells fill = board.getCell(j,height - i - 1);
+					Cells fill = board.getCell(j, height - i - 1);
 					drawSquare(g, 0 + j * squareWidth(), boardTop + i
 							* squareHeight(), fill);
 				}
@@ -60,49 +60,39 @@ public class Draw extends JPanel implements IGameListener {
 	}
 
 	private void drawSquare(Graphics g, int x, int y, Cells fill) {
-		Color colors[] = { new Color(80, 80, 80), new Color(204, 102, 102),
-				new Color(102, 204, 102), new Color(102, 102, 204),
-				new Color(204, 204, 102), new Color(204, 102, 204),
-				new Color(102, 204, 204), new Color(218, 170, 0) };
+		Color colors[] = { new Color(220, 220, 220), new Color(40, 40, 40) };
 
 		Color color = colors[fill.ordinal()];
 
 		g.setColor(color);
-		g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
-
-		g.setColor(color.brighter());
-		g.drawLine(x, y + squareHeight() - 1, x, y);
-		g.drawLine(x, y, x + squareWidth() - 1, y);
-
-		g.setColor(color.darker());
-		g.drawLine(x + 1, y + squareHeight() - 1, x + squareWidth() - 1, y
-				+ squareHeight() - 1);
-		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x
-				+ squareWidth() - 1, y + 1);
+		g.drawRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
+		g.drawRect(x + 2, y + 2, squareWidth() - 4, squareHeight() - 2);
+		g.fillRect(x + 1 + (squareWidth() / 4), y + 1 + (squareHeight() / 4),
+				squareWidth() / 2, squareHeight() / 2);
 
 	}
 
 	@Override
 	public void boardChanged(GameEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void previewChanged(GameEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void statusChanged(GameEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void infoChanged(GameEvent event) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

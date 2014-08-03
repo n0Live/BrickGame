@@ -122,11 +122,13 @@ public class GameSelector extends Game {
 
 	public void changeGame() {
 		switch (letter) {
-		case "B":
+		case "A":
 			Main.setGame(new TetrisGame());
 			Main.getGame().start();
 			break;
 		default:
+			Main.setGame(new TetrisGame());
+			Main.getGame().start();
 			break;
 		}
 	}

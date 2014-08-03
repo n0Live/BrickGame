@@ -261,6 +261,20 @@ public class Game implements ActionListener {
 				|| checkBoardCollisionHorisontal(piece, x);
 	}
 
+	protected void animatedClearBoard() {
+		for (int y = BOARD_HEIGHT - 1; y >= 0; --y) {
+			for (int x = 0; x < BOARD_WIDTH; ++x) {
+				board.setCell(Cells.Full, x, y);
+			}
+			try {
+				Thread.sleep(100);
+				fireBoardChanged(board);
+			} catch (InterruptedException ex) {
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
