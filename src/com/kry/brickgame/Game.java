@@ -1,10 +1,6 @@
 package com.kry.brickgame;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
-import javax.swing.Timer;
 
 import com.kry.brickgame.Board.Cells;
 
@@ -13,8 +9,9 @@ import com.kry.brickgame.Board.Cells;
  * Фабричный класс для игр.
  * </p>
  */
-public class Game implements ActionListener {
+public class Game implements Runnable {
 
+	/*---MAGIC NUMBERS---*/
 	/**
 	 * Количество линий основного поля (доски), которые не должны выводиться на
 	 * экран ({@value} ). Используется для плавного появления фигур.
@@ -36,8 +33,15 @@ public class Game implements ActionListener {
 	 * Высота поля предпросмотра ({@value} ).
 	 */
 	public final static int PREVIEW_HEIGHT = 4;
+	/**
+	 * Задержка анимации, миллисекунды
+	 */
+	private final static int ANIMATION_DELAY = 50;
+	/*---MAGIC NUMBERS---*/
 
-	protected Timer timer;
+	protected TimerGame timer;
+
+	private int speed = 0;
 
 	/**
 	 * Слушатели, подписанные на события игры.
@@ -105,7 +109,7 @@ public class Game implements ActionListener {
 	/**
 	 * Событие изменения состояния предпросмотра
 	 */
-	protected void firePreviewChanged(Board preview) {
+	protected synchronized void firePreviewChanged(Board preview) {
 		GameEvent event = new GameEvent(this, preview);
 		for (IGameListener listener : listeners) {
 			listener.previewChanged(event);
@@ -115,7 +119,7 @@ public class Game implements ActionListener {
 	/**
 	 * Событие изменения состояния игры
 	 */
-	protected void fireStatusChanged(Status status) {
+	protected synchronized void fireStatusChanged(Status status) {
 		GameEvent event = new GameEvent(this, status);
 		for (IGameListener listener : listeners) {
 			listener.statusChanged(event);
@@ -125,11 +129,34 @@ public class Game implements ActionListener {
 	/**
 	 * Событие изменения дополнительной информации (счет и т.п.)
 	 */
-	protected void fireInfoChanged(String info) {
+	protected synchronized void fireInfoChanged(String info) {
 		GameEvent event = new GameEvent(this, info);
 		for (IGameListener listener : listeners) {
 			listener.infoChanged(event);
 		}
+	}
+
+	/**
+	 * Speed
+	 * 
+	 * @param genuine
+	 *            return genuine speed (true) or speed level (false)
+	 * @return if genuine than return genuine speed in millisecond else return
+	 *         speed level 0-9
+	 */
+	protected int getSpeed(boolean genuine) {
+		if (genuine) {
+			return (ANIMATION_DELAY * 10) / (speed + 1);
+		}
+		return speed;
+	}
+
+	protected int getSpeed() {
+		return getSpeed(false);
+	}
+
+	protected void setSpeed(int speed) {
+		this.speed = speed;
 	}
 
 	protected Board getBoard() {
@@ -261,24 +288,55 @@ public class Game implements ActionListener {
 				|| checkBoardCollisionHorisontal(piece, x);
 	}
 
-	protected void animatedClearBoard() {
-		for (int y = BOARD_HEIGHT - 1; y >= 0; --y) {
-			for (int x = 0; x < BOARD_WIDTH; ++x) {
-				board.setCell(Cells.Full, x, y);
+	/**
+	 * Анимированная очистка доски
+	 * 
+	 * @param firstRun
+	 *            - первый запуск (да|нет)
+	 * @return если первый запуск - доска заполняется снизу вверх, иначе
+	 *         очищается сверху вниз
+	 */
+	protected void animatedClearBoard(boolean firstRun) {
+		if (firstRun) {
+			for (int y = 0; y < BOARD_HEIGHT; ++y) {
+				for (int x = 0; x < BOARD_WIDTH; ++x) {
+					board.setCell(Cells.Full, x, y);
+				}
+				try {
+					Thread.sleep(ANIMATION_DELAY);
+					fireBoardChanged(board);
+				} catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+				}
 			}
-			try {
-				Thread.sleep(100);
-				fireBoardChanged(board);
-			} catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
+		} else {
+			for (int y = BOARD_HEIGHT - 1; y >= 0; --y) {
+				for (int x = 0; x < BOARD_WIDTH; ++x) {
+					board.setCell(Cells.Empty, x, y);
+				}
+				try {
+					Thread.sleep(ANIMATION_DELAY);
+					fireBoardChanged(board);
+				} catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+				}
 			}
 		}
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
+	/**
+	 * Анимированная очистка доски в два прохода (снизу вверх и сверху вниз)
+	 * 
+	 */
+	protected void animatedClearBoard() {
+		animatedClearBoard(true);
+		animatedClearBoard(false);
+	}
 
+	protected void gameOver() {
+		setStatus(Status.GameOver);
+		animatedClearBoard();
+		Main.setGame(Main.gameSelector);
 	}
 
 	protected void keyPressed(KeyPressed key) {
@@ -289,6 +347,11 @@ public class Game implements ActionListener {
 	public void start() {
 		clearBoard();
 		clearPreview();
+	}
+
+	@Override
+	public void run() {
+		this.start();
 	}
 
 }

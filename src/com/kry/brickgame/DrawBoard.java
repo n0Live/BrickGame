@@ -28,7 +28,7 @@ public class DrawBoard extends Draw implements IGameListener {
 	}
 
 	@Override
-	public void boardChanged(GameEvent event) {
+	public void boardChanged(final GameEvent event) {
 		setBoard(event.getBoard());
 		repaint();
 	}

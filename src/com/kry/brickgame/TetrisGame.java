@@ -1,9 +1,7 @@
 package com.kry.brickgame;
 
-import java.awt.event.ActionEvent;
+import java.util.TimerTask;
 import java.util.logging.Logger;
-
-import javax.swing.Timer;
 
 import com.kry.brickgame.Board.Cells;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
@@ -39,7 +37,6 @@ public class TetrisGame extends Game {
 		super();
 
 		setStatus(Status.None);
-		timer = new Timer(400, this);
 
 		curPiece = new TetrisShape();
 		nextPiece = new TetrisShape();
@@ -49,18 +46,19 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * События по таймеру
+	 * Класс-наследник TimerTask, нужен для остановки и возобновления таймера
 	 */
-	public void actionPerformed(ActionEvent e) {
-		// если падение закончилось - создаем новую фигуру, иначе - падаем
-		// дальше
-		if (isFallingFinished) {
-			isFallingFinished = false;
-			newPiece();
-		} else {
-			oneLineDown();
-		}
-	}
+	public class GameTimerTask extends TimerTask {
+		@Override
+		public synchronized void run() {
+			if (isFallingFinished) {
+				isFallingFinished = false;
+				newPiece();
+			} else {
+				oneLineDown();
+			}
+		};
+	};
 
 	/**
 	 * Запуск игры
@@ -78,7 +76,9 @@ public class TetrisGame extends Game {
 		// Создаем "следующую" фигуру
 		nextPiece.setRandomShapeAndRotate();
 		newPiece();
-		timer.start();
+
+		timer = new TimerGame(getSpeed(true));
+		timer.start(new GameTimerTask());
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class TetrisGame extends Game {
 			timer.stop();
 			setStatus(Status.Paused);
 		} else if (getStatus() == Status.Paused) {
-			timer.start();
+			timer.start(new GameTimerTask());
 			setStatus(Status.Running);
 		}
 	}
@@ -147,8 +147,9 @@ public class TetrisGame extends Game {
 		// Попытка поместить фигуру на доску
 		if (!tryMove(nextPiece, curX, curY)) {
 			timer.stop();
-			setStatus(Status.GameOver);
-			animatedClearBoard();
+			gameOver();
+			//setStatus(Status.GameOver); TODO
+			//animatedClearBoard();
 		} else { // если попытка удалась
 			// готовим следующую фигуру и помещаем ее в предпросмотр
 			nextPiece.setRandomShapeAndRotate();

@@ -60,7 +60,7 @@ public class Draw extends JPanel implements IGameListener {
 	}
 
 	private void drawSquare(Graphics g, int x, int y, Cells fill) {
-		Color colors[] = { new Color(220, 220, 220), new Color(40, 40, 40) };
+		Color colors[] = { new Color(220, 220, 220, 30), new Color(40, 40, 40, 255) };
 
 		Color color = colors[fill.ordinal()];
 

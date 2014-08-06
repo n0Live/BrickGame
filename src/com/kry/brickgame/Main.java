@@ -7,12 +7,16 @@ import java.awt.EventQueue;
  * @author noLive
  *
  */
-public final class Main {
+public final class Main{
 
 	/**
 	 * Текущая игра 
 	 */
 	private static Game game;
+	/**
+	 * Текущий поток игры 
+	 */
+	private static Thread gameThread;
 	/**
 	 * Диалог выбора игры
 	 */
@@ -22,16 +26,14 @@ public final class Main {
 	 */
 	public static GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
 
-	public Main() {
-		Main.game = Main.gameSelector;
-	}
-
 	public static Game getGame() {
 		return game;
 	}
 
 	public static void setGame(Game game) {
 		Main.game = game;
+		gameThread = new Thread(game, "TGameThread");
+		gameThread.start();
 	}
 
 	/**

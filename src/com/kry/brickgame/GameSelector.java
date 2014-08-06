@@ -82,7 +82,7 @@ public class GameSelector extends Game {
 	 * Следующая допустимая буква
 	 */
 	private void nextLetter() {
-		if (letter.toCharArray()[0] < 'H') {
+		if (letter.toCharArray()[0] < 'X') {
 			letter = String.valueOf((char) (letter.toCharArray()[0] + 1));
 		} else {
 			letter = "A";
@@ -96,7 +96,7 @@ public class GameSelector extends Game {
 		if (letter.toCharArray()[0] > 'A') {
 			letter = String.valueOf((char) (letter.toCharArray()[0] - 1));
 		} else {
-			letter = "H";
+			letter = "X";
 		}
 	}
 
@@ -124,11 +124,9 @@ public class GameSelector extends Game {
 		switch (letter) {
 		case "A":
 			Main.setGame(new TetrisGame());
-			Main.getGame().start();
 			break;
 		default:
 			Main.setGame(new TetrisGame());
-			Main.getGame().start();
 			break;
 		}
 	}

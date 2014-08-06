@@ -6,7 +6,7 @@ public class BoardLetters extends Board {
 	 * Фигуры - буквы
 	 */
 	enum Letters {
-		None, A, B, C, D, E, F, G, H
+		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X
 	};
 
 	private final static int width = 5;
@@ -34,33 +34,33 @@ public class BoardLetters extends Board {
 					{ Empty, Empty, Empty, Empty, Empty },
 					{ Empty, Empty, Empty, Empty, Empty } },
 			{
-					{ Empty, Empty, Full, Empty, Empty },// A
-					{ Empty, Full, Empty, Full, Empty },
+					{ Empty, Full, Full, Full, Empty },// A
 					{ Full, Empty, Empty, Empty, Full },
 					{ Full, Full, Full, Full, Full },
+					{ Full, Empty, Empty, Empty, Full },
 					{ Full, Empty, Empty, Empty, Full } },
 			{
 					{ Full, Full, Full, Full, Empty },// B
 					{ Full, Empty, Empty, Empty, Full },
-					{ Full, Full, Full, Full, Full },
+					{ Full, Full, Full, Full, Empty },
 					{ Full, Empty, Empty, Empty, Full },
 					{ Full, Full, Full, Full, Empty } },
 			{
-					{ Empty, Full, Full, Full, Empty },// C
-					{ Full, Empty, Empty, Empty, Full },
+					{ Empty, Full, Full, Full, Full },// C
 					{ Full, Empty, Empty, Empty, Empty },
-					{ Full, Empty, Empty, Empty, Full },
-					{ Empty, Full, Full, Full, Empty } },
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Empty, Full, Full, Full, Full } },
 			{
 					{ Full, Full, Full, Full, Empty },// D
-					{ Full, Empty, Empty, Empty, Full },
-					{ Full, Empty, Empty, Empty, Full },
-					{ Full, Empty, Empty, Empty, Full },
+					{ Empty, Full, Empty, Empty, Full },
+					{ Empty, Full, Empty, Empty, Full },
+					{ Empty, Full, Empty, Empty, Full },
 					{ Full, Full, Full, Full, Empty } },
 			{
 					{ Full, Full, Full, Full, Full },// E
 					{ Full, Empty, Empty, Empty, Empty },
-					{ Full, Full, Full, Full, Full },
+					{ Full, Full, Full, Full, Empty },
 					{ Full, Empty, Empty, Empty, Empty },
 					{ Full, Full, Full, Full, Full } },
 			{
@@ -70,16 +70,112 @@ public class BoardLetters extends Board {
 					{ Full, Empty, Empty, Empty, Empty },
 					{ Full, Empty, Empty, Empty, Empty } },
 			{
-					{ Empty, Full, Full, Full, Empty },// G
+					{ Empty, Full, Full, Full, Full },// G
 					{ Full, Empty, Empty, Empty, Empty },
-					{ Full, Empty, Full, Full, Empty },
+					{ Full, Empty, Empty, Full, Full },
 					{ Full, Empty, Empty, Empty, Full },
-					{ Empty, Full, Full, Full, Empty } },
+					{ Empty, Full, Full, Full, Full } },
 			{
 					{ Full, Empty, Empty, Empty, Full },// H
 					{ Full, Empty, Empty, Empty, Full },
 					{ Full, Full, Full, Full, Full },
 					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Empty, Full, Full, Full, Empty },// I
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Full, Full, Full, Empty } },
+			{
+					{ Full, Full, Full, Full, Full },// J
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Full, Empty, Full, Empty, Empty },
+					{ Empty, Full, Empty, Empty, Empty } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// K
+					{ Full, Empty, Empty, Full, Empty },
+					{ Full, Full, Full, Empty, Empty },
+					{ Full, Empty, Empty, Full, Empty },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Full, Empty, Empty, Empty, Empty },// L
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Full, Full, Full, Full, Full } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// M
+					{ Full, Full, Empty, Full, Full },
+					{ Full, Empty, Full, Empty, Full },
+					{ Full, Empty, Full, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// N
+					{ Full, Full, Empty, Empty, Full },
+					{ Full, Empty, Full, Empty, Full },
+					{ Full, Empty, Empty, Full, Full },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Empty, Full, Full, Full, Empty },// O
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Empty, Full, Full, Full, Empty } },
+			{
+					{ Full, Full, Full, Full, Empty },// P
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Full, Full, Full, Empty },
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Full, Empty, Empty, Empty, Empty } },
+			{
+					{ Empty, Full, Full, Full, Empty },// Q
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Full, Full },
+					{ Empty, Full, Full, Full, Empty } },
+			{
+					{ Full, Full, Full, Full, Empty },// R
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Full, Full, Full, Empty },
+					{ Full, Empty, Empty, Full, Empty },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Empty, Full, Full, Full, Full },// S
+					{ Full, Empty, Empty, Empty, Empty },
+					{ Empty, Full, Full, Full, Empty },
+					{ Empty, Empty, Empty, Empty, Full },
+					{ Full, Full, Full, Full, Empty } },
+			{
+					{ Full, Full, Full, Full, Full },// T
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Empty, Full, Empty, Empty } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// U
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Empty, Full, Full, Full, Empty } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// V
+					{ Full, Empty, Empty, Empty, Full },
+					{ Full, Empty, Empty, Empty, Full },
+					{ Empty, Full, Empty, Full, Empty },
+					{ Empty, Empty, Full, Empty, Empty } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// W
+					{ Full, Empty, Full, Empty, Full },
+					{ Full, Empty, Full, Empty, Full },
+					{ Full, Full, Empty, Full, Full },
+					{ Full, Empty, Empty, Empty, Full } },
+			{
+					{ Full, Empty, Empty, Empty, Full },// X
+					{ Empty, Full, Empty, Full, Empty },
+					{ Empty, Empty, Full, Empty, Empty },
+					{ Empty, Full, Empty, Full, Empty },
 					{ Full, Empty, Empty, Empty, Full } } };
 
 	protected void setLetter(Letters letter) {
@@ -111,7 +207,7 @@ public class BoardLetters extends Board {
 		result = Letters.None;
 
 		try {
-			result = Letters.valueOf(str);
+			result = Letters.valueOf(str.toUpperCase());
 		} catch (IllegalArgumentException e) {
 			result = Letters.None;
 		}
