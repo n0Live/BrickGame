@@ -1,6 +1,7 @@
 package com.kry.brickgame;
 
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import com.kry.brickgame.Board.Cells;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
@@ -10,7 +11,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
-	private boolean isFallingFinished = false;
+	private volatile boolean isFallingFinished = false;
 	/**
 	 * Counter of the number of removed lines
 	 */
@@ -119,23 +120,24 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
-		Cells fill = (curPiece.getShape() == Tetrominoes.NoShape) ? Cells.Empty
-				: Cells.Full;
+		timer.stop();
 
 		// add the figure to the board
-		setBoard(drawPiece(getBoard(), curX, curY, curPiece, fill));
+		if (curPiece.getShape() != Tetrominoes.NoShape)
+			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Full));
 
 		removeFullLines();
 
 		if (!isFallingFinished)
 			newPiece();
+
+		timer.start(new GameTimerTask());
 	}
 
 	/**
 	 * Creation of a new figure
 	 */
 	private void newPiece() {
-
 		curPiece.setShape(Tetrominoes.NoShape);
 
 		// X-coordinate - middle of the board
@@ -243,9 +245,7 @@ public class TetrisGame extends Game {
 	 * Removal of a filled lines
 	 */
 	private void removeFullLines() {
-		Board board = getBoard().clone();
-
-		setStatus(Status.DoSomeWork);
+		Board board = getBoard();
 
 		isFallingFinished = true;
 
@@ -265,21 +265,7 @@ public class TetrisGame extends Game {
 				++numFullLines;
 
 				// animated clearing of a full line
-				int x1 = curX - 1; // left direction
-				int x2 = curX; // right direction
-				while ((x1 >= 0) || (x2 < BOARD_WIDTH)) {
-					if (x1 >= 0)
-						board.setCell(Cells.Empty, x1--, y);
-					if (x2 < BOARD_WIDTH)
-						board.setCell(Cells.Empty, x2++, y);
-					try {
-						Thread.sleep(ANIMATION_DELAY);
-						setBoard(board);
-					} catch (InterruptedException ex) {
-						ex.printStackTrace();
-						Thread.currentThread().interrupt();
-					}
-				}
+				animatedClearLine(y, curX);
 
 				// drop the lines down on the filled line
 				for (int k = y; k < BOARD_HEIGHT - 1; ++k) {
@@ -291,22 +277,54 @@ public class TetrisGame extends Game {
 			}
 		}
 
-		setBoard(board);
+		// setBoard(board);
 
 		if (numFullLines > 0) {
 			numLinesRemoved += numFullLines;
 		}
 		curPiece.setShape(Tetrominoes.NoShape);
 		fireInfoChanged(String.valueOf(numLinesRemoved));
-
-		setStatus(Status.Running);
 	}
 
+	/**
+	 * Animated clearing of a full line
+	 * 
+	 * @param line
+	 *            number of the line to be removed (y-coordinate)
+	 * @param startPoint
+	 *            point, on both sides of which cells will be removed
+	 *            (x-coordinate)
+	 */
+	private void animatedClearLine(int line, int startPoint) {
+		Board board = getBoard();
+
+		int x1 = startPoint - 1; // left direction
+		int x2 = startPoint; // right direction
+
+		while ((x1 >= 0) || (x2 < BOARD_WIDTH)) {
+			if (x1 >= 0)
+				board.setCell(Cells.Empty, x1--, line);
+			if (x2 < BOARD_WIDTH)
+				board.setCell(Cells.Empty, x2++, line);
+			try {
+				Logger.getAnonymousLogger().info(
+						Thread.currentThread().getName());// TODO
+				Thread.sleep(ANIMATION_DELAY);
+				setBoard(board);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
+	@Override
 	public void keyPressed(KeyPressed key) {
+		super.keyPressed(key);
 		if (getStatus() == Status.None)
 			return;
 
-		if (key == KeyPressed.KeyStart) {
+		if (keys.contains(KeyPressed.KeyStart)) {
 			if (getStatus() == Status.GameOver) {
 				start();
 			} else {
@@ -317,30 +335,20 @@ public class TetrisGame extends Game {
 
 		if (getStatus() != Status.Running)
 			return;
-
 		if (!isFallingFinished) {
-			switch (key) {
-			case KeyLeft:
+			if (keys.contains(KeyPressed.KeyLeft))
 				tryMove(curPiece, curX - 1, curY);
-				break;
-			case KeyRight:
+			if (keys.contains(KeyPressed.KeyRight))
 				tryMove(curPiece, curX + 1, curY);
-				break;
-			case KeyRotate:
+			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = new TetrisShape(curPiece)
 						.rotateRight();
 				tryMove(rotatedPiece, curX, curY);
-				break;
-			case KeyDown:
-				oneLineDown();
-				break;
-			case KeyMode:
-				dropDown();
-				break;
-			default:
-				break;
 			}
+			if (keys.contains(KeyPressed.KeyDown))
+				oneLineDown();
+			if (keys.contains(KeyPressed.KeyReset))
+				dropDown();
 		}
 	}
-
 }

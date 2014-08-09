@@ -34,10 +34,45 @@ public class GameKeyAdapter extends KeyAdapter {
 			Main.getGame().keyPressed(KeyPressed.KeyStart);
 			break;
 		case 'm':
-			Main.getGame().keyPressed(KeyPressed.KeyMode);
+			Main.getGame().keyPressed(KeyPressed.KeyReset);
 			break;
 		case 'M':
-			Main.getGame().keyPressed(KeyPressed.KeyMode);
+			Main.getGame().keyPressed(KeyPressed.KeyReset);
+			break;
+		}
+	}
+
+	public void keyReleased(KeyEvent e) {
+
+		int keycode = e.getKeyCode();
+
+		switch (keycode) {
+		case KeyEvent.VK_LEFT:
+			Main.getGame().keyReleased(KeyPressed.KeyLeft);
+			break;
+		case KeyEvent.VK_RIGHT:
+			Main.getGame().keyReleased(KeyPressed.KeyRight);
+			break;
+		case KeyEvent.VK_DOWN:
+			Main.getGame().keyReleased(KeyPressed.KeyDown);
+			break;
+		case KeyEvent.VK_UP:
+			Main.getGame().keyReleased(KeyPressed.KeyUp);
+			break;
+		case KeyEvent.VK_SPACE:
+			Main.getGame().keyReleased(KeyPressed.KeyRotate);
+			break;
+		case 'p':
+			Main.getGame().keyReleased(KeyPressed.KeyStart);
+			break;
+		case 'P':
+			Main.getGame().keyReleased(KeyPressed.KeyStart);
+			break;
+		case 'm':
+			Main.getGame().keyReleased(KeyPressed.KeyReset);
+			break;
+		case 'M':
+			Main.getGame().keyReleased(KeyPressed.KeyReset);
 			break;
 		}
 	}

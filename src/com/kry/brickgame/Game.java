@@ -1,6 +1,8 @@
 package com.kry.brickgame;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.kry.brickgame.Board.Cells;
 
@@ -59,8 +61,10 @@ public class Game implements Runnable {
 	private Board preview;
 
 	static enum KeyPressed {
-		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyMode, KeyMute
+		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
+
+	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
 	public Game() {
 		board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
@@ -86,21 +90,21 @@ public class Game implements Runnable {
 		}
 	}
 
-	protected synchronized void firePreviewChanged(Board preview) {
+	protected void firePreviewChanged(Board preview) {
 		GameEvent event = new GameEvent(this, preview);
 		for (IGameListener listener : listeners) {
 			listener.previewChanged(event);
 		}
 	}
 
-	protected synchronized void fireStatusChanged(Status status) {
+	protected void fireStatusChanged(Status status) {
 		GameEvent event = new GameEvent(this, status);
 		for (IGameListener listener : listeners) {
 			listener.statusChanged(event);
 		}
 	}
 
-	protected synchronized void fireInfoChanged(String info) {
+	protected void fireInfoChanged(String info) {
 		GameEvent event = new GameEvent(this, info);
 		for (IGameListener listener : listeners) {
 			listener.infoChanged(event);
@@ -276,8 +280,8 @@ public class Game implements Runnable {
 				try {
 					Thread.sleep(ANIMATION_DELAY);
 					fireBoardChanged(board);
-				} catch (InterruptedException ex) {
-					ex.printStackTrace();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -289,7 +293,8 @@ public class Game implements Runnable {
 				try {
 					Thread.sleep(ANIMATION_DELAY);
 					fireBoardChanged(board);
-				} catch (InterruptedException ex) {
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
@@ -312,8 +317,11 @@ public class Game implements Runnable {
 	}
 
 	protected void keyPressed(KeyPressed key) {
-		// TODO Auto-generated method stub
+		keys.add(key);
+	}
 
+	protected void keyReleased(KeyPressed key) {
+		keys.remove(key);
 	}
 
 	public void start() {
