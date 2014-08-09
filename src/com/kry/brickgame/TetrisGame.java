@@ -245,6 +245,8 @@ public class TetrisGame extends Game {
 	private void removeFullLines() {
 		Board board = getBoard().clone();
 
+		setStatus(Status.DoSomeWork);
+
 		isFallingFinished = true;
 
 		int numFullLines = 0;
@@ -261,6 +263,24 @@ public class TetrisGame extends Game {
 			}
 			if (lineIsFull) {
 				++numFullLines;
+
+				// animated clearing of a full line
+				int x1 = curX - 1; // left direction
+				int x2 = curX; // right direction
+				while ((x1 >= 0) || (x2 < BOARD_WIDTH)) {
+					if (x1 >= 0)
+						board.setCell(Cells.Empty, x1--, y);
+					if (x2 < BOARD_WIDTH)
+						board.setCell(Cells.Empty, x2++, y);
+					try {
+						Thread.sleep(ANIMATION_DELAY);
+						setBoard(board);
+					} catch (InterruptedException ex) {
+						ex.printStackTrace();
+						Thread.currentThread().interrupt();
+					}
+				}
+
 				// drop the lines down on the filled line
 				for (int k = y; k < BOARD_HEIGHT - 1; ++k) {
 					for (int x = 0; x < BOARD_WIDTH; ++x)
@@ -278,6 +298,8 @@ public class TetrisGame extends Game {
 		}
 		curPiece.setShape(Tetrominoes.NoShape);
 		fireInfoChanged(String.valueOf(numLinesRemoved));
+
+		setStatus(Status.Running);
 	}
 
 	public void keyPressed(KeyPressed key) {

@@ -31,7 +31,7 @@ public class Game implements Runnable {
 	/**
 	 * Animation delay in milliseconds
 	 */
-	private final static int ANIMATION_DELAY = 50;
+	protected final static int ANIMATION_DELAY = 50;
 	/*---MAGIC NUMBERS---*/
 
 	protected TimerGame timer;
@@ -41,7 +41,7 @@ public class Game implements Runnable {
 	private static ArrayList<IGameListener> listeners = new ArrayList<IGameListener>();
 
 	static enum Status {
-		None, Running, Paused, GameOver
+		None, Running, Paused, GameOver, DoSomeWork
 	};
 
 	private Status status;
@@ -277,6 +277,7 @@ public class Game implements Runnable {
 					Thread.sleep(ANIMATION_DELAY);
 					fireBoardChanged(board);
 				} catch (InterruptedException ex) {
+					ex.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
