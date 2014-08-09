@@ -4,37 +4,32 @@ import java.util.ArrayList;
 
 import com.kry.brickgame.Board.Cells;
 
-/**
- * <p>
- * Фабричный класс для игр.
- * </p>
- */
 public class Game implements Runnable {
 
 	/*---MAGIC NUMBERS---*/
 	/**
-	 * Количество линий основного поля (доски), которые не должны выводиться на
-	 * экран ({@value} ). Используется для плавного появления фигур.
+	 * The number of lines of the base field (the board), that should not be
+	 * displayed ({@value} ). Used for smooth the appearance of a figures.
 	 */
 	public final static int UNSHOWED_LINES = 4;
 	/**
-	 * Ширина основного поля (доски) ({@value} ).
+	 * Width of the board ({@value} ).
 	 */
 	public final static int BOARD_WIDTH = 10;
 	/**
-	 * Высота основного поля (доски) ({@value} ).
+	 * Height of the board ({@value} ).
 	 */
 	public final static int BOARD_HEIGHT = 20 + UNSHOWED_LINES;
 	/**
-	 * Ширина поля предпросмотра ({@value} ).
+	 * Width of the preview board ({@value} ).
 	 */
 	public final static int PREVIEW_WIDTH = 4;
 	/**
-	 * Высота поля предпросмотра ({@value} ).
+	 * Height of the preview board ({@value} ).
 	 */
 	public final static int PREVIEW_HEIGHT = 4;
 	/**
-	 * Задержка анимации, миллисекунды
+	 * Animation delay in milliseconds
 	 */
 	private final static int ANIMATION_DELAY = 50;
 	/*---MAGIC NUMBERS---*/
@@ -43,18 +38,12 @@ public class Game implements Runnable {
 
 	private int speed = 0;
 
-	/**
-	 * Слушатели, подписанные на события игры.
-	 */
 	private static ArrayList<IGameListener> listeners = new ArrayList<IGameListener>();
 
 	static enum Status {
 		None, Running, Paused, GameOver
 	};
 
-	/**
-	 * Состояние игры
-	 */
 	private Status status;
 
 	protected Status getStatus() {
@@ -66,13 +55,7 @@ public class Game implements Runnable {
 		fireStatusChanged(status);
 	}
 
-	/**
-	 * Основная доска
-	 */
 	private Board board;
-	/**
-	 * Предпросмотр фигур
-	 */
 	private Board preview;
 
 	static enum KeyPressed {
@@ -96,9 +79,6 @@ public class Game implements Runnable {
 		listeners.remove(listener);
 	}
 
-	/**
-	 * Событие изменения состояния доски
-	 */
 	protected void fireBoardChanged(Board board) {
 		GameEvent event = new GameEvent(this, board);
 		for (IGameListener listener : listeners) {
@@ -106,9 +86,6 @@ public class Game implements Runnable {
 		}
 	}
 
-	/**
-	 * Событие изменения состояния предпросмотра
-	 */
 	protected synchronized void firePreviewChanged(Board preview) {
 		GameEvent event = new GameEvent(this, preview);
 		for (IGameListener listener : listeners) {
@@ -116,9 +93,6 @@ public class Game implements Runnable {
 		}
 	}
 
-	/**
-	 * Событие изменения состояния игры
-	 */
 	protected synchronized void fireStatusChanged(Status status) {
 		GameEvent event = new GameEvent(this, status);
 		for (IGameListener listener : listeners) {
@@ -126,9 +100,6 @@ public class Game implements Runnable {
 		}
 	}
 
-	/**
-	 * Событие изменения дополнительной информации (счет и т.п.)
-	 */
 	protected synchronized void fireInfoChanged(String info) {
 		GameEvent event = new GameEvent(this, info);
 		for (IGameListener listener : listeners) {
@@ -178,7 +149,8 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Очистка доски
+	 * Clears the cells of the board and raises the {@code fireBoardChanged}
+	 * event
 	 */
 	protected void clearBoard() {
 		board.clearBoard();
@@ -186,7 +158,8 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Очистка предпросмотра
+	 * Clears the cells of the preview and raises the {@code firePreviewChanged}
+	 * event
 	 */
 	protected void clearPreview() {
 		preview.clearBoard();
@@ -194,18 +167,17 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Проверка на пересечение (столкновение) новой фигуры с заполненными
-	 * клетками на доске
+	 * Collision check of a new figure with a filled cells on a board
 	 * 
 	 * @param board
-	 *            - доска
+	 *            - a board
 	 * @param piece
-	 *            - новая фигура
+	 *            - a new figure
 	 * @param x
-	 *            - координата "x" фигуры
+	 *            - x-coordinate figures
 	 * @param y
-	 *            - координата "y" фигуры
-	 * @return true - если есть пересечение, false - если пересечения нет
+	 *            - y-coordinate figures
+	 * @return true if there is a collision
 	 * 
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollisionVertical
@@ -226,14 +198,13 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Проверка на пересечение (столкновение) новой фигуры с вертикальными
-	 * (верхней и нижней) границами доски
+	 * Collision check of a new figure with the vertical boundaries of the board
 	 * 
 	 * @param piece
-	 *            - новая фигура
+	 *            - a new figure
 	 * @param y
-	 *            - координата "y" фигуры
-	 * @return true - если есть пересечение, false - если пересечения нет
+	 *            - y-coordinate figures
+	 * @return true if there is a collision
 	 * 
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollision
@@ -246,38 +217,38 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Проверка на пересечение (столкновение) новой фигуры с горизонтальными
-	 * (левой и правой) границами доски
+	 * Collision check of a new figure with the horizontal boundaries of the
+	 * board
 	 * 
 	 * @param piece
-	 *            - новая фигура
+	 *            - a new figure
 	 * @param x
-	 *            - координата "x" фигуры
-	 * @return true - если есть пересечение, false - если пересечения нет
+	 *            - x-coordinate figures
+	 * @return true if there is a collision
 	 * 
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected boolean checkBoardCollisionHorisontal(Shape piece, int x) {
+	protected boolean checkBoardCollisionHorizontal(Shape piece, int x) {
 		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= BOARD_WIDTH)
 			return true;
 		return false;
 	}
 
 	/**
-	 * Проверка на пересечение (столкновение) новой фигуры с
-	 * {@link Game#checkBoardCollisionVertical вертикальными} и
-	 * {@link Game#checkBoardCollisionHorisontal горизонтальными} границами
-	 * доски
+	 * Collision check of a new figure with the
+	 * {@link Game#checkBoardCollisionVertical vertical} and the
+	 * {@link Game#checkBoardCollisionHorizontal horizontal} boundaries of the
+	 * board
 	 * 
 	 * @param piece
-	 *            - новая фигура
+	 *            - a new figure
 	 * @param x
-	 *            - координата "x" фигуры
+	 *            - x-coordinate figures
 	 * @param y
-	 *            - координата "y" фигуры
-	 * @return true - если есть пересечение, false - если пересечения нет
+	 *            - y-coordinate figures
+	 * @return true if there is a collision
 	 * 
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollisionHorisontal
@@ -285,16 +256,16 @@ public class Game implements Runnable {
 	 */
 	protected boolean checkBoardCollision(Shape piece, int x, int y) {
 		return checkBoardCollisionVertical(piece, y)
-				|| checkBoardCollisionHorisontal(piece, x);
+				|| checkBoardCollisionHorizontal(piece, x);
 	}
 
 	/**
-	 * Анимированная очистка доски
+	 * Animated clearing of the board
 	 * 
 	 * @param firstRun
-	 *            - первый запуск (да|нет)
-	 * @return если первый запуск - доска заполняется снизу вверх, иначе
-	 *         очищается сверху вниз
+	 *            - is the first run
+	 * @return if is the first run then the board is filled upwards, otherwise
+	 *         is cleaned downwards
 	 */
 	protected void animatedClearBoard(boolean firstRun) {
 		if (firstRun) {
@@ -325,7 +296,7 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Анимированная очистка доски в два прохода (снизу вверх и сверху вниз)
+	 * Animated clearing of the board in several passes (upwards then downwards)
 	 * 
 	 */
 	protected void animatedClearBoard() {

@@ -3,26 +3,28 @@ package com.kry.brickgame;
 import java.awt.EventQueue;
 
 /**
- * Основной класс для запуска
+ * The main class to launching
+ * 
  * @author noLive
- *
+ * @since 01.08.2014
+ * 
  */
-public final class Main{
+public final class Main {
 
 	/**
-	 * Текущая игра 
+	 * The current game
 	 */
 	private static Game game;
 	/**
-	 * Текущий поток игры 
+	 * The current thread of the game
 	 */
 	private static Thread gameThread;
 	/**
-	 * Диалог выбора игры
+	 * The selection screen of a game
 	 */
 	public static GameSelector gameSelector = new GameSelector();
 	/**
-	 * Подписчик на события нажатия кнопок
+	 * Subscriber to {@code KeyEvent}
 	 */
 	public static GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
 
@@ -37,7 +39,7 @@ public final class Main{
 	}
 
 	/**
-	 * Launch the application.
+	 * Launch the application
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {

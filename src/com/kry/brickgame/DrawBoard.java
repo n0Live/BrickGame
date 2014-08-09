@@ -5,10 +5,6 @@ import java.awt.Graphics;
 import javax.swing.JLabel;
 
 public class DrawBoard extends Draw implements IGameListener {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private JLabel statusbar;

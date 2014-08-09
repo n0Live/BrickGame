@@ -6,4 +6,5 @@ public interface IGameListener {
     public void previewChanged(GameEvent event);
     public void statusChanged(GameEvent event);
     public void infoChanged(GameEvent event);
+    
 }

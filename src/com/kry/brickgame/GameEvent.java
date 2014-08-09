@@ -12,11 +12,16 @@ public class GameEvent extends EventObject {
 	private String info;
 
 	/**
-	 * События игры
-	 * @param source - источник события
-	 * @param board - состояние доски
-	 * @param status - статус игры
-	 * @param info - доп. информация (счет и т.п.)
+	 * Events of a game
+	 * 
+	 * @param source
+	 *            source of the event
+	 * @param board
+	 *            state of a board
+	 * @param status
+	 *            a game state
+	 * @param info
+	 *            an additional info (score etc.)
 	 */
 	public GameEvent(Object source, Board board, Status status, String info) {
 		super(source);

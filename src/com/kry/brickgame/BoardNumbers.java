@@ -2,9 +2,6 @@ package com.kry.brickgame;
 
 public class BoardNumbers extends Board {
 
-	/**
-	 * Фигуры - цифры
-	 */
 	enum Numbers {
 		None, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9
 	};
@@ -12,19 +9,15 @@ public class BoardNumbers extends Board {
 	private final static int width = 3;
 	private final static int height = 5;
 
-	/**
-	 * Цифра
-	 */
 	private Numbers number;
 
 	/**
-	 * Доска, с нарисованной цифрой
+	 * Board with a drawn number
 	 */
 	private Cells[][] board = new Cells[width][height];
 
 	/**
-	 * Таблица рисунков цифр на доске:
-	 * [индекс_цифры][координата_y][координата_x]
+	 * Table numbers to draw them on the board 5x5: [index][y][x]
 	 */
 	private final static Cells[][][] numbersTable = new Cells[][][] {
 			{ { Empty, Empty, Empty },// None
@@ -84,11 +77,9 @@ public class BoardNumbers extends Board {
 					{ Full, Full, Full } } };
 
 	protected void setNumber(Numbers number) {
-		// Рисуем на доске цифру из #numbersTable
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				// [height - y - 1] - рисуем вверх ногами (доска заполняется
-				// снизу вверх)
+				// [height - y - 1] - draw upside down
 				board[x][y] = numbersTable[number.ordinal()][height - y - 1][x];
 			}
 		}
@@ -101,15 +92,13 @@ public class BoardNumbers extends Board {
 	}
 
 	/**
-	 * Преобразование строки в объект Numbers
+	 * Convert a string to a Numbers object
 	 * 
 	 * @param str
-	 *            - число в виде строки от "0" до "9"
+	 *            - string like "0" .. "9"
 	 */
 	protected Numbers stringToNumbers(String str) {
-		Numbers result;
-
-		result = Numbers.None;
+		Numbers result = Numbers.None;
 
 		try {
 			result = Numbers.valueOf("n" + str);
@@ -121,10 +110,10 @@ public class BoardNumbers extends Board {
 	}
 
 	/**
-	 * Преобразование числа в объект Numbers
+	 * Convert an integer to a Numbers object
 	 * 
 	 * @param i
-	 *            - целое число от 0 до 9
+	 *            - integer from 0 to 9
 	 */
 	protected Numbers intToNumbers(int i) {
 		return stringToNumbers(String.valueOf(i));

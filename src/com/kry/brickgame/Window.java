@@ -29,7 +29,6 @@ public class Window extends JFrame {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 338, 456);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// TODO обработка onclose
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 

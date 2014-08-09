@@ -5,25 +5,22 @@ import java.util.Random;
 public class TetrisShape extends Shape implements Cloneable {
 
 	/**
-	 * Количество точек фигуры ({@value} )
+	 * Number of the points of the figures ({@value} )
 	 */
 	private final static int LENGTH = 4;
 
-	/**
-	 * Фигуры - тетрамино
-	 */
 	enum Tetrominoes {
 		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape
 	};
 
 	/**
-	 * Угол поворота фигуры (в градусах)
+	 * Rotation angle of a figure (in degrees)
 	 */
 	enum RotationAngle {
 		d0, d90, d180, d270;
 
 		/**
-		 * Следующий угол поворота против часовой стрелки
+		 * The next clockwise rotation angle
 		 */
 		public RotationAngle getLeft() {
 			return this.ordinal() > 0 ? RotationAngle.values()[this.ordinal() - 1]
@@ -31,7 +28,7 @@ public class TetrisShape extends Shape implements Cloneable {
 		}
 
 		/**
-		 * Следующий угол поворота по часовой стрелке
+		 * The next counterclockwise rotation angle
 		 */
 		public RotationAngle getRight() {
 			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle
@@ -39,18 +36,13 @@ public class TetrisShape extends Shape implements Cloneable {
 		}
 	};
 
-	/**
-	 * Форма фигуры
-	 */
 	private Tetrominoes shape;
-	/**
-	 * Угол поворота
-	 */
+
 	private RotationAngle rotationAngle;
 
 	/**
-	 * Таблица координат точек фигур:
-	 * [индекс_фигуры][индекс_точки][координата:0-x,1-y]
+	 * A set of coordinates of a points of a figures:
+	 * [shapeIndex][pointIndex][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] coordsTable = new int[][][] {
 			{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // NoShape
@@ -68,10 +60,10 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Копирующий конструктор
+	 * The copy constructor of a TetrisShape
 	 * 
 	 * @param aTetrisShape
-	 *            - объект для копирования
+	 *            a TetrisShape object for copying
 	 */
 	public TetrisShape(TetrisShape aTetrisShape) {
 		super(LENGTH);
@@ -85,12 +77,12 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Выбор фигуры
+	 * Selection of a figure
 	 * 
 	 * @param shape
-	 *            - фигура
+	 *            a figure
 	 * @param rotationAngle
-	 *            - угол поворота
+	 *            rotation angle of a figure
 	 */
 	public void setShape(Tetrominoes shape, RotationAngle rotationAngle) {
 		for (int i = 0; i < LENGTH; ++i) {
@@ -114,10 +106,9 @@ public class TetrisShape extends Shape implements Cloneable {
 			}
 		}
 
-		// Сдвигаем центр тяжести фигуры ближе к фактическому центру:
-		// сдвиг вправо и вверх
-
-		if ((minX() < -1) || (maxX() <= 0) && !(shape == Tetrominoes.LineShape)) {
+		// Center the figures, which were shifted to aside after rotation
+		if ((shape != Tetrominoes.LineShape) // except LineShape
+				&& ((minX() < -1) || (maxX() <= 0))) {
 			for (int i = 0; i < LENGTH; ++i) {
 				setX(i, x(i) + 1);
 			}
@@ -128,38 +119,15 @@ public class TetrisShape extends Shape implements Cloneable {
 			}
 		}
 
-		// while (minX() != 0) {
-		// if (minX() < 0) {
-		// for (int i = 0; i < LENGTH; ++i) {
-		// setX(i, x(i) + 1);
-		// }
-		// } else {
-		// for (int i = 0; i < LENGTH; ++i) {
-		// setX(i, x(i) - 1);
-		// }
-		// }
-		// }
-		// while (minY() != 0) {
-		// if (minY() < 0) {
-		// for (int i = 0; i < LENGTH; ++i) {
-		// setY(i, y(i) + 1);
-		// }
-		// } else {
-		// for (int i = 0; i < LENGTH; ++i) {
-		// setY(i, y(i) - 1);
-		// }
-		// }
-		// }
-
 		this.shape = shape;
 		this.rotationAngle = rotationAngle;
 	}
 
 	/**
-	 * Выбор фигуры (без поворота)
+	 * Selection of a figure (without rotation)
 	 * 
 	 * @param shape
-	 *            - фигура
+	 *            a figure
 	 */
 	public void setShape(Tetrominoes shape) {
 		setShape(shape, RotationAngle.d0);
@@ -170,7 +138,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Выбор случайной фигуры
+	 * Selection of a random figure
 	 */
 	public void setRandomShape() {
 		Random r = new Random();
@@ -180,7 +148,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Выбор случайного угла поворота
+	 * Selection of a random rotation angle
 	 */
 	public void setRandomRotate() {
 		Random r = new Random();
@@ -190,8 +158,11 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Выбор случайной {@link #setRandomShape фигуры} и случайного
-	 * {@link #setRandomRotate угла поворота}
+	 * Selection of a {@link #setRandomShape random figure} and a
+	 * {@link #setRandomRotate random rotation angle}
+	 * 
+	 * @see #setRandomShape
+	 * @see #setRandomRotate
 	 */
 	public void setRandomShapeAndRotate() {
 		setRandomShape();
@@ -199,7 +170,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Поворот против часовой стрелки
+	 * Counterclockwise rotation of the figure
 	 */
 	public TetrisShape rotateLeft() {
 		if (getShape() != Tetrominoes.SquareShape)
@@ -208,7 +179,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Поворот по часовой стрелке
+	 * Clockwise rotation of the figure
 	 */
 	public TetrisShape rotateRight() {
 		if (getShape() != Tetrominoes.SquareShape)
@@ -218,8 +189,10 @@ public class TetrisShape extends Shape implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "TetrisShape [" + this.getShape() + ", " + this.rotationAngle //фигура и угол поворота
-				+ ", (" + minX() + ";" + minY() + ")" + "]\n" //левый нижний угол
+		// the figure and its rotation angle
+		return "TetrisShape [" + this.getShape() + ", " + this.rotationAngle
+				// the lower left corner
+				+ ", (" + minX() + ";" + minY() + ")]\n"
 				+ super.toString();
 	}
 

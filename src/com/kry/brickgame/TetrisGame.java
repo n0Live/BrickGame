@@ -1,7 +1,6 @@
 package com.kry.brickgame;
 
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 import com.kry.brickgame.Board.Cells;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
@@ -9,29 +8,29 @@ import com.kry.brickgame.TetrisShape.Tetrominoes;
 public class TetrisGame extends Game {
 
 	/**
-	 * Падение фигуры закончилось?
+	 * Flag to check the completion of falling of a figure
 	 */
 	private boolean isFallingFinished = false;
 	/**
-	 * Счетчик удаленных линий
+	 * Counter of the number of removed lines
 	 */
 	private int numLinesRemoved = 0;
 	/**
-	 * Координата "x" размещения на доске текущей фигуры
-	 */
-	private int curX = 0;
-	/**
-	 * Координата "y" размещения на доске текущей фигуры
-	 */
-	private int curY = 0;
-	/**
-	 * Текущая фигура
+	 * The current figure
 	 */
 	private TetrisShape curPiece;
 	/**
-	 * Следующая фигура
+	 * The "next" figure
 	 */
 	private TetrisShape nextPiece;
+	/**
+	 * X-coordinate position on the board of the current figure
+	 */
+	private int curX = 0;
+	/**
+	 * Y-coordinate position on the board of the current figure
+	 */
+	private int curY = 0;
 
 	public TetrisGame() {
 		super();
@@ -46,7 +45,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Класс-наследник TimerTask, нужен для остановки и возобновления таймера
+	 * TimerTask derived class, contains the recurring task
 	 */
 	public class GameTimerTask extends TimerTask {
 		@Override
@@ -61,8 +60,9 @@ public class TetrisGame extends Game {
 	};
 
 	/**
-	 * Запуск игры
+	 * Launching the game
 	 */
+	@Override
 	public void start() {
 		super.start();
 
@@ -73,7 +73,7 @@ public class TetrisGame extends Game {
 		isFallingFinished = false;
 		numLinesRemoved = 0;
 
-		// Создаем "следующую" фигуру
+		// Create the "next" figure
 		nextPiece.setRandomShapeAndRotate();
 		newPiece();
 
@@ -82,7 +82,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Пауза/продолжение
+	 * Pause / Resume
 	 */
 	private void pause() {
 		if (getStatus() == Status.Running) {
@@ -95,7 +95,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Быстрое падение до низа доски или препятствия
+	 * Rapidly drops of the figure to the bottom of the board or a obstructions
 	 */
 	private void dropDown() {
 		int newY = curY;
@@ -108,7 +108,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Падение на одну линию вниз
+	 * Dropping on one line down
 	 */
 	private void oneLineDown() {
 		if (!tryMove(curPiece, curX, curY - 1))
@@ -116,13 +116,13 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Фигура упала вниз
+	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
 		Cells fill = (curPiece.getShape() == Tetrominoes.NoShape) ? Cells.Empty
 				: Cells.Full;
 
-		// дорисовываем упавшую фигуру к доске
+		// add the figure to the board
 		setBoard(drawPiece(getBoard(), curX, curY, curPiece, fill));
 
 		removeFullLines();
@@ -132,39 +132,37 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Создание новой фигуры
+	 * Creation of a new figure
 	 */
 	private void newPiece() {
 
 		curPiece.setShape(Tetrominoes.NoShape);
 
-		// Координата x - середина доски
+		// X-coordinate - middle of the board
 		curX = BOARD_WIDTH / 2 - 1;
-		// Координата y - верхний край, причем таким образом, чтобы нижний край
-		// фигуры находился у границы не показываемых строк #UNSHOWED_LINES
+		// Y-coordinate - top edge, and so that the bottom edge of the figure
+		// was at the border of #UNSHOWED_LINES
 		curY = BOARD_HEIGHT - (UNSHOWED_LINES - nextPiece.maxY());
 
-		// Попытка поместить фигуру на доску
 		if (!tryMove(nextPiece, curX, curY)) {
 			timer.stop();
 			gameOver();
-			//setStatus(Status.GameOver); TODO
-			//animatedClearBoard();
-		} else { // если попытка удалась
-			// готовим следующую фигуру и помещаем ее в предпросмотр
+		} else {
 			nextPiece.setRandomShapeAndRotate();
+
 			clearPreview();
-			Logger.getAnonymousLogger().info(nextPiece.toString()); // TODO
-																	// удалить
 			setPreview(drawPiece(getPreview(),//
-					// Координата "x":
-					(PREVIEW_WIDTH / 2) // середина ширины доски
-							// половина ширины фигуры
+					// X-coordinate:
+					// (middle of the board)-(half the width of the
+					// figure)-(offset of the leftmost x-coordinate from zero)
+					(PREVIEW_WIDTH / 2)
 							- ((nextPiece.maxX() - nextPiece.minX() + 1) / 2)
 							- (nextPiece.minX()),
-					// Координата "y" (помним, что y рисуется снизу вверх):
-					(PREVIEW_HEIGHT / 2 - 1)// середина высоты доски
-							// половина высоты фигуры
+					// Y-coordinate
+					// (remember that the figure is drawn from the bottom up):
+					// (middle of the board)+(half the height of the
+					// figure)+(offset of the lower y-coordinate from zero)
+					(PREVIEW_HEIGHT / 2 - 1)
 							+ ((nextPiece.maxY() - nextPiece.minY() + 1) / 2)
 							+ (nextPiece.minY()),//
 					nextPiece, Cells.Full));
@@ -172,21 +170,21 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Отрисовка фигуры на доске
+	 * Drawing of a figure on a board
 	 * 
 	 * @param board
-	 *            - доска (основная доска или предпросмотр или временная доска
-	 *            для проверки)
+	 *            a board for drawing
 	 * @param x
-	 *            - координата "x" для размещения фигуры на доске
+	 *            x-coordinate position on a board of a figure
 	 * @param y
-	 *            - координата "y" для размещения фигуры на доске
+	 *            y-coordinate position on a board of a figure
 	 * @param piece
-	 *            - фигура
+	 *            a figure
 	 * @param fill
-	 *            - заливка: Cells.Full - для рисования фигуры, Cells.Empty -
-	 *            для стирания
-	 * @return - возвращает доску с нарисованной (или стертой) фигурой
+	 *            {@code Cells.Full} - to draw a figure, {@code Cells.Empty} -
+	 *            to erase a figure
+	 * 
+	 * @return - the board with the figure
 	 */
 	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
 			Cells fill) {
@@ -199,44 +197,41 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Перемещение фигуры
+	 * Moving a figure
 	 * 
 	 * @param newPiece
-	 *            - фигура после перемещения (напр., для поворота фигуры)
+	 *            a figure after the movement (eg. to rotate the figure)
 	 * @param newX
-	 *            - координата "x" для размещения фигуры на доске после
-	 *            перемещения
+	 *            x-coordinate position on the board of a figure
 	 * @param newY
-	 *            - координата "y" для размещения фигуры на доске после
-	 *            перемещения
-	 * @return - возвращает true - если перемещение удалось и false - в
-	 *         противном случае
+	 *            y-coordinate position on the board of a figure
+	 * @return {@code true} if the movement succeeded otherwise {@code false}
 	 */
 	private boolean tryMove(TetrisShape newPiece, int newX, int newY) {
-		// Создаем временную доску, копию основной
+		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
 
-		// Стираем текущую фигуру с временной доски, чтобы не мешалась при
-		// проверках
+		// Erase the current figure from the temporary board to not interfere
+		// with the checks
 		board = drawPiece(board, curX, curY, curPiece, Cells.Empty);
 
-		// При пересечении с боковой границей доски, пытаемся сдвинуться в
-		// сторону
+		// If a collision from the new figure with the side boundary of the
+		// board then trying to move aside
 		int prepX = newX;
-		while (checkBoardCollisionHorisontal(newPiece, prepX)) {
+		while (checkBoardCollisionHorizontal(newPiece, prepX)) {
 			prepX = ((prepX + newPiece.minX()) < 0) ? prepX + 1 : prepX - 1;
 		}
-		// Проверки
+		// Checks
 		if (checkBoardCollisionVertical(newPiece, newY))
 			return false;
 		if (checkCollision(board, newPiece, prepX, newY))
 			return false;
 
-		// Стираем текущую фигуру с основной доски и рисуем новую
+		// Erase the current figure from the basic board and draw the new figure
 		setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Empty));
 		setBoard(drawPiece(getBoard(), prepX, newY, newPiece, Cells.Full));
 
-		// Заменяем текущую фигуру на новую
+		// The current figure is replaced by the new
 		curPiece = newPiece.clone();
 		curX = prepX;
 		curY = newY;
@@ -245,7 +240,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Удаление заполненных линий
+	 * Removal of a filled lines
 	 */
 	private void removeFullLines() {
 		Board board = getBoard().clone();
@@ -254,10 +249,10 @@ public class TetrisGame extends Game {
 
 		int numFullLines = 0;
 
-		// проходим по всем строкам
+		// going through on all lines
 		for (int y = 0; y < BOARD_HEIGHT - 1; ++y) {
 			boolean lineIsFull = true;
-			// проверка на наличие пустой ячейки в строке
+			// check for the existence an empty cell in the line
 			for (int x = 0; x < BOARD_WIDTH; ++x) {
 				if (board.getCell(x, y) == Cells.Empty) {
 					lineIsFull = false;
@@ -266,12 +261,12 @@ public class TetrisGame extends Game {
 			}
 			if (lineIsFull) {
 				++numFullLines;
-				// опускаем строки сверху на заполненную строку
+				// drop the lines down on the filled line
 				for (int k = y; k < BOARD_HEIGHT - 1; ++k) {
 					for (int x = 0; x < BOARD_WIDTH; ++x)
 						board.setCell(board.getCell(x, k + 1), x, k);
 				}
-				// возвращаемся на строку назад (т.к. заполненную мы удалили)
+				// return to one line back (because we removed the filled line)
 				--y;
 			}
 		}
@@ -285,9 +280,6 @@ public class TetrisGame extends Game {
 		fireInfoChanged(String.valueOf(numLinesRemoved));
 	}
 
-	/**
-	 * Обработка нажатий кнопок
-	 */
 	public void keyPressed(KeyPressed key) {
 		if (getStatus() == Status.None)
 			return;

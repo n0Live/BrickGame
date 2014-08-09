@@ -1,15 +1,10 @@
 package com.kry.brickgame;
 
-
-/**
- * <p>
- * Фабричный класс для фигур
- * </p>
- */
 public class Shape {
 
 	/**
-	 * Набор координат фигур: [индекс_точки][координата:0-x,1-y]
+	 * A set of coordinates of a points of a figures:
+	 * [index][coordinate:0-x,1-y]
 	 */
 	private int coords[][];
 
@@ -22,8 +17,9 @@ public class Shape {
 	}
 
 	/**
+	 * 
 	 * @param length
-	 *            - количество точек фигуры
+	 *            number of the points of the figure
 	 */
 	public Shape(int length) {
 		super();
@@ -31,24 +27,24 @@ public class Shape {
 	}
 
 	/**
-	 * Устанавливает значение координаты x точки фигуры
+	 * Setting the value of the x-coordinate of a points of the figure
 	 * 
 	 * @param index
-	 *            - индекс точки фигуры
+	 *            index of the point of the figures
 	 * @param x
-	 *            - значение координаты x
+	 *            the x-coordinate value
 	 */
 	protected void setX(int index, int x) {
 		coords[index][0] = x;
 	}
 
 	/**
-	 * Устанавливает значение координаты y точки фигуры
+	 * Setting the value of the y-coordinate of a points of the figure
 	 * 
 	 * @param index
-	 *            - индекс точки фигуры
+	 *            index of the point of the figures
 	 * @param y
-	 *            - значение координаты y
+	 *            the y-coordinate value
 	 */
 	protected void setY(int index, int y) {
 		coords[index][1] = y;
@@ -63,7 +59,8 @@ public class Shape {
 	}
 
 	/**
-	 * @return Минимальное значение координаты "x" среди всех точек фигуры
+	 * @return The minimum value of the x-coordinates of all points of the
+	 *         figure
 	 */
 	public int minX() {
 		int result = coords[0][0];
@@ -74,7 +71,8 @@ public class Shape {
 	}
 
 	/**
-	 * @return Минимальное значение координаты "y" среди всех точек фигуры
+	 * @return The minimum value of the y-coordinates of all points of the
+	 *         figure
 	 */
 	public int minY() {
 		int result = coords[0][1];
@@ -85,7 +83,8 @@ public class Shape {
 	}
 
 	/**
-	 * @return Максимальное значение координаты "x" среди всех точек фигуры
+	 * @return The maximum value of the x-coordinates of all points of the
+	 *         figure
 	 */
 	public int maxX() {
 		int result = coords[0][0];
@@ -96,7 +95,8 @@ public class Shape {
 	}
 
 	/**
-	 * @return Максимальное значение координаты "y" среди всех точек фигуры
+	 * @return The maximum value of the y-coordinates of all points of the
+	 *         figure
 	 */
 	public int maxY() {
 		int result = coords[0][1];
@@ -107,10 +107,11 @@ public class Shape {
 	}
 
 	/**
-	 * Вращение фигуры против часовой стрелки
+	 * Counterclockwise rotation of a figure
 	 * 
 	 * @param shape
-	 *            - вращаемая фигура
+	 *            a figure
+	 * @return a figure after rotation
 	 */
 	public Shape rotateLeft(Shape shape) {
 		Shape result = new Shape(shape.coords.length);
@@ -123,10 +124,11 @@ public class Shape {
 	}
 
 	/**
-	 * Вращение фигуры по часовой стрелке
+	 * Clockwise rotation of a figure
 	 * 
 	 * @param shape
-	 *            - вращаемая фигура
+	 *            a figure
+	 * @return a figure after rotation
 	 */
 	public Shape rotateRight(Shape shape) {
 		Shape result = new Shape(shape.coords.length);
@@ -138,6 +140,12 @@ public class Shape {
 		return result;
 	}
 
+	/**
+	 * Loop through the value of {@code maxY()} to {@code minY()} (downwards)
+	 * and from {@code minX()} to {@code maxX()} (left to right), if the value
+	 * of x and y match with coordinates value in any point of the figure then
+	 * print "0" otherwise " " (space)
+	 */
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -149,22 +157,17 @@ public class Shape {
 		int min_y = minY();
 		int max_y = maxY();
 
-		// Перебираем значение от max_y до min_y (сверху вниз) и
-		// от min_x до max_x (слева направо) и, если значение x и y совпадут со
-		// значением координат в какой-либо точке, то по адресу x,y рисуем 0,
-		// иначе " " (пробел).
-		// [y + (0 - min_x) - сдвигаем точку отсчета для массива символов к
-		// нулю.
-		// Результаты:
-		// _0_ | 0__ | 00
-		// 000 | 000 | 00
-		for (int x = max_y; x >= min_y; --x) {
+		for (int y = max_y; y >= min_y; --y) {
 			char line[] = new char[(max_x - min_x) + 1];
-			for (int y = min_x; y <= max_x; ++y) {
-				line[y + (0 - min_x)] = ' ';
+
+			for (int x = min_x; x <= max_x; ++x) {
+				// [x + (0 - min_x)]: because x can be less than 0, then x is
+				// shifted to 0
+				line[x + (0 - min_x)] = ' ';
 				for (int k = 0; k < coords.length; ++k) {
-					if ((coords[k][0] == y) && (coords[k][1] == x)) {
-						line[y + (0 - min_x)] = '0';
+					if ((coords[k][0] == x) && (coords[k][1] == y)) {
+						// see previous comment
+						line[x + (0 - min_x)] = '0';
 						break;
 					}
 				}
@@ -172,6 +175,9 @@ public class Shape {
 			result.append(line).append("\n");
 		}
 		return result.toString();
+		// Results:
+		// _0_ | 0__ | 00
+		// 000 | 000 | 00
 	}
 
 }

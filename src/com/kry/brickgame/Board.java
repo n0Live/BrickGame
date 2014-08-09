@@ -20,25 +20,17 @@ public class Board {
 	}
 
 	private int width;
-	
+
 	protected int getWidth() {
 		return width;
 	}
-
 
 	private int height;
 
 	protected int getHeight() {
 		return height;
 	}
-	/**
-	 * Создание доски
-	 * 
-	 * @param width
-	 *            - ширина доски
-	 * @param height
-	 *            - высота доски
-	 */
+
 	public Board(int width, int height) {
 		super();
 		this.width = width;
@@ -47,10 +39,10 @@ public class Board {
 	}
 
 	/**
-	 * Копирующий конструктор
+	 * The copy constructor of a Board
 	 * 
 	 * @param aBoard
-	 *            - доска, с которой будет создаваться копия
+	 *            - a board for copying
 	 */
 	public Board(Board aBoard) {
 		super();
@@ -70,7 +62,7 @@ public class Board {
 	}
 
 	/**
-	 * Очистка доски
+	 * Clears the cells of the board
 	 */
 	protected void clearBoard() {
 		for (int i = 0; i < width; ++i)
@@ -91,11 +83,11 @@ public class Board {
 		StringBuilder result = new StringBuilder();
 
 		result.append("Board [" + width + "x" + height + "]").append("\n");
-		// Перебираем строки доски (доска заполняется снизу вверх)
+		// Going through the board (the board is filled from the bottom up)
 		for (int i = height - 1; i >= 0; --i) {
 			char line[] = new char[width];
 			for (int j = 0; j < width; ++j) {
-				// если ячейка заполнена рисуем "0", иначе "."
+				//If the cell[j][i] is full then print "0" otherwise "."
 				line[j] = (board[j][i] == Cells.Full) ? '0' : '.';
 			}
 			result.append(line).append("\n");

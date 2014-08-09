@@ -1,5 +1,8 @@
 package com.kry.brickgame;
 
+/**
+ * The selection screen of a game
+ */
 public class GameSelector extends Game {
 
 	private String letter;
@@ -12,16 +15,17 @@ public class GameSelector extends Game {
 	}
 
 	/**
-	 * Вставка доски с буквой или цифрой в основную доску
+	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
+	 * {@code x, y}) is set a point, which gets the lower left corner of the
+	 * {@code boardToInsert}
 	 * 
 	 * @param boardToInsert
-	 *            - доска с буквой или цифрой
+	 *            a Letters or a Numbers board
 	 * @param x
-	 *            - координата x места для вставки
+	 *            x-coordinate for the insertion
 	 * @param y
-	 *            - координата y места для вставки
+	 *            y-coordinate for the insertion
 	 * 
-	 *            В координаты (x,y) вставляется левый нижний угол
 	 */
 	public void insertBoard(Board boardToInsert, int x, int y) {
 		Board board = getBoard();
@@ -43,7 +47,7 @@ public class GameSelector extends Game {
 	}
 
 	/**
-	 * Вывод буквы на доску
+	 * Displays a letter at the top of the basic board
 	 */
 	public void drawLetter() {
 		BoardLetters boardLetter = new BoardLetters();
@@ -54,7 +58,7 @@ public class GameSelector extends Game {
 	}
 
 	/**
-	 * Вывод номера на доску
+	 * Displays a two numbers at the bottom of the basic board
 	 */
 	public void drawNumber() {
 		int number_1;
@@ -69,17 +73,21 @@ public class GameSelector extends Game {
 		}
 
 		BoardNumbers boardNumber = new BoardNumbers();
+
+		// 1st number
 		boardNumber.setNumber(boardNumber.intToNumbers(number_1));
 		insertBoard(boardNumber,
 				(BOARD_WIDTH / 2 - boardNumber.getWidth() - 1),// x
 				0);// y
+
+		// 2nd number
 		boardNumber.setNumber(boardNumber.intToNumbers(number_2));
 		insertBoard(boardNumber, (BOARD_WIDTH / 2 + 1),// x
 				0);// y
 	}
 
 	/**
-	 * Следующая допустимая буква
+	 * Next allowable letter
 	 */
 	private void nextLetter() {
 		if (letter.toCharArray()[0] < 'X') {
@@ -90,7 +98,7 @@ public class GameSelector extends Game {
 	}
 
 	/**
-	 * Предыдущая допустимая буква
+	 * Previous allowable letter
 	 */
 	private void prevLetter() {
 		if (letter.toCharArray()[0] > 'A') {
@@ -101,14 +109,14 @@ public class GameSelector extends Game {
 	}
 
 	/**
-	 * Следующий допустимый номер
+	 * Next allowable number
 	 */
 	private void nextNumber() {
 		number = (number < 99) ? number + 1 : 1;
 	}
 
 	/**
-	 * Предыдущий допустимый номер
+	 * Previous allowable number
 	 */
 	private void prevNumber() {
 		number = (number > 1) ? number - 1 : 99;
@@ -120,6 +128,9 @@ public class GameSelector extends Game {
 		drawNumber();
 	}
 
+	/**
+	 * Launching a game depending on the chosen letters and numbers
+	 */
 	public void changeGame() {
 		switch (letter) {
 		case "A":
@@ -131,9 +142,6 @@ public class GameSelector extends Game {
 		}
 	}
 
-	/**
-	 * Обработка нажатий кнопок
-	 */
 	public void keyPressed(KeyPressed key) {
 		switch (key) {
 		case KeyLeft:

@@ -2,9 +2,6 @@ package com.kry.brickgame;
 
 public class BoardLetters extends Board {
 
-	/**
-	 * Фигуры - буквы
-	 */
 	enum Letters {
 		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X
 	};
@@ -12,19 +9,16 @@ public class BoardLetters extends Board {
 	private final static int width = 5;
 	private final static int height = 5;
 
-	/**
-	 * Буква
-	 */
 	private Letters letter;
 
 	/**
-	 * Доска, с нарисованной буквой
+	 * Board with a drawn letter
 	 */
 	private Cells[][] board = new Cells[width][height];
 
 	/**
-	 * Таблица рисунков букв на доске:
-	 * [индекс_буквы][координата_y][координата_x]
+	 * Table letters to draw them on the board 5x5:
+	 * [index][y][x]
 	 */
 	private final static Cells[][][] lettersTable = new Cells[][][] {
 			{
@@ -179,11 +173,9 @@ public class BoardLetters extends Board {
 					{ Full, Empty, Empty, Empty, Full } } };
 
 	protected void setLetter(Letters letter) {
-		// Рисуем на доске букву из #lettersTable
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				// [height - y - 1] - рисуем вверх ногами (доска заполняется
-				// снизу вверх)
+				// [height - y - 1] - draw upside down
 				board[x][y] = lettersTable[letter.ordinal()][height - y - 1][x];
 			}
 		}
@@ -196,15 +188,13 @@ public class BoardLetters extends Board {
 	}
 
 	/**
-	 * Преобразование строки в объект Letters
+	 * Convert a string to a Letters object 
 	 * 
 	 * @param str
-	 *            - строка вида "A", "B", "C", ...
+	 *            - string like "A", "B", "C", ...
 	 */
 	protected Letters stringToLetters(String str) {
-		Letters result;
-
-		result = Letters.None;
+		Letters result = Letters.None;
 
 		try {
 			result = Letters.valueOf(str.toUpperCase());
