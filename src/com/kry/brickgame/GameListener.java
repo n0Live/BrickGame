@@ -1,6 +1,8 @@
 package com.kry.brickgame;
 
-public interface IGameListener {
+import java.util.EventListener;
+
+public interface GameListener extends EventListener{
 	
     public void boardChanged(GameEvent event);
     public void previewChanged(GameEvent event);
