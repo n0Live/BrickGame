@@ -2,6 +2,8 @@ package com.kry.brickgame;
 
 import java.util.Random;
 
+import com.kry.brickgame.Board.Cells;
+
 public class TetrisShape extends Shape implements Cloneable {
 
 	/**
@@ -13,32 +15,11 @@ public class TetrisShape extends Shape implements Cloneable {
 		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape
 	};
 
-	/**
-	 * Rotation angle of a figure (in degrees)
-	 */
-	enum RotationAngle {
-		d0, d90, d180, d270;
-
-		/**
-		 * The next clockwise rotation angle
-		 */
-		public RotationAngle getLeft() {
-			return this.ordinal() > 0 ? RotationAngle.values()[this.ordinal() - 1]
-					: RotationAngle.values()[RotationAngle.values().length - 1];
-		}
-
-		/**
-		 * The next counterclockwise rotation angle
-		 */
-		public RotationAngle getRight() {
-			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle
-					.values()[this.ordinal() + 1] : RotationAngle.values()[0];
-		}
-	};
-
 	private Tetrominoes shape;
 
 	private RotationAngle rotationAngle;
+
+	private Cells fill;
 
 	/**
 	 * A set of coordinates of a points of a figures:
@@ -67,7 +48,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public TetrisShape(TetrisShape aTetrisShape) {
 		super(LENGTH);
-		setShape(aTetrisShape.shape, aTetrisShape.rotationAngle);
+		setShape(aTetrisShape.shape, aTetrisShape.rotationAngle, aTetrisShape.fill);
 	}
 
 	public TetrisShape clone() {
@@ -83,8 +64,11 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            a figure
 	 * @param rotationAngle
 	 *            rotation angle of a figure
+	 * @param fill
+	 *            type of fill of a figure
 	 */
-	public void setShape(Tetrominoes shape, RotationAngle rotationAngle) {
+	public void setShape(Tetrominoes shape, RotationAngle rotationAngle,
+			Cells fill) {
 		for (int i = 0; i < LENGTH; ++i) {
 			switch (rotationAngle) {
 			case d0:
@@ -121,20 +105,41 @@ public class TetrisShape extends Shape implements Cloneable {
 
 		this.shape = shape;
 		this.rotationAngle = rotationAngle;
+		this.fill = fill;
 	}
 
 	/**
-	 * Selection of a figure (without rotation)
+	 * Selection of a figure (with type of fill is {@code Full})
+	 * 
+	 * @param shape
+	 *            a figure
+	 * @param rotationAngle
+	 *            rotation angle of a figure
+	 */
+	public void setShape(Tetrominoes shape, RotationAngle rotationAngle) {
+		setShape(shape, rotationAngle, Cells.Full);
+	}
+
+	/**
+	 * Selection of a figure (without rotation and type of fill is {@code Full})
 	 * 
 	 * @param shape
 	 *            a figure
 	 */
 	public void setShape(Tetrominoes shape) {
-		setShape(shape, RotationAngle.d0);
+		setShape(shape, RotationAngle.d0, Cells.Full);
 	}
 
 	public Tetrominoes getShape() {
 		return shape;
+	}
+
+	public Cells getFill() {
+		return fill;
+	}
+
+	public void setFill(Cells fill) {
+		this.fill = fill;
 	}
 
 	/**
@@ -191,9 +196,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	public String toString() {
 		// the figure and its rotation angle
 		return "TetrisShape [" + this.getShape() + ", " + this.rotationAngle
-				// the lower left corner
-				+ ", (" + minX() + ";" + minY() + ")]\n"
-				+ super.toString();
+		// the lower left corner
+				+ ", (" + minX() + ";" + minY() + ")]\n" + super.toString();
 	}
 
 }

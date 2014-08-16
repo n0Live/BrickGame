@@ -3,10 +3,48 @@ package com.kry.brickgame;
 public class Shape {
 
 	/**
+	 * Rotation angle of a figure (in degrees)
+	 */
+	enum RotationAngle {
+		/**
+		 * North
+		 */
+		d0, 
+		/**
+		 * East
+		 */
+		d90,
+		/**
+		 * South
+		 */
+		d180,
+		/**
+		 * West
+		 */
+		d270;
+
+		/**
+		 * The next clockwise rotation angle
+		 */
+		public RotationAngle getLeft() {
+			return this.ordinal() > 0 ? RotationAngle.values()[this.ordinal() - 1]
+					: RotationAngle.values()[RotationAngle.values().length - 1];
+		}
+
+		/**
+		 * The next counterclockwise rotation angle
+		 */
+		public RotationAngle getRight() {
+			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle
+					.values()[this.ordinal() + 1] : RotationAngle.values()[0];
+		}
+	};
+
+	/**
 	 * A set of coordinates of a points of a figures:
 	 * [index][coordinate:0-x,1-y]
 	 */
-	private int coords[][];
+	private int[][] coords;
 
 	protected int[][] getCoords() {
 		return coords;
