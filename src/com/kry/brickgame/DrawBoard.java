@@ -4,7 +4,7 @@ import java.awt.Graphics;
 
 import javax.swing.JLabel;
 
-public class DrawBoard extends Draw implements IGameListener {
+public class DrawBoard extends Draw {
 	private static final long serialVersionUID = 1L;
 
 	private JLabel statusbar;
@@ -20,7 +20,6 @@ public class DrawBoard extends Draw implements IGameListener {
 
 	public void paint(Graphics g) {
 		super.paint(g);
-
 	}
 
 	@Override
@@ -49,5 +48,4 @@ public class DrawBoard extends Draw implements IGameListener {
 		info = event.getInfo();
 		statusbar.setText(info);
 	}
-
 }

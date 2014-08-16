@@ -3,11 +3,12 @@ package com.kry.brickgame;
 public class Board {
 
 	static enum Cells {
-		Empty, Full
+		Empty, Full, Blink
 	};
 
 	protected final static Cells Empty = Cells.Empty;
 	protected final static Cells Full = Cells.Full;
+	protected final static Cells Blink = Cells.Blink;
 
 	private Cells[][] board;
 
@@ -30,6 +31,11 @@ public class Board {
 	protected int getHeight() {
 		return height;
 	}
+
+	public Board() {
+		
+	}
+	
 
 	public Board(int width, int height) {
 		super();

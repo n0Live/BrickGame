@@ -1,11 +1,14 @@
 package com.kry.brickgame;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JSplitPane;
-import java.awt.Color;
+import javax.swing.SwingUtilities;
 
 public class Window extends JFrame {
 	private static final long serialVersionUID = 3466619047314091863L;
@@ -46,9 +49,9 @@ public class Window extends JFrame {
 
 		statusbar = new JLabel("0");
 
-		DrawBoard drawBoard = new DrawBoard(this);
+		final DrawBoard drawBoard = new DrawBoard(this);
 		drawBoard.setBackground(bgColor);
-		DrawPreview drawPreview = new DrawPreview();
+		final DrawPreview drawPreview = new DrawPreview();
 		drawPreview.setBackground(bgColor);
 
 		splitPane_1.setRightComponent(statusbar);
@@ -61,7 +64,20 @@ public class Window extends JFrame {
 		Game.addGameListener(drawBoard);
 		drawBoard.addKeyListener(Main.gameKeyAdapter);
 
-		setTitle("Tetris");
+		Timer timer = new Timer("Blinking", true);
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						drawBoard.blinking();
+						drawPreview.blinking();
+					}
+				});
+			}
+		}, 0, 50);
+
+		setTitle("Brick Game");
 		Main.setGame(Main.gameSelector);
 
 	}
