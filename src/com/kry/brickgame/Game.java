@@ -33,20 +33,23 @@ public class Game implements Runnable {
 	/**
 	 * Animation delay in milliseconds
 	 */
-	protected final static int ANIMATION_DELAY = 50;
+	protected final static int ANIMATION_DELAY = 20;
 	/*---MAGIC NUMBERS---*/
 
-	protected TimerGame timer;
-
+	/**
+	 * Speed level
+	 */
 	private int speed = 0;
 
-	private static ArrayList<IGameListener> listeners = new ArrayList<IGameListener>();
+	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
 	static enum Status {
 		None, Running, Paused, GameOver, DoSomeWork
 	};
 
-	private Status status;
+	private volatile Status status;
+
+	private long timePoint = System.currentTimeMillis();
 
 	protected Status getStatus() {
 		return status;
@@ -57,8 +60,8 @@ public class Game implements Runnable {
 		fireStatusChanged(status);
 	}
 
-	private Board board;
-	private Board preview;
+	private volatile Board board;
+	private volatile Board preview;
 
 	static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
@@ -71,42 +74,42 @@ public class Game implements Runnable {
 		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 	}
 
-	public static void addGameListener(IGameListener listener) {
+	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
 
-	public static IGameListener[] getGameListeners() {
-		return listeners.toArray(new IGameListener[listeners.size()]);
+	public static synchronized GameListener[] getGameListeners() {
+		return listeners.toArray(new GameListener[listeners.size()]);
 	}
 
-	public static void removeGameListener(IGameListener listener) {
+	public static synchronized void removeGameListener(GameListener listener) {
 		listeners.remove(listener);
 	}
 
-	protected void fireBoardChanged(Board board) {
+	protected synchronized void fireBoardChanged(Board board) {
 		GameEvent event = new GameEvent(this, board);
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.boardChanged(event);
 		}
 	}
 
-	protected void firePreviewChanged(Board preview) {
+	protected synchronized void firePreviewChanged(Board preview) {
 		GameEvent event = new GameEvent(this, preview);
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.previewChanged(event);
 		}
 	}
 
-	protected void fireStatusChanged(Status status) {
+	protected synchronized void fireStatusChanged(Status status) {
 		GameEvent event = new GameEvent(this, status);
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.statusChanged(event);
 		}
 	}
 
-	protected void fireInfoChanged(String info) {
+	protected synchronized void fireInfoChanged(String info) {
 		GameEvent event = new GameEvent(this, info);
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.infoChanged(event);
 		}
 	}
@@ -150,6 +153,22 @@ public class Game implements Runnable {
 	protected void setPreview(Board preview) {
 		this.preview = preview;
 		firePreviewChanged(preview);
+	}
+
+	/**
+	 * Calculates if elapsed of {@code millis} since the last time point. If
+	 * elapsed, the time point is set the current time.
+	 * 
+	 * @param millis
+	 *            delay in milliseconds
+	 * @return true - if elapsed of {@code millis} since the last time point
+	 */
+	protected boolean elapsedTime(int millis) {
+		long nowTime = System.currentTimeMillis();
+		boolean result = ((nowTime - timePoint) >= millis);
+		if (result)
+			timePoint = nowTime;
+		return result;
 	}
 
 	/**
@@ -264,41 +283,49 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Animated clearing of the board
+	 * Animated clearing of the board. Direction is determined from the value of
+	 * {@code fromY} and {@code toY}
 	 * 
-	 * @param firstRun
-	 *            - is the first run
-	 * @return if is the first run then the board is filled upwards, otherwise
-	 *         is cleaned downwards
+	 * @param fromY
+	 *            starting line (y-coordinate)
+	 * @param toY
+	 *            ending line (y-coordinate)
+	 * @return if {@code toY} is more than {@code fromY} then the board is
+	 *         filled upwards, otherwise is cleaned downwards
 	 */
-	protected void animatedClearBoard(boolean firstRun) {
-		if (firstRun) {
-			for (int y = 0; y < BOARD_HEIGHT; ++y) {
-				for (int x = 0; x < BOARD_WIDTH; ++x) {
+	protected boolean animatedClearBoard(int fromY, int toY) {
+		boolean isUpDirection = ((toY - fromY) >= 0);
+
+		// the board is filled upwards
+		if (isUpDirection) {
+			for (int y = fromY; y <= toY; y++) {
+				for (int x = 0; x < BOARD_WIDTH; x++) {
 					board.setCell(Cells.Full, x, y);
 				}
+				fireBoardChanged(board);
 				try {
 					Thread.sleep(ANIMATION_DELAY);
-					fireBoardChanged(board);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
+			// and is cleaned downwards
 		} else {
-			for (int y = BOARD_HEIGHT - 1; y >= 0; --y) {
-				for (int x = 0; x < BOARD_WIDTH; ++x) {
+			for (int y = fromY; y >= toY; y--) {
+				for (int x = 0; x < BOARD_WIDTH; x++) {
 					board.setCell(Cells.Empty, x, y);
 				}
+				fireBoardChanged(board);
 				try {
 					Thread.sleep(ANIMATION_DELAY);
-					fireBoardChanged(board);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					Thread.currentThread().interrupt();
 				}
 			}
 		}
+		return isUpDirection;
 	}
 
 	/**
@@ -306,8 +333,8 @@ public class Game implements Runnable {
 	 * 
 	 */
 	protected void animatedClearBoard() {
-		animatedClearBoard(true);
-		animatedClearBoard(false);
+		animatedClearBoard(0, BOARD_HEIGHT - UNSHOWED_LINES);
+		animatedClearBoard(BOARD_HEIGHT - UNSHOWED_LINES, 0);
 	}
 
 	protected void gameOver() {

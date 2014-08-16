@@ -1,8 +1,5 @@
 package com.kry.brickgame;
 
-import java.util.TimerTask;
-import java.util.logging.Logger;
-
 import com.kry.brickgame.Board.Cells;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
 
@@ -46,29 +43,11 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * TimerTask derived class, contains the recurring task
-	 */
-	public class GameTimerTask extends TimerTask {
-		@Override
-		public synchronized void run() {
-			if (isFallingFinished) {
-				isFallingFinished = false;
-				newPiece();
-			} else {
-				oneLineDown();
-			}
-		};
-	};
-
-	/**
 	 * Launching the game
 	 */
 	@Override
 	public void start() {
 		super.start();
-
-		if (getStatus() == Status.Paused)
-			return;
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
@@ -78,60 +57,20 @@ public class TetrisGame extends Game {
 		nextPiece.setRandomShapeAndRotate();
 		newPiece();
 
-		timer = new TimerGame(getSpeed(true));
-		timer.start(new GameTimerTask());
-	}
+		while (getStatus() != Status.GameOver) {
+			// dropping of a figure
+			if (elapsedTime(getSpeed(true))) {
+				if (isFallingFinished) {
+					isFallingFinished = false;
+					newPiece();
+				} else {
+					oneLineDown();
+				}
 
-	/**
-	 * Pause / Resume
-	 */
-	private void pause() {
-		if (getStatus() == Status.Running) {
-			timer.stop();
-			setStatus(Status.Paused);
-		} else if (getStatus() == Status.Paused) {
-			timer.start(new GameTimerTask());
-			setStatus(Status.Running);
+			}
+			// processing of key presses
+			processKeys();
 		}
-	}
-
-	/**
-	 * Rapidly drops of the figure to the bottom of the board or a obstructions
-	 */
-	private void dropDown() {
-		int newY = curY;
-		while (newY > 0) {
-			if (!tryMove(curPiece, curX, newY - 1))
-				break;
-			--newY;
-		}
-		pieceDropped();
-	}
-
-	/**
-	 * Dropping on one line down
-	 */
-	private void oneLineDown() {
-		if (!tryMove(curPiece, curX, curY - 1))
-			pieceDropped();
-	}
-
-	/**
-	 * Ending of falling of the figure
-	 */
-	private void pieceDropped() {
-		timer.stop();
-
-		// add the figure to the board
-		if (curPiece.getShape() != Tetrominoes.NoShape)
-			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Full));
-
-		removeFullLines();
-
-		if (!isFallingFinished)
-			newPiece();
-
-		timer.start(new GameTimerTask());
 	}
 
 	/**
@@ -147,10 +86,13 @@ public class TetrisGame extends Game {
 		curY = BOARD_HEIGHT - (UNSHOWED_LINES - nextPiece.maxY());
 
 		if (!tryMove(nextPiece, curX, curY)) {
-			timer.stop();
 			gameOver();
 		} else {
 			nextPiece.setRandomShapeAndRotate();
+
+			// TODO test
+			if (nextPiece.getShape() == Tetrominoes.SquareShape)
+				nextPiece.setFill(Cells.Blink);
 
 			clearPreview();
 			setPreview(drawPiece(getPreview(),//
@@ -167,35 +109,8 @@ public class TetrisGame extends Game {
 					(PREVIEW_HEIGHT / 2 - 1)
 							+ ((nextPiece.maxY() - nextPiece.minY() + 1) / 2)
 							+ (nextPiece.minY()),//
-					nextPiece, Cells.Full));
+					nextPiece, nextPiece.getFill()));
 		}
-	}
-
-	/**
-	 * Drawing of a figure on a board
-	 * 
-	 * @param board
-	 *            a board for drawing
-	 * @param x
-	 *            x-coordinate position on a board of a figure
-	 * @param y
-	 *            y-coordinate position on a board of a figure
-	 * @param piece
-	 *            a figure
-	 * @param fill
-	 *            {@code Cells.Full} - to draw a figure, {@code Cells.Empty} -
-	 *            to erase a figure
-	 * 
-	 * @return - the board with the figure
-	 */
-	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
-			Cells fill) {
-		for (int i = 0; i < piece.getCoords().length; ++i) {
-			int board_x = x + piece.x(i);
-			int board_y = y - piece.y(i);
-			board.setCell(fill, board_x, board_y);
-		}
-		return board;
 	}
 
 	/**
@@ -231,7 +146,8 @@ public class TetrisGame extends Game {
 
 		// Erase the current figure from the basic board and draw the new figure
 		setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Empty));
-		setBoard(drawPiece(getBoard(), prepX, newY, newPiece, Cells.Full));
+		setBoard(drawPiece(getBoard(), prepX, newY, newPiece,
+				newPiece.getFill()));
 
 		// The current figure is replaced by the new
 		curPiece = newPiece.clone();
@@ -239,6 +155,71 @@ public class TetrisGame extends Game {
 		curY = newY;
 
 		return true;
+	}
+
+	/**
+	 * Drawing of a figure on a board
+	 * 
+	 * @param board
+	 *            a board for drawing
+	 * @param x
+	 *            x-coordinate position on a board of a figure
+	 * @param y
+	 *            y-coordinate position on a board of a figure
+	 * @param piece
+	 *            a figure
+	 * @param fill
+	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw a figure,
+	 *            {@code Cells.Empty} - to erase a figure
+	 * 
+	 * @return - the board with the figure
+	 */
+	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
+			Cells fill) {
+		for (int i = 0; i < piece.getCoords().length; ++i) {
+			int board_x = x + piece.x(i);
+			int board_y = y - piece.y(i);
+			board.setCell(fill, board_x, board_y);
+		}
+		return board;
+	}
+
+	/**
+	 * Dropping on one line down
+	 */
+	private void oneLineDown() {
+		if (!tryMove(curPiece, curX, curY - 1))
+			pieceDropped();
+	}
+
+	/**
+	 * Rapidly drops of the figure to the bottom of the board or a obstructions
+	 */
+	private void dropDown() {
+		int newY = curY;
+		while (newY > 0) {
+			if (!tryMove(curPiece, curX, newY - 1))
+				break;
+			--newY;
+		}
+		pieceDropped();
+	}
+
+	/**
+	 * Ending of falling of the figure
+	 */
+	private void pieceDropped() {
+		// add the figure to the board
+		if (curPiece.getShape() != Tetrominoes.NoShape)
+			// Cells.Full instead curPiece.getFill() because is Blink should
+			// change to Full when lying on the board
+			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Full));
+
+		removeFullLines();
+
+		if (!isFallingFinished)
+			newPiece();
+
 	}
 
 	/**
@@ -277,8 +258,6 @@ public class TetrisGame extends Game {
 			}
 		}
 
-		// setBoard(board);
-
 		if (numFullLines > 0) {
 			numLinesRemoved += numFullLines;
 		}
@@ -296,7 +275,7 @@ public class TetrisGame extends Game {
 	 *            (x-coordinate)
 	 */
 	private void animatedClearLine(int line, int startPoint) {
-		Board board = getBoard();
+		final Board board = getBoard();
 
 		int x1 = startPoint - 1; // left direction
 		int x2 = startPoint; // right direction
@@ -306,9 +285,8 @@ public class TetrisGame extends Game {
 				board.setCell(Cells.Empty, x1--, line);
 			if (x2 < BOARD_WIDTH)
 				board.setCell(Cells.Empty, x2++, line);
+
 			try {
-				Logger.getAnonymousLogger().info(
-						Thread.currentThread().getName());// TODO
 				Thread.sleep(ANIMATION_DELAY);
 				setBoard(board);
 			} catch (InterruptedException e) {
@@ -318,9 +296,21 @@ public class TetrisGame extends Game {
 		}
 	}
 
-	@Override
-	public void keyPressed(KeyPressed key) {
-		super.keyPressed(key);
+	/**
+	 * Pause / Resume
+	 */
+	private void pause() {
+		if (getStatus() == Status.Running) {
+			setStatus(Status.Paused);
+		} else if (getStatus() == Status.Paused) {
+			setStatus(Status.Running);
+		}
+	}
+
+	/**
+	 * Processing of key presses
+	 */
+	private void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
@@ -330,25 +320,36 @@ public class TetrisGame extends Game {
 			} else {
 				pause();
 			}
+			keys.remove(KeyPressed.KeyStart);
 			return;
 		}
 
 		if (getStatus() != Status.Running)
 			return;
 		if (!isFallingFinished) {
-			if (keys.contains(KeyPressed.KeyLeft))
+			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
-			if (keys.contains(KeyPressed.KeyRight))
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (keys.contains(KeyPressed.KeyRight)) {
 				tryMove(curPiece, curX + 1, curY);
+				keys.remove(KeyPressed.KeyRight);
+			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = new TetrisShape(curPiece)
 						.rotateRight();
 				tryMove(rotatedPiece, curX, curY);
+				keys.remove(KeyPressed.KeyRotate);
 			}
-			if (keys.contains(KeyPressed.KeyDown))
+			if (keys.contains(KeyPressed.KeyDown)) {
 				oneLineDown();
-			if (keys.contains(KeyPressed.KeyReset))
+				keys.remove(KeyPressed.KeyDown);
+			}
+			if (keys.contains(KeyPressed.KeyReset)) {
 				dropDown();
+				keys.remove(KeyPressed.KeyReset);
+			}
 		}
 	}
+
 }
