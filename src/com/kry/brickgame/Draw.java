@@ -51,7 +51,9 @@ public class Draw extends JPanel implements GameListener {
 
 	
 	@Override
-	public void paint(Graphics g) {
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		
 		size = getSize();
 		int windowWidth = size.width;
 		int windowHeight = size.height;
@@ -119,7 +121,7 @@ public class Draw extends JPanel implements GameListener {
 	}
 
 	public void blinking() {
-		if (blinkColor.getAlpha() == fullColor.getAlpha()) {
+		if (blinkColor.equals(fullColor)) {
 			blinkColor = emptyColor;
 		} else {
 			blinkColor = fullColor;

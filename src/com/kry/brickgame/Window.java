@@ -75,7 +75,7 @@ public class Window extends JFrame {
 					}
 				});
 			}
-		}, 0, 50);
+		}, 0, 10);
 
 		setTitle("Brick Game");
 		Main.setGame(Main.gameSelector);

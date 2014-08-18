@@ -9,7 +9,7 @@ public class Shape {
 		/**
 		 * North
 		 */
-		d0, 
+		d0,
 		/**
 		 * East
 		 */
@@ -55,6 +55,20 @@ public class Shape {
 	}
 
 	/**
+	 * Set a single coordinate of a single point
+	 * 
+	 * @param i
+	 *            index of a point
+	 * @param j
+	 *            coordinate: 0 - x, 1 - y
+	 * @param value
+	 *            coordinate value
+	 */
+	protected void setCoord(int i, int j, int value) {
+		this.coords[i][j] = value;
+	}
+
+	/**
 	 * 
 	 * @param length
 	 *            number of the points of the figure
@@ -73,7 +87,7 @@ public class Shape {
 	 *            the x-coordinate value
 	 */
 	protected void setX(int index, int x) {
-		coords[index][0] = x;
+		setCoord(index, 0, x);
 	}
 
 	/**
@@ -85,15 +99,15 @@ public class Shape {
 	 *            the y-coordinate value
 	 */
 	protected void setY(int index, int y) {
-		coords[index][1] = y;
+		setCoord(index, 1, y);
 	}
 
 	public int x(int index) {
-		return coords[index][0];
+		return getCoords()[index][0];
 	}
 
 	public int y(int index) {
-		return coords[index][1];
+		return getCoords()[index][1];
 	}
 
 	/**
@@ -101,9 +115,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int minX() {
-		int result = coords[0][0];
-		for (int i = 0; i < coords.length; i++) {
-			result = Math.min(result, coords[i][0]);
+		int result = getCoords()[0][0];
+		for (int i = 0; i < getCoords().length; i++) {
+			result = Math.min(result, getCoords()[i][0]);
 		}
 		return result;
 	}
@@ -113,9 +127,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int minY() {
-		int result = coords[0][1];
-		for (int i = 0; i < coords.length; i++) {
-			result = Math.min(result, coords[i][1]);
+		int result = getCoords()[0][1];
+		for (int i = 0; i < getCoords().length; i++) {
+			result = Math.min(result, getCoords()[i][1]);
 		}
 		return result;
 	}
@@ -125,9 +139,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int maxX() {
-		int result = coords[0][0];
-		for (int i = 0; i < coords.length; i++) {
-			result = Math.max(result, coords[i][0]);
+		int result = getCoords()[0][0];
+		for (int i = 0; i < getCoords().length; i++) {
+			result = Math.max(result, getCoords()[i][0]);
 		}
 		return result;
 	}
@@ -137,9 +151,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int maxY() {
-		int result = coords[0][1];
-		for (int i = 0; i < coords.length; i++) {
-			result = Math.max(result, coords[i][1]);
+		int result = getCoords()[0][1];
+		for (int i = 0; i < getCoords().length; i++) {
+			result = Math.max(result, getCoords()[i][1]);
 		}
 		return result;
 	}
@@ -152,9 +166,9 @@ public class Shape {
 	 * @return a figure after rotation
 	 */
 	public Shape rotateLeft(Shape shape) {
-		Shape result = new Shape(shape.coords.length);
+		Shape result = new Shape(shape.getCoords().length);
 
-		for (int i = 0; i < shape.coords.length; ++i) {
+		for (int i = 0; i < shape.getCoords().length; ++i) {
 			result.setX(i, shape.y(i));
 			result.setY(i, -shape.x(i));
 		}
@@ -169,9 +183,9 @@ public class Shape {
 	 * @return a figure after rotation
 	 */
 	public Shape rotateRight(Shape shape) {
-		Shape result = new Shape(shape.coords.length);
+		Shape result = new Shape(shape.getCoords().length);
 
-		for (int i = 0; i < shape.coords.length; ++i) {
+		for (int i = 0; i < shape.getCoords().length; ++i) {
 			result.setX(i, -shape.y(i));
 			result.setY(i, shape.x(i));
 		}
@@ -202,8 +216,8 @@ public class Shape {
 				// [x + (0 - min_x)]: because x can be less than 0, then x is
 				// shifted to 0
 				line[x + (0 - min_x)] = ' ';
-				for (int k = 0; k < coords.length; ++k) {
-					if ((coords[k][0] == x) && (coords[k][1] == y)) {
+				for (int k = 0; k < getCoords().length; ++k) {
+					if ((getCoords()[k][0] == x) && (getCoords()[k][1] == y)) {
 						// see previous comment
 						line[x + (0 - min_x)] = '0';
 						break;

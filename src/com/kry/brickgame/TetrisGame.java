@@ -80,17 +80,16 @@ public class TetrisGame extends Game {
 		curPiece.setShape(Tetrominoes.NoShape);
 
 		// X-coordinate - middle of the board
-		curX = BOARD_WIDTH / 2 - 1;
+		curX = BOARD_WIDTH / 2;
 		// Y-coordinate - top edge, and so that the bottom edge of the figure
 		// was at the border of #UNSHOWED_LINES
-		curY = BOARD_HEIGHT - (UNSHOWED_LINES - nextPiece.maxY());
+		curY = BOARD_HEIGHT - 1 - (UNSHOWED_LINES - nextPiece.maxY());
 
 		if (!tryMove(nextPiece, curX, curY)) {
 			gameOver();
 		} else {
 			nextPiece.setRandomShapeAndRotate();
-
-			// TODO test
+			
 			if (nextPiece.getShape() == Tetrominoes.SquareShape)
 				nextPiece.setFill(Cells.Blink);
 

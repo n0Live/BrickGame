@@ -33,13 +33,15 @@ public class Game implements Runnable {
 	/**
 	 * Animation delay in milliseconds
 	 */
-	protected final static int ANIMATION_DELAY = 20;
+	protected final static int ANIMATION_DELAY = 30;
+	/**
+	 * Coefficient to get genuine speed
+	 */
+	protected final static int SPEED_RATIO = 50;
 	/*---MAGIC NUMBERS---*/
 
-	/**
-	 * Speed level
-	 */
-	private int speed = 0;
+	private int speed = 1;
+	private int level = 1;
 
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
@@ -120,21 +122,55 @@ public class Game implements Runnable {
 	 * @param genuine
 	 *            return genuine speed (true) or speed level (false)
 	 * @return if genuine than return genuine speed in millisecond else return
-	 *         speed level 0-9
+	 *         speed level 1-10
 	 */
 	protected int getSpeed(boolean genuine) {
 		if (genuine) {
-			return (ANIMATION_DELAY * 10) / (speed + 1);
+			return (SPEED_RATIO * 10) / speed;
 		}
 		return speed;
 	}
 
+	/**
+	 * Speed level
+	 * @return speed level 1-10
+	 */
 	protected int getSpeed() {
 		return getSpeed(false);
 	}
 
+	/**
+	 * Set speed level 
+	 * @param speed speed level 1-10
+	 */
 	protected void setSpeed(int speed) {
-		this.speed = speed;
+		if (speed < 1) {
+			this.speed = 1;
+		} else if (speed > 10) {
+			this.speed = 10;
+		} else
+			this.speed = speed;
+	}
+
+	/**
+	 * Level
+	 * @return level 1-10
+	 */
+	protected int getLevel() {
+		return level;
+	}
+
+	/**
+	 * Set level 
+	 * @param level level 1-10
+	 */
+	protected void setLevel(int level) {
+		if (level < 1) {
+			this.level = 1;
+		} else if (level > 10) {
+			this.level = 10;
+		} else
+			this.level = level;
 	}
 
 	protected Board getBoard() {
