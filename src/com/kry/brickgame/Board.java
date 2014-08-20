@@ -32,16 +32,22 @@ public class Board {
 		return height;
 	}
 
-	public Board() {
-		
-	}
-	
+	private int unshowedLines;
 
-	public Board(int width, int height) {
+	protected int getUnshowedLines() {
+		return unshowedLines;
+	}
+
+	public Board(int width, int height, int unshowedLines) {
 		super();
 		this.width = width;
 		this.height = height;
+		this.unshowedLines = unshowedLines;
 		this.board = new Cells[width][height];
+	}
+
+	public Board(int width, int height) {
+		this(width, height, 0);
 	}
 
 	/**
@@ -93,7 +99,7 @@ public class Board {
 		for (int i = height - 1; i >= 0; --i) {
 			char line[] = new char[width];
 			for (int j = 0; j < width; ++j) {
-				//If the cell[j][i] is full then print "0" otherwise "."
+				// If the cell[j][i] is full then print "0" otherwise "."
 				line[j] = (board[j][i] == Cells.Full) ? '0' : '.';
 			}
 			result.append(line).append("\n");

@@ -13,31 +13,31 @@ public class Game implements Runnable {
 	 * The number of lines of the base field (the board), that should not be
 	 * displayed ({@value} ). Used for smooth the appearance of a figures.
 	 */
-	public final static int UNSHOWED_LINES = 4;
+	public static final int UNSHOWED_LINES = 4;
 	/**
 	 * Width of the board ({@value} ).
 	 */
-	public final static int BOARD_WIDTH = 10;
+	public static final int BOARD_WIDTH = 10;
 	/**
 	 * Height of the board ({@value} ).
 	 */
-	public final static int BOARD_HEIGHT = 20 + UNSHOWED_LINES;
+	public static final int BOARD_HEIGHT = 20 + UNSHOWED_LINES;
 	/**
 	 * Width of the preview board ({@value} ).
 	 */
-	public final static int PREVIEW_WIDTH = 4;
+	public static final int PREVIEW_WIDTH = 4;
 	/**
 	 * Height of the preview board ({@value} ).
 	 */
-	public final static int PREVIEW_HEIGHT = 4;
+	public static final int PREVIEW_HEIGHT = 4;
 	/**
 	 * Animation delay in milliseconds
 	 */
-	protected final static int ANIMATION_DELAY = 30;
+	protected static final int ANIMATION_DELAY = 30;
 	/**
 	 * Coefficient to get genuine speed
 	 */
-	protected final static int SPEED_RATIO = 50;
+	protected static final int SPEED_RATIO = 50;
 	/*---MAGIC NUMBERS---*/
 
 	private int speed = 1;
@@ -72,7 +72,7 @@ public class Game implements Runnable {
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
 	public Game() {
-		board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+		board = new Board(BOARD_WIDTH, BOARD_HEIGHT, UNSHOWED_LINES);
 		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 	}
 
@@ -133,6 +133,7 @@ public class Game implements Runnable {
 
 	/**
 	 * Speed level
+	 * 
 	 * @return speed level 1-10
 	 */
 	protected int getSpeed() {
@@ -140,8 +141,10 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Set speed level 
-	 * @param speed speed level 1-10
+	 * Set speed level
+	 * 
+	 * @param speed
+	 *            speed level 1-10
 	 */
 	protected void setSpeed(int speed) {
 		if (speed < 1) {
@@ -154,6 +157,7 @@ public class Game implements Runnable {
 
 	/**
 	 * Level
+	 * 
 	 * @return level 1-10
 	 */
 	protected int getLevel() {
@@ -161,8 +165,10 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Set level 
-	 * @param level level 1-10
+	 * Set level
+	 * 
+	 * @param level
+	 *            level 1-10
 	 */
 	protected void setLevel(int level) {
 		if (level < 1) {

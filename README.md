@@ -9,4 +9,6 @@ Race, Frogger and maybe some other.
 Project Maintainers:
 - noLive
 
+Thanks Cedders (fonts@cedders.com) for the great Segment7 font.
+
 P.S. I'm very sorry for my English, but I'll try to improve, I promise.

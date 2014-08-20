@@ -1,8 +1,12 @@
 package com.kry.brickgame;
 
-import com.kry.brickgame.Board.Cells;
 
 public class BoardGamesAnimation extends Board {
+
+	public BoardGamesAnimation(int width, int height) {
+		super(width, height);
+		// TODO Auto-generated constructor stub
+	}
 
 	enum GamesForAnimation {
 		None, Dancing, Racing, Arcanoid, Snakes, Frogger, Tetris

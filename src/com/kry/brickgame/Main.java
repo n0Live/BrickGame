@@ -24,7 +24,7 @@ public final class Main {
 	 */
 	public static GameSelector gameSelector = new GameSelector();
 	/**
-	 * Subscriber to {@code KeyEvent}
+	 * Observer to {@code KeyEvent}
 	 */
 	public static GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
 

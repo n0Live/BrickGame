@@ -59,7 +59,7 @@ public class TetrisGame extends Game {
 
 		while (getStatus() != Status.GameOver) {
 			// dropping of a figure
-			if (elapsedTime(getSpeed(true))) {
+			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (isFallingFinished) {
 					isFallingFinished = false;
 					newPiece();
@@ -89,7 +89,7 @@ public class TetrisGame extends Game {
 			gameOver();
 		} else {
 			nextPiece.setRandomShapeAndRotate();
-			
+
 			if (nextPiece.getShape() == Tetrominoes.SquareShape)
 				nextPiece.setFill(Cells.Blink);
 
