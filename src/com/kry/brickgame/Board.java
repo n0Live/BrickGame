@@ -2,21 +2,24 @@ package com.kry.brickgame;
 
 public class Board {
 
-	static enum Cells {
+	/**
+	 * Cell type
+	 */
+	static enum Cell {
 		Empty, Full, Blink
 	};
 
-	protected final static Cells Empty = Cells.Empty;
-	protected final static Cells Full = Cells.Full;
-	protected final static Cells Blink = Cells.Blink;
+	protected final static Cell Empty = Cell.Empty;
+	protected final static Cell Full = Cell.Full;
+	protected final static Cell Blink = Cell.Blink;
 
-	private Cells[][] board;
+	private Cell[][] board;
 
-	protected Cells[][] getBoard() {
+	protected Cell[][] getBoard() {
 		return this.board;
 	}
 
-	protected void setBoard(Cells[][] board) {
+	protected void setBoard(Cell[][] board) {
 		this.board = board;
 	}
 
@@ -38,14 +41,33 @@ public class Board {
 		return unshowedLines;
 	}
 
+	/**
+	 * Creating the board of a given size and a number of lines that should not
+	 * be displayed
+	 * 
+	 * @param width
+	 *            the width of the board
+	 * @param height
+	 *            the height of the board
+	 * @param unshowedLines
+	 *            number of lines that should not be displayed
+	 */
 	public Board(int width, int height, int unshowedLines) {
 		super();
 		this.width = width;
 		this.height = height;
 		this.unshowedLines = unshowedLines;
-		this.board = new Cells[width][height];
+		this.board = new Cell[width][height];
 	}
 
+	/**
+	 * Creating the board of a given size
+	 * 
+	 * @param width
+	 *            the width of the board
+	 * @param height
+	 *            the height of the board
+	 */
 	public Board(int width, int height) {
 		this(width, height, 0);
 	}
@@ -60,7 +82,7 @@ public class Board {
 		super();
 		this.width = aBoard.width;
 		this.height = aBoard.height;
-		this.board = new Cells[aBoard.width][aBoard.height];
+		this.board = new Cell[aBoard.width][aBoard.height];
 		for (int x = 0; x < aBoard.width; ++x) {
 			for (int y = 0; y < aBoard.height; ++y) {
 				this.board[x][y] = aBoard.board[x][y];
@@ -79,14 +101,14 @@ public class Board {
 	protected void clearBoard() {
 		for (int i = 0; i < width; ++i)
 			for (int j = 0; j < height; ++j)
-				this.board[i][j] = Cells.Empty;
+				this.board[i][j] = Cell.Empty;
 	}
 
-	protected Cells getCell(int x, int y) {
+	protected Cell getCell(int x, int y) {
 		return this.board[x][y];
 	}
 
-	protected void setCell(Cells cell, int x, int y) {
+	protected void setCell(Cell cell, int x, int y) {
 		this.board[x][y] = cell;
 	}
 
@@ -100,7 +122,7 @@ public class Board {
 			char line[] = new char[width];
 			for (int j = 0; j < width; ++j) {
 				// If the cell[j][i] is full then print "0" otherwise "."
-				line[j] = (board[j][i] == Cells.Full) ? '0' : '.';
+				line[j] = (board[j][i] == Cell.Full) ? '0' : '.';
 			}
 			result.append(line).append("\n");
 		}

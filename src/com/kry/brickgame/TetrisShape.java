@@ -2,7 +2,7 @@ package com.kry.brickgame;
 
 import java.util.Random;
 
-import com.kry.brickgame.Board.Cells;
+import com.kry.brickgame.Board.Cell;
 
 public class TetrisShape extends Shape implements Cloneable {
 
@@ -19,7 +19,7 @@ public class TetrisShape extends Shape implements Cloneable {
 
 	private RotationAngle rotationAngle;
 
-	private Cells fill;
+	private Cell fill;
 
 	/**
 	 * A set of coordinates of a points of a figures:
@@ -68,7 +68,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            type of fill of a figure
 	 */
 	public void setShape(Tetrominoes shape, RotationAngle rotationAngle,
-			Cells fill) {
+			Cell fill) {
 		for (int i = 0; i < LENGTH; ++i) {
 			switch (rotationAngle) {
 			case d0:
@@ -117,7 +117,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            rotation angle of a figure
 	 */
 	public void setShape(Tetrominoes shape, RotationAngle rotationAngle) {
-		setShape(shape, rotationAngle, Cells.Full);
+		setShape(shape, rotationAngle, Cell.Full);
 	}
 
 	/**
@@ -127,18 +127,18 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            a figure
 	 */
 	public void setShape(Tetrominoes shape) {
-		setShape(shape, RotationAngle.d0, Cells.Full);
+		setShape(shape, RotationAngle.d0, Cell.Full);
 	}
 
 	public Tetrominoes getShape() {
 		return shape;
 	}
 
-	public Cells getFill() {
+	public Cell getFill() {
 		return fill;
 	}
 
-	public void setFill(Cells fill) {
+	public void setFill(Cell fill) {
 		this.fill = fill;
 	}
 

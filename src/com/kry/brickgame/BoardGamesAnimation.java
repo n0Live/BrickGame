@@ -15,20 +15,20 @@ public class BoardGamesAnimation extends Board {
 	private final static int width = Game.BOARD_WIDTH;
 	private final static int height = 5;
 	private final static int frames = 5;
-	private final static Cells cE = Cells.Empty;
-	private final static Cells cF = Cells.Full;
+	private final static Cell cE = Cell.Empty;
+	private final static Cell cF = Cell.Full;
 
 	private GamesForAnimation animation;
 
 	/**
 	 * Board with an animation
 	 */
-	private Cells[][] board = new Cells[width][height];
+	private Cell[][] board = new Cell[width][height];
 
 	/**
 	 * Table animation to draw them on the board 10x5: [index][frame][y][x]
 	 */
-	private final static Cells[][][][] lettersTable = new Cells[][][][] { //
+	private final static Cell[][][][] lettersTable = new Cell[][][][] { //
 		{// None
 			{ //None-1
 				{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },

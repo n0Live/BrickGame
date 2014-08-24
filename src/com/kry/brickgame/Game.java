@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kry.brickgame.Board.Cells;
+import com.kry.brickgame.Board.Cell;
 
 public class Game implements Runnable {
 
@@ -42,6 +42,7 @@ public class Game implements Runnable {
 
 	private int speed = 1;
 	private int level = 1;
+	private int score = 0;
 
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
@@ -49,6 +50,9 @@ public class Game implements Runnable {
 		None, Running, Paused, GameOver, DoSomeWork
 	};
 
+	/**
+	 * Game status
+	 */
 	private volatile Status status;
 
 	private long timePoint = System.currentTimeMillis();
@@ -179,6 +183,15 @@ public class Game implements Runnable {
 			this.level = level;
 	}
 
+	protected int getScore() {
+		return score;
+	}
+
+	protected void setScore(int score) {
+		this.score = score;
+		fireInfoChanged(String.valueOf(score));
+	}
+
 	protected Board getBoard() {
 		return board;
 	}
@@ -253,7 +266,7 @@ public class Game implements Runnable {
 			for (int i = 0; i < piece.getCoords().length; ++i) {
 				int board_x = x + piece.x(i);
 				int board_y = y - piece.y(i);
-				if (board.getCell(board_x, board_y) != Cells.Empty)
+				if (board.getCell(board_x, board_y) != Cell.Empty)
 					return true;
 			}
 		} catch (Exception e) {
@@ -342,7 +355,7 @@ public class Game implements Runnable {
 		if (isUpDirection) {
 			for (int y = fromY; y <= toY; y++) {
 				for (int x = 0; x < BOARD_WIDTH; x++) {
-					board.setCell(Cells.Full, x, y);
+					board.setCell(Cell.Full, x, y);
 				}
 				fireBoardChanged(board);
 				try {
@@ -356,7 +369,7 @@ public class Game implements Runnable {
 		} else {
 			for (int y = fromY; y >= toY; y--) {
 				for (int x = 0; x < BOARD_WIDTH; x++) {
-					board.setCell(Cells.Empty, x, y);
+					board.setCell(Cell.Empty, x, y);
 				}
 				fireBoardChanged(board);
 				try {

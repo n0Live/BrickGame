@@ -14,12 +14,12 @@ public class BoardNumbers extends Board {
 	/**
 	 * Board with a drawn number
 	 */
-	private Cells[][] board = new Cells[width][height];
+	private Cell[][] board = new Cell[width][height];
 
 	/**
 	 * Table numbers to draw them on the board 5x5: [index][y][x]
 	 */
-	private final static Cells[][][] numbersTable = new Cells[][][] {
+	private final static Cell[][][] numbersTable = new Cell[][][] {
 			{ { Empty, Empty, Empty },// None
 					{ Empty, Empty, Empty },//
 					{ Empty, Empty, Empty },//

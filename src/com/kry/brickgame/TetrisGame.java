@@ -1,6 +1,6 @@
 package com.kry.brickgame;
 
-import com.kry.brickgame.Board.Cells;
+import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
 
 public class TetrisGame extends Game {
@@ -91,7 +91,7 @@ public class TetrisGame extends Game {
 			nextPiece.setRandomShapeAndRotate();
 
 			if (nextPiece.getShape() == Tetrominoes.SquareShape)
-				nextPiece.setFill(Cells.Blink);
+				nextPiece.setFill(Cell.Blink);
 
 			clearPreview();
 			setPreview(drawPiece(getPreview(),//
@@ -129,7 +129,7 @@ public class TetrisGame extends Game {
 
 		// Erase the current figure from the temporary board to not interfere
 		// with the checks
-		board = drawPiece(board, curX, curY, curPiece, Cells.Empty);
+		board = drawPiece(board, curX, curY, curPiece, Cell.Empty);
 
 		// If a collision from the new figure with the side boundary of the
 		// board then trying to move aside
@@ -144,7 +144,7 @@ public class TetrisGame extends Game {
 			return false;
 
 		// Erase the current figure from the basic board and draw the new figure
-		setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Empty));
+		setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cell.Empty));
 		setBoard(drawPiece(getBoard(), prepX, newY, newPiece,
 				newPiece.getFill()));
 
@@ -174,7 +174,7 @@ public class TetrisGame extends Game {
 	 * @return - the board with the figure
 	 */
 	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
-			Cells fill) {
+			Cell fill) {
 		for (int i = 0; i < piece.getCoords().length; ++i) {
 			int board_x = x + piece.x(i);
 			int board_y = y - piece.y(i);
@@ -212,7 +212,7 @@ public class TetrisGame extends Game {
 		if (curPiece.getShape() != Tetrominoes.NoShape)
 			// Cells.Full instead curPiece.getFill() because is Blink should
 			// change to Full when lying on the board
-			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cells.Full));
+			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cell.Full));
 
 		removeFullLines();
 
@@ -236,7 +236,7 @@ public class TetrisGame extends Game {
 			boolean lineIsFull = true;
 			// check for the existence an empty cell in the line
 			for (int x = 0; x < BOARD_WIDTH; ++x) {
-				if (board.getCell(x, y) == Cells.Empty) {
+				if (board.getCell(x, y) == Cell.Empty) {
 					lineIsFull = false;
 					break;
 				}
@@ -259,9 +259,26 @@ public class TetrisGame extends Game {
 
 		if (numFullLines > 0) {
 			numLinesRemoved += numFullLines;
+			
+			//increasing score
+			switch (numFullLines) {
+			case 1:
+				setScore(getScore() + 1);
+				break;
+			case 2:
+				setScore(getScore() + 3);
+				break;
+			case 3:
+				setScore(getScore() + 7);
+				break;
+			case 4:
+				setScore(getScore() + 15);
+				break;
+			default:
+				break;
+			}
 		}
 		curPiece.setShape(Tetrominoes.NoShape);
-		fireInfoChanged(String.valueOf(numLinesRemoved));
 	}
 
 	/**
@@ -281,9 +298,9 @@ public class TetrisGame extends Game {
 
 		while ((x1 >= 0) || (x2 < BOARD_WIDTH)) {
 			if (x1 >= 0)
-				board.setCell(Cells.Empty, x1--, line);
+				board.setCell(Cell.Empty, x1--, line);
 			if (x2 < BOARD_WIDTH)
-				board.setCell(Cells.Empty, x2++, line);
+				board.setCell(Cell.Empty, x2++, line);
 
 			try {
 				Thread.sleep(ANIMATION_DELAY);

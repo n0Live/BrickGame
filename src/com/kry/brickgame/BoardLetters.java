@@ -14,13 +14,13 @@ public class BoardLetters extends Board {
 	/**
 	 * Board with a drawn letter
 	 */
-	private Cells[][] board = new Cells[width][height];
+	private Cell[][] board = new Cell[width][height];
 
 	/**
 	 * Table letters to draw them on the board 5x5:
 	 * [index][y][x]
 	 */
-	private final static Cells[][][] lettersTable = new Cells[][][] {
+	private final static Cell[][][] lettersTable = new Cell[][][] {
 			{
 					{ Empty, Empty, Empty, Empty, Empty },// None
 					{ Empty, Empty, Empty, Empty, Empty },
