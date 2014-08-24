@@ -75,9 +75,15 @@ public class Game implements Runnable {
 
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
-	public Game() {
+	public Game(int speed, int level) {
+		this.speed = speed;
+		this.level = level;
 		board = new Board(BOARD_WIDTH, BOARD_HEIGHT, UNSHOWED_LINES);
 		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+	}
+
+	public Game() {
+		this(1, 1);
 	}
 
 	public static synchronized void addGameListener(GameListener listener) {
@@ -120,6 +126,20 @@ public class Game implements Runnable {
 		}
 	}
 
+	protected synchronized void fireSpeedChanged(int speed) {
+		GameEvent event = new GameEvent(this, (float) speed);
+		for (GameListener listener : listeners) {
+			listener.speedChanged(event);
+		}
+	}
+
+	protected synchronized void fireLevelChanged(int level) {
+		GameEvent event = new GameEvent(this, level);
+		for (GameListener listener : listeners) {
+			listener.levelChanged(event);
+		}
+	}
+
 	/**
 	 * Speed
 	 * 
@@ -152,11 +172,12 @@ public class Game implements Runnable {
 	 */
 	protected void setSpeed(int speed) {
 		if (speed < 1) {
-			this.speed = 1;
-		} else if (speed > 10) {
 			this.speed = 10;
+		} else if (speed > 10) {
+			this.speed = 1;
 		} else
 			this.speed = speed;
+		fireSpeedChanged(this.speed);
 	}
 
 	/**
@@ -176,11 +197,12 @@ public class Game implements Runnable {
 	 */
 	protected void setLevel(int level) {
 		if (level < 1) {
-			this.level = 1;
-		} else if (level > 10) {
 			this.level = 10;
+		} else if (level > 10) {
+			this.level = 1;
 		} else
 			this.level = level;
+		fireLevelChanged(this.level);
 	}
 
 	protected int getScore() {
@@ -263,7 +285,7 @@ public class Game implements Runnable {
 	 */
 	protected boolean checkCollision(Board board, Shape piece, int x, int y) {
 		try {
-			for (int i = 0; i < piece.getCoords().length; ++i) {
+			for (int i = 0; i < piece.getCoords().length; i++) {
 				int board_x = x + piece.x(i);
 				int board_y = y - piece.y(i);
 				if (board.getCell(board_x, board_y) != Cell.Empty)

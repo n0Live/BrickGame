@@ -77,8 +77,8 @@ public class BoardNumbers extends Board {
 					{ Full, Full, Full } } };
 
 	protected void setNumber(Numbers number) {
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				// [height - y - 1] - draw upside down
 				board[x][y] = numbersTable[number.ordinal()][height - y - 1][x];
 			}

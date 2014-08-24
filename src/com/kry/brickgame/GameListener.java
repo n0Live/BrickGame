@@ -8,5 +8,7 @@ public interface GameListener extends EventListener{
     public void previewChanged(GameEvent event);
     public void statusChanged(GameEvent event);
     public void infoChanged(GameEvent event);
+    public void speedChanged(GameEvent event);
+    public void levelChanged(GameEvent event);
     
 }

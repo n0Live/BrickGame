@@ -10,40 +10,62 @@ public class GameEvent extends EventObject {
 	private Board board;
 	private Status status;
 	private String info;
+	private int speed;
+	private int level;
 
 	/**
-	 * Events of a game
+	 * Events of the game
 	 * 
 	 * @param source
 	 *            source of the event
 	 * @param board
 	 *            state of a board
 	 * @param status
-	 *            a game state
+	 *            game state
 	 * @param info
-	 *            an additional info (score etc.)
+	 *            additional info (score, etc.)
+	 * @param speed
+	 *            game speed
+	 * @param level
+	 *            game level
 	 */
-	public GameEvent(Object source, Board board, Status status, String info) {
+	public GameEvent(Object source, Board board, Status status, String info,
+			int speed, int level) {
 		super(source);
 		this.board = board;
 		this.status = status;
 		this.info = info;
+		this.speed = speed;
+		this.level = level;
 	}
 
 	public GameEvent(Object source) {
-		this(source, null, null, "");
+		super(source);
 	}
 
 	public GameEvent(Object source, Board board) {
-		this(source, board, null, "");
+		super(source);
+		this.board = board;
 	}
 
 	public GameEvent(Object source, Status status) {
-		this(source, null, status, "");
+		super(source);
+		this.status = status;
 	}
 
 	public GameEvent(Object source, String info) {
-		this(source, null, null, info);
+		super(source);
+		this.info = info;
+	}
+
+	public GameEvent(Object source, float speed) {
+		super(source);
+		this.speed = (int) speed;
+	}
+
+	public GameEvent(Object source, int level) {
+		super(source);
+		this.level = level;
 	}
 
 	protected Status getStatus() {
@@ -56,6 +78,14 @@ public class GameEvent extends EventObject {
 
 	protected Board getBoard() {
 		return board;
+	}
+
+	protected int getSpeed() {
+		return speed;
+	}
+
+	protected int getLevel() {
+		return level;
 	}
 
 }

@@ -83,8 +83,8 @@ public class Board {
 		this.width = aBoard.width;
 		this.height = aBoard.height;
 		this.board = new Cell[aBoard.width][aBoard.height];
-		for (int x = 0; x < aBoard.width; ++x) {
-			for (int y = 0; y < aBoard.height; ++y) {
+		for (int x = 0; x < aBoard.width; x++) {
+			for (int y = 0; y < aBoard.height; y++) {
 				this.board[x][y] = aBoard.board[x][y];
 			}
 		}
@@ -99,8 +99,8 @@ public class Board {
 	 * Clears the cells of the board
 	 */
 	protected void clearBoard() {
-		for (int i = 0; i < width; ++i)
-			for (int j = 0; j < height; ++j)
+		for (int i = 0; i < width; i++)
+			for (int j = 0; j < height; j++)
 				this.board[i][j] = Cell.Empty;
 	}
 
@@ -112,15 +112,31 @@ public class Board {
 		this.board[x][y] = cell;
 	}
 
+	protected Cell[] getLine(int y) {
+		Cell line[] = new Cell[this.getWidth()];
+
+		for (int i = 0; i < line.length; i++) {
+			line[i] = this.board[i][y];
+		}
+
+		return line;
+	}
+
+	protected void setLine(Cell[] line, int y) {
+		for (int i = 0; i < line.length; i++) {
+			this.board[i][y] = line[i];
+		}
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 
 		result.append("Board [" + width + "x" + height + "]").append("\n");
 		// Going through the board (the board is filled from the bottom up)
-		for (int i = height - 1; i >= 0; --i) {
+		for (int i = height - 1; i >= 0; i--) {
 			char line[] = new char[width];
-			for (int j = 0; j < width; ++j) {
+			for (int j = 0; j < width; j++) {
 				// If the cell[j][i] is full then print "0" otherwise "."
 				line[j] = (board[j][i] == Cell.Full) ? '0' : '.';
 			}

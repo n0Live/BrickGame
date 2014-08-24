@@ -38,8 +38,8 @@ public class GameSelector extends Game {
 			return;
 		}
 
-		for (int i = 0; i < boardToInsert.getWidth(); ++i) {
-			for (int j = 0; j < boardToInsert.getHeight(); ++j) {
+		for (int i = 0; i < boardToInsert.getWidth(); i++) {
+			for (int j = 0; j < boardToInsert.getHeight(); j++) {
 				board.setCell(boardToInsert.getCell(i, j), x + i, y + j);
 			}
 		}
@@ -134,10 +134,10 @@ public class GameSelector extends Game {
 	public void changeGame() {
 		switch (letter) {
 		case "A":
-			Main.setGame(new TetrisGame());
+			Main.setGame(new TetrisGame(getSpeed(), getLevel()));
 			break;
 		default:
-			Main.setGame(new TetrisGame());
+			Main.setGame(new TetrisGame(getSpeed(), getLevel()));
 			break;
 		}
 	}
@@ -145,28 +145,29 @@ public class GameSelector extends Game {
 	public void keyPressed(KeyPressed key) {
 		switch (key) {
 		case KeyLeft:
-			prevNumber();
-			drawNumber();
+			setSpeed(getSpeed() + 1);
 			break;
 		case KeyRight:
-			nextNumber();
-			drawNumber();
+			setLevel(getLevel() + 1);
 			break;
 		case KeyRotate:
-			changeGame();
-			break;
-		case KeyUp:
 			nextLetter();
 			drawLetter();
 			break;
+		case KeyUp:
+			prevNumber();
+			drawNumber();
+			break;
 		case KeyDown:
-			prevLetter();
-			drawLetter();
+			nextNumber();
+			drawNumber();
+			break;
+		case KeyStart:
+			changeGame();
 			break;
 		default:
 			break;
 		}
 
 	}
-
 }

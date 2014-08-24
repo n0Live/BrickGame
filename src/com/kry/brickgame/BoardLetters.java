@@ -173,8 +173,8 @@ public class BoardLetters extends Board {
 					{ Full, Empty, Empty, Empty, Full } } };
 
 	protected void setLetter(Letters letter) {
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				// [height - y - 1] - draw upside down
 				board[x][y] = lettersTable[letter.ordinal()][height - y - 1][x];
 			}

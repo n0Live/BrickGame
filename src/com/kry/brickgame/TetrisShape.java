@@ -69,7 +69,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public void setShape(Tetrominoes shape, RotationAngle rotationAngle,
 			Cell fill) {
-		for (int i = 0; i < LENGTH; ++i) {
+		for (int i = 0; i < LENGTH; i++) {
 			switch (rotationAngle) {
 			case d0:
 				setX(i, coordsTable[shape.ordinal()][i][0]);
@@ -93,12 +93,12 @@ public class TetrisShape extends Shape implements Cloneable {
 		// Center the figures, which were shifted to aside after rotation
 		if ((shape != Tetrominoes.LineShape) // except LineShape
 				&& ((minX() < -1) || (maxX() <= 0))) {
-			for (int i = 0; i < LENGTH; ++i) {
+			for (int i = 0; i < LENGTH; i++) {
 				setX(i, x(i) + 1);
 			}
 		}
 		if ((minY() < 0) || (maxY() <= 0)) {
-			for (int i = 0; i < LENGTH; ++i) {
+			for (int i = 0; i < LENGTH; i++) {
 				setY(i, y(i) + 1);
 			}
 		}

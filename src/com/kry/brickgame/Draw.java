@@ -71,9 +71,9 @@ public class Draw extends JPanel implements GameListener {
 	private Color bgColor;
 
 	/* Numerical values */
-	private String dScores = "0";
-	private String dSpeed = "1";
-	private String dLevel = "1";
+	private String scores = "0";
+	private String speed = "1";
+	private String level = "1";
 
 	/**
 	 * Game status
@@ -450,7 +450,7 @@ public class Draw extends JPanel implements GameListener {
 	 * Draws all text labels and icons on the main canvas
 	 */
 	protected void drawLabelsAndIcons() {
-		if ((canvas == null) || (dScores == null))
+		if ((canvas == null) || (scores == null))
 			return;
 
 		Font biggerTextFont = textFont.deriveFont((float) (textFontSize + 4));
@@ -461,7 +461,7 @@ public class Draw extends JPanel implements GameListener {
 		x = boardCanvas.getWidth();
 		y = digitalFontSize;
 
-		drawTextOnCanvas(canvas, "18888", dScores, digitFont, x, y);
+		drawTextOnCanvas(canvas, "18888", scores, digitFont, x, y);
 		/* --- */
 
 		/* Scores label */
@@ -497,8 +497,8 @@ public class Draw extends JPanel implements GameListener {
 		fm = getGraphics().getFontMetrics(digitFont);
 		space = fm.stringWidth("18") + (SQUARE_SIZE / 2);
 
-		drawTextOnCanvas(canvas, "18", dSpeed, digitFont, x, y);
-		drawTextOnCanvas(canvas, "18", dLevel, digitFont, x + space, y);
+		drawTextOnCanvas(canvas, "18", speed, digitFont, x, y);
+		drawTextOnCanvas(canvas, "18", level, digitFont, x + space, y);
 		/* --- */
 
 		/* Speed and Level labels */
@@ -605,7 +605,17 @@ public class Draw extends JPanel implements GameListener {
 
 	@Override
 	public void infoChanged(GameEvent event) {
-		dScores = event.getInfo();
+		scores = event.getInfo();
+	}
+
+	@Override
+	public void speedChanged(GameEvent event) {
+		speed = String.valueOf(event.getSpeed());
+	}
+
+	@Override
+	public void levelChanged(GameEvent event) {
+		level = String.valueOf(event.getLevel());
 	}
 
 }

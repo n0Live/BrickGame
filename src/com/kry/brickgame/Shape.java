@@ -168,7 +168,7 @@ public class Shape {
 	public Shape rotateLeft(Shape shape) {
 		Shape result = new Shape(shape.getCoords().length);
 
-		for (int i = 0; i < shape.getCoords().length; ++i) {
+		for (int i = 0; i < shape.getCoords().length; i++) {
 			result.setX(i, shape.y(i));
 			result.setY(i, -shape.x(i));
 		}
@@ -185,7 +185,7 @@ public class Shape {
 	public Shape rotateRight(Shape shape) {
 		Shape result = new Shape(shape.getCoords().length);
 
-		for (int i = 0; i < shape.getCoords().length; ++i) {
+		for (int i = 0; i < shape.getCoords().length; i++) {
 			result.setX(i, -shape.y(i));
 			result.setY(i, shape.x(i));
 		}
@@ -209,14 +209,14 @@ public class Shape {
 		int min_y = minY();
 		int max_y = maxY();
 
-		for (int y = max_y; y >= min_y; --y) {
+		for (int y = max_y; y >= min_y; y--) {
 			char line[] = new char[(max_x - min_x) + 1];
 
-			for (int x = min_x; x <= max_x; ++x) {
+			for (int x = min_x; x <= max_x; x++) {
 				// [x + (0 - min_x)]: because x can be less than 0, then x is
 				// shifted to 0
 				line[x + (0 - min_x)] = ' ';
-				for (int k = 0; k < getCoords().length; ++k) {
+				for (int k = 0; k < getCoords().length; k++) {
 					if ((getCoords()[k][0] == x) && (getCoords()[k][1] == y)) {
 						// see previous comment
 						line[x + (0 - min_x)] = '0';

@@ -1,5 +1,7 @@
 package com.kry.brickgame;
 
+import java.util.Random;
+
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
 
@@ -30,16 +32,13 @@ public class TetrisGame extends Game {
 	 */
 	private int curY = 0;
 
-	public TetrisGame() {
-		super();
+	public TetrisGame(int speed, int level) {
+		super(speed, level);
 
 		setStatus(Status.None);
 
 		curPiece = new TetrisShape();
 		nextPiece = new TetrisShape();
-
-		clearPreview();
-		clearBoard();
 	}
 
 	/**
@@ -48,6 +47,9 @@ public class TetrisGame extends Game {
 	@Override
 	public void start() {
 		super.start();
+
+		// getLevel() - 1 - because on the first level doesn't need to add line
+		addLines(getLevel() - 1);
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
@@ -175,7 +177,7 @@ public class TetrisGame extends Game {
 	 */
 	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
 			Cell fill) {
-		for (int i = 0; i < piece.getCoords().length; ++i) {
+		for (int i = 0; i < piece.getCoords().length; i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y - piece.y(i);
 			board.setCell(fill, board_x, board_y);
@@ -199,7 +201,7 @@ public class TetrisGame extends Game {
 		while (newY > 0) {
 			if (!tryMove(curPiece, curX, newY - 1))
 				break;
-			--newY;
+			newY--;
 		}
 		pieceDropped();
 	}
@@ -214,7 +216,18 @@ public class TetrisGame extends Game {
 			// change to Full when lying on the board
 			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cell.Full));
 
+		int oldHundreds = getScore() / 100;
+
 		removeFullLines();
+
+		// when a sufficient number of points changes the speed and the level
+		if (getScore() / 100 > oldHundreds) {
+			setSpeed(getSpeed() + 1);
+			if (getSpeed() == 1) {
+				setLevel(getLevel() + 1);
+				addLines(getLevel() - 1);
+			}
+		}
 
 		if (!isFallingFinished)
 			newPiece();
@@ -228,39 +241,40 @@ public class TetrisGame extends Game {
 		Board board = getBoard();
 
 		isFallingFinished = true;
+		curPiece.setShape(Tetrominoes.NoShape);
 
 		int numFullLines = 0;
 
 		// going through on all lines
-		for (int y = 0; y < BOARD_HEIGHT - 1; ++y) {
+		for (int y = 0; y < BOARD_HEIGHT - 1; y++) {
 			boolean lineIsFull = true;
 			// check for the existence an empty cell in the line
-			for (int x = 0; x < BOARD_WIDTH; ++x) {
+			for (int x = 0; x < BOARD_WIDTH; x++) {
 				if (board.getCell(x, y) == Cell.Empty) {
 					lineIsFull = false;
 					break;
 				}
 			}
 			if (lineIsFull) {
-				++numFullLines;
+				numFullLines++;
 
 				// animated clearing of a full line
 				animatedClearLine(y, curX);
 
 				// drop the lines down on the filled line
-				for (int k = y; k < BOARD_HEIGHT - 1; ++k) {
-					for (int x = 0; x < BOARD_WIDTH; ++x)
+				for (int k = y; k < BOARD_HEIGHT - 1; k++) {
+					for (int x = 0; x < BOARD_WIDTH; x++)
 						board.setCell(board.getCell(x, k + 1), x, k);
 				}
 				// return to one line back (because we removed the filled line)
-				--y;
+				y--;
 			}
 		}
 
 		if (numFullLines > 0) {
 			numLinesRemoved += numFullLines;
-			
-			//increasing score
+
+			// increasing score
 			switch (numFullLines) {
 			case 1:
 				setScore(getScore() + 1);
@@ -278,7 +292,6 @@ public class TetrisGame extends Game {
 				break;
 			}
 		}
-		curPiece.setShape(Tetrominoes.NoShape);
 	}
 
 	/**
@@ -321,6 +334,78 @@ public class TetrisGame extends Game {
 		} else if (getStatus() == Status.Paused) {
 			setStatus(Status.Running);
 		}
+	}
+
+	/**
+	 * Adds randomly generated lines at the bottom of the board
+	 * 
+	 * @param linesCount
+	 *            count of added lines
+	 * @return if {@code linesCount < 0} or when adding the lines, the board
+	 *         reaches the upper border, then return {@code false}, otherwise
+	 *         the lines adds and returns {@code true}
+	 */
+	private boolean addLines(int linesCount) {
+		if (linesCount < 1)
+			return false;
+
+		Board board = getBoard();
+
+		// checks whether there are full cells at a distance of
+		// <i>linesCount</i> from the top of the board
+		for (int i = 0; i < BOARD_WIDTH; i++) {
+			if (board.getCell(i, (BOARD_HEIGHT - linesCount)) == Cell.Full)
+				return false;
+		}
+
+		Random r = new Random();
+		Cell newLines[][] = new Cell[linesCount][BOARD_WIDTH];
+
+		// picks up the lines of the board
+		for (int y = linesCount + 1; y < BOARD_HEIGHT; y++) {
+			for (int x = 0; x < BOARD_WIDTH; x++)
+				board.setCell(board.getCell(x, y - 1), x, y);
+		}
+
+		// generates a new lines
+		for (int line = 0; line < linesCount; line++) {
+			boolean hasEmpty = false;
+			boolean hasFull = false;
+
+			for (int i = 0; i < BOARD_WIDTH; i++) {
+				if ((Math.abs(r.nextInt()) % 2) == 0) {
+					newLines[line][i] = Cell.Empty;
+					hasEmpty = true;
+				} else {
+					newLines[line][i] = Cell.Full;
+					hasFull = true;
+				}
+			}
+
+			// if all the cells were empty, creates a full one in a random place
+			// of the line
+			if (!hasEmpty || !hasFull) {
+				newLines[line][Math.abs(r.nextInt(BOARD_WIDTH))] = ((!hasEmpty) ? Cell.Empty
+						: Cell.Full);
+			}
+
+			// adds the created line to the board
+			board.setLine(newLines[line], line);
+		}
+
+		setBoard(board);
+		return true;
+	}
+
+	/**
+	 * Adds one randomly generated line at the bottom of the board
+	 * 
+	 * @return if when adding the line, the board reaches the upper border, then
+	 *         return {@code false}, otherwise the line adds and returns
+	 *         {@code true}
+	 */
+	private boolean addLines() {
+		return addLines(1);
 	}
 
 	/**

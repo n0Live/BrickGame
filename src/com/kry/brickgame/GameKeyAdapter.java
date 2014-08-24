@@ -27,6 +27,9 @@ public class GameKeyAdapter extends KeyAdapter {
 		case KeyEvent.VK_SPACE:
 			Main.getGame().keyPressed(KeyPressed.KeyRotate);
 			break;
+		case KeyEvent.VK_ENTER:
+			Main.getGame().keyPressed(KeyPressed.KeyStart);
+			break;
 		case 'p':
 			Main.getGame().keyPressed(KeyPressed.KeyStart);
 			break;
