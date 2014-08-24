@@ -24,7 +24,8 @@ public class Window extends JFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		Color bgColor = new Color(109, 119, 92);
+		//Color bgColor = new Color(109, 119, 92);
+		Color bgColor = new Color(136, 153, 107);
 
 		frame = new JFrame();
 		frame.setBounds(100, 100, 430, 565);
@@ -39,17 +40,26 @@ public class Window extends JFrame {
 		Game.addGameListener(drawPanel);
 		frame.addKeyListener(Main.gameKeyAdapter);
 
-		Timer timer = new Timer("Blinking", true);
-		timer.schedule(new TimerTask() {
+		new Timer("BlinkingSquares", true).schedule(new TimerTask() {
 			@Override
 			public void run() {
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						drawPanel.blinking();
+						drawPanel.blinkingSquares();
 					}
 				});
 			}
 		}, 0, 10);
+		new Timer("BlinkingPause", true).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						drawPanel.blinkingPauseIcon();
+					}
+				});
+			}
+		}, 0, 500);
 
 		setTitle("Brick Game");
 		Main.setGame(Main.gameSelector);

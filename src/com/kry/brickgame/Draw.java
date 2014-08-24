@@ -1,5 +1,6 @@
 package com.kry.brickgame;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -13,15 +14,19 @@ import java.io.IOException;
 
 import javax.swing.JPanel;
 
-import com.kry.brickgame.Board.Cells;
+import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.Game.Status;
 
 public class Draw extends JPanel implements GameListener {
 
 	private static final long serialVersionUID = 1043017116324502441L;
 
+	/**
+	 * Size of a single cell of a board
+	 */
 	private static final int SQUARE_SIZE = 26;
 
+	/* LABELS */
 	private static final String HI = "HI";
 	private static final String SCORE = "SCORE";
 	private static final String NEXT = "NEXT";
@@ -32,50 +37,100 @@ public class Draw extends JPanel implements GameListener {
 	private static final String PAUSE = "PAUSE";
 	private static final String GAME_OVER = "GAME OVER";
 
-	private Font digital;
+	/**
+	 * Font for digital data (score, etc.)
+	 */
+	private Font digitFont;
+	/**
+	 * Font for textual data (labels, etc.)
+	 */
 	private Font textFont;
+	/**
+	 * Font of icons
+	 */
+	private Font iconFont;
 
 	private Board board = null;
 	private Board preview = null;
 
-	private final Color emptyColor = new Color(40, 40, 40, 40);
+	/**
+	 * Color of inactive elements
+	 */
+	private final Color emptyColor = new Color(60, 60, 60, 20);
+	/**
+	 * Color of active elements
+	 */
 	private final Color fullColor = new Color(40, 40, 40, 255);
+	/**
+	 * Color of elements that change their state from active to inactive
+	 */
 	private Color blinkColor = fullColor;
+	/**
+	 * Background color
+	 */
 	private Color bgColor;
 
+	/* Numerical values */
 	private String dScores = "0";
 	private String dSpeed = "1";
 	private String dLevel = "1";
 
+	/**
+	 * Game status
+	 */
 	private Status status;
 
-	private FontMetrics fm;
-
-	private final float digitalFontSize = (float) 46;
+	/* Font sizes */
+	private final int digitalFontSize = 46;
 	private final int textFontSize = 20;
+	private final int iconFontSize = 20;
 
 	private Dimension size = null;
 
+	/**
+	 * Main canvas, combining all elements
+	 */
 	private BufferedImage canvas = null;
+	/**
+	 * Canvas that is used to display the main board
+	 */
 	private BufferedImage boardCanvas = null;
+	/**
+	 * Canvas that is used to display the preview board
+	 */
 	private BufferedImage previewCanvas = null;
+	/**
+	 * Flag for blinking "Pause" icon
+	 */
+	private boolean showPauseIcon = false;
 
 	public Draw() {
 		super();
-
+		/* initialize the fonts */
+		textFont = new Font(Font.SANS_SERIF, Font.PLAIN, textFontSize);
 		try {
-			digital = Font.createFont(
+			// trying to get the font from a resource file
+			digitFont = Font.createFont(
 					Font.TRUETYPE_FONT,
 					getClass().getResourceAsStream(
-							"/fonts/Segment7Standard.otf")).deriveFont(
-					digitalFontSize);
+							"/fonts/Segment7Standard.otf"))//
+					.deriveFont((float) digitalFontSize);// set the font size
 
 		} catch (FontFormatException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			// if error just create a monospaced font
+			digitFont = new Font(Font.MONOSPACED, Font.PLAIN, digitalFontSize);
 		}
+		try {
+			iconFont = Font.createFont(Font.TRUETYPE_FONT,
+					getClass().getResourceAsStream("/fonts/icomoon.ttf"))
+					.deriveFont((float) iconFontSize);
 
-		textFont = new Font(Font.SANS_SERIF, Font.PLAIN, textFontSize);
+		} catch (FontFormatException | IOException e) {
+			e.printStackTrace();
+			// If error does not use the font
+			iconFont = null;
+		}
 	}
 
 	protected Board getBoard() {
@@ -100,11 +155,28 @@ public class Draw extends JPanel implements GameListener {
 			previewCanvas = initCanvas(preview);
 	}
 
-	int boardWidthInSquares(Board board) {
+	/**
+	 * Converting the width of the board from cells to pixels
+	 * 
+	 * @param board
+	 *            the board for which determine the width in pixels
+	 * @return the width of the board in pixels
+	 * @see #boardHeightInPixels
+	 */
+	int boardWidthInPixels(Board board) {
 		return board.getWidth() * SQUARE_SIZE;
 	}
 
-	int boardHeightInSquares(Board board) {
+	/**
+	 * Converting the height of the board from the <b>visible</b> cells to
+	 * pixels
+	 * 
+	 * @param board
+	 *            the board for which determine the width in pixels
+	 * @return the height of the board in pixels
+	 * @see #boardWidthInPixels
+	 */
+	int boardHeightInPixels(Board board) {
 		return (board.getHeight() - board.getUnshowedLines()) * SQUARE_SIZE;
 	}
 
@@ -112,25 +184,31 @@ public class Draw extends JPanel implements GameListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		size = getSize();
 		bgColor = getBackground();
 
-		if ((canvas == null) || (canvas.getWidth() != size.width + 2)
-				|| (canvas.getHeight() != size.height + 2)) {
+		// get new size of this component
+		size = getSize();
+		// if the main canvas is not created or the size changed
+		if ((canvas == null) || (canvas.getWidth() != size.width)
+				|| (canvas.getHeight() != size.height)) {
+			// create the main canvas
 			canvas = initCanvas(size.width, size.height);
 		}
 
 		clearCanvas(canvas, bgColor);
 
+		// draw the board and the preview
 		updateCanvas(boardCanvas, board);
 		updateCanvas(previewCanvas, preview);
-		canvasSetBorder(boardCanvas, board, fullColor);
+		canvasSetBorder(boardCanvas);
 
+		// append the board and the preview to the main canvas
 		appendCanvas(canvas, boardCanvas, 0, 0);
 		appendCanvas(canvas, previewCanvas, boardCanvas.getWidth()
 				+ SQUARE_SIZE, 5 * SQUARE_SIZE);
 
-		drawScoresAndStatus();
+		// append labels and icons
+		drawLabelsAndIcons();
 
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -139,19 +217,44 @@ public class Draw extends JPanel implements GameListener {
 		g2d.drawRenderedImage(canvas, null);
 	}
 
+	/**
+	 * Creating the canvas specified width and height
+	 * 
+	 * @param width
+	 *            width of the created canvas
+	 * @param height
+	 *            height of the created canvas
+	 */
 	private BufferedImage initCanvas(int width, int height) {
-		return new BufferedImage(width + 2, height + 2,
-				BufferedImage.TYPE_INT_ARGB);
+		return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	}
 
+	/**
+	 * Creating the canvas based on a board
+	 * 
+	 * @param board
+	 *            board, the width and the height of which will be used to
+	 *            create of the canvas
+	 * @return {@code null} if the board is not defined, otherwise - the new
+	 *         canvas
+	 */
 	private BufferedImage initCanvas(Board board) {
 		if (board == null)
 			return null;
 
-		return initCanvas(boardWidthInSquares(board),
-				boardHeightInSquares(board));
+		// increasing of the width and height by 2 needed to draw borders
+		return initCanvas(boardWidthInPixels(board) + 2,
+				boardHeightInPixels(board) + 2);
 	}
 
+	/**
+	 * Clears the canvas by filling it with the background color
+	 * 
+	 * @param canvas
+	 *            the canvas to clear
+	 * @param bgColor
+	 *            the background color
+	 */
 	protected void clearCanvas(BufferedImage canvas, Color bgColor) {
 		if (canvas == null)
 			return;
@@ -162,18 +265,34 @@ public class Draw extends JPanel implements GameListener {
 		g2d.dispose();
 	}
 
-	protected void canvasSetBorder(BufferedImage canvas, Board board,
-			Color color) {
+	/**
+	 * Draws the borders around the canvas
+	 * 
+	 * @param canvas
+	 *            the canvas to draw the borders
+	 */
+	protected void canvasSetBorder(BufferedImage canvas) {
 		if (canvas == null)
 			return;
 
 		Graphics2D g2d = canvas.createGraphics();
+
 		g2d.setColor(fullColor);
+		g2d.setStroke(new BasicStroke(5));// set thickness of the line
 		g2d.drawRect(0, 0, canvas.getWidth() - 1, canvas.getHeight() - 1);
+
 		g2d.dispose();
 	}
 
-	protected void paintBoardCanvas(BufferedImage canvas, Board board) {
+	/**
+	 * Draws the contents of the board to the canvas
+	 * 
+	 * @param canvas
+	 *            the target canvas
+	 * @param board
+	 *            the board whose contents need to be drawn
+	 */
+	protected void drawBoardOnCanvas(BufferedImage canvas, Board board) {
 		if ((canvas == null) || (board == null))
 			return;
 
@@ -181,48 +300,114 @@ public class Draw extends JPanel implements GameListener {
 		int boardHeight = board.getHeight() - board.getUnshowedLines();
 
 		Graphics2D g2d = canvas.createGraphics();
-
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		for (int i = 0; i < boardHeight; ++i) {
-			for (int j = 0; j < boardWidth; ++j) {
-				Cells fill = board.getCell(j, boardHeight - i - 1);
+		// draw squares of the board
+		for (int i = 0; i < boardHeight; i++) {
+			for (int j = 0; j < boardWidth; j++) {
+				// "boardHeight - i - 1" - the board reads from the bottom up
+				Cell fill = board.getCell(j, boardHeight - i - 1);
 				drawSquare(g2d, j * SQUARE_SIZE + 1, i * SQUARE_SIZE + 1, fill);
 			}
 		}
-
 		g2d.dispose();
 	}
 
-	private void drawSquare(Graphics g, int x, int y, Cells fill) {
+	/**
+	 * Draws one square from a board
+	 * 
+	 * @param g2d
+	 *            {@code Graphics2D} object, which used to draw on it
+	 * @param x
+	 *            x-coordinate of upper left corner of the square to be drawn
+	 * @param y
+	 *            y-coordinate of upper left corner of the square to be drawn
+	 * @param fill
+	 *            fill type: {@code Full}, {@code Empty} or {@code Blink}
+	 */
+	private void drawSquare(Graphics2D g2d, int x, int y, Cell fill) {
 		Color colors[] = { emptyColor, fullColor, blinkColor };
 
 		Color color = colors[fill.ordinal()];
+		g2d.setColor(color);
 
-		g.setColor(color);
-		g.drawRect(x + 1, y + 1, SQUARE_SIZE - 2, SQUARE_SIZE - 2);
-		g.drawRect(x + 2, y + 2, SQUARE_SIZE - 4, SQUARE_SIZE - 2);
-		g.fillRect(x + 1 + (SQUARE_SIZE / 4), y + 1 + (SQUARE_SIZE / 4),
+		// set thickness of the line
+		g2d.setStroke(new BasicStroke(2));
+		// draw the frame
+		g2d.drawRect(x + 2, y + 2, SQUARE_SIZE - 4, SQUARE_SIZE - 4);
+		// draw the inner square
+		g2d.fillRect(x + 1 + (SQUARE_SIZE / 4), y + 1 + (SQUARE_SIZE / 4),
 				SQUARE_SIZE / 2, SQUARE_SIZE / 2);
-
 	}
 
-	protected void appendCanvas(BufferedImage toCanvas,
-			BufferedImage fromCanvas, int x, int y) {
-		if ((toCanvas == null) || (fromCanvas == null))
+	/**
+	 * Clears the canvas and draws on it the contents of the board
+	 * 
+	 * @param canvas
+	 *            the target canvas
+	 * @param board
+	 *            the board whose contents need to be drawn
+	 */
+	protected void updateCanvas(BufferedImage canvas, Board board) {
+		if (canvas == null)
 			return;
 
-		Graphics2D g2d = toCanvas.createGraphics();
+		clearCanvas(canvas, bgColor);
+		drawBoardOnCanvas(canvas, board);
+	}
 
-		g2d.drawImage(fromCanvas, x, y, fromCanvas.getWidth(),
-				fromCanvas.getHeight(), null);
+	/**
+	 * Adding to the {@code targetCanvas} the image from the
+	 * {@code sourceCanvas}
+	 * 
+	 * @param targetCanvas
+	 *            the canvas on which the image to be added
+	 * @param sourceCanvas
+	 *            the canvas, the image from which to be added
+	 * @param x
+	 *            x-coordinate of upper left corner of the image to be added
+	 * @param y
+	 *            y-coordinate of upper left corner of the image to be added
+	 */
+	protected void appendCanvas(BufferedImage targetCanvas,
+			BufferedImage sourceCanvas, int x, int y) {
+		if ((targetCanvas == null) || (sourceCanvas == null))
+			return;
+
+		Graphics2D g2d = targetCanvas.createGraphics();
+
+		g2d.drawImage(sourceCanvas, x, y, sourceCanvas.getWidth(),
+				sourceCanvas.getHeight(), null);
 
 		g2d.dispose();
 	}
 
-	protected void drawTextOnCanvas(BufferedImage canvas, String init,
-			String digits, Font font, int x, int y) {
+	/**
+	 * Draws the text labels on the canvas.
+	 * <p>
+	 * First, the {@code backgroundText} is drawn in {@code emptyColor} color,
+	 * then the {@code foregroundText} is drawn in {@code fullColor} color. The
+	 * length of the {@code backgroundText} should not exceed the length of the
+	 * {@code foregroundText}.
+	 * 
+	 * @param canvas
+	 *            the target canvas
+	 * @param backgroundText
+	 *            the text that displayed in the background
+	 * @param foregroundText
+	 *            the text that displayed in the foreground
+	 * @param font
+	 *            text font
+	 * @param x
+	 *            x-coordinate of lower left corner of the text to be drawn
+	 * @param y
+	 *            y-coordinate of lower left corner of the text to be drawn
+	 * 
+	 */
+	protected void drawTextOnCanvas(BufferedImage canvas,
+			String backgroundText, String foregroundText, Font font, int x,
+			int y) {
 		if (canvas == null)
 			return;
 
@@ -232,90 +417,175 @@ public class Draw extends JPanel implements GameListener {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2d.setFont(font);
+		// need to determine the size of the text area
+		FontMetrics fm = g2d.getFontMetrics();
 
-		fm = g2d.getFontMetrics();
-
+		// clear the text area
 		g2d.setBackground(bgColor);
-		g2d.clearRect(x, y - font.getSize(), fm.stringWidth(init),
+		g2d.clearRect(x, y - font.getSize(), fm.stringWidth(backgroundText),
 				font.getSize());
 
+		// forming a string for text formatting, based on backgroundText
+		// like "%5.5s"
+		// http://download.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax
 		StringBuilder formatString = new StringBuilder("%")
-				.append(init.length()).append(".").append(init.length())
-				.append("s");
+				.append(backgroundText.length()).append(".")
+				.append(backgroundText.length()).append("s");
 
+		// draws the backgroundText
 		g2d.setColor(emptyColor);
-		g2d.drawString(String.format(formatString.toString(), init), x, y);
+		g2d.drawString(String.format(formatString.toString(), backgroundText),
+				x, y);
 
+		// draws the foregroundText
 		g2d.setColor(fullColor);
-		g2d.drawString(String.format(formatString.toString(), digits), x, y);
+		g2d.drawString(String.format(formatString.toString(), foregroundText),
+				x, y);
 
 		g2d.dispose();
 
 	}
 
-	protected void drawScoresAndStatus() {
+	/**
+	 * Draws all text labels and icons on the main canvas
+	 */
+	protected void drawLabelsAndIcons() {
 		if ((canvas == null) || (dScores == null))
 			return;
 
-		int x = boardCanvas.getWidth() + 2;
-		int y = (int) digitalFontSize;
-		drawTextOnCanvas(canvas, "18888", dScores, digital, x, y);
+		Font biggerTextFont = textFont.deriveFont((float) (textFontSize + 4));
+		FontMetrics fm;
+		int x, y, space;
 
-		x += 12;
-		y += 10 + textFontSize - 2;
+		/* Scores */
+		x = boardCanvas.getWidth();
+		y = digitalFontSize;
+
+		drawTextOnCanvas(canvas, "18888", dScores, digitFont, x, y);
+		/* --- */
+
+		/* Scores label */
+		x = boardCanvas.getWidth() + (3 * SQUARE_SIZE / 4);
+		y = 2 * SQUARE_SIZE + textFontSize;
+		fm = getGraphics().getFontMetrics(textFont);
+		space = fm.stringWidth(HI) + 2;
+
 		drawTextOnCanvas(canvas, HI, "", textFont, x, y);
-		drawTextOnCanvas(canvas, SCORE, SCORE, textFont,
-				x + 2 + fm.stringWidth(HI), y);
+		drawTextOnCanvas(canvas, SCORE, SCORE, textFont, x + space, y);
+		/* --- */
 
-		y += 16 + textFontSize + 6;
-		drawTextOnCanvas(canvas, NEXT, NEXT,
-				textFont.deriveFont((float) textFont.getSize() + 4), x - 6, y);
-		drawTextOnCanvas(canvas, LINES, "",
-				textFont.deriveFont((float) textFont.getSize() + 4),
-				x + fm.stringWidth(NEXT), y);
+		/* Music icon */
+		space = fm.stringWidth(HI + SCORE) + (SQUARE_SIZE / 2);
 
-		x += 10;
-		y += 10 + 5 * SQUARE_SIZE + digitalFontSize;
-		drawTextOnCanvas(canvas, "18", dSpeed, digital, x, y);
-		drawTextOnCanvas(canvas, "18", dLevel, digital,
-				x + 6 + fm.stringWidth("18"), y);
+		if (iconFont != null)
+			drawTextOnCanvas(canvas, "\ue602", "\ue602", iconFont, x + space, y);
+		/* --- */
 
-		x -= 12;
-		y += 10 + textFontSize;
+		/* Next/Lines labels */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = 4 * SQUARE_SIZE + biggerTextFont.getSize();
+		fm = getGraphics().getFontMetrics(biggerTextFont);
+		space = fm.stringWidth(NEXT) + (SQUARE_SIZE / 4);
+
+		drawTextOnCanvas(canvas, NEXT, NEXT, biggerTextFont, x, y);
+		drawTextOnCanvas(canvas, LINES, "", biggerTextFont, x + space, y);
+		/* --- */
+
+		/* Speed and Level */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 4);
+		y = 9 * SQUARE_SIZE + digitalFontSize;
+		fm = getGraphics().getFontMetrics(digitFont);
+		space = fm.stringWidth("18") + (SQUARE_SIZE / 2);
+
+		drawTextOnCanvas(canvas, "18", dSpeed, digitFont, x, y);
+		drawTextOnCanvas(canvas, "18", dLevel, digitFont, x + space, y);
+		/* --- */
+
+		/* Speed and Level labels */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = 11 * SQUARE_SIZE + textFontSize;
+		fm = getGraphics().getFontMetrics(textFont);
+		space = fm.stringWidth(SPEED) + (SQUARE_SIZE / 4);
+
 		drawTextOnCanvas(canvas, SPEED, SPEED, textFont, x, y);
-		drawTextOnCanvas(canvas, LEVEL, LEVEL, textFont,
-				x + 6 + fm.stringWidth(SPEED), y);
+		drawTextOnCanvas(canvas, LEVEL, LEVEL, textFont, x + space, y);
+		/* --- */
 
-		y += 20 + textFontSize;
+		/* Rotate label */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = 13 * SQUARE_SIZE + textFontSize;
+
 		drawTextOnCanvas(canvas, ROTATE, "", textFont, x, y);
+		/* --- */
 
-		y += 30 + textFontSize;
+		/* Rotate icons (left/right) */
+		fm = getGraphics().getFontMetrics(textFont);
+		space = fm.stringWidth(ROTATE) + (SQUARE_SIZE / 2);
+
+		if (iconFont != null) {
+			drawTextOnCanvas(canvas, "\ue600", "", iconFont, x + space, y
+					- (SQUARE_SIZE / 4));
+
+			space = fm.stringWidth(ROTATE + "\ue600") + (SQUARE_SIZE / 2);
+			drawTextOnCanvas(canvas, "\ue601", "", iconFont, x + space, y
+					+ (SQUARE_SIZE / 4));
+		}
+		/* --- */
+
+		/* Pause label */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = 15 * SQUARE_SIZE + textFontSize;
+
 		drawTextOnCanvas(canvas, PAUSE,
 				((status == Status.Paused) ? PAUSE : ""), textFont, x, y);
+		/* --- */
 
-		y += 50 + textFontSize;
+		/* Pause icon */
+		fm = getGraphics().getFontMetrics(textFont);
+		space = fm.stringWidth(PAUSE) + (SQUARE_SIZE / 2);
+
+		if (iconFont != null)
+			drawTextOnCanvas(canvas, "\ue603",
+					((showPauseIcon) ? "\ue603" : ""),
+					iconFont.deriveFont((float) digitalFontSize), x + space, y
+							+ (3 * digitalFontSize / 4));
+		/* --- */
+
+		/* Game Over label */
+		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = 18 * SQUARE_SIZE + textFontSize;
 		drawTextOnCanvas(canvas, GAME_OVER,
 				((status == Status.GameOver) ? GAME_OVER : ""), textFont, x, y);
+		/* --- */
 	}
 
-	protected void updateCanvas(BufferedImage canvas, Board board) {
-		if (canvas == null)
-			return;
-
-		clearCanvas(canvas, bgColor);
-		paintBoardCanvas(canvas, board);
-	}
-
-	public void blinking() {
-		if (blinkColor.equals(fullColor)) {
+	/**
+	 * Changes the {@code blinkColor} color from {@code fullColor} to
+	 * {@code emptyColor} and vice versa
+	 */
+	public void blinkingSquares() {
+		if (blinkColor.equals(fullColor))
 			blinkColor = emptyColor;
-		} else {
+		else
 			blinkColor = fullColor;
-		}
 
 		repaint();
 	}
 
+	/**
+	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
+	 * and vice versa, for blinking "Pause" icon
+	 */
+	public void blinkingPauseIcon() {
+		if (status == Status.Paused)
+			showPauseIcon = !showPauseIcon;
+		else
+			showPauseIcon = false;
+
+		repaint();
+	}
+
+	/* Events */
 	@Override
 	public void boardChanged(GameEvent event) {
 		setBoard(event.getBoard());
