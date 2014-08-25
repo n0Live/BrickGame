@@ -68,7 +68,6 @@ public class TetrisGame extends Game {
 				} else {
 					oneLineDown();
 				}
-
 			}
 			// processing of key presses
 			processKeys();
@@ -225,12 +224,17 @@ public class TetrisGame extends Game {
 			setSpeed(getSpeed() + 1);
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
-				addLines(getLevel() - 1);
+				for (int i = 0; i < getLevel() - 1; i++) {
+					try {
+						Thread.sleep(ANIMATION_DELAY * 4);
+						addLines();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						Thread.currentThread().interrupt();
+					}
+				}
 			}
 		}
-
-		if (!isFallingFinished)
-			newPiece();
 
 	}
 
@@ -362,7 +366,7 @@ public class TetrisGame extends Game {
 		Cell newLines[][] = new Cell[linesCount][BOARD_WIDTH];
 
 		// picks up the lines of the board
-		for (int y = linesCount + 1; y < BOARD_HEIGHT; y++) {
+		for (int y = BOARD_HEIGHT - 1; y >= linesCount; y--) {
 			for (int x = 0; x < BOARD_WIDTH; x++)
 				board.setCell(board.getCell(x, y - 1), x, y);
 		}
@@ -429,12 +433,22 @@ public class TetrisGame extends Game {
 			return;
 		if (!isFallingFinished) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				tryMove(curPiece, curX - 1, curY);
-				keys.remove(KeyPressed.KeyLeft);
+				try {
+					tryMove(curPiece, curX - 1, curY);
+					Thread.sleep(ANIMATION_DELAY * 3);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					Thread.currentThread().interrupt();
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				tryMove(curPiece, curX + 1, curY);
-				keys.remove(KeyPressed.KeyRight);
+				try {
+					tryMove(curPiece, curX + 1, curY);
+					Thread.sleep(ANIMATION_DELAY * 3);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					Thread.currentThread().interrupt();
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = new TetrisShape(curPiece)
@@ -443,8 +457,13 @@ public class TetrisGame extends Game {
 				keys.remove(KeyPressed.KeyRotate);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
-				oneLineDown();
-				keys.remove(KeyPressed.KeyDown);
+				try {
+					oneLineDown();
+					Thread.sleep(ANIMATION_DELAY);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					Thread.currentThread().interrupt();
+				}
 			}
 			if (keys.contains(KeyPressed.KeyReset)) {
 				dropDown();

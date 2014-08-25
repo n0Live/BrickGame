@@ -34,10 +34,9 @@ public class Game implements Runnable {
 	 * Animation delay in milliseconds
 	 */
 	protected static final int ANIMATION_DELAY = 30;
-	/**
-	 * Coefficient to get genuine speed
-	 */
-	protected static final int SPEED_RATIO = 50;
+
+	private static final int FIRST_LEVEL_SPEED = 500;
+	private static final int TENTH_LEVEL_SPEED = 80;
 	/*---MAGIC NUMBERS---*/
 
 	private int speed = 1;
@@ -150,7 +149,10 @@ public class Game implements Runnable {
 	 */
 	protected int getSpeed(boolean genuine) {
 		if (genuine) {
-			return (SPEED_RATIO * 10) / speed;
+			// getting a uniform distribution from FIRST_LEVEL_SPEED to
+			// TENTH_LEVEL_SPEED
+			return (FIRST_LEVEL_SPEED - (FIRST_LEVEL_SPEED - TENTH_LEVEL_SPEED)
+					/ (10 - 1) * (speed - 1));
 		}
 		return speed;
 	}
