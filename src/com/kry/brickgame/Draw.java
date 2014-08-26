@@ -24,7 +24,7 @@ public class Draw extends JPanel implements GameListener {
 	/**
 	 * Size of a single cell of a board
 	 */
-	private static final int SQUARE_SIZE = 26;
+	public static final int SQUARE_SIZE = 26;
 
 	/* LABELS */
 	private static final String HI = "HI";
@@ -40,7 +40,7 @@ public class Draw extends JPanel implements GameListener {
 	/**
 	 * Font for digital data (score, etc.)
 	 */
-	private Font digitFont;
+	private Font digitalFont;
 	/**
 	 * Font for textual data (labels, etc.)
 	 */
@@ -81,9 +81,9 @@ public class Draw extends JPanel implements GameListener {
 	private Status status;
 
 	/* Font sizes */
-	private final int digitalFontSize = 46;
-	private final int textFontSize = 20;
-	private final int iconFontSize = 20;
+	private final int digitalFontSize = SQUARE_SIZE * 2;// 46;
+	private final int textFontSize = (3 * SQUARE_SIZE / 4);// 20;
+	private final int iconFontSize = (3 * SQUARE_SIZE / 4);// 20;
 
 	private Dimension size = null;
 
@@ -110,7 +110,7 @@ public class Draw extends JPanel implements GameListener {
 		textFont = new Font(Font.SANS_SERIF, Font.PLAIN, textFontSize);
 		try {
 			// trying to get the font from a resource file
-			digitFont = Font.createFont(
+			digitalFont = Font.createFont(
 					Font.TRUETYPE_FONT,
 					getClass().getResourceAsStream(
 							"/fonts/Segment7Standard.otf"))//
@@ -119,7 +119,7 @@ public class Draw extends JPanel implements GameListener {
 		} catch (FontFormatException | IOException e) {
 			e.printStackTrace();
 			// if error just create a monospaced font
-			digitFont = new Font(Font.MONOSPACED, Font.PLAIN, digitalFontSize);
+			digitalFont = new Font(Font.MONOSPACED, Font.PLAIN, digitalFontSize);
 		}
 		try {
 			iconFont = Font.createFont(Font.TRUETYPE_FONT,
@@ -461,12 +461,12 @@ public class Draw extends JPanel implements GameListener {
 		x = boardCanvas.getWidth();
 		y = digitalFontSize;
 
-		drawTextOnCanvas(canvas, "18888", scores, digitFont, x, y);
+		drawTextOnCanvas(canvas, "18888", scores, digitalFont, x, y);
 		/* --- */
 
 		/* Scores label */
 		x = boardCanvas.getWidth() + (3 * SQUARE_SIZE / 4);
-		y = 2 * SQUARE_SIZE + textFontSize;
+		y = 2 * SQUARE_SIZE + SQUARE_SIZE / 3 + textFontSize;
 		fm = getGraphics().getFontMetrics(textFont);
 		space = fm.stringWidth(HI) + 2;
 
@@ -494,11 +494,11 @@ public class Draw extends JPanel implements GameListener {
 		/* Speed and Level */
 		x = boardCanvas.getWidth() + (SQUARE_SIZE / 4);
 		y = 9 * SQUARE_SIZE + digitalFontSize;
-		fm = getGraphics().getFontMetrics(digitFont);
-		space = fm.stringWidth("18") + (SQUARE_SIZE / 2);
+		fm = getGraphics().getFontMetrics(digitalFont);
+		space = fm.stringWidth("18") + (SQUARE_SIZE / 4);
 
-		drawTextOnCanvas(canvas, "18", speed, digitFont, x, y);
-		drawTextOnCanvas(canvas, "18", level, digitFont, x + space, y);
+		drawTextOnCanvas(canvas, "18", speed, digitalFont, x, y);
+		drawTextOnCanvas(canvas, "18", level, digitalFont, x + space, y);
 		/* --- */
 
 		/* Speed and Level labels */

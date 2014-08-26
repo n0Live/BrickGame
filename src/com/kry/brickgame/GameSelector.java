@@ -27,29 +27,14 @@ public class GameSelector extends Game {
 	 *            y-coordinate for the insertion
 	 * 
 	 */
-	public void insertBoard(Board boardToInsert, int x, int y) {
-		Board board = getBoard();
-
-		if ((x < 0) || (y < 0)) {
-			return;
-		}
-		if ((x + boardToInsert.getWidth() > board.getWidth())
-				|| (y + boardToInsert.getHeight() > board.getHeight())) {
-			return;
-		}
-
-		for (int i = 0; i < boardToInsert.getWidth(); i++) {
-			for (int j = 0; j < boardToInsert.getHeight(); j++) {
-				board.setCell(boardToInsert.getCell(i, j), x + i, y + j);
-			}
-		}
-		fireBoardChanged(board);
+	private void insertBoard(Board boardToInsert, int x, int y) {
+		insertCells(boardToInsert.getBoard(), x, y);
 	}
 
 	/**
 	 * Displays a letter at the top of the basic board
 	 */
-	public void drawLetter() {
+	protected void drawLetter() {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(boardLetter.stringToLetters(letter));
 		insertBoard(boardLetter,
@@ -60,7 +45,7 @@ public class GameSelector extends Game {
 	/**
 	 * Displays a two numbers at the bottom of the basic board
 	 */
-	public void drawNumber() {
+	protected void drawNumber() {
 		int number_1;
 		int number_2;
 

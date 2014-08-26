@@ -225,13 +225,8 @@ public class TetrisGame extends Game {
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
 				for (int i = 0; i < getLevel() - 1; i++) {
-					try {
-						Thread.sleep(ANIMATION_DELAY * 4);
-						addLines();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						Thread.currentThread().interrupt();
-					}
+					sleep(ANIMATION_DELAY * 4);
+					addLines();
 				}
 			}
 		}
@@ -319,13 +314,8 @@ public class TetrisGame extends Game {
 			if (x2 < BOARD_WIDTH)
 				board.setCell(Cell.Empty, x2++, line);
 
-			try {
-				Thread.sleep(ANIMATION_DELAY);
-				setBoard(board);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-				Thread.currentThread().interrupt();
-			}
+			sleep(ANIMATION_DELAY);
+			setBoard(board);
 		}
 	}
 
@@ -433,22 +423,12 @@ public class TetrisGame extends Game {
 			return;
 		if (!isFallingFinished) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				try {
-					tryMove(curPiece, curX - 1, curY);
-					Thread.sleep(ANIMATION_DELAY * 3);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				tryMove(curPiece, curX - 1, curY);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				try {
-					tryMove(curPiece, curX + 1, curY);
-					Thread.sleep(ANIMATION_DELAY * 3);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				tryMove(curPiece, curX + 1, curY);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = new TetrisShape(curPiece)
@@ -457,13 +437,8 @@ public class TetrisGame extends Game {
 				keys.remove(KeyPressed.KeyRotate);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
-				try {
-					oneLineDown();
-					Thread.sleep(ANIMATION_DELAY);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				oneLineDown();
+				sleep(ANIMATION_DELAY);
 			}
 			if (keys.contains(KeyPressed.KeyReset)) {
 				dropDown();

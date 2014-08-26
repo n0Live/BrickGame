@@ -373,7 +373,7 @@ public class Game implements Runnable {
 	 *         filled upwards, otherwise is cleaned downwards
 	 */
 	protected boolean animatedClearBoard(int fromY, int toY) {
-		boolean isUpDirection = ((toY - fromY) >= 0);
+		boolean isUpDirection = (toY >= fromY);
 
 		// the board is filled upwards
 		if (isUpDirection) {
@@ -382,12 +382,7 @@ public class Game implements Runnable {
 					board.setCell(Cell.Full, x, y);
 				}
 				fireBoardChanged(board);
-				try {
-					Thread.sleep(ANIMATION_DELAY);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				sleep(ANIMATION_DELAY);
 			}
 			// and is cleaned downwards
 		} else {
@@ -396,12 +391,7 @@ public class Game implements Runnable {
 					board.setCell(Cell.Empty, x, y);
 				}
 				fireBoardChanged(board);
-				try {
-					Thread.sleep(ANIMATION_DELAY);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
+				sleep(ANIMATION_DELAY);
 			}
 		}
 		return isUpDirection;
@@ -414,6 +404,37 @@ public class Game implements Runnable {
 	protected void animatedClearBoard() {
 		animatedClearBoard(0, BOARD_HEIGHT - UNSHOWED_LINES);
 		animatedClearBoard(BOARD_HEIGHT - UNSHOWED_LINES, 0);
+	}
+
+	/**
+	 * Insert the cells in the basic board. Coordinate ( {@code x, y}) is set a
+	 * point, which gets the lower left corner of the {@code cells}
+	 * 
+	 * @param cells
+	 *            the cells to insert
+	 * @param x
+	 *            x-coordinate for the insertion
+	 * @param y
+	 *            y-coordinate for the insertion
+	 * 
+	 */
+	protected void insertCells(Cell[][] cells, int x, int y) {
+		Board board = getBoard();
+
+		if ((x < 0) || (y < 0)) {
+			return;
+		}
+		if ((x + cells.length > board.getWidth())
+				|| (y + cells[0].length > board.getHeight())) {
+			return;
+		}
+
+		for (int i = 0; i < cells.length; i++) {
+			for (int j = 0; j < cells[0].length; j++) {
+				board.setCell(cells[i][j], x + i, y + j);
+			}
+		}
+		fireBoardChanged(board);
 	}
 
 	protected void gameOver() {
@@ -438,6 +459,21 @@ public class Game implements Runnable {
 	@Override
 	public void run() {
 		this.start();
+	}
+
+	/**
+	 * Sleep for the specified number of milliseconds
+	 * 
+	 * @param millis
+	 *            the length of time to sleep in milliseconds
+	 */
+	public void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+
 	}
 
 }

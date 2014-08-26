@@ -24,11 +24,16 @@ public class Window extends JFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		//Color bgColor = new Color(109, 119, 92);
+		// Color bgColor = new Color(109, 119, 92);
 		Color bgColor = new Color(136, 153, 107);
 
 		frame = new JFrame();
-		frame.setBounds(100, 100, 430, 565);
+		frame.setResizable(false);
+		// frame.setUndecorated(true);
+
+		frame.setBounds(100, 100, Draw.SQUARE_SIZE * (10 + 6)
+				+ Draw.SQUARE_SIZE / 2, Draw.SQUARE_SIZE * 20
+				+ Draw.SQUARE_SIZE / 2 + 35);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -62,7 +67,8 @@ public class Window extends JFrame {
 		}, 0, 500);
 
 		setTitle("Brick Game");
-		Main.setGame(Main.gameSelector);
+		//Main.setGame(Main.gameSelector);
+		SplashScreen ss = new SplashScreen();
+		Main.setGame(ss);
 	}
-
 }
