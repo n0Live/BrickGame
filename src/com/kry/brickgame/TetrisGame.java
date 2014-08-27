@@ -5,6 +5,10 @@ import java.util.Random;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.TetrisShape.Tetrominoes;
 
+/**
+ * @author noLive
+ * 
+ */
 public class TetrisGame extends Game {
 
 	/**
@@ -81,16 +85,17 @@ public class TetrisGame extends Game {
 		curPiece.setShape(Tetrominoes.NoShape);
 
 		// X-coordinate - middle of the board
-		curX = BOARD_WIDTH / 2;
+		curX = boardWidth / 2;
 		// Y-coordinate - top edge, and so that the bottom edge of the figure
-		// was at the border of #UNSHOWED_LINES
-		curY = BOARD_HEIGHT - 1 - (UNSHOWED_LINES - nextPiece.maxY());
+		// was at the top of the border
+		curY = boardHeight - 1 + nextPiece.maxY();
 
 		if (!tryMove(nextPiece, curX, curY)) {
 			gameOver();
 		} else {
 			nextPiece.setRandomShapeAndRotate();
 
+			// TODO delete after test
 			if (nextPiece.getShape() == Tetrominoes.SquareShape)
 				nextPiece.setFill(Cell.Blink);
 
@@ -99,14 +104,14 @@ public class TetrisGame extends Game {
 					// X-coordinate:
 					// (middle of the board)-(half the width of the
 					// figure)-(offset of the leftmost x-coordinate from zero)
-					(PREVIEW_WIDTH / 2)
+					(previewWidth / 2)
 							- ((nextPiece.maxX() - nextPiece.minX() + 1) / 2)
 							- (nextPiece.minX()),
 					// Y-coordinate
 					// (remember that the figure is drawn from the bottom up):
 					// (middle of the board)+(half the height of the
 					// figure)+(offset of the lower y-coordinate from zero)
-					(PREVIEW_HEIGHT / 2 - 1)
+					(previewHeight / 2 - 1)
 							+ ((nextPiece.maxY() - nextPiece.minY() + 1) / 2)
 							+ (nextPiece.minY()),//
 					nextPiece, nextPiece.getFill()));
@@ -114,15 +119,15 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Moving a figure
+	 * Tries to move the figure
 	 * 
 	 * @param newPiece
-	 *            a figure after the movement (eg. to rotate the figure)
+	 *            the figure after the movement (eg. to rotate the figure)
 	 * @param newX
-	 *            x-coordinate position on the board of a figure
+	 *            x-coordinate position on the board of the figure
 	 * @param newY
-	 *            y-coordinate position on the board of a figure
-	 * @return {@code true} if the movement succeeded otherwise {@code false}
+	 *            y-coordinate position on the board of the figure
+	 * @return {@code true} if the movement succeeded, otherwise {@code false}
 	 */
 	private boolean tryMove(TetrisShape newPiece, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
@@ -139,7 +144,7 @@ public class TetrisGame extends Game {
 			prepX = ((prepX + newPiece.minX()) < 0) ? prepX + 1 : prepX - 1;
 		}
 		// Checks
-		if (checkBoardCollisionVertical(newPiece, newY))
+		if (checkBoardCollisionVertical(newPiece, newY, false))
 			return false;
 		if (checkCollision(board, newPiece, prepX, newY))
 			return false;
@@ -158,19 +163,19 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Drawing of a figure on a board
+	 * Draws the figure on the board
 	 * 
 	 * @param board
-	 *            a board for drawing
+	 *            the board for drawing
 	 * @param x
-	 *            x-coordinate position on a board of a figure
+	 *            x-coordinate position on the board of the figure
 	 * @param y
-	 *            y-coordinate position on a board of a figure
+	 *            y-coordinate position on the board of the figure
 	 * @param piece
-	 *            a figure
+	 *            the figure
 	 * @param fill
-	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw a figure,
-	 *            {@code Cells.Empty} - to erase a figure
+	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
+	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * 
 	 * @return - the board with the figure
 	 */
@@ -179,7 +184,13 @@ public class TetrisGame extends Game {
 		for (int i = 0; i < piece.getCoords().length; i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y - piece.y(i);
-			board.setCell(fill, board_x, board_y);
+
+			// if the figure does not leave off the board
+			if (((board_y < board.getHeight()) && (board_y >= 0))
+					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
+				// draws the figure on the board
+				board.setCell(fill, board_x, board_y);
+			}
 		}
 		return board;
 	}
@@ -231,6 +242,10 @@ public class TetrisGame extends Game {
 			}
 		}
 
+		// check for game over
+		if ((curY + curPiece.maxY()) > boardHeight)
+			gameOver();
+
 	}
 
 	/**
@@ -245,10 +260,10 @@ public class TetrisGame extends Game {
 		int numFullLines = 0;
 
 		// going through on all lines
-		for (int y = 0; y < BOARD_HEIGHT - 1; y++) {
+		for (int y = 0; y < boardHeight - 1; y++) {
 			boolean lineIsFull = true;
 			// check for the existence an empty cell in the line
-			for (int x = 0; x < BOARD_WIDTH; x++) {
+			for (int x = 0; x < boardWidth; x++) {
 				if (board.getCell(x, y) == Cell.Empty) {
 					lineIsFull = false;
 					break;
@@ -261,8 +276,8 @@ public class TetrisGame extends Game {
 				animatedClearLine(y, curX);
 
 				// drop the lines down on the filled line
-				for (int k = y; k < BOARD_HEIGHT - 1; k++) {
-					for (int x = 0; x < BOARD_WIDTH; x++)
+				for (int k = y; k < boardHeight - 1; k++) {
+					for (int x = 0; x < boardWidth; x++)
 						board.setCell(board.getCell(x, k + 1), x, k);
 				}
 				// return to one line back (because we removed the filled line)
@@ -308,25 +323,14 @@ public class TetrisGame extends Game {
 		int x1 = startPoint - 1; // left direction
 		int x2 = startPoint; // right direction
 
-		while ((x1 >= 0) || (x2 < BOARD_WIDTH)) {
+		while ((x1 >= 0) || (x2 < boardWidth)) {
 			if (x1 >= 0)
 				board.setCell(Cell.Empty, x1--, line);
-			if (x2 < BOARD_WIDTH)
+			if (x2 < boardWidth)
 				board.setCell(Cell.Empty, x2++, line);
 
 			sleep(ANIMATION_DELAY);
 			setBoard(board);
-		}
-	}
-
-	/**
-	 * Pause / Resume
-	 */
-	private void pause() {
-		if (getStatus() == Status.Running) {
-			setStatus(Status.Paused);
-		} else if (getStatus() == Status.Paused) {
-			setStatus(Status.Running);
 		}
 	}
 
@@ -347,17 +351,17 @@ public class TetrisGame extends Game {
 
 		// checks whether there are full cells at a distance of
 		// <i>linesCount</i> from the top of the board
-		for (int i = 0; i < BOARD_WIDTH; i++) {
-			if (board.getCell(i, (BOARD_HEIGHT - linesCount)) == Cell.Full)
+		for (int i = 0; i < boardWidth; i++) {
+			if (board.getCell(i, (boardHeight - linesCount)) == Cell.Full)
 				return false;
 		}
 
 		Random r = new Random();
-		Cell newLines[][] = new Cell[linesCount][BOARD_WIDTH];
+		Cell newLines[][] = new Cell[linesCount][boardWidth];
 
 		// picks up the lines of the board
-		for (int y = BOARD_HEIGHT - 1; y >= linesCount; y--) {
-			for (int x = 0; x < BOARD_WIDTH; x++)
+		for (int y = boardHeight - 1; y >= linesCount; y--) {
+			for (int x = 0; x < boardWidth; x++)
 				board.setCell(board.getCell(x, y - 1), x, y);
 		}
 
@@ -366,7 +370,7 @@ public class TetrisGame extends Game {
 			boolean hasEmpty = false;
 			boolean hasFull = false;
 
-			for (int i = 0; i < BOARD_WIDTH; i++) {
+			for (int i = 0; i < boardWidth; i++) {
 				if ((Math.abs(r.nextInt()) % 2) == 0) {
 					newLines[line][i] = Cell.Empty;
 					hasEmpty = true;
@@ -379,7 +383,7 @@ public class TetrisGame extends Game {
 			// if all the cells were empty, creates a full one in a random place
 			// of the line
 			if (!hasEmpty || !hasFull) {
-				newLines[line][Math.abs(r.nextInt(BOARD_WIDTH))] = ((!hasEmpty) ? Cell.Empty
+				newLines[line][Math.abs(r.nextInt(boardWidth))] = ((!hasEmpty) ? Cell.Empty
 						: Cell.Full);
 			}
 
@@ -410,11 +414,7 @@ public class TetrisGame extends Game {
 			return;
 
 		if (keys.contains(KeyPressed.KeyStart)) {
-			if (getStatus() == Status.GameOver) {
-				start();
-			} else {
-				pause();
-			}
+			pause();
 			keys.remove(KeyPressed.KeyStart);
 			return;
 		}
@@ -431,8 +431,7 @@ public class TetrisGame extends Game {
 				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				TetrisShape rotatedPiece = new TetrisShape(curPiece)
-						.rotateRight();
+				TetrisShape rotatedPiece = curPiece.clone().rotateRight();
 				tryMove(rotatedPiece, curX, curY);
 				keys.remove(KeyPressed.KeyRotate);
 			}

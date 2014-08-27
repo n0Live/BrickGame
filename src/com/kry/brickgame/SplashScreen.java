@@ -2,6 +2,10 @@ package com.kry.brickgame;
 
 import com.kry.brickgame.Board.Cell;
 
+/**
+ * @author noLive
+ * 
+ */
 public class SplashScreen extends Game {
 
 	public SplashScreen() {
@@ -41,18 +45,18 @@ public class SplashScreen extends Game {
 	 */
 	private void insertNumbers() {
 		Board board = getBoard();
-		int boardHeight = board.getHeight() - board.getUnshowedLines();
 		BoardNumbers boardNumber = new BoardNumbers();
 
 		boardNumber.setNumber(boardNumber.intToNumbers(9));
 
 		insertCells(boardNumber.getBoard(),// upper left
-				1, boardHeight - boardNumber.getHeight() - 1);
+				1, board.getHeight() - boardNumber.getHeight() - 1);
 		insertCells(boardNumber.getBoard(),// lower left
 				1, boardNumber.getHeight());
-		insertCells(boardNumber.getBoard(),// upper right
-				board.getWidth() - boardNumber.getWidth() - 1, boardHeight
-						- boardNumber.getHeight() * 2);
+		insertCells(
+				boardNumber.getBoard(),// upper right
+				board.getWidth() - boardNumber.getWidth() - 1,
+				board.getHeight() - boardNumber.getHeight() * 2);
 		insertCells(boardNumber.getBoard(),// lower right
 				board.getWidth() - boardNumber.getWidth() - 1, 1);
 	}
@@ -160,7 +164,7 @@ public class SplashScreen extends Game {
 		int fromX = 0;
 		int toX = board.getWidth() - 1;
 		// y: board.height --> 0
-		int fromY = board.getHeight() - board.getUnshowedLines() - 1;
+		int fromY = board.getHeight() - 1;
 		int toY = 0;
 
 		// until it reaches the middle of the board

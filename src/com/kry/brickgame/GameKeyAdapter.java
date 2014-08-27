@@ -5,6 +5,10 @@ import java.awt.event.KeyEvent;
 
 import com.kry.brickgame.Game.KeyPressed;
 
+/**
+ * @author noLive
+ * 
+ */
 public class GameKeyAdapter extends KeyAdapter {
 
 	public void keyPressed(KeyEvent e) {
@@ -77,6 +81,10 @@ public class GameKeyAdapter extends KeyAdapter {
 		case 'M':
 			Main.getGame().keyReleased(KeyPressed.KeyReset);
 			break;
+		case KeyEvent.VK_ESCAPE:
+			System.exit(0);
+			break;
+
 		}
 	}
 }

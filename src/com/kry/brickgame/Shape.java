@@ -1,5 +1,9 @@
 package com.kry.brickgame;
 
+/**
+ * @author noLive
+ * 
+ */
 public class Shape {
 
 	/**
@@ -55,17 +59,26 @@ public class Shape {
 	}
 
 	/**
-	 * Set a single coordinate of a single point
+	 * Set the coordinates of the single point
 	 * 
 	 * @param i
 	 *            index of a point
-	 * @param j
-	 *            coordinate: 0 - x, 1 - y
 	 * @param value
 	 *            coordinate value
 	 */
-	protected void setCoord(int i, int j, int value) {
-		this.coords[i][j] = value;
+	protected void setCoord(int i, int[] value) {
+		this.coords[i] = value;
+	}
+
+	/**
+	 * Get the coordinates of the single point
+	 * 
+	 * @param i
+	 *            index of a point
+	 * @return coordinate value
+	 */
+	protected int[] getCoord(int i) {
+		return this.coords[i];
 	}
 
 	/**
@@ -87,7 +100,7 @@ public class Shape {
 	 *            the x-coordinate value
 	 */
 	protected void setX(int index, int x) {
-		setCoord(index, 0, x);
+		coords[index][0] = x;
 	}
 
 	/**
@@ -99,7 +112,7 @@ public class Shape {
 	 *            the y-coordinate value
 	 */
 	protected void setY(int index, int y) {
-		setCoord(index, 1, y);
+		coords[index][1] = y;
 	}
 
 	public int x(int index) {

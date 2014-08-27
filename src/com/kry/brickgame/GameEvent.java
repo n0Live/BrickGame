@@ -4,6 +4,10 @@ import java.util.EventObject;
 
 import com.kry.brickgame.Game.Status;
 
+/**
+ * @author noLive
+ * 
+ */
 public class GameEvent extends EventObject {
 
 	private static final long serialVersionUID = 3341669389633046775L;

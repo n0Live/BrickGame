@@ -4,6 +4,10 @@ import java.util.Random;
 
 import com.kry.brickgame.Board.Cell;
 
+/**
+ * @author noLive
+ * 
+ */
 public class TetrisShape extends Shape implements Cloneable {
 
 	/**
@@ -48,7 +52,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public TetrisShape(TetrisShape aTetrisShape) {
 		super(LENGTH);
-		setShape(aTetrisShape.shape, aTetrisShape.rotationAngle, aTetrisShape.fill);
+		setShape(aTetrisShape.shape, aTetrisShape.rotationAngle,
+				aTetrisShape.fill);
 	}
 
 	public TetrisShape clone() {
@@ -197,7 +202,7 @@ public class TetrisShape extends Shape implements Cloneable {
 		// the figure and its rotation angle
 		return "TetrisShape [" + this.getShape() + ", " + this.rotationAngle
 		// the lower left corner
-				+ ", (" + minX() + ";" + minY() + ")]\n" + super.toString();
+				+ ", [" + minX() + ";" + minY() + "]]\n" + super.toString();
 	}
 
 }

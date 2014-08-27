@@ -17,6 +17,10 @@ import javax.swing.JPanel;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.Game.Status;
 
+/**
+ * @author noLive
+ * 
+ */
 public class Draw extends JPanel implements GameListener {
 
 	private static final long serialVersionUID = 1043017116324502441L;
@@ -177,7 +181,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @see #boardWidthInPixels
 	 */
 	int boardHeightInPixels(Board board) {
-		return (board.getHeight() - board.getUnshowedLines()) * SQUARE_SIZE;
+		return board.getHeight() * SQUARE_SIZE;
 	}
 
 	@Override
@@ -297,7 +301,7 @@ public class Draw extends JPanel implements GameListener {
 			return;
 
 		int boardWidth = board.getWidth();
-		int boardHeight = board.getHeight() - board.getUnshowedLines();
+		int boardHeight = board.getHeight();
 
 		Graphics2D g2d = canvas.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

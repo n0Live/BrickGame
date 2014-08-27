@@ -1,5 +1,9 @@
 package com.kry.brickgame;
 
+/**
+ * @author noLive
+ * 
+ */
 public class Board {
 
 	/**
@@ -35,33 +39,8 @@ public class Board {
 		return height;
 	}
 
-	private int unshowedLines;
-
-	protected int getUnshowedLines() {
-		return unshowedLines;
-	}
-
 	/**
-	 * Creating the board of a given size and a number of lines that should not
-	 * be displayed
-	 * 
-	 * @param width
-	 *            the width of the board
-	 * @param height
-	 *            the height of the board
-	 * @param unshowedLines
-	 *            number of lines that should not be displayed
-	 */
-	public Board(int width, int height, int unshowedLines) {
-		super();
-		this.width = width;
-		this.height = height;
-		this.unshowedLines = unshowedLines;
-		this.board = new Cell[width][height];
-	}
-
-	/**
-	 * Creating the board of a given size
+	 * Creating the board of the given size
 	 * 
 	 * @param width
 	 *            the width of the board
@@ -69,7 +48,10 @@ public class Board {
 	 *            the height of the board
 	 */
 	public Board(int width, int height) {
-		this(width, height, 0);
+		super();
+		this.width = width;
+		this.height = height;
+		this.board = new Cell[width][height];
 	}
 
 	/**
@@ -137,8 +119,17 @@ public class Board {
 		for (int i = height - 1; i >= 0; i--) {
 			char line[] = new char[width];
 			for (int j = 0; j < width; j++) {
-				// If the cell[j][i] is full then print "0" otherwise "."
-				line[j] = (board[j][i] == Cell.Full) ? '0' : '.';
+				switch (board[j][i]) {
+				case Full:
+					line[j] = '0';
+					break;
+				case Blink:
+					line[j] = '*';
+					break;
+				default:
+					line[j] = '.';
+					break;
+				}
 			}
 			result.append(line).append("\n");
 		}

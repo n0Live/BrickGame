@@ -6,28 +6,27 @@ import java.util.Set;
 
 import com.kry.brickgame.Board.Cell;
 
+/**
+ * @author noLive
+ * 
+ */
 public class Game implements Runnable {
 
 	/*---MAGIC NUMBERS---*/
 	/**
-	 * The number of lines of the base field (the board), that should not be
-	 * displayed ({@value} ). Used for smooth the appearance of a figures.
-	 */
-	public static final int UNSHOWED_LINES = 4;
-	/**
-	 * Width of the board ({@value} ).
+	 * Width of the default board ({@value} )
 	 */
 	public static final int BOARD_WIDTH = 10;
 	/**
-	 * Height of the board ({@value} ).
+	 * Height of the default board ({@value} )
 	 */
-	public static final int BOARD_HEIGHT = 20 + UNSHOWED_LINES;
+	public static final int BOARD_HEIGHT = 20;
 	/**
-	 * Width of the preview board ({@value} ).
+	 * Width of the default preview board ({@value} )
 	 */
 	public static final int PREVIEW_WIDTH = 4;
 	/**
-	 * Height of the preview board ({@value} ).
+	 * Height of the default preview board ({@value} )
 	 */
 	public static final int PREVIEW_HEIGHT = 4;
 	/**
@@ -42,6 +41,23 @@ public class Game implements Runnable {
 	private int speed = 1;
 	private int level = 1;
 	private int score = 0;
+
+	/**
+	 * Width of the board
+	 */
+	protected int boardWidth;
+	/**
+	 * Height of the board
+	 */
+	protected int boardHeight;
+	/**
+	 * Width of the preview board
+	 */
+	protected int previewWidth;
+	/**
+	 * Height of the preview board
+	 */
+	protected int previewHeight;
 
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
@@ -74,11 +90,21 @@ public class Game implements Runnable {
 
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
-	public Game(int speed, int level) {
+	public Game(int speed, int level, Board board, Board preview) {
 		this.speed = speed;
 		this.level = level;
-		board = new Board(BOARD_WIDTH, BOARD_HEIGHT, UNSHOWED_LINES);
-		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+		this.board = board;
+		this.preview = preview;
+
+		boardWidth = board.getWidth();
+		boardHeight = board.getHeight();
+		previewWidth = preview.getWidth();
+		previewHeight = preview.getHeight();
+	}
+
+	public Game(int speed, int level) {
+		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
+				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));// preview
 	}
 
 	public Game() {
@@ -293,27 +319,33 @@ public class Game implements Runnable {
 				if (board.getCell(board_x, board_y) != Cell.Empty)
 					return true;
 			}
-		} catch (Exception e) {
-			return true;
+		} catch (IndexOutOfBoundsException e) {
+			// do nothing - it's ok
 		}
 		return false;
 	}
 
 	/**
-	 * Collision check of a new figure with the vertical boundaries of the board
+	 * Collision check of the new figure with the vertical boundaries of the
+	 * board
 	 * 
 	 * @param piece
-	 *            - a new figure
+	 *            the new figure
 	 * @param y
-	 *            - y-coordinate figures
+	 *            y-coordinate figures
+	 * @param checkTopBoundary
+	 *            is it necessary to check the upper boundary
 	 * @return true if there is a collision
 	 * 
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected boolean checkBoardCollisionVertical(Shape piece, int y) {
-		if ((y - piece.maxY()) < 0 || (y - piece.minY()) >= BOARD_HEIGHT)
+	protected boolean checkBoardCollisionVertical(Shape piece, int y,
+			boolean checkTopBoundary) {
+		if (checkTopBoundary && ((y + piece.maxY()) >= boardHeight))
+			return true;
+		if ((y - piece.maxY()) < 0)
 			return true;
 		return false;
 	}
@@ -333,7 +365,7 @@ public class Game implements Runnable {
 	 * @see #checkCollision
 	 */
 	protected boolean checkBoardCollisionHorizontal(Shape piece, int x) {
-		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= BOARD_WIDTH)
+		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= boardWidth)
 			return true;
 		return false;
 	}
@@ -357,7 +389,7 @@ public class Game implements Runnable {
 	 * @see #checkCollision
 	 */
 	protected boolean checkBoardCollision(Shape piece, int x, int y) {
-		return checkBoardCollisionVertical(piece, y)
+		return checkBoardCollisionVertical(piece, y, true)
 				|| checkBoardCollisionHorizontal(piece, x);
 	}
 
@@ -378,7 +410,7 @@ public class Game implements Runnable {
 		// the board is filled upwards
 		if (isUpDirection) {
 			for (int y = fromY; y <= toY; y++) {
-				for (int x = 0; x < BOARD_WIDTH; x++) {
+				for (int x = 0; x < boardWidth; x++) {
 					board.setCell(Cell.Full, x, y);
 				}
 				fireBoardChanged(board);
@@ -387,7 +419,7 @@ public class Game implements Runnable {
 			// and is cleaned downwards
 		} else {
 			for (int y = fromY; y >= toY; y--) {
-				for (int x = 0; x < BOARD_WIDTH; x++) {
+				for (int x = 0; x < boardWidth; x++) {
 					board.setCell(Cell.Empty, x, y);
 				}
 				fireBoardChanged(board);
@@ -402,8 +434,8 @@ public class Game implements Runnable {
 	 * 
 	 */
 	protected void animatedClearBoard() {
-		animatedClearBoard(0, BOARD_HEIGHT - UNSHOWED_LINES);
-		animatedClearBoard(BOARD_HEIGHT - UNSHOWED_LINES, 0);
+		animatedClearBoard(0, boardHeight - 1);
+		animatedClearBoard(boardHeight - 1, 0);
 	}
 
 	/**
@@ -437,6 +469,20 @@ public class Game implements Runnable {
 		fireBoardChanged(board);
 	}
 
+	/**
+	 * Pause / Resume
+	 */
+	protected void pause() {
+		if (getStatus() == Status.Running) {
+			setStatus(Status.Paused);
+		} else if (getStatus() == Status.Paused) {
+			setStatus(Status.Running);
+		}
+	}
+
+	/**
+	 * Game Over
+	 */
 	protected void gameOver() {
 		setStatus(Status.GameOver);
 		animatedClearBoard();

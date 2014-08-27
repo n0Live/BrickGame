@@ -1,5 +1,9 @@
 package com.kry.brickgame;
 
+/**
+ * @author noLive
+ * 
+ */
 public class BoardNumbers extends Board {
 
 	enum Numbers {

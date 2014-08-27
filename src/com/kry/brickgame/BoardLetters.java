@@ -1,5 +1,9 @@
 package com.kry.brickgame;
 
+/**
+ * @author noLive
+ * 
+ */
 public class BoardLetters extends Board {
 
 	enum Letters {
@@ -17,8 +21,7 @@ public class BoardLetters extends Board {
 	private Cell[][] board = new Cell[width][height];
 
 	/**
-	 * Table letters to draw them on the board 5x5:
-	 * [index][y][x]
+	 * Table letters to draw them on the board 5x5: [index][y][x]
 	 */
 	private final static Cell[][][] lettersTable = new Cell[][][] {
 			{
@@ -188,7 +191,7 @@ public class BoardLetters extends Board {
 	}
 
 	/**
-	 * Convert a string to a Letters object 
+	 * Convert a string to a Letters object
 	 * 
 	 * @param str
 	 *            - string like "A", "B", "C", ...

@@ -1,6 +1,9 @@
 package com.kry.brickgame;
 
-
+/**
+ * @author noLive
+ * 
+ */
 public class BoardGamesAnimation extends Board {
 
 	public BoardGamesAnimation(int width, int height) {
@@ -29,20 +32,17 @@ public class BoardGamesAnimation extends Board {
 	 * Table animation to draw them on the board 10x5: [index][frame][y][x]
 	 */
 	private final static Cell[][][][] lettersTable = new Cell[][][][] { //
-		{// None
-			{ //None-1
-				{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
+	{// None
+			{ // None-1
+			{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
-					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE } }
-		},
-		{// Dancing
-			{ //Dancing-1
-				{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
+					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE } } }, {// Dancing
+			{ // Dancing-1
+			{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
 					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE },
-					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE } }}
-		};
+					{ cE, cE, cE, cE, cE, cE, cE, cE, cE, cE } } } };
 }

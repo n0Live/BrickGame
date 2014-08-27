@@ -2,6 +2,9 @@ package com.kry.brickgame;
 
 /**
  * The selection screen of a game
+ * 
+ * @author noLive
+ * 
  */
 public class GameSelector extends Game {
 
@@ -37,9 +40,8 @@ public class GameSelector extends Game {
 	protected void drawLetter() {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(boardLetter.stringToLetters(letter));
-		insertBoard(boardLetter,
-				(BOARD_WIDTH / 2 - boardLetter.getWidth() / 2),// x
-				BOARD_HEIGHT - UNSHOWED_LINES - boardLetter.getHeight());// y
+		insertBoard(boardLetter, (boardWidth / 2 - boardLetter.getWidth() / 2),// x
+				boardHeight - boardLetter.getHeight());// y
 	}
 
 	/**
@@ -61,13 +63,12 @@ public class GameSelector extends Game {
 
 		// 1st number
 		boardNumber.setNumber(boardNumber.intToNumbers(number_1));
-		insertBoard(boardNumber,
-				(BOARD_WIDTH / 2 - boardNumber.getWidth() - 1),// x
+		insertBoard(boardNumber, (boardWidth / 2 - boardNumber.getWidth() - 1),// x
 				0);// y
 
 		// 2nd number
 		boardNumber.setNumber(boardNumber.intToNumbers(number_2));
-		insertBoard(boardNumber, (BOARD_WIDTH / 2 + 1),// x
+		insertBoard(boardNumber, (boardWidth / 2 + 1),// x
 				0);// y
 	}
 
@@ -120,6 +121,9 @@ public class GameSelector extends Game {
 		switch (letter) {
 		case "A":
 			Main.setGame(new TetrisGame(getSpeed(), getLevel()));
+			break;
+		case "B":
+			Main.setGame(new SnakeGame(getSpeed(), getLevel()));
 			break;
 		default:
 			Main.setGame(new TetrisGame(getSpeed(), getLevel()));
