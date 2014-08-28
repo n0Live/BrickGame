@@ -16,19 +16,19 @@ public class Game implements Runnable {
 	/**
 	 * Width of the default board ({@value} )
 	 */
-	public static final int BOARD_WIDTH = 10;
+	private static final int BOARD_WIDTH = 10;
 	/**
 	 * Height of the default board ({@value} )
 	 */
-	public static final int BOARD_HEIGHT = 20;
+	private static final int BOARD_HEIGHT = 20;
 	/**
 	 * Width of the default preview board ({@value} )
 	 */
-	public static final int PREVIEW_WIDTH = 4;
+	private static final int PREVIEW_WIDTH = 4;
 	/**
 	 * Height of the default preview board ({@value} )
 	 */
-	public static final int PREVIEW_HEIGHT = 4;
+	private static final int PREVIEW_HEIGHT = 4;
 	/**
 	 * Animation delay in milliseconds
 	 */
@@ -448,17 +448,17 @@ public class Game implements Runnable {
 	 *            x-coordinate for the insertion
 	 * @param y
 	 *            y-coordinate for the insertion
-	 * 
+	 * @return {@code true} if the insertion is success, otherwise {@code false}
 	 */
-	protected void insertCells(Cell[][] cells, int x, int y) {
+	protected boolean insertCells(Cell[][] cells, int x, int y) {
 		Board board = getBoard();
 
 		if ((x < 0) || (y < 0)) {
-			return;
+			return false;
 		}
 		if ((x + cells.length > board.getWidth())
 				|| (y + cells[0].length > board.getHeight())) {
-			return;
+			return false;
 		}
 
 		for (int i = 0; i < cells.length; i++) {
@@ -467,6 +467,39 @@ public class Game implements Runnable {
 			}
 		}
 		fireBoardChanged(board);
+		return true;
+	}
+
+	/**
+	 * Draws the figure on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param x
+	 *            x-coordinate position on the board of the figure
+	 * @param y
+	 *            y-coordinate position on the board of the figure
+	 * @param shape
+	 *            the figure
+	 * @param fill
+	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
+	 *            figure, {@code Cells.Empty} - to erase the figure
+	 * 
+	 * @return - the board with the figure
+	 */
+	protected Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
+		for (int i = 0; i < shape.getCoords().length; i++) {
+			int board_x = x + shape.x(i);
+			int board_y = y - shape.y(i);
+
+			// if the figure does not leave off the board
+			if (((board_y < board.getHeight()) && (board_y >= 0))
+					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
+				// draws the figure on the board
+				board.setCell(fill, board_x, board_y);
+			}
+		}
+		return board;
 	}
 
 	/**

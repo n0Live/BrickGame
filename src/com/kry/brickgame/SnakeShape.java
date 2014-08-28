@@ -8,11 +8,11 @@ public class SnakeShape extends Shape {
 	/**
 	 * Initial size of the snake
 	 */
-	private final static int INITIAL_LENGTH = 7;//TODO replace on 3 after tests
+	private final static int INITIAL_LENGTH = 3;
 	/**
 	 * Maximum size of the snake
 	 */
-	private final static int MAX_LENGTH = 13;
+	private final static int MAX_LENGTH = 16;
 
 	/**
 	 * Current size of the snake
@@ -24,6 +24,9 @@ public class SnakeShape extends Shape {
 	 */
 	private RotationAngle direction;
 
+	/**
+	 * Constructor of the SnakeShape
+	 */
 	public SnakeShape() {
 		super(MAX_LENGTH);
 		this.length = INITIAL_LENGTH;
@@ -37,7 +40,7 @@ public class SnakeShape extends Shape {
 	}
 
 	/**
-	 * The copy constructor of a SnakeShape
+	 * The copy constructor of the SnakeShape
 	 * 
 	 * @param aSnakeShape
 	 *            a SnakeShape object for copying
@@ -59,17 +62,30 @@ public class SnakeShape extends Shape {
 		return newSnakeShape;
 	}
 
+	/**
+	 * Gets the current length of the snake
+	 */
 	public int getLength() {
 		return length;
 	}
 
 	/**
+	 * Gets the maximum possible length of the snake
+	 */
+	public int getMaxLength() {
+		return MAX_LENGTH;
+	}
+
+	/**
 	 * Return index of the last cell of the snake
 	 */
-	protected int tail() {
+	public int tail() {
 		return this.getLength() - 1;
 	}
 
+	/**
+	 * Return direction of movement of the snake
+	 */
 	public RotationAngle getDirection() {
 		return direction;
 	}
@@ -79,13 +95,64 @@ public class SnakeShape extends Shape {
 	}
 
 	/**
+	 * Returns the direction opposite to the specified direction
+	 * 
+	 * @param direction
+	 *            the specified direction
+	 * @return the opposite direction
+	 */
+	public RotationAngle getOppositeDirection(RotationAngle direction) {
+		return direction.getRight().getRight();
+	}
+
+	/**
+	 * Increases snake on the one cell in the specified direction
+	 * 
+	 * @param direction
+	 *            direction of movement of the snake
+	 * @return the instance of the snake after increasing
+	 */
+	public SnakeShape eatApple(RotationAngle direction) {
+		SnakeShape newSnake = this.clone();
+
+		if (newSnake.getLength() != newSnake.getMaxLength()) {
+			int shiftX = getShiftX(direction);
+			int shiftY = getShiftY(direction);
+
+			newSnake.length++;
+			for (int i = 1; i <= newSnake.tail(); i++) {
+				newSnake.setX(i, x(i - 1) - shiftX);
+				newSnake.setY(i, y(i - 1) - shiftY);
+			}
+		}
+		return newSnake;
+	}
+
+	/**
 	 * Turn of the snake by 180 degrees
 	 */
 	public SnakeShape turnReversal() {
 		SnakeShape newSnake = this.clone();
 
-		// 180-degree turn
-		newSnake.setDirection(getDirection().getRight().getRight());
+		RotationAngle direction;
+
+		int shiftX = x(tail()) - x(tail() - 1);
+		int shiftY = y(tail()) - y(tail() - 1);
+
+		// sets the new direction in the direction of the tail
+		if (shiftX != 0) {
+			if (shiftX < 0)
+				direction = RotationAngle.d270;
+			else
+				direction = RotationAngle.d90;
+		} else {
+			if (shiftY < 0)
+				direction = RotationAngle.d180;
+			else
+				direction = RotationAngle.d0;
+		}
+
+		newSnake.setDirection(direction);
 
 		int lastCellX = x(tail());
 		int lastCellY = y(tail());
@@ -103,7 +170,7 @@ public class SnakeShape extends Shape {
 	 * Gets the offset for the x-coordinate in dependence on the direction
 	 * 
 	 * @param direction
-	 *            direction of movement of of the snake
+	 *            direction of movement of the snake
 	 * @return the offset for the x-coordinate
 	 */
 	public int getShiftX(RotationAngle direction) {
@@ -125,7 +192,7 @@ public class SnakeShape extends Shape {
 	 * Gets the offset for the y-coordinate in dependence on the direction
 	 * 
 	 * @param direction
-	 *            direction of movement of of the snake
+	 *            direction of movement of the snake
 	 * @return the offset for the y-coordinate
 	 */
 	public int getShiftY(RotationAngle direction) {
@@ -147,10 +214,10 @@ public class SnakeShape extends Shape {
 	 * Movement of the snake in the selected direction
 	 * 
 	 * @param direction
-	 *            direction of movement of of the snake
-	 * @return the instance of of the snake after moving
+	 *            direction of movement of the snake
+	 * @return the instance of the snake after moving
 	 */
-	protected SnakeShape move(RotationAngle direction) {
+	private SnakeShape move(RotationAngle direction) {
 		SnakeShape newSnake = this.clone();
 		newSnake.setDirection(direction);
 
@@ -168,61 +235,97 @@ public class SnakeShape extends Shape {
 	/**
 	 * Movement of the snake in the current direction
 	 * 
-	 * @return the instance of of the snake after moving
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	public SnakeShape move() {
-		return move(getDirection());
+	public SnakeShape moveTo(boolean isAppleAhead) {
+		return turn(getDirection(), isAppleAhead);
+	}
+
+	/**
+	 * Movement of the snake in the selected direction
+	 * 
+	 * @param direction
+	 *            direction of movement of the snake
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
+	 */
+	public SnakeShape moveTo(RotationAngle direction, boolean isAppleAhead) {
+		return turn(direction, isAppleAhead);
 	}
 
 	/**
 	 * Rotating and movement of the snake in the selected direction
 	 * 
 	 * @param direction
-	 *            direction of movement of of the snake
-	 * @return the instance of of the snake after moving
+	 *            direction of movement of the snake
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	protected SnakeShape turn(RotationAngle direction) {
-		if (direction == getDirection().getRight().getRight()) {
+	protected SnakeShape turn(RotationAngle direction, boolean isAppleAhead) {
+		if (direction == getOppositeDirection(getDirection())) {
 			return turnReversal();
 		} else {
-			return move(direction);
+			if (isAppleAhead) {
+				return eatApple(direction);
+			} else {
+				return move(direction);
+			}
 		}
 	}
 
 	/**
 	 * Movement of the snake in the upward direction
 	 * 
-	 * @return the instance of of the snake after moving
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	public SnakeShape moveUp() {
-		return turn(RotationAngle.d0);
+	public SnakeShape moveUp(boolean isAppleAhead) {
+		return turn(RotationAngle.d0, isAppleAhead);
 	}
 
 	/**
 	 * Movement of the snake in the downward direction
 	 * 
-	 * @return the instance of of the snake after moving
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	public SnakeShape moveDown() {
-		return turn(RotationAngle.d180);
+	public SnakeShape moveDown(boolean isAppleAhead) {
+		return turn(RotationAngle.d180, isAppleAhead);
 	}
 
 	/**
 	 * Movement of the snake in the left direction
 	 * 
-	 * @return the instance of of the snake after moving
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	public SnakeShape moveLeft() {
-		return turn(RotationAngle.d270);
+	public SnakeShape moveLeft(boolean isAppleAhead) {
+		return turn(RotationAngle.d270, isAppleAhead);
 	}
 
 	/**
 	 * Movement of the snake in the right direction
 	 * 
-	 * @return the instance of of the snake after moving
+	 * @param isAppleAhead
+	 *            the indication that the snake should eat the apple ahead of
+	 *            her
+	 * @return the instance of the snake after moving
 	 */
-	public SnakeShape moveRight() {
-		return turn(RotationAngle.d90);
+	public SnakeShape moveRight(boolean isAppleAhead) {
+		return turn(RotationAngle.d90, isAppleAhead);
 	}
 
 	@Override
@@ -232,6 +335,32 @@ public class SnakeShape extends Shape {
 				// (head) - (tail)
 				+ ", [" + x(0) + ";" + y(0) + "]<-[" + x(tail()) + ";"
 				+ y(tail()) + "]]\n" + super.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((direction == null) ? 0 : direction.hashCode());
+		result = prime * result + length;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SnakeShape other = (SnakeShape) obj;
+		if (direction != other.direction)
+			return false;
+		if (length != other.length)
+			return false;
+		return true;
 	}
 
 }

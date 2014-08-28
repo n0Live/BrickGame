@@ -15,7 +15,7 @@ public class BoardGamesAnimation extends Board {
 		None, Dancing, Racing, Arcanoid, Snakes, Frogger, Tetris
 	};
 
-	private final static int width = Game.BOARD_WIDTH;
+	private final static int width = 10;
 	private final static int height = 5;
 	private final static int frames = 5;
 	private final static Cell cE = Cell.Empty;

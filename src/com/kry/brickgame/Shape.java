@@ -1,5 +1,9 @@
 package com.kry.brickgame;
 
+import java.util.Arrays;
+
+import com.kry.brickgame.Board.Cell;
+
 /**
  * @author noLive
  * 
@@ -45,6 +49,15 @@ public class Shape {
 	};
 
 	/**
+	 * Rotation angle of the figure
+	 */
+	private RotationAngle rotationAngle;
+	/**
+	 * Type of fill of the figure
+	 */
+	private Cell fill;
+
+	/**
 	 * A set of coordinates of a points of a figures:
 	 * [index][coordinate:0-x,1-y]
 	 */
@@ -81,7 +94,24 @@ public class Shape {
 		return this.coords[i];
 	}
 
+	public RotationAngle getRotationAngle() {
+		return rotationAngle;
+	}
+
+	public void setRotationAngle(RotationAngle rotationAngle) {
+		this.rotationAngle = rotationAngle;
+	}
+
+	public Cell getFill() {
+		return fill;
+	}
+
+	public void setFill(Cell fill) {
+		this.fill = fill;
+	}
+
 	/**
+	 * Constructor of the shape
 	 * 
 	 * @param length
 	 *            number of the points of the figure
@@ -89,6 +119,25 @@ public class Shape {
 	public Shape(int length) {
 		super();
 		coords = new int[length][2];
+		rotationAngle = RotationAngle.d0;
+		fill = Cell.Empty;
+	}
+
+	/**
+	 * Copy constructor of the shape
+	 * 
+	 * @param aShape
+	 *            a shape for copying
+	 */
+	public Shape(Shape aShape) {
+		super();
+		rotationAngle = aShape.rotationAngle;
+		fill = aShape.fill;
+
+		this.coords = new int[aShape.coords.length][aShape.coords[0].length];
+		for (int i = 0; i < aShape.coords.length; i++) {
+			this.coords[i] = aShape.coords[i].clone();
+		}
 	}
 
 	/**
@@ -172,37 +221,49 @@ public class Shape {
 	}
 
 	/**
-	 * Counterclockwise rotation of a figure
-	 * 
-	 * @param shape
-	 *            a figure
-	 * @return a figure after rotation
+	 * @return the width of the figure
 	 */
-	public Shape rotateLeft(Shape shape) {
-		Shape result = new Shape(shape.getCoords().length);
-
-		for (int i = 0; i < shape.getCoords().length; i++) {
-			result.setX(i, shape.y(i));
-			result.setY(i, -shape.x(i));
-		}
-		return result;
+	public int getWidth() {
+		return maxX() - minX() + 1;
 	}
 
 	/**
-	 * Clockwise rotation of a figure
-	 * 
-	 * @param shape
-	 *            a figure
-	 * @return a figure after rotation
+	 * @return the height of the figure
 	 */
-	public Shape rotateRight(Shape shape) {
-		Shape result = new Shape(shape.getCoords().length);
+	public int getHeight() {
+		return maxY() - minY() + 1;
+	}
 
-		for (int i = 0; i < shape.getCoords().length; i++) {
-			result.setX(i, -shape.y(i));
-			result.setY(i, shape.x(i));
+	/**
+	 * Counterclockwise rotation of the figure
+	 * 
+	 * @return the figure after rotation
+	 */
+	public Shape rotateLeft() {
+		Shape originalShape = new Shape(this);
+
+		for (int i = 0; i < getCoords().length; i++) {
+			setX(i, originalShape.y(i));
+			setY(i, -originalShape.x(i));
 		}
-		return result;
+		rotationAngle = rotationAngle.getLeft();
+		return this;
+	}
+
+	/**
+	 * Clockwise rotation of the figure
+	 * 
+	 * @return the figure after rotation
+	 */
+	public Shape rotateRight() {
+		Shape originalShape = new Shape(this);
+
+		for (int i = 0; i < getCoords().length; i++) {
+			setX(i, -originalShape.y(i));
+			setY(i, originalShape.x(i));
+		}
+		rotationAngle = rotationAngle.getRight();
+		return this;
 	}
 
 	/**
@@ -243,6 +304,28 @@ public class Shape {
 		// Results:
 		// _0_ | 0__ | 00
 		// 000 | 000 | 00
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(coords);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Shape other = (Shape) obj;
+		if (!Arrays.deepEquals(coords, other.coords))
+			return false;
+		return true;
 	}
 
 }

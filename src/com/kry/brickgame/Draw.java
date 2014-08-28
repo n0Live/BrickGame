@@ -207,9 +207,10 @@ public class Draw extends JPanel implements GameListener {
 		canvasSetBorder(boardCanvas);
 
 		// append the board and the preview to the main canvas
-		appendCanvas(canvas, boardCanvas, 0, 0);
-		appendCanvas(canvas, previewCanvas, boardCanvas.getWidth()
-				+ SQUARE_SIZE, 5 * SQUARE_SIZE);
+		appendCanvas(canvas, boardCanvas, (SQUARE_SIZE / 2), (SQUARE_SIZE / 2));
+		appendCanvas(canvas, previewCanvas,
+				(SQUARE_SIZE / 2) + boardCanvas.getWidth() + SQUARE_SIZE,
+				(5 * SQUARE_SIZE));
 
 		// append labels and icons
 		drawLabelsAndIcons();
@@ -462,15 +463,16 @@ public class Draw extends JPanel implements GameListener {
 		int x, y, space;
 
 		/* Scores */
-		x = boardCanvas.getWidth();
-		y = digitalFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth();
+		y = (SQUARE_SIZE / 2) + digitalFontSize;
 
 		drawTextOnCanvas(canvas, "18888", scores, digitalFont, x, y);
 		/* --- */
 
 		/* Scores label */
-		x = boardCanvas.getWidth() + (3 * SQUARE_SIZE / 4);
-		y = 2 * SQUARE_SIZE + SQUARE_SIZE / 3 + textFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (3 * SQUARE_SIZE / 4);
+		y = (SQUARE_SIZE / 2) + (2 * SQUARE_SIZE) + (SQUARE_SIZE / 3)
+				+ textFontSize;
 		fm = getGraphics().getFontMetrics(textFont);
 		space = fm.stringWidth(HI) + 2;
 
@@ -486,8 +488,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Next/Lines labels */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = 4 * SQUARE_SIZE + biggerTextFont.getSize();
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = (4 * SQUARE_SIZE) + biggerTextFont.getSize();
 		fm = getGraphics().getFontMetrics(biggerTextFont);
 		space = fm.stringWidth(NEXT) + (SQUARE_SIZE / 4);
 
@@ -496,8 +498,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Speed and Level */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 4);
-		y = 9 * SQUARE_SIZE + digitalFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 4);
+		y = (SQUARE_SIZE / 2) + (9 * SQUARE_SIZE) + digitalFontSize;
 		fm = getGraphics().getFontMetrics(digitalFont);
 		space = fm.stringWidth("18") + (SQUARE_SIZE / 4);
 
@@ -506,8 +508,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Speed and Level labels */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = 11 * SQUARE_SIZE + textFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = (SQUARE_SIZE / 2) + (11 * SQUARE_SIZE) + textFontSize;
 		fm = getGraphics().getFontMetrics(textFont);
 		space = fm.stringWidth(SPEED) + (SQUARE_SIZE / 4);
 
@@ -516,8 +518,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Rotate label */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = 13 * SQUARE_SIZE + textFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = (SQUARE_SIZE / 2) + (13 * SQUARE_SIZE) + textFontSize;
 
 		drawTextOnCanvas(canvas, ROTATE, "", textFont, x, y);
 		/* --- */
@@ -537,8 +539,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Pause label */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = 15 * SQUARE_SIZE + textFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = (SQUARE_SIZE / 2) + (15 * SQUARE_SIZE) + textFontSize;
 
 		drawTextOnCanvas(canvas, PAUSE,
 				((status == Status.Paused) ? PAUSE : ""), textFont, x, y);
@@ -556,8 +558,8 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Game Over label */
-		x = boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = 18 * SQUARE_SIZE + textFontSize;
+		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		y = (SQUARE_SIZE / 2) + (18 * SQUARE_SIZE) + textFontSize;
 		drawTextOnCanvas(canvas, GAME_OVER,
 				((status == Status.GameOver) ? GAME_OVER : ""), textFont, x, y);
 		/* --- */

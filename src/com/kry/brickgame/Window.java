@@ -36,9 +36,12 @@ public class Window extends JFrame implements MouseInputListener {
 		frame.setResizable(false);
 		frame.setUndecorated(true);
 
-		frame.setBounds(100, 100, Draw.SQUARE_SIZE * (10 + 6)
-				+ Draw.SQUARE_SIZE / 2, Draw.SQUARE_SIZE * 20
-				+ Draw.SQUARE_SIZE / 2);
+		frame.setBounds(0, 0, Draw.SQUARE_SIZE * (10 + 6)
+				+ Draw.SQUARE_SIZE, Draw.SQUARE_SIZE * 20
+				+ Draw.SQUARE_SIZE);
+		
+		frame.setLocationRelativeTo(null);
+		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));

@@ -1,5 +1,7 @@
 package com.kry.brickgame;
 
+import java.util.Random;
+
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.Shape.RotationAngle;
 
@@ -8,6 +10,13 @@ import com.kry.brickgame.Shape.RotationAngle;
  * 
  */
 public class SnakeGame extends Game {
+
+	// ** Direction constants **
+	private static final RotationAngle LEFT = RotationAngle.d270;
+	private static final RotationAngle RIGHT = RotationAngle.d90;
+	private static final RotationAngle UP = RotationAngle.d0;
+	private static final RotationAngle DOWN = RotationAngle.d180;
+	// **
 
 	/**
 	 * The snake
@@ -43,14 +52,19 @@ public class SnakeGame extends Game {
 
 		setStatus(Status.Running);
 
-		if (!tryMove(snake, curX, curY))
-			gameOver();
+		tryMove(snake.getDirection());
+		prepareBoard();
+		addApple();
 
 		while (getStatus() != Status.GameOver) {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-				if (!snakeMovement())
+				if (!tryMove(snake.getDirection())) {
 					gameOver();
+				}
+				if (snake.getLength() >= snake.getMaxLength()) {
+					nextLevel();
+				}
 			}
 			// processing of key presses
 			processKeys();
@@ -58,15 +72,62 @@ public class SnakeGame extends Game {
 	}
 
 	/**
-	 * Movement of the snake
-	 * 
-	 * @return {@code true} if the motion is possible, otherwise {@code false}
+	 * Preparation of the boards for the new level
 	 */
-	private boolean snakeMovement() {
-		int shiftX = snake.getShiftX(snake.getDirection());
-		int shiftY = snake.getShiftY(snake.getDirection());
+	private void prepareBoard() {
+		if (getLevel() > 1) {
+			// from 2 to 5 - 1, from 6 to 20 - 2
+			int obstaclesMultiplier = (getLevel() / 5) + 1;
 
-		return tryMove(snake.move(), curX + shiftX, curY + shiftY);
+			for (int i = 0; i < obstaclesMultiplier; i++) {
+				for (int k = 1; k <= 2; k++) {
+					generateObstacle(k);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Creates the obstacle and places it on the board randomly
+	 * 
+	 * @param type
+	 *            type of the obstacle
+	 */
+	private void generateObstacle(int type) {
+		Random r = new Random();
+		int x, y;
+
+		Obstacle obstacle = new Obstacle(type);
+		obstacle.setRandomRotate();
+
+		// finds empty cells
+		do {
+			// in line at the borders of the board shall not be put an obstacle
+			x = r.nextInt(boardWidth - obstacle.getWidth() - 1) + 1;
+			y = r.nextInt(boardHeight - obstacle.getHeight() - 1) + 1;
+		} while (checkCollision(getBoard(), obstacle, x, y));
+
+		setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
+	}
+
+	/**
+	 * Going to the next level
+	 */
+	private void nextLevel() {
+		animatedClearBoard();
+
+		//increases level and speed
+		setLevel(getLevel() + 1);
+		if (getLevel() == 1)
+			setSpeed(getSpeed() + 1);
+
+		snake = new SnakeShape();
+		curX = boardWidth / 2 - snake.getLength() / 2;
+		curY = 0;
+
+		tryMove(snake.getDirection());
+		prepareBoard();
+		addApple();
 	}
 
 	/**
@@ -103,41 +164,93 @@ public class SnakeGame extends Game {
 	 *            y-coordinate position on the board of the snake's head
 	 * @return {@code true} if the movement succeeded otherwise {@code false}
 	 */
-	private boolean tryMove(SnakeShape snake, int newX, int newY) {
-		Shape headOfSnake = new Shape(1);
+	private boolean tryMove(RotationAngle direction) {
+		int newX;
+		int newY;
+		boolean isReversal = (direction == snake.getOppositeDirection(snake
+				.getDirection()));
 
-		// gets the head of the new snake
+		if (isReversal) {
+			newX = curX + snake.x(snake.tail());
+			newY = curY + snake.y(snake.tail());
+		} else {
+			newX = curX + getShiftX(direction);
+			newY = curY + getShiftY(direction);
+		}
+
+		// gets the head of the snake
+		Shape headOfSnake = new Shape(1);
 		headOfSnake.setCoord(0, snake.getCoord(0));
+
+		// check the out off the board
+		if (checkBoardCollision(headOfSnake, newX, newY))
+			return false;
+
+		boolean isAppleAhead = (getBoard().getCell(newX, newY) == Cell.Blink);
+
+		SnakeShape newSnake = snake.moveTo(direction, isAppleAhead);
+
+		// if the reversal is not possible
+		if (isReversal && newSnake.equals(snake)) {
+			// returns the old values of the coordinates
+			newX = curX;
+			newY = curY;
+		}
 
 		// create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
 
-		// if the head of the new snake is same as the tail of the old snake
-		// (snake made a 180-degree turn), then DO NOT cut off the tail of the
-		// snake
-		if (headOfSnake.getCoord(0) != snake.getCoord(snake.tail())) {
-			// cut off the tail of the old snake
-			int board_x = curX + this.snake.x(this.snake.tail());
-			int board_y = curY + this.snake.y(this.snake.tail());
-			board.setCell(Cell.Empty, board_x, board_y);
+		// cut off the tail of the old snake, because the snake should already
+		// move and the tail will interfere with checks
+		int board_x = curX + snake.x(snake.tail());
+		int board_y = curY + snake.y(snake.tail());
+		board.setCell(Cell.Empty, board_x, board_y);
+
+		// if it was an apple in front then erase it
+		if (isAppleAhead) {
+			board.setCell(Cell.Empty, newX, newY);
 		}
 
-		// Checks
-		if (checkBoardCollision(headOfSnake, newX, newY))
+		// check the collision with obstacles
+		if (checkCollision(board, headOfSnake, newX, newY)) {
 			return false;
-		if (checkCollision(board, headOfSnake, newX, newY))
-			return false;
+		}
 
-		// Draw the new snake on the board
+		// draw the new snake on the board
 		setBoard(board.clone());
-		setBoard(drawSnake(getBoard(), snake, newX, newY));
+		setBoard(drawSnake(getBoard(), newSnake, newX, newY));
 
-		// The old snake is replaced by the new snake
-		this.snake = snake.clone();
+		if (isAppleAhead) {
+			// increases score
+			setScore(getScore() + 1);
+			// add a new apple
+			if (newSnake.getLength() < newSnake.getMaxLength())
+				addApple();
+		}
+
+		// the old snake is replaced by the new snake
+		this.snake = newSnake.clone();
 		curX = newX;
 		curY = newY;
 
 		return true;
+	}
+
+	/**
+	 * Adds "apple" (the blinking cell) to the board
+	 */
+	private void addApple() {
+		Random r = new Random();
+		int x, y;
+
+		// finds empty cell
+		do {
+			x = r.nextInt(boardWidth);
+			y = r.nextInt(boardHeight);
+		} while (getBoard().getCell(x, y) != Cell.Empty);
+
+		// adds "apple" - the blinking cell
+		getBoard().setCell(Cell.Blink, x, y);
 	}
 
 	/**
@@ -180,13 +293,6 @@ public class SnakeGame extends Game {
 	 * Processing of key presses
 	 */
 	private void processKeys() {
-		// ** Direction constants **
-		final RotationAngle LEFT = RotationAngle.d270;
-		final RotationAngle RIGHT = RotationAngle.d90;
-		final RotationAngle UP = RotationAngle.d0;
-		final RotationAngle DOWN = RotationAngle.d180;
-		// **
-
 		if (getStatus() == Status.None)
 			return;
 
@@ -200,29 +306,24 @@ public class SnakeGame extends Game {
 			return;
 
 		if (keys.contains(KeyPressed.KeyLeft)) {
-			tryMove(snake.moveLeft(), curX + getShiftX(LEFT), curY
-					+ getShiftY(LEFT));
-			sleep(ANIMATION_DELAY * 3);
+			tryMove(LEFT);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRight)) {
-			tryMove(snake.moveRight(), curX + getShiftX(RIGHT), curY
-					+ getShiftY(RIGHT));
-			sleep(ANIMATION_DELAY * 3);
+			tryMove(RIGHT);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyDown)) {
-			tryMove(snake.moveDown(), curX + getShiftX(DOWN), curY
-					+ getShiftY(DOWN));
-			sleep(ANIMATION_DELAY * 3);
+			tryMove(DOWN);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyUp)) {
-			tryMove(snake.moveUp(), curX + getShiftX(UP), curY + getShiftY(UP));
-			sleep(ANIMATION_DELAY * 3);
+			tryMove(UP);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRotate)) {
-			//gets the offset for the current direction
-			tryMove(snake.move(), curX + getShiftX(snake.getDirection()), curY
-					+ getShiftY(snake.getDirection()));
-			sleep(ANIMATION_DELAY);
+			tryMove(snake.getDirection());
+			sleep(ANIMATION_DELAY * 2);
 		}
 	}
 }

@@ -21,10 +21,6 @@ public class TetrisShape extends Shape implements Cloneable {
 
 	private Tetrominoes shape;
 
-	private RotationAngle rotationAngle;
-
-	private Cell fill;
-
 	/**
 	 * A set of coordinates of a points of a figures:
 	 * [shapeIndex][pointIndex][coordinate:0-x,1-y]
@@ -52,8 +48,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public TetrisShape(TetrisShape aTetrisShape) {
 		super(LENGTH);
-		setShape(aTetrisShape.shape, aTetrisShape.rotationAngle,
-				aTetrisShape.fill);
+		setShape(aTetrisShape.shape, aTetrisShape.getRotationAngle(),
+				aTetrisShape.getFill());
 	}
 
 	public TetrisShape clone() {
@@ -109,8 +105,8 @@ public class TetrisShape extends Shape implements Cloneable {
 		}
 
 		this.shape = shape;
-		this.rotationAngle = rotationAngle;
-		this.fill = fill;
+		this.setRotationAngle(rotationAngle);
+		this.setFill(fill);
 	}
 
 	/**
@@ -139,14 +135,6 @@ public class TetrisShape extends Shape implements Cloneable {
 		return shape;
 	}
 
-	public Cell getFill() {
-		return fill;
-	}
-
-	public void setFill(Cell fill) {
-		this.fill = fill;
-	}
-
 	/**
 	 * Selection of a random figure
 	 */
@@ -162,7 +150,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public void setRandomRotate() {
 		Random r = new Random();
-		int x = Math.abs(r.nextInt()) % 3 + 1;
+		int x = Math.abs(r.nextInt()) % 4;
 		RotationAngle[] values = RotationAngle.values();
 		setShape(getShape(), values[x]);
 	}
@@ -182,25 +170,27 @@ public class TetrisShape extends Shape implements Cloneable {
 	/**
 	 * Counterclockwise rotation of the figure
 	 */
+	@Override
 	public TetrisShape rotateLeft() {
 		if (getShape() != Tetrominoes.SquareShape)
-			setShape(getShape(), this.rotationAngle.getLeft());
+			setShape(getShape(), this.getRotationAngle().getLeft());
 		return this;
 	}
 
 	/**
 	 * Clockwise rotation of the figure
 	 */
+	@Override
 	public TetrisShape rotateRight() {
 		if (getShape() != Tetrominoes.SquareShape)
-			setShape(getShape(), this.rotationAngle.getRight());
+			setShape(getShape(), this.getRotationAngle().getRight());
 		return this;
 	}
 
 	@Override
 	public String toString() {
 		// the figure and its rotation angle
-		return "TetrisShape [" + this.getShape() + ", " + this.rotationAngle
+		return "TetrisShape [" + this.getShape() + ", " + this.getRotationAngle()
 		// the lower left corner
 				+ ", [" + minX() + ";" + minY() + "]]\n" + super.toString();
 	}

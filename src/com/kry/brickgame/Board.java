@@ -64,11 +64,10 @@ public class Board {
 		super();
 		this.width = aBoard.width;
 		this.height = aBoard.height;
+		
 		this.board = new Cell[aBoard.width][aBoard.height];
-		for (int x = 0; x < aBoard.width; x++) {
-			for (int y = 0; y < aBoard.height; y++) {
-				this.board[x][y] = aBoard.board[x][y];
-			}
+		for (int i = 0; i < aBoard.width; i++) {
+			this.board[i] = aBoard.board[i].clone();
 		}
 	}
 

@@ -100,7 +100,7 @@ public class TetrisGame extends Game {
 				nextPiece.setFill(Cell.Blink);
 
 			clearPreview();
-			setPreview(drawPiece(getPreview(),//
+			setPreview(drawShape(getPreview(),//
 					// X-coordinate:
 					// (middle of the board)-(half the width of the
 					// figure)-(offset of the leftmost x-coordinate from zero)
@@ -135,7 +135,7 @@ public class TetrisGame extends Game {
 
 		// Erase the current figure from the temporary board to not interfere
 		// with the checks
-		board = drawPiece(board, curX, curY, curPiece, Cell.Empty);
+		board = drawShape(board, curX, curY, curPiece, Cell.Empty);
 
 		// If a collision from the new figure with the side boundary of the
 		// board then trying to move aside
@@ -150,8 +150,8 @@ public class TetrisGame extends Game {
 			return false;
 
 		// Erase the current figure from the basic board and draw the new figure
-		setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cell.Empty));
-		setBoard(drawPiece(getBoard(), prepX, newY, newPiece,
+		setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Empty));
+		setBoard(drawShape(getBoard(), prepX, newY, newPiece,
 				newPiece.getFill()));
 
 		// The current figure is replaced by the new
@@ -160,39 +160,6 @@ public class TetrisGame extends Game {
 		curY = newY;
 
 		return true;
-	}
-
-	/**
-	 * Draws the figure on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param x
-	 *            x-coordinate position on the board of the figure
-	 * @param y
-	 *            y-coordinate position on the board of the figure
-	 * @param piece
-	 *            the figure
-	 * @param fill
-	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
-	 *            figure, {@code Cells.Empty} - to erase the figure
-	 * 
-	 * @return - the board with the figure
-	 */
-	private Board drawPiece(Board board, int x, int y, TetrisShape piece,
-			Cell fill) {
-		for (int i = 0; i < piece.getCoords().length; i++) {
-			int board_x = x + piece.x(i);
-			int board_y = y - piece.y(i);
-
-			// if the figure does not leave off the board
-			if (((board_y < board.getHeight()) && (board_y >= 0))
-					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
-				// draws the figure on the board
-				board.setCell(fill, board_x, board_y);
-			}
-		}
-		return board;
 	}
 
 	/**
@@ -224,7 +191,7 @@ public class TetrisGame extends Game {
 		if (curPiece.getShape() != Tetrominoes.NoShape)
 			// Cells.Full instead curPiece.getFill() because is Blink should
 			// change to Full when lying on the board
-			setBoard(drawPiece(getBoard(), curX, curY, curPiece, Cell.Full));
+			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 
 		int oldHundreds = getScore() / 100;
 
