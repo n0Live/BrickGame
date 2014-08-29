@@ -68,7 +68,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 * @param fill
 	 *            type of fill of a figure
 	 */
-	public void setShape(Tetrominoes shape, RotationAngle rotationAngle,
+	public TetrisShape setShape(Tetrominoes shape, RotationAngle rotationAngle,
 			Cell fill) {
 		for (int i = 0; i < LENGTH; i++) {
 			switch (rotationAngle) {
@@ -107,6 +107,8 @@ public class TetrisShape extends Shape implements Cloneable {
 		this.shape = shape;
 		this.setRotationAngle(rotationAngle);
 		this.setFill(fill);
+		
+		return this;
 	}
 
 	/**
@@ -117,8 +119,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 * @param rotationAngle
 	 *            rotation angle of a figure
 	 */
-	public void setShape(Tetrominoes shape, RotationAngle rotationAngle) {
-		setShape(shape, rotationAngle, Cell.Full);
+	public TetrisShape setShape(Tetrominoes shape, RotationAngle rotationAngle) {
+		return setShape(shape, rotationAngle, Cell.Full);
 	}
 
 	/**
@@ -127,8 +129,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 * @param shape
 	 *            a figure
 	 */
-	public void setShape(Tetrominoes shape) {
-		setShape(shape, RotationAngle.d0, Cell.Full);
+	public TetrisShape setShape(Tetrominoes shape) {
+		return setShape(shape, RotationAngle.d0, Cell.Full);
 	}
 
 	public Tetrominoes getShape() {
@@ -138,21 +140,21 @@ public class TetrisShape extends Shape implements Cloneable {
 	/**
 	 * Selection of a random figure
 	 */
-	public void setRandomShape() {
+	public TetrisShape setRandomShape() {
 		Random r = new Random();
 		int x = Math.abs(r.nextInt()) % 7 + 1;
 		Tetrominoes[] values = Tetrominoes.values();
-		setShape(values[x]);
+		return setShape(values[x]);
 	}
 
 	/**
 	 * Selection of a random rotation angle
 	 */
-	public void setRandomRotate() {
+	public TetrisShape setRandomRotate() {
 		Random r = new Random();
 		int x = Math.abs(r.nextInt()) % 4;
 		RotationAngle[] values = RotationAngle.values();
-		setShape(getShape(), values[x]);
+		return setShape(getShape(), values[x]);
 	}
 
 	/**
@@ -162,9 +164,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 * @see #setRandomShape
 	 * @see #setRandomRotate
 	 */
-	public void setRandomShapeAndRotate() {
-		setRandomShape();
-		setRandomRotate();
+	public TetrisShape setRandomShapeAndRotate() {
+		return setRandomShape().setRandomRotate();
 	}
 
 	/**

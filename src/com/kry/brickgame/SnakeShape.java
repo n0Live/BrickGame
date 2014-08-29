@@ -90,8 +90,9 @@ public class SnakeShape extends Shape {
 		return direction;
 	}
 
-	private void setDirection(RotationAngle direction) {
+	private SnakeShape setDirection(RotationAngle direction) {
 		this.direction = direction;
+		return this;
 	}
 
 	/**
@@ -124,6 +125,7 @@ public class SnakeShape extends Shape {
 				newSnake.setX(i, x(i - 1) - shiftX);
 				newSnake.setY(i, y(i - 1) - shiftY);
 			}
+			newSnake.setDirection(direction);
 		}
 		return newSnake;
 	}

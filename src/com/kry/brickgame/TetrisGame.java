@@ -88,7 +88,7 @@ public class TetrisGame extends Game {
 		curX = boardWidth / 2;
 		// Y-coordinate - top edge, and so that the bottom edge of the figure
 		// was at the top of the border
-		curY = boardHeight - 1 + nextPiece.maxY();
+		curY = boardHeight - 1 - nextPiece.minY();
 
 		if (!tryMove(nextPiece, curX, curY)) {
 			gameOver();
@@ -111,9 +111,9 @@ public class TetrisGame extends Game {
 					// (remember that the figure is drawn from the bottom up):
 					// (middle of the board)+(half the height of the
 					// figure)+(offset of the lower y-coordinate from zero)
-					(previewHeight / 2 - 1)
-							+ ((nextPiece.maxY() - nextPiece.minY() + 1) / 2)
-							+ (nextPiece.minY()),//
+					(previewHeight / 2)
+							- ((nextPiece.maxY() - nextPiece.minY() + 1) / 2)
+							- (nextPiece.minY()),//
 					nextPiece, nextPiece.getFill()));
 		}
 	}

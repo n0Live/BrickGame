@@ -64,7 +64,7 @@ public class Board {
 		super();
 		this.width = aBoard.width;
 		this.height = aBoard.height;
-		
+
 		this.board = new Cell[aBoard.width][aBoard.height];
 		for (int i = 0; i < aBoard.width; i++) {
 			this.board[i] = aBoard.board[i].clone();
@@ -82,7 +82,7 @@ public class Board {
 	protected void clearBoard() {
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < height; j++)
-				this.board[i][j] = Cell.Empty;
+				this.board[i][j] = Empty;
 	}
 
 	protected Cell getCell(int x, int y) {
@@ -103,6 +103,14 @@ public class Board {
 		return line;
 	}
 
+	/**
+	 * Replacing a single line of the board
+	 * 
+	 * @param line
+	 *            new line
+	 * @param y
+	 *            y-coordinate of the line
+	 */
 	protected void setLine(Cell[] line, int y) {
 		for (int i = 0; i < line.length; i++) {
 			this.board[i][y] = line[i];

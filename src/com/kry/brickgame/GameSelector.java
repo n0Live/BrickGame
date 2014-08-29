@@ -1,5 +1,8 @@
 package com.kry.brickgame;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The selection screen of a game
  * 
@@ -7,13 +10,45 @@ package com.kry.brickgame;
  * 
  */
 public class GameSelector extends Game {
+	
+	/**
+	 * Number of subtypes for each game type
+	 */
+	private static Map<Character, Integer> maxNumbersForGames;
+	static {
+		maxNumbersForGames = new HashMap<Character, Integer>();
+		maxNumbersForGames.put('A', 2);
+		maxNumbersForGames.put('B', 4);
+		maxNumbersForGames.put('C', 32);
+		maxNumbersForGames.put('D', 4);
+		maxNumbersForGames.put('E', 8);
+		maxNumbersForGames.put('F', 2);
+		maxNumbersForGames.put('G', 16);
+		maxNumbersForGames.put('H', 8);
+		maxNumbersForGames.put('I', 48);
+		maxNumbersForGames.put('J', 48);
+		maxNumbersForGames.put('K', 48);
+		maxNumbersForGames.put('L', 48);
+		maxNumbersForGames.put('M', 48);
+		maxNumbersForGames.put('N', 48);
+		maxNumbersForGames.put('O', 48);
+		maxNumbersForGames.put('P', 48);
+		maxNumbersForGames.put('Q', 48);
+		maxNumbersForGames.put('R', 48);
+		maxNumbersForGames.put('S', 48);
+		maxNumbersForGames.put('T', 48);
+		maxNumbersForGames.put('U', 48);
+		maxNumbersForGames.put('V', 48);
+		maxNumbersForGames.put('W', 48);
+		maxNumbersForGames.put('X', 48);
+	}
 
-	private String letter;
+	private char letter;
 	private int number;
 
 	public GameSelector() {
 		super();
-		this.letter = "A";
+		this.letter = 'A';
 		this.number = 1;
 	}
 
@@ -39,9 +74,13 @@ public class GameSelector extends Game {
 	 */
 	protected void drawLetter() {
 		BoardLetters boardLetter = new BoardLetters();
-		boardLetter.setLetter(boardLetter.stringToLetters(letter));
+		boardLetter.setLetter(boardLetter.charToLetters(letter));
 		insertBoard(boardLetter, (boardWidth / 2 - boardLetter.getWidth() / 2),// x
 				boardHeight - boardLetter.getHeight());// y
+		if (number > maxNumbersForGames.get(letter)){
+			number = 1;
+			drawNumber();
+		}
 	}
 
 	/**
@@ -76,10 +115,10 @@ public class GameSelector extends Game {
 	 * Next allowable letter
 	 */
 	private void nextLetter() {
-		if (letter.toCharArray()[0] < 'X') {
-			letter = String.valueOf((char) (letter.toCharArray()[0] + 1));
+		if (letter < 'X') {
+			letter++;
 		} else {
-			letter = "A";
+			letter = 'A';
 		}
 	}
 
@@ -87,10 +126,10 @@ public class GameSelector extends Game {
 	 * Previous allowable letter
 	 */
 	private void prevLetter() {
-		if (letter.toCharArray()[0] > 'A') {
-			letter = String.valueOf((char) (letter.toCharArray()[0] - 1));
+		if (letter > 'A') {
+			letter--;
 		} else {
-			letter = "X";
+			letter = 'X';
 		}
 	}
 
@@ -98,14 +137,14 @@ public class GameSelector extends Game {
 	 * Next allowable number
 	 */
 	private void nextNumber() {
-		number = (number < 99) ? number + 1 : 1;
+		number = (number < maxNumbersForGames.get(letter)) ? number + 1 : 1;
 	}
 
 	/**
 	 * Previous allowable number
 	 */
 	private void prevNumber() {
-		number = (number > 1) ? number - 1 : 99;
+		number = (number > 1) ? number - 1 : maxNumbersForGames.get(letter);
 	}
 
 	public void start() {
@@ -119,10 +158,10 @@ public class GameSelector extends Game {
 	 */
 	public void changeGame() {
 		switch (letter) {
-		case "A":
+		case 'A':
 			Main.setGame(new TetrisGame(getSpeed(), getLevel()));
 			break;
-		case "B":
+		case 'B':
 			Main.setGame(new SnakeGame(getSpeed(), getLevel()));
 			break;
 		default:

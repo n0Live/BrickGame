@@ -51,19 +51,31 @@ public class SnakeGame extends Game {
 		super.start();
 
 		setStatus(Status.Running);
+		setLives(4);
 
 		tryMove(snake.getDirection());
-		prepareBoard();
+		//prepareBoard();
+		loadPreparedObstacle();
 		addApple();
 
 		while (getStatus() != Status.GameOver) {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (!tryMove(snake.getDirection())) {
-					gameOver();
+					// kaboom and decrease lives
+					kaboom(curX, curY);
+					setLives(getLives() - 1);
+					if (getLives() > 0) {
+						loadLevel();
+					} else {
+						gameOver();
+					}
 				}
+				// when the snake has reached the maximum length
 				if (snake.getLength() >= snake.getMaxLength()) {
-					nextLevel();
+					// increases level and load it
+					incLevel();
+					loadLevel();
 				}
 			}
 			// processing of key presses
@@ -103,30 +115,120 @@ public class SnakeGame extends Game {
 		// finds empty cells
 		do {
 			// in line at the borders of the board shall not be put an obstacle
-			x = r.nextInt(boardWidth - obstacle.getWidth() - 1) + 1;
-			y = r.nextInt(boardHeight - obstacle.getHeight() - 1) + 1;
+			x = r.nextInt(boardWidth - obstacle.getWidth() - 2) + 1;
+			y = r.nextInt(boardHeight - obstacle.getHeight() - 2)
+					+ obstacle.getHeight() + 1;
 		} while (checkCollision(getBoard(), obstacle, x, y));
 
 		setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
 	}
+	
+	/**
+	 * Loading predefined obstacles
+	 */
+	private void loadPreparedObstacle(){
+		Obstacle obstacle;
+	
+		switch (getLevel()) {
+		case 2:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 3:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 4:
+			obstacle = new Obstacle(1).changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			break;
+		case 5:
+			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			break;
+		case 6:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 7:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 8:
+			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 9:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 10:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			break;
+		default:
+			break;
+		}
+	}
 
 	/**
-	 * Going to the next level
+	 * Increases level and speed
 	 */
-	private void nextLevel() {
-		animatedClearBoard();
-
-		//increases level and speed
+	private void incLevel() {
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1)
 			setSpeed(getSpeed() + 1);
+	}
+
+	/**
+	 * Loading or reloading the specified level
+	 */
+	private void loadLevel() {
+		animatedClearBoard(true);// fast
 
 		snake = new SnakeShape();
 		curX = boardWidth / 2 - snake.getLength() / 2;
 		curY = 0;
 
 		tryMove(snake.getDirection());
-		prepareBoard();
+		//prepareBoard();
+		loadPreparedObstacle();
 		addApple();
 	}
 

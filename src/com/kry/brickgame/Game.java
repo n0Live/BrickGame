@@ -38,9 +38,10 @@ public class Game implements Runnable {
 	private static final int TENTH_LEVEL_SPEED = 80;
 	/*---MAGIC NUMBERS---*/
 
-	private int speed = 1;
-	private int level = 1;
-	private int score = 0;
+	private int speed;
+	private int level;
+	private int score;
+	private int lives;
 
 	/**
 	 * Width of the board
@@ -72,15 +73,6 @@ public class Game implements Runnable {
 
 	private long timePoint = System.currentTimeMillis();
 
-	protected Status getStatus() {
-		return status;
-	}
-
-	protected void setStatus(Status status) {
-		this.status = status;
-		fireStatusChanged(status);
-	}
-
 	private volatile Board board;
 	private volatile Board preview;
 
@@ -95,6 +87,9 @@ public class Game implements Runnable {
 		this.level = level;
 		this.board = board;
 		this.preview = preview;
+
+		this.score = 0;
+		this.lives = 4;
 
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
@@ -163,6 +158,15 @@ public class Game implements Runnable {
 		for (GameListener listener : listeners) {
 			listener.levelChanged(event);
 		}
+	}
+
+	protected Status getStatus() {
+		return status;
+	}
+
+	protected void setStatus(Status status) {
+		this.status = status;
+		fireStatusChanged(status);
 	}
 
 	/**
@@ -242,6 +246,39 @@ public class Game implements Runnable {
 		fireInfoChanged(String.valueOf(score));
 	}
 
+	/**
+	 * Lives
+	 * 
+	 * @return lives 0 - 4
+	 */
+	protected int getLives() {
+		return lives;
+	}
+
+	/**
+	 * Set lives
+	 * 
+	 * @param lives
+	 *            lives 0 - 4
+	 */
+	protected void setLives(int lives) {
+		if (lives > 4) {
+			this.lives = 4;
+		} else if (lives < 0) {
+			this.lives = 0;
+		} else {
+			this.lives = lives;
+		}
+		clearPreview();
+		if (this.lives > 0) {
+			for (int i = 0; i < lives; i++) {
+				preview.setCell(Cell.Full, 1, i);
+				preview.setCell(Cell.Full, 2, i);
+			}
+		}
+		firePreviewChanged(preview);
+	}
+
 	protected Board getBoard() {
 		return board;
 	}
@@ -315,7 +352,7 @@ public class Game implements Runnable {
 		try {
 			for (int i = 0; i < piece.getCoords().length; i++) {
 				int board_x = x + piece.x(i);
-				int board_y = y - piece.y(i);
+				int board_y = y + piece.y(i);
 				if (board.getCell(board_x, board_y) != Cell.Empty)
 					return true;
 			}
@@ -345,7 +382,7 @@ public class Game implements Runnable {
 			boolean checkTopBoundary) {
 		if (checkTopBoundary && ((y + piece.maxY()) >= boardHeight))
 			return true;
-		if ((y - piece.maxY()) < 0)
+		if ((y + piece.minY()) < 0)
 			return true;
 		return false;
 	}
@@ -394,48 +431,38 @@ public class Game implements Runnable {
 	}
 
 	/**
-	 * Animated clearing of the board. Direction is determined from the value of
-	 * {@code fromY} and {@code toY}
+	 * Animated clearing of the board (upwards then downwards)
 	 * 
-	 * @param fromY
-	 *            starting line (y-coordinate)
-	 * @param toY
-	 *            ending line (y-coordinate)
-	 * @return if {@code toY} is more than {@code fromY} then the board is
-	 *         filled upwards, otherwise is cleaned downwards
+	 * @param isFast
+	 *            if true then animation speed is increased twice
 	 */
-	protected boolean animatedClearBoard(int fromY, int toY) {
-		boolean isUpDirection = (toY >= fromY);
+	protected void animatedClearBoard(boolean isFast) {
+		int k = (isFast ? 2 : 1);
 
 		// the board is filled upwards
-		if (isUpDirection) {
-			for (int y = fromY; y <= toY; y++) {
-				for (int x = 0; x < boardWidth; x++) {
-					board.setCell(Cell.Full, x, y);
-				}
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+		for (int y = 0; y < boardHeight; y++) {
+			for (int x = 0; x < boardWidth; x++) {
+				board.setCell(Cell.Full, x, y);
 			}
-			// and is cleaned downwards
-		} else {
-			for (int y = fromY; y >= toY; y--) {
-				for (int x = 0; x < boardWidth; x++) {
-					board.setCell(Cell.Empty, x, y);
-				}
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
-			}
+			fireBoardChanged(board);
+			sleep(ANIMATION_DELAY / k);
 		}
-		return isUpDirection;
+		// and is cleaned downwards
+		for (int y = boardHeight - 1; y >= 0; y--) {
+			for (int x = 0; x < boardWidth; x++) {
+				board.setCell(Cell.Empty, x, y);
+			}
+			fireBoardChanged(board);
+			sleep(ANIMATION_DELAY / k);
+		}
 	}
 
 	/**
-	 * Animated clearing of the board in several passes (upwards then downwards)
+	 * Animated clearing of the board on the normal speed
 	 * 
 	 */
 	protected void animatedClearBoard() {
-		animatedClearBoard(0, boardHeight - 1);
-		animatedClearBoard(boardHeight - 1, 0);
+		animatedClearBoard(false);
 	}
 
 	/**
@@ -490,7 +517,7 @@ public class Game implements Runnable {
 	protected Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
 		for (int i = 0; i < shape.getCoords().length; i++) {
 			int board_x = x + shape.x(i);
-			int board_y = y - shape.y(i);
+			int board_y = y + shape.y(i);
 
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
@@ -500,6 +527,83 @@ public class Game implements Runnable {
 			}
 		}
 		return board;
+	}
+
+	protected void kaboom(int x, int y) {
+		/**
+		 * Inner class to draw an explosion
+		 */
+		class Kaboom {
+			/**
+			 * Drawing a single pass of the blast wave
+			 * 
+			 * @param x
+			 *            x-coordinate of the epicenter
+			 * @param y
+			 *            x-coordinate of the epicenter
+			 * @param width
+			 *            width of the spread of the blast wave
+			 * @param isOutward
+			 *            direction of the spread of the blast wave:
+			 *            {@code true} is outward, {@code false} is inward
+			 */
+			void blast(int x, int y, int width, boolean isOutward) {
+				int halfWidth = width / 2;
+
+				// draw the perimeter of the blast wave with Cell.Full
+				for (int i = x - halfWidth; i <= x + halfWidth; i++) {
+					for (int j = y - halfWidth; j <= y + halfWidth; j++) {
+						board.setCell(Cell.Full, i, j);
+					}
+				}
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+
+				// if is outward direction then erase the inner part of the
+				// blast wave, else erase the outside
+				int k = ((isOutward) ? -1 : 1);
+				for (int i = x - (halfWidth + k); i <= x + (halfWidth + k); i++) {
+					for (int j = y - (halfWidth + k); j <= y + (halfWidth + k); j++) {
+						board.setCell(Cell.Empty, i, j);
+					}
+				}
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+			}
+		}
+
+		// diameter of the explosion
+		// must be an odd number
+		int EXPLODE_SIZE = 5;
+
+		int newX = x;
+		int newY = y;
+
+		// if the explosion leave off the board, move the epicenter point
+		while ((newX - EXPLODE_SIZE / 2) < 0) {
+			newX++;
+		}
+		while ((newX - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardWidth) {
+			newX--;
+		}
+		while ((newY - EXPLODE_SIZE / 2) < 0) {
+			newY++;
+		}
+		while ((newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardHeight) {
+			newY--;
+		}
+
+		Kaboom kaboom = new Kaboom();
+		for (int i = 0; i < 3; i++) {
+			// outward blast wave
+			for (int k = 1; k <= EXPLODE_SIZE; k++) {
+				kaboom.blast(newX, newY, k, true);
+			}
+			// inward blast wave
+			for (int k = EXPLODE_SIZE - 2; k > 0; k--) {
+				kaboom.blast(newX, newY, k, false);
+			}
+		}
 	}
 
 	/**

@@ -3,6 +3,7 @@ package com.kry.brickgame;
 import java.util.Random;
 
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.Shape.RotationAngle;
 
 /**
  * @author noLive
@@ -47,7 +48,7 @@ public class Obstacle extends Shape {
 	 * @param fill
 	 *            type of fill of the obstacle
 	 */
-	public void setType(int type, RotationAngle rotationAngle, Cell fill) {
+	public Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < obstaclesTable[type].length; i++) {
 			setX(i, obstaclesTable[type][i][0]);
 			setY(i, obstaclesTable[type][i][1]);
@@ -83,6 +84,8 @@ public class Obstacle extends Shape {
 		this.type = type;
 		this.setRotationAngle(rotationAngle);
 		this.setFill(fill);
+
+		return this;
 	}
 
 	/**
@@ -93,8 +96,8 @@ public class Obstacle extends Shape {
 	 * @param rotationAngle
 	 *            rotation angle of the obstacle
 	 */
-	public void setType(int type, RotationAngle rotationAngle) {
-		setType(type, rotationAngle, Cell.Full);
+	public Obstacle setType(int type, RotationAngle rotationAngle) {
+		return setType(type, rotationAngle, Cell.Full);
 	}
 
 	/**
@@ -104,8 +107,8 @@ public class Obstacle extends Shape {
 	 * @param type
 	 *            type of the obstacle
 	 */
-	public void setType(int type) {
-		setType(type, RotationAngle.d0, Cell.Full);
+	public Obstacle setType(int type) {
+		return setType(type, RotationAngle.d0, Cell.Full);
 	}
 
 	/**
@@ -115,23 +118,27 @@ public class Obstacle extends Shape {
 		return type;
 	}
 
+	public Obstacle changeRotationAngle(RotationAngle rotationAngle) {
+		return setType(getType(), rotationAngle, getFill());
+	}
+
 	/**
 	 * Selection of a random obstacle
 	 */
-	public void setRandomType() {
+	public Obstacle setRandomType() {
 		Random r = new Random();
 		int x = r.nextInt(obstaclesTable.length - 1) + 1;
-		setType(x);
+		return setType(x);
 	}
 
 	/**
 	 * Selection of a random rotation angle
 	 */
-	public void setRandomRotate() {
+	public Obstacle setRandomRotate() {
 		Random r = new Random();
 		int x = Math.abs(r.nextInt()) % 4;
 		RotationAngle[] values = RotationAngle.values();
-		setType(getType(), values[x]);
+		return setType(getType(), values[x]);
 	}
 
 	/**
@@ -141,9 +148,8 @@ public class Obstacle extends Shape {
 	 * @see #setRandomShape
 	 * @see #setRandomRotate
 	 */
-	public void setRandomShapeAndRotate() {
-		setRandomType();
-		setRandomRotate();
+	public Obstacle setRandomShapeAndRotate() {
+		return setRandomType().setRandomRotate();
 	}
 
 	@Override

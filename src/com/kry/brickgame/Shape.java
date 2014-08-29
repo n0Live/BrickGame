@@ -15,19 +15,19 @@ public class Shape {
 	 */
 	enum RotationAngle {
 		/**
-		 * North
+		 * North/Up
 		 */
 		d0,
 		/**
-		 * East
+		 * East/Right
 		 */
 		d90,
 		/**
-		 * South
+		 * South/Down
 		 */
 		d180,
 		/**
-		 * West
+		 * West/Left
 		 */
 		d270;
 
@@ -63,6 +63,36 @@ public class Shape {
 	 */
 	private int[][] coords;
 
+	/**
+	 * Constructor of the shape
+	 * 
+	 * @param length
+	 *            number of the points of the figure
+	 */
+	public Shape(int length) {
+		super();
+		coords = new int[length][2];
+		rotationAngle = RotationAngle.d0;
+		fill = Cell.Empty;
+	}
+
+	/**
+	 * Copy constructor of the shape
+	 * 
+	 * @param aShape
+	 *            a shape for copying
+	 */
+	public Shape(Shape aShape) {
+		super();
+		rotationAngle = aShape.rotationAngle;
+		fill = aShape.fill;
+
+		this.coords = new int[aShape.coords.length][aShape.coords[0].length];
+		for (int i = 0; i < aShape.coords.length; i++) {
+			this.coords[i] = aShape.coords[i].clone();
+		}
+	}
+
 	protected int[][] getCoords() {
 		return coords;
 	}
@@ -94,12 +124,23 @@ public class Shape {
 		return this.coords[i];
 	}
 
+	/**
+	 * @return rotation angle of the figure
+	 */
 	public RotationAngle getRotationAngle() {
 		return rotationAngle;
 	}
 
-	public void setRotationAngle(RotationAngle rotationAngle) {
+	/**
+	 * Sets rotation angle of the figure
+	 * 
+	 * @param rotationAngle
+	 *            new rotation angle of the figure
+	 * @return the figure after rotation
+	 */
+	public Shape setRotationAngle(RotationAngle rotationAngle) {
 		this.rotationAngle = rotationAngle;
+		return this;
 	}
 
 	public Cell getFill() {
@@ -108,36 +149,6 @@ public class Shape {
 
 	public void setFill(Cell fill) {
 		this.fill = fill;
-	}
-
-	/**
-	 * Constructor of the shape
-	 * 
-	 * @param length
-	 *            number of the points of the figure
-	 */
-	public Shape(int length) {
-		super();
-		coords = new int[length][2];
-		rotationAngle = RotationAngle.d0;
-		fill = Cell.Empty;
-	}
-
-	/**
-	 * Copy constructor of the shape
-	 * 
-	 * @param aShape
-	 *            a shape for copying
-	 */
-	public Shape(Shape aShape) {
-		super();
-		rotationAngle = aShape.rotationAngle;
-		fill = aShape.fill;
-
-		this.coords = new int[aShape.coords.length][aShape.coords[0].length];
-		for (int i = 0; i < aShape.coords.length; i++) {
-			this.coords[i] = aShape.coords[i].clone();
-		}
 	}
 
 	/**
@@ -243,8 +254,8 @@ public class Shape {
 		Shape originalShape = new Shape(this);
 
 		for (int i = 0; i < getCoords().length; i++) {
-			setX(i, originalShape.y(i));
-			setY(i, -originalShape.x(i));
+			setX(i, -originalShape.y(i));
+			setY(i, originalShape.x(i));
 		}
 		rotationAngle = rotationAngle.getLeft();
 		return this;
@@ -259,8 +270,8 @@ public class Shape {
 		Shape originalShape = new Shape(this);
 
 		for (int i = 0; i < getCoords().length; i++) {
-			setX(i, -originalShape.y(i));
-			setY(i, originalShape.x(i));
+			setX(i, originalShape.y(i));
+			setY(i, -originalShape.x(i));
 		}
 		rotationAngle = rotationAngle.getRight();
 		return this;
@@ -293,7 +304,7 @@ public class Shape {
 				for (int k = 0; k < getCoords().length; k++) {
 					if ((getCoords()[k][0] == x) && (getCoords()[k][1] == y)) {
 						// see previous comment
-						line[x + (0 - min_x)] = '0';
+						line[x + (0 - min_x)] = (getFill() == Cell.Blink) ? '*' : '0';
 						break;
 					}
 				}

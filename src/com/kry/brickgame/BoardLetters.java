@@ -207,6 +207,25 @@ public class BoardLetters extends Board {
 
 		return result;
 	}
+	
+	/**
+	 * Convert a character to a Letters object
+	 * 
+	 * @param ch
+	 *            - character like 'A', 'B', 'C', ...
+	 */
+	protected Letters charToLetters(char ch) {
+		Letters result = Letters.None;
+
+		try {
+			result = Letters.valueOf(String.valueOf(ch).toUpperCase());
+		} catch (IllegalArgumentException e) {
+			result = Letters.None;
+		}
+
+		return result;
+	}
+	
 
 	public BoardLetters() {
 		super(width, height);
