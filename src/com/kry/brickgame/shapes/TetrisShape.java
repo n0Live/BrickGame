@@ -1,7 +1,8 @@
-package com.kry.brickgame;
+package com.kry.brickgame.shapes;
 
 import java.util.Random;
 
+import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
 
 /**
@@ -15,7 +16,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	private final static int LENGTH = 4;
 
-	enum Tetrominoes {
+	public enum Tetrominoes {
 		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape
 	};
 

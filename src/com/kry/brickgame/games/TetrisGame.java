@@ -1,15 +1,27 @@
-package com.kry.brickgame;
+package com.kry.brickgame.games;
 
 import java.util.Random;
 
+import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.TetrisShape.Tetrominoes;
+import com.kry.brickgame.shapes.TetrisShape;
+import com.kry.brickgame.shapes.TetrisShape.Tetrominoes;
+import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.TetrisSplash;
 
 /**
  * @author noLive
  * 
  */
 public class TetrisGame extends Game {
+	/**
+	 * Animated splash for game
+	 */
+	public static final GameSplash splash = new TetrisSplash();
+	/**
+	 * Number of subtypes
+	 */
+	public static final int subtypesNumber = 48;
 
 	/**
 	 * Flag to check the completion of falling of a figure
@@ -63,7 +75,7 @@ public class TetrisGame extends Game {
 		nextPiece.setRandomShapeAndRotate();
 		newPiece();
 
-		while (getStatus() != Status.GameOver) {
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// dropping of a figure
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (isFallingFinished) {
@@ -203,14 +215,14 @@ public class TetrisGame extends Game {
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
 				for (int i = 0; i < getLevel() - 1; i++) {
-					sleep(ANIMATION_DELAY * 4);
+					justSleep(ANIMATION_DELAY * 4);
 					addLines();
 				}
 			}
 		}
 
 		// check for game over
-		if ((curY + curPiece.maxY()) > boardHeight)
+		if ((curY + curPiece.maxY()) >= boardHeight)
 			gameOver();
 
 	}
@@ -296,7 +308,7 @@ public class TetrisGame extends Game {
 			if (x2 < boardWidth)
 				board.setCell(Cell.Empty, x2++, line);
 
-			sleep(ANIMATION_DELAY);
+			justSleep(ANIMATION_DELAY);
 			setBoard(board);
 		}
 	}
@@ -380,9 +392,15 @@ public class TetrisGame extends Game {
 		if (getStatus() == Status.None)
 			return;
 
+		if (keys.contains(KeyPressed.KeyReset)) {
+			keys.remove(KeyPressed.KeyReset);
+			ExitToMainMenu();
+			return;
+		}
+
 		if (keys.contains(KeyPressed.KeyStart)) {
-			pause();
 			keys.remove(KeyPressed.KeyStart);
+			pause();
 			return;
 		}
 
@@ -391,11 +409,11 @@ public class TetrisGame extends Game {
 		if (!isFallingFinished) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				justSleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				tryMove(curPiece, curX + 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				justSleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = curPiece.clone().rotateRight();
@@ -404,11 +422,7 @@ public class TetrisGame extends Game {
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
 				oneLineDown();
-				sleep(ANIMATION_DELAY);
-			}
-			if (keys.contains(KeyPressed.KeyReset)) {
-				dropDown();
-				keys.remove(KeyPressed.KeyReset);
+				justSleep(ANIMATION_DELAY);
 			}
 		}
 	}

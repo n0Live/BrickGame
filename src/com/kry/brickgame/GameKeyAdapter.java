@@ -3,7 +3,7 @@ package com.kry.brickgame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import com.kry.brickgame.Game.KeyPressed;
+import com.kry.brickgame.games.Game.KeyPressed;
 
 /**
  * @author noLive
@@ -39,6 +39,12 @@ public class GameKeyAdapter extends KeyAdapter {
 			break;
 		case 'P':
 			Main.getGame().keyPressed(KeyPressed.KeyStart);
+			break;
+		case 'r':
+			Main.getGame().keyPressed(KeyPressed.KeyReset);
+			break;
+		case 'R':
+			Main.getGame().keyPressed(KeyPressed.KeyReset);
 			break;
 		case 'm':
 			Main.getGame().keyPressed(KeyPressed.KeyReset);

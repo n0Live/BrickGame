@@ -2,7 +2,7 @@ package com.kry.brickgame;
 
 import java.util.EventObject;
 
-import com.kry.brickgame.Game.Status;
+import com.kry.brickgame.games.Game.Status;
 
 /**
  * @author noLive

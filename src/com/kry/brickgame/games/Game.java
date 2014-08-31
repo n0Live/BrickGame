@@ -1,16 +1,30 @@
-package com.kry.brickgame;
+package com.kry.brickgame.games;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.kry.brickgame.Board;
+import com.kry.brickgame.GameEvent;
+import com.kry.brickgame.GameListener;
+import com.kry.brickgame.Main;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.shapes.Shape;
+import com.kry.brickgame.splashes.GameSplash;
 
 /**
  * @author noLive
  * 
  */
-public class Game implements Runnable {
+public class Game extends Thread { // implements Runnable
+	/**
+	 * Animated splash for game
+	 */
+	public static GameSplash splash;
+	/**
+	 * Number of subtypes
+	 */
+	public static int subtypesNumber;
 
 	/*---MAGIC NUMBERS---*/
 	/**
@@ -62,7 +76,7 @@ public class Game implements Runnable {
 
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
-	static enum Status {
+	public static enum Status {
 		None, Running, Paused, GameOver, DoSomeWork
 	};
 
@@ -76,7 +90,7 @@ public class Game implements Runnable {
 	private volatile Board board;
 	private volatile Board preview;
 
-	static enum KeyPressed {
+	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
 
@@ -158,6 +172,10 @@ public class Game implements Runnable {
 		for (GameListener listener : listeners) {
 			listener.levelChanged(event);
 		}
+	}
+
+	public GameSplash getSplash() {
+		return splash;
 	}
 
 	protected Status getStatus() {
@@ -445,7 +463,7 @@ public class Game implements Runnable {
 				board.setCell(Cell.Full, x, y);
 			}
 			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY / k);
+			justSleep(ANIMATION_DELAY / k);
 		}
 		// and is cleaned downwards
 		for (int y = boardHeight - 1; y >= 0; y--) {
@@ -453,7 +471,7 @@ public class Game implements Runnable {
 				board.setCell(Cell.Empty, x, y);
 			}
 			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY / k);
+			justSleep(ANIMATION_DELAY / k);
 		}
 	}
 
@@ -557,7 +575,7 @@ public class Game implements Runnable {
 					}
 				}
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 
 				// if is outward direction then erase the inner part of the
 				// blast wave, else erase the outside
@@ -568,7 +586,7 @@ public class Game implements Runnable {
 					}
 				}
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 			}
 		}
 
@@ -623,15 +641,17 @@ public class Game implements Runnable {
 	protected void gameOver() {
 		setStatus(Status.GameOver);
 		animatedClearBoard();
+		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
 
-	protected void keyPressed(KeyPressed key) {
-		keys.add(key);
-	}
-
-	protected void keyReleased(KeyPressed key) {
-		keys.remove(key);
+	/**
+	 * Exit to Main menu
+	 */
+	protected void ExitToMainMenu() {
+		setStatus(Status.None);
+		Thread.currentThread().interrupt();
+		Main.setGame(Main.gameSelector);
 	}
 
 	public void start() {
@@ -650,13 +670,32 @@ public class Game implements Runnable {
 	 * @param millis
 	 *            the length of time to sleep in milliseconds
 	 */
-	public void sleep(long millis) {
+	public void justSleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
+	}
 
+	/**
+	 * Processing key pressing
+	 * 
+	 * @param key
+	 *            keyCode associated with the pressed key
+	 */
+	public void keyPressed(KeyPressed key) {
+		keys.add(key);
+	}
+
+	/**
+	 * Processing key releasing
+	 * 
+	 * @param key
+	 *            keyCode associated with the released key
+	 */
+	public void keyReleased(KeyPressed key) {
+		keys.remove(key);
 	}
 
 }

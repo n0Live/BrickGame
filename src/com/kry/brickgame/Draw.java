@@ -1,5 +1,6 @@
 package com.kry.brickgame;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,10 +13,12 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.Game.Status;
+import com.kry.brickgame.games.Game.Status;
+import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  * @author noLive
@@ -23,12 +26,14 @@ import com.kry.brickgame.Game.Status;
  */
 public class Draw extends JPanel implements GameListener {
 
+	// TODO put in order
+
 	private static final long serialVersionUID = 1043017116324502441L;
 
 	/**
 	 * Size of a single cell of a board
 	 */
-	public static final int SQUARE_SIZE = 26;
+	public static final int SQUARE_SIZE = 18;
 
 	/* LABELS */
 	private static final String HI = "HI";
@@ -40,19 +45,6 @@ public class Draw extends JPanel implements GameListener {
 	private static final String ROTATE = "ROTATE";
 	private static final String PAUSE = "PAUSE";
 	private static final String GAME_OVER = "GAME OVER";
-
-	/**
-	 * Font for digital data (score, etc.)
-	 */
-	private Font digitalFont;
-	/**
-	 * Font for textual data (labels, etc.)
-	 */
-	private Font textFont;
-	/**
-	 * Font of icons
-	 */
-	private Font iconFont;
 
 	private Board board = null;
 	private Board preview = null;
@@ -72,37 +64,53 @@ public class Draw extends JPanel implements GameListener {
 	/**
 	 * Background color
 	 */
-	private Color bgColor;
+	private Color bgColor = new Color(136, 153, 107);
 
 	/* Numerical values */
-	private String scores = "0";
-	private String speed = "1";
-	private String level = "1";
+	private String scores;
+	private String speed;
+	private String level;
 
 	/**
 	 * Game status
 	 */
 	private Status status;
 
-	/* Font sizes */
-	private final int digitalFontSize = SQUARE_SIZE * 2;// 46;
-	private final int textFontSize = (3 * SQUARE_SIZE / 4);// 20;
-	private final int iconFontSize = (3 * SQUARE_SIZE / 4);// 20;
+	/**
+	 * Font for digital data (score, etc.)
+	 */
+	private Font digitalFont;
+	/**
+	 * Font for textual data (labels, etc.)
+	 */
+	private Font textFont;
+	/**
+	 * Font of icons
+	 */
+	private Font iconFont;
 
-	private Dimension size = null;
+	/* Font sizes */
+	private final int digitalFontSize = 26;
+	private final int textFontSize = 11;
+	private final int iconFontSize = 12;
+
+	private Dimension size;
 
 	/**
 	 * Main canvas, combining all elements
 	 */
-	private BufferedImage canvas = null;
+	private BufferedImage canvas;
 	/**
 	 * Canvas that is used to display the main board
 	 */
-	private BufferedImage boardCanvas = null;
+	private BufferedImage boardCanvas;
 	/**
 	 * Canvas that is used to display the preview board
 	 */
-	private BufferedImage previewCanvas = null;
+	private BufferedImage previewCanvas;
+
+	private BufferedImage background;
+
 	/**
 	 * Flag for blinking "Pause" icon
 	 */
@@ -111,7 +119,7 @@ public class Draw extends JPanel implements GameListener {
 	public Draw() {
 		super();
 		/* initialize the fonts */
-		textFont = new Font(Font.SANS_SERIF, Font.PLAIN, textFontSize);
+		textFont = new Font(Font.SANS_SERIF, Font.BOLD, textFontSize);
 		try {
 			// trying to get the font from a resource file
 			digitalFont = Font.createFont(
@@ -135,6 +143,27 @@ public class Draw extends JPanel implements GameListener {
 			// If error does not use the font
 			iconFont = null;
 		}
+
+		try {
+			background = new BufferedImage(360, 640,
+					BufferedImage.TYPE_INT_ARGB);
+
+			Graphics g = background.getGraphics();
+			g.setColor(Color.DARK_GRAY);
+			g.drawRoundRect(0, 0, 360, 640, 30, 30);
+			g.drawImage(
+					ImageIO.read(getClass().getResourceAsStream(
+							"/images/background.png")), 0, 0, 360, 640,
+							Color.DARK_GRAY, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			background = null;
+		}
+
+		scores = "0";
+		speed = "1";
+		level = "1";
+
 	}
 
 	protected Board getBoard() {
@@ -188,16 +217,18 @@ public class Draw extends JPanel implements GameListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		bgColor = getBackground();
+		// bgColor = getBackground();
 
 		// get new size of this component
 		size = getSize();
 		// if the main canvas is not created or the size changed
-		if ((canvas == null) || (canvas.getWidth() != size.width)
-				|| (canvas.getHeight() != size.height)) {
-			// create the main canvas
-			canvas = initCanvas(size.width, size.height);
-		}
+		/*
+		 * if ((canvas == null) || (canvas.getWidth() != size.width) ||
+		 * (canvas.getHeight() != size.height)) { // create the main canvas
+		 * canvas = initCanvas(size.width, size.height); }
+		 */
+		canvas = initCanvas(SQUARE_SIZE * 14 + (SQUARE_SIZE / 2) - 1,
+				SQUARE_SIZE * 20 + 5 + (SQUARE_SIZE / 2));
 
 		clearCanvas(canvas, bgColor);
 
@@ -207,19 +238,20 @@ public class Draw extends JPanel implements GameListener {
 		canvasSetBorder(boardCanvas);
 
 		// append the board and the preview to the main canvas
-		appendCanvas(canvas, boardCanvas, (SQUARE_SIZE / 2), (SQUARE_SIZE / 2));
-		appendCanvas(canvas, previewCanvas,
-				(SQUARE_SIZE / 2) + boardCanvas.getWidth() + SQUARE_SIZE,
-				(5 * SQUARE_SIZE));
-
+		appendCanvas(canvas, boardCanvas, 2, (SQUARE_SIZE / 4) + 2);
+		appendCanvas(canvas, previewCanvas, boardCanvas.getWidth() + 4,
+				(5 * SQUARE_SIZE) + (SQUARE_SIZE / 4) + 2);
 		// append labels and icons
 		drawLabelsAndIcons();
+
+		// TODO draw background above canvas
+		appendCanvas(background, canvas, 50, 52);
 
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		g2d.drawRenderedImage(canvas, null);
+		g2d.drawRenderedImage(background, null);
 	}
 
 	/**
@@ -338,12 +370,13 @@ public class Draw extends JPanel implements GameListener {
 		g2d.setColor(color);
 
 		// set thickness of the line
-		g2d.setStroke(new BasicStroke(2));
+		g2d.setStroke(new BasicStroke((float) 2));
 		// draw the frame
 		g2d.drawRect(x + 2, y + 2, SQUARE_SIZE - 4, SQUARE_SIZE - 4);
 		// draw the inner square
-		g2d.fillRect(x + 1 + (SQUARE_SIZE / 4), y + 1 + (SQUARE_SIZE / 4),
-				SQUARE_SIZE / 2, SQUARE_SIZE / 2);
+		g2d.fillRect(x + 2 + (SQUARE_SIZE / 4), y + 2 + (SQUARE_SIZE / 4),// x +
+																			// 1
+				SQUARE_SIZE / 2 - 2, SQUARE_SIZE / 2 - 2);
 	}
 
 	/**
@@ -382,8 +415,12 @@ public class Draw extends JPanel implements GameListener {
 
 		Graphics2D g2d = targetCanvas.createGraphics();
 
-		g2d.drawImage(sourceCanvas, x, y, sourceCanvas.getWidth(),
-				sourceCanvas.getHeight(), null);
+		int width = (sourceCanvas.getWidth() > targetCanvas.getWidth()) ? targetCanvas
+				.getWidth() : sourceCanvas.getWidth();
+		int height = (sourceCanvas.getHeight() > targetCanvas.getHeight()) ? targetCanvas
+				.getHeight() : sourceCanvas.getHeight();
+
+		g2d.drawImage(sourceCanvas, x, y, width, height, this);
 
 		g2d.dispose();
 	}
@@ -458,47 +495,49 @@ public class Draw extends JPanel implements GameListener {
 		if ((canvas == null) || (scores == null))
 			return;
 
-		Font biggerTextFont = textFont.deriveFont((float) (textFontSize + 4));
+		Font biggerTextFont = textFont.deriveFont((float) (textFontSize + 1));
 		FontMetrics fm;
 		int x, y, space;
 
+		int indent = 2;
+
 		/* Scores */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth();
-		y = (SQUARE_SIZE / 2) + digitalFontSize;
+		x = indent + boardCanvas.getWidth();
+		y = indent + digitalFontSize;
 
 		drawTextOnCanvas(canvas, "18888", scores, digitalFont, x, y);
 		/* --- */
 
 		/* Scores label */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (3 * SQUARE_SIZE / 4);
-		y = (SQUARE_SIZE / 2) + (2 * SQUARE_SIZE) + (SQUARE_SIZE / 3)
-				+ textFontSize;
+		x = indent * 4 + boardCanvas.getWidth();
+		y = indent + (2 * SQUARE_SIZE) + textFontSize;
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(HI) + 2;
+		space = fm.stringWidth(HI) + 1;
 
-		drawTextOnCanvas(canvas, HI, "", textFont, x, y);
-		drawTextOnCanvas(canvas, SCORE, SCORE, textFont, x + space, y);
+		drawTextOnCanvas(canvas, HI, "", textFont.deriveFont(Font.PLAIN), x, y);
+		drawTextOnCanvas(canvas, SCORE, SCORE, textFont.deriveFont(Font.PLAIN),
+				x + space, y);
 		/* --- */
 
 		/* Music icon */
-		space = fm.stringWidth(HI + SCORE) + (SQUARE_SIZE / 2);
+		space = fm.stringWidth(HI + SCORE) + indent * 4;
 
 		if (iconFont != null)
 			drawTextOnCanvas(canvas, "\ue602", "\ue602", iconFont, x + space, y);
 		/* --- */
 
 		/* Next/Lines labels */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = (4 * SQUARE_SIZE) + biggerTextFont.getSize();
+		x = indent * 4 + boardCanvas.getWidth();
+		y = (4 * SQUARE_SIZE) + indent * 2 + biggerTextFont.getSize();
 		fm = getGraphics().getFontMetrics(biggerTextFont);
-		space = fm.stringWidth(NEXT) + (SQUARE_SIZE / 4);
+		space = fm.stringWidth(NEXT) + indent * 2;
 
 		drawTextOnCanvas(canvas, NEXT, NEXT, biggerTextFont, x, y);
 		drawTextOnCanvas(canvas, LINES, "", biggerTextFont, x + space, y);
 		/* --- */
 
 		/* Speed and Level */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 4);
+		x = indent + boardCanvas.getWidth();
 		y = (SQUARE_SIZE / 2) + (9 * SQUARE_SIZE) + digitalFontSize;
 		fm = getGraphics().getFontMetrics(digitalFont);
 		space = fm.stringWidth("18") + (SQUARE_SIZE / 4);
@@ -508,17 +547,17 @@ public class Draw extends JPanel implements GameListener {
 		/* --- */
 
 		/* Speed and Level labels */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		x = indent * 4 + boardCanvas.getWidth();
 		y = (SQUARE_SIZE / 2) + (11 * SQUARE_SIZE) + textFontSize;
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(SPEED) + (SQUARE_SIZE / 4);
+		space = fm.stringWidth(SPEED) + indent * 2;
 
 		drawTextOnCanvas(canvas, SPEED, SPEED, textFont, x, y);
 		drawTextOnCanvas(canvas, LEVEL, LEVEL, textFont, x + space, y);
 		/* --- */
 
 		/* Rotate label */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		x = indent * 4 + boardCanvas.getWidth();
 		y = (SQUARE_SIZE / 2) + (13 * SQUARE_SIZE) + textFontSize;
 
 		drawTextOnCanvas(canvas, ROTATE, "", textFont, x, y);
@@ -526,20 +565,20 @@ public class Draw extends JPanel implements GameListener {
 
 		/* Rotate icons (left/right) */
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(ROTATE) + (SQUARE_SIZE / 2);
+		space = fm.stringWidth(ROTATE) + indent * 2;
 
 		if (iconFont != null) {
 			drawTextOnCanvas(canvas, "\ue600", "", iconFont, x + space, y
 					- (SQUARE_SIZE / 4));
 
-			space = fm.stringWidth(ROTATE + "\ue600") + (SQUARE_SIZE / 2);
+			space = fm.stringWidth(ROTATE + "\ue600") + (SQUARE_SIZE / 3);
 			drawTextOnCanvas(canvas, "\ue601", "", iconFont, x + space, y
 					+ (SQUARE_SIZE / 4));
 		}
 		/* --- */
 
 		/* Pause label */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
+		x = indent * 4 + boardCanvas.getWidth();
 		y = (SQUARE_SIZE / 2) + (15 * SQUARE_SIZE) + textFontSize;
 
 		drawTextOnCanvas(canvas, PAUSE,
@@ -548,20 +587,21 @@ public class Draw extends JPanel implements GameListener {
 
 		/* Pause icon */
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(PAUSE) + (SQUARE_SIZE / 2);
+		space = fm.stringWidth(PAUSE) + indent * 4;
 
 		if (iconFont != null)
 			drawTextOnCanvas(canvas, "\ue603",
 					((showPauseIcon) ? "\ue603" : ""),
 					iconFont.deriveFont((float) digitalFontSize), x + space, y
-							+ (3 * digitalFontSize / 4));
+							+ digitalFontSize);
 		/* --- */
 
 		/* Game Over label */
-		x = (SQUARE_SIZE / 2) + boardCanvas.getWidth() + (SQUARE_SIZE / 2);
-		y = (SQUARE_SIZE / 2) + (18 * SQUARE_SIZE) + textFontSize;
+		x = indent * 4 + boardCanvas.getWidth();
+		y = (SQUARE_SIZE / 2) + (18 * SQUARE_SIZE) + biggerTextFont.getSize();
 		drawTextOnCanvas(canvas, GAME_OVER,
-				((status == Status.GameOver) ? GAME_OVER : ""), textFont, x, y);
+				((status == Status.GameOver) ? GAME_OVER : ""), biggerTextFont,
+				x, y);
 		/* --- */
 	}
 

@@ -1,6 +1,11 @@
-package com.kry.brickgame;
+package com.kry.brickgame.splashes;
 
+import com.kry.brickgame.Board;
+import com.kry.brickgame.BoardNumbers;
+import com.kry.brickgame.Main;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game;
+import com.kry.brickgame.games.GameSelector;
 
 /**
  * @author noLive
@@ -22,7 +27,7 @@ public class SplashScreen extends Game {
 		Thread splashScreenThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (!Thread.interrupted()) {
+				while (!interrupted()) {
 					animatedInvertBoard();
 					blinkNumbers(5);
 				}
@@ -37,6 +42,7 @@ public class SplashScreen extends Game {
 		}
 
 		splashScreenThread.interrupt();
+		Main.gameSelector = new GameSelector();
 		Main.setGame(Main.gameSelector);
 	}
 
@@ -82,27 +88,27 @@ public class SplashScreen extends Game {
 		if (isRightDirection) {
 			for (int i = fromX; i <= toX; i++) {
 
-				if (Thread.interrupted())
+				if (interrupted())
 					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), i, y);
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 			}
 			// right to left
 		} else {
 			for (int i = fromX; i >= toX; i--) {
 
-				if (Thread.interrupted())
+				if (interrupted())
 					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), i, y);
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 			}
 		}
 		return true;
@@ -129,27 +135,27 @@ public class SplashScreen extends Game {
 		if (isUpDirection) {
 			for (int i = fromY; i <= toY; i++) {
 
-				if (Thread.interrupted())
+				if (interrupted())
 					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), x, i);
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 			}
 			// top to bottom
 		} else {
 			for (int i = fromY; i >= toY; i--) {
 
-				if (Thread.interrupted())
+				if (interrupted())
 					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), x, i);
 				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
+				justSleep(ANIMATION_DELAY);
 			}
 		}
 		return true;
@@ -178,7 +184,7 @@ public class SplashScreen extends Game {
 				return;
 			}
 		}
-		sleep(ANIMATION_DELAY * 2);
+		justSleep(ANIMATION_DELAY * 2);
 	}
 
 	/**
@@ -193,7 +199,7 @@ public class SplashScreen extends Game {
 
 		for (int i = 0; i < repeatCount; i++) {
 
-			if (Thread.interrupted()) {
+			if (interrupted()) {
 				// when checking the "interrupted" flag is reset, so sets it
 				// again
 				Thread.currentThread().interrupt();
@@ -201,9 +207,9 @@ public class SplashScreen extends Game {
 			}
 
 			clearBoard();
-			sleep(ANIMATION_DELAY * 5);
+			justSleep(ANIMATION_DELAY * 5);
 			insertNumbers();
-			sleep(ANIMATION_DELAY * 6);
+			justSleep(ANIMATION_DELAY * 6);
 		}
 	}
 

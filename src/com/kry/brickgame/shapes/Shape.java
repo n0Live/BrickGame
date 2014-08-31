@@ -1,7 +1,8 @@
-package com.kry.brickgame;
+package com.kry.brickgame.shapes;
 
 import java.util.Arrays;
 
+import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
 
 /**
@@ -13,7 +14,7 @@ public class Shape {
 	/**
 	 * Rotation angle of a figure (in degrees)
 	 */
-	enum RotationAngle {
+	public enum RotationAngle {
 		/**
 		 * North/Up
 		 */
@@ -93,7 +94,7 @@ public class Shape {
 		}
 	}
 
-	protected int[][] getCoords() {
+	public int[][] getCoords() {
 		return coords;
 	}
 
@@ -109,7 +110,7 @@ public class Shape {
 	 * @param value
 	 *            coordinate value
 	 */
-	protected void setCoord(int i, int[] value) {
+	public void setCoord(int i, int[] value) {
 		this.coords[i] = value;
 	}
 
@@ -120,7 +121,7 @@ public class Shape {
 	 *            index of a point
 	 * @return coordinate value
 	 */
-	protected int[] getCoord(int i) {
+	public int[] getCoord(int i) {
 		return this.coords[i];
 	}
 

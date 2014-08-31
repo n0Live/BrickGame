@@ -2,6 +2,7 @@ package com.kry.brickgame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -9,6 +10,10 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
+
+import com.kry.brickgame.games.Game;
+import com.kry.brickgame.splashes.SplashScreen;
+import com.sun.awt.AWTUtilities;
 
 public class Window extends JFrame implements MouseInputListener {
 	private static final long serialVersionUID = 3466619047314091863L;
@@ -35,10 +40,11 @@ public class Window extends JFrame implements MouseInputListener {
 		frame = new JFrame();
 		frame.setResizable(false);
 		frame.setUndecorated(true);
-
-		frame.setBounds(0, 0, Draw.SQUARE_SIZE * (10 + 6)
+		
+		/*frame.setBounds(0, 0, Draw.SQUARE_SIZE * (10 + 6)
 				+ Draw.SQUARE_SIZE, Draw.SQUARE_SIZE * 20
-				+ Draw.SQUARE_SIZE);
+				+ Draw.SQUARE_SIZE);*/
+		frame.setBounds(0, 0, 360, 640); 
 		
 		frame.setLocationRelativeTo(null);
 		
@@ -48,6 +54,7 @@ public class Window extends JFrame implements MouseInputListener {
 
 		final Draw drawPanel = new Draw();
 		drawPanel.setBackground(bgColor);
+		//drawPanel.setOpaque(true);
 		frame.getContentPane().add(drawPanel);
 
 		Game.addGameListener(drawPanel);
@@ -78,9 +85,7 @@ public class Window extends JFrame implements MouseInputListener {
 		}, 0, 500);
 
 		setTitle("Brick Game");
-		// Main.setGame(Main.gameSelector);
-		SplashScreen ss = new SplashScreen();
-		Main.setGame(ss);
+		Main.setGame(new SplashScreen());
 	}
 
 	@Override

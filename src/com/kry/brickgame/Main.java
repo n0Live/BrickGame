@@ -2,6 +2,9 @@ package com.kry.brickgame;
 
 import java.awt.EventQueue;
 
+import com.kry.brickgame.games.Game;
+import com.kry.brickgame.games.GameSelector;
+
 /**
  * The main class to launching
  * 
@@ -22,7 +25,7 @@ public final class Main {
 	/**
 	 * The selection screen of a game
 	 */
-	public static GameSelector gameSelector = new GameSelector();
+	public static GameSelector gameSelector;
 	/**
 	 * Observer to {@code KeyEvent}
 	 */

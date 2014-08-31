@@ -1,15 +1,29 @@
-package com.kry.brickgame;
+package com.kry.brickgame.games;
 
 import java.util.Random;
 
+import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.Shape.RotationAngle;
+import com.kry.brickgame.shapes.Obstacle;
+import com.kry.brickgame.shapes.Shape;
+import com.kry.brickgame.shapes.SnakeShape;
+import com.kry.brickgame.shapes.Shape.RotationAngle;
+import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.SnakeSplash;
 
 /**
  * @author noLive
  * 
  */
 public class SnakeGame extends Game {
+	/**
+	 * Animated splash for game
+	 */
+	public static final GameSplash splash = new SnakeSplash();
+	/**
+	 * Number of subtypes
+	 */
+	public static final int subtypesNumber = 2;
 
 	// ** Direction constants **
 	private static final RotationAngle LEFT = RotationAngle.d270;
@@ -58,7 +72,7 @@ public class SnakeGame extends Game {
 		loadPreparedObstacle();
 		addApple();
 
-		while (getStatus() != Status.GameOver) {
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (!tryMove(snake.getDirection())) {
@@ -398,9 +412,15 @@ public class SnakeGame extends Game {
 		if (getStatus() == Status.None)
 			return;
 
+		if (keys.contains(KeyPressed.KeyReset)) {
+			keys.remove(KeyPressed.KeyReset);
+			ExitToMainMenu();
+			return;
+		}
+		
 		if (keys.contains(KeyPressed.KeyStart)) {
-			pause();
 			keys.remove(KeyPressed.KeyStart);
+			pause();
 			return;
 		}
 
@@ -409,23 +429,23 @@ public class SnakeGame extends Game {
 
 		if (keys.contains(KeyPressed.KeyLeft)) {
 			tryMove(LEFT);
-			sleep(ANIMATION_DELAY * 4);
+			justSleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRight)) {
 			tryMove(RIGHT);
-			sleep(ANIMATION_DELAY * 4);
+			justSleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyDown)) {
 			tryMove(DOWN);
-			sleep(ANIMATION_DELAY * 4);
+			justSleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyUp)) {
 			tryMove(UP);
-			sleep(ANIMATION_DELAY * 4);
+			justSleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRotate)) {
 			tryMove(snake.getDirection());
-			sleep(ANIMATION_DELAY * 2);
+			justSleep(ANIMATION_DELAY * 2);
 		}
 	}
 }

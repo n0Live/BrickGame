@@ -1,9 +1,9 @@
-package com.kry.brickgame;
+package com.kry.brickgame.shapes;
 
 import java.util.Random;
 
+import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.Shape.RotationAngle;
 
 /**
  * @author noLive

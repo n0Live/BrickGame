@@ -9,35 +9,18 @@ public class Board {
 	/**
 	 * Cell type
 	 */
-	static enum Cell {
+	public static enum Cell {
 		Empty, Full, Blink
 	};
 
-	protected final static Cell Empty = Cell.Empty;
-	protected final static Cell Full = Cell.Full;
-	protected final static Cell Blink = Cell.Blink;
-
-	private Cell[][] board;
-
-	protected Cell[][] getBoard() {
-		return this.board;
-	}
-
-	protected void setBoard(Cell[][] board) {
-		this.board = board;
-	}
+	protected final static Cell E = Cell.Empty;
+	protected final static Cell F = Cell.Full;
+	protected final static Cell B = Cell.Blink;
 
 	private int width;
-
-	protected int getWidth() {
-		return width;
-	}
-
 	private int height;
 
-	protected int getHeight() {
-		return height;
-	}
+	private Cell[][] board;
 
 	/**
 	 * Creating the board of the given size
@@ -52,6 +35,8 @@ public class Board {
 		this.width = width;
 		this.height = height;
 		this.board = new Cell[width][height];
+		
+		clearBoard();
 	}
 
 	/**
@@ -61,11 +46,7 @@ public class Board {
 	 *            - a board for copying
 	 */
 	public Board(Board aBoard) {
-		super();
-		this.width = aBoard.width;
-		this.height = aBoard.height;
-
-		this.board = new Cell[aBoard.width][aBoard.height];
+		this(aBoard.width, aBoard.height);
 		for (int i = 0; i < aBoard.width; i++) {
 			this.board[i] = aBoard.board[i].clone();
 		}
@@ -76,24 +57,40 @@ public class Board {
 		return newBoard;
 	}
 
+	public Cell[][] getBoard() {
+		return this.board;
+	}
+
+	public void setBoard(Cell[][] board) {
+		this.board = board;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 	/**
 	 * Clears the cells of the board
 	 */
-	protected void clearBoard() {
+	public void clearBoard() {
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < height; j++)
-				this.board[i][j] = Empty;
+				this.board[i][j] = E;
 	}
 
-	protected Cell getCell(int x, int y) {
+	public Cell getCell(int x, int y) {
 		return this.board[x][y];
 	}
 
-	protected void setCell(Cell cell, int x, int y) {
+	public void setCell(Cell cell, int x, int y) {
 		this.board[x][y] = cell;
 	}
 
-	protected Cell[] getLine(int y) {
+	public Cell[] getLine(int y) {
 		Cell line[] = new Cell[this.getWidth()];
 
 		for (int i = 0; i < line.length; i++) {
@@ -111,7 +108,7 @@ public class Board {
 	 * @param y
 	 *            y-coordinate of the line
 	 */
-	protected void setLine(Cell[] line, int y) {
+	public void setLine(Cell[] line, int y) {
 		for (int i = 0; i < line.length; i++) {
 			this.board[i][y] = line[i];
 		}
