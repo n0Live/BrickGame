@@ -8,7 +8,7 @@ import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.SnakeShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
-import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.Splash;
 import com.kry.brickgame.splashes.SnakeSplash;
 
 /**
@@ -19,7 +19,7 @@ public class SnakeGame extends Game {
 	/**
 	 * Animated splash for game
 	 */
-	public static final GameSplash splash = new SnakeSplash();
+	public static final Splash splash = new SnakeSplash();
 	/**
 	 * Number of subtypes
 	 */
@@ -429,23 +429,23 @@ public class SnakeGame extends Game {
 
 		if (keys.contains(KeyPressed.KeyLeft)) {
 			tryMove(LEFT);
-			justSleep(ANIMATION_DELAY * 4);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRight)) {
 			tryMove(RIGHT);
-			justSleep(ANIMATION_DELAY * 4);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyDown)) {
 			tryMove(DOWN);
-			justSleep(ANIMATION_DELAY * 4);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyUp)) {
 			tryMove(UP);
-			justSleep(ANIMATION_DELAY * 4);
+			sleep(ANIMATION_DELAY * 4);
 		}
 		if (keys.contains(KeyPressed.KeyRotate)) {
 			tryMove(snake.getDirection());
-			justSleep(ANIMATION_DELAY * 2);
+			sleep(ANIMATION_DELAY * 2);
 		}
 	}
 }

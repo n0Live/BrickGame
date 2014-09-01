@@ -12,7 +12,7 @@ import com.kry.brickgame.Board;
 import com.kry.brickgame.BoardLetters;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.Splash;
 import com.kry.brickgame.splashes.SplashScreen;
 
 /**
@@ -22,39 +22,6 @@ import com.kry.brickgame.splashes.SplashScreen;
  * 
  */
 public class GameSelector extends Game {
-
-	/**
-	 * Number of subtypes for each game type
-	 */
-	private static Map<Character, Integer> maxNumbersForGames;
-	static {
-		maxNumbersForGames = new HashMap<Character, Integer>();
-		maxNumbersForGames.put('A', 2);
-		maxNumbersForGames.put('B', 4);
-		maxNumbersForGames.put('C', 32);
-		maxNumbersForGames.put('D', 4);
-		maxNumbersForGames.put('E', 8);
-		maxNumbersForGames.put('F', 2);
-		maxNumbersForGames.put('G', 16);
-		maxNumbersForGames.put('H', 8);
-		maxNumbersForGames.put('I', 48);
-		maxNumbersForGames.put('J', 48);
-		maxNumbersForGames.put('K', 48);
-		maxNumbersForGames.put('L', 48);
-		maxNumbersForGames.put('M', 48);
-		maxNumbersForGames.put('N', 48);
-		maxNumbersForGames.put('O', 48);
-		maxNumbersForGames.put('P', 48);
-		maxNumbersForGames.put('Q', 48);
-		maxNumbersForGames.put('R', 48);
-		maxNumbersForGames.put('S', 48);
-		maxNumbersForGames.put('T', 48);
-		maxNumbersForGames.put('U', 48);
-		maxNumbersForGames.put('V', 48);
-		maxNumbersForGames.put('W', 48);
-		maxNumbersForGames.put('X', 48);
-	}
-
 	/**
 	 * List of games with the letters associated with them
 	 */
@@ -63,19 +30,19 @@ public class GameSelector extends Game {
 		gamesList = new HashMap<Character, Class>();
 		try {
 			gamesList.put('A',
-					Class.forName("com.kry.brickgame.games.games.DanceGame"));
+					Class.forName("com.kry.brickgame.games.DanceGame"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('A', null);
 		}
 		try {
 			gamesList.put('B',
-					Class.forName("com.kry.brickgame.games.TankGame"));
+					Class.forName("com.kry.brickgame.games.TanksGame"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('B', null);
 		}
 		try {
 			gamesList.put('C',
-					Class.forName("com.kry.brickgame.games.ArcanoidGame"));
+					Class.forName("com.kry.brickgame.games.ArkanoidGame"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('C', null);
 		}
@@ -260,7 +227,7 @@ public class GameSelector extends Game {
 	protected void drawLetter(char letter) {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(boardLetter.charToLetters(letter));
-		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2),// x
+		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
 				boardHeight - BoardLetters.height);// y
 	}
 
@@ -288,7 +255,7 @@ public class GameSelector extends Game {
 
 		// 2nd number
 		boardNumber.setNumber(boardNumber.intToNumbers(number_2));
-		insertBoard(boardNumber, (boardWidth / 2 + 1),// x
+		insertBoard(boardNumber, (boardWidth / 2),// x
 				0);// y
 	}
 
@@ -369,7 +336,7 @@ public class GameSelector extends Game {
 			try {
 				// trying to get the splash screen instance from the class of
 				// the game
-				splash = (GameSplash) c.getField("splash").get(c);
+				splash = (Splash) c.getField("splash").get(c);
 			} catch (IllegalArgumentException | IllegalAccessException
 					| NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
@@ -406,12 +373,12 @@ public class GameSelector extends Game {
 	 * @param splash
 	 *            splash screen instance
 	 */
-	private void drawGameSplash(GameSplash splash) {
+	private void drawGameSplash(Splash splash) {
 		if (splash != null) {
 			insertBoard(splash.getNextFrame(), 0,// x
 					BoardNumbers.height + 1);// y
 		} else {
-			Board clear = new Board(GameSplash.width, GameSplash.height);
+			Board clear = new Board(Splash.width, Splash.height);
 			insertBoard(clear, 0,// x
 					BoardNumbers.height + 1);// y
 		}

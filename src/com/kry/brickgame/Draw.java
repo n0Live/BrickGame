@@ -154,7 +154,7 @@ public class Draw extends JPanel implements GameListener {
 			g.drawImage(
 					ImageIO.read(getClass().getResourceAsStream(
 							"/images/background.png")), 0, 0, 360, 640,
-							Color.DARK_GRAY, null);
+					Color.DARK_GRAY, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			background = null;
@@ -565,15 +565,15 @@ public class Draw extends JPanel implements GameListener {
 
 		/* Rotate icons (left/right) */
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(ROTATE) + indent * 2;
+		space = fm.stringWidth(ROTATE) + indent;
 
 		if (iconFont != null) {
 			drawTextOnCanvas(canvas, "\ue600", "", iconFont, x + space, y
-					- (SQUARE_SIZE / 4));
+					- indent);
 
-			space = fm.stringWidth(ROTATE + "\ue600") + (SQUARE_SIZE / 3);
+			space = fm.stringWidth(ROTATE + "\ue600") + indent * 2 + 1;
 			drawTextOnCanvas(canvas, "\ue601", "", iconFont, x + space, y
-					+ (SQUARE_SIZE / 4));
+					+ indent);
 		}
 		/* --- */
 
@@ -587,7 +587,7 @@ public class Draw extends JPanel implements GameListener {
 
 		/* Pause icon */
 		fm = getGraphics().getFontMetrics(textFont);
-		space = fm.stringWidth(PAUSE) + indent * 4;
+		space = fm.stringWidth(PAUSE);
 
 		if (iconFont != null)
 			drawTextOnCanvas(canvas, "\ue603",

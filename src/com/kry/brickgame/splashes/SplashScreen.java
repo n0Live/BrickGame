@@ -95,7 +95,7 @@ public class SplashScreen extends Game {
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), i, y);
 				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY);
 			}
 			// right to left
 		} else {
@@ -108,7 +108,7 @@ public class SplashScreen extends Game {
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), i, y);
 				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY);
 			}
 		}
 		return true;
@@ -142,7 +142,7 @@ public class SplashScreen extends Game {
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), x, i);
 				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY);
 			}
 			// top to bottom
 		} else {
@@ -155,7 +155,7 @@ public class SplashScreen extends Game {
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
 						: Cell.Empty), x, i);
 				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY);
 			}
 		}
 		return true;
@@ -184,7 +184,7 @@ public class SplashScreen extends Game {
 				return;
 			}
 		}
-		justSleep(ANIMATION_DELAY * 2);
+		sleep(ANIMATION_DELAY * 2);
 	}
 
 	/**
@@ -207,9 +207,9 @@ public class SplashScreen extends Game {
 			}
 
 			clearBoard();
-			justSleep(ANIMATION_DELAY * 5);
+			sleep(ANIMATION_DELAY * 5);
 			insertNumbers();
-			justSleep(ANIMATION_DELAY * 6);
+			sleep(ANIMATION_DELAY * 6);
 		}
 	}
 

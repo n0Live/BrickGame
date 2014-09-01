@@ -6,7 +6,7 @@ import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Tetrominoes;
-import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.Splash;
 import com.kry.brickgame.splashes.TetrisSplash;
 
 /**
@@ -17,7 +17,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Animated splash for game
 	 */
-	public static final GameSplash splash = new TetrisSplash();
+	public static final Splash splash = new TetrisSplash();
 	/**
 	 * Number of subtypes
 	 */
@@ -26,11 +26,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
-	private volatile boolean isFallingFinished = false;
-	/**
-	 * Counter of the number of removed lines
-	 */
-	private int numLinesRemoved = 0;
+	private volatile boolean isFallingFinished;
 	/**
 	 * The current figure
 	 */
@@ -42,11 +38,11 @@ public class TetrisGame extends Game {
 	/**
 	 * X-coordinate position on the board of the current figure
 	 */
-	private int curX = 0;
+	private int curX;
 	/**
 	 * Y-coordinate position on the board of the current figure
 	 */
-	private int curY = 0;
+	private int curY;
 
 	public TetrisGame(int speed, int level) {
 		super(speed, level);
@@ -69,7 +65,8 @@ public class TetrisGame extends Game {
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
-		numLinesRemoved = 0;
+
+		setScore(95);
 
 		// Create the "next" figure
 		nextPiece.setRandomShapeAndRotate();
@@ -183,7 +180,7 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Rapidly drops of the figure to the bottom of the board or a obstructions
+	 * Rapidly drops of the figure to the bottom of the board
 	 */
 	private void dropDown() {
 		int newY = curY;
@@ -215,7 +212,7 @@ public class TetrisGame extends Game {
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
 				for (int i = 0; i < getLevel() - 1; i++) {
-					justSleep(ANIMATION_DELAY * 4);
+					sleep(ANIMATION_DELAY * 4);
 					addLines();
 				}
 			}
@@ -265,8 +262,6 @@ public class TetrisGame extends Game {
 		}
 
 		if (numFullLines > 0) {
-			numLinesRemoved += numFullLines;
-
 			// increasing score
 			switch (numFullLines) {
 			case 1:
@@ -308,7 +303,7 @@ public class TetrisGame extends Game {
 			if (x2 < boardWidth)
 				board.setCell(Cell.Empty, x2++, line);
 
-			justSleep(ANIMATION_DELAY);
+			sleep(ANIMATION_DELAY);
 			setBoard(board);
 		}
 	}
@@ -409,11 +404,11 @@ public class TetrisGame extends Game {
 		if (!isFallingFinished) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
-				justSleep(ANIMATION_DELAY * 3);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				tryMove(curPiece, curX + 1, curY);
-				justSleep(ANIMATION_DELAY * 3);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				TetrisShape rotatedPiece = curPiece.clone().rotateRight();
@@ -422,7 +417,7 @@ public class TetrisGame extends Game {
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
 				oneLineDown();
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY);
 			}
 		}
 	}
