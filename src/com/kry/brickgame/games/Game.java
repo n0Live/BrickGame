@@ -10,7 +10,7 @@ import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.Shape;
-import com.kry.brickgame.splashes.GameSplash;
+import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -20,7 +20,7 @@ public class Game extends Thread { // implements Runnable
 	/**
 	 * Animated splash for game
 	 */
-	public static GameSplash splash;
+	public static Splash splash;
 	/**
 	 * Number of subtypes
 	 */
@@ -174,7 +174,7 @@ public class Game extends Thread { // implements Runnable
 		}
 	}
 
-	public GameSplash getSplash() {
+	public Splash getSplash() {
 		return splash;
 	}
 
@@ -463,7 +463,7 @@ public class Game extends Thread { // implements Runnable
 				board.setCell(Cell.Full, x, y);
 			}
 			fireBoardChanged(board);
-			justSleep(ANIMATION_DELAY / k);
+			sleep(ANIMATION_DELAY / k);
 		}
 		// and is cleaned downwards
 		for (int y = boardHeight - 1; y >= 0; y--) {
@@ -471,7 +471,7 @@ public class Game extends Thread { // implements Runnable
 				board.setCell(Cell.Empty, x, y);
 			}
 			fireBoardChanged(board);
-			justSleep(ANIMATION_DELAY / k);
+			sleep(ANIMATION_DELAY / k);
 		}
 	}
 
@@ -552,6 +552,49 @@ public class Game extends Thread { // implements Runnable
 		 * Inner class to draw an explosion
 		 */
 		class Kaboom {
+			final Cell E = Cell.Empty;
+			final Cell F = Cell.Full;
+			/**
+			 * Blast waves
+			 */
+			final Cell waves[][][] = new Cell[][][] { {
+					// 0
+					{ F, F, F },//
+					{ F, E, F },//
+					{ F, F, F } }, {
+					// 1
+					{ F, F, F, F, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, F, F, F, F } }, {
+					// 2
+					{ F, E, F, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, E, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, F, E, F } }, {
+					// 3
+					{ F, E, F, E, F },//
+					{ E, F, F, F, E },//
+					{ F, F, E, F, F },//
+					{ E, F, F, F, E },//
+					{ F, E, F, E, F } }, {
+					// 4
+					{ E, E, E, E, E },//
+					{ E, F, F, F, E },//
+					{ E, F, E, F, E },//
+					{ E, F, F, F, E },//
+					{ E, E, E, E, E } }, {
+					// 5
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }
+
+			};
+
 			/**
 			 * Drawing a single pass of the blast wave
 			 * 
@@ -559,41 +602,27 @@ public class Game extends Thread { // implements Runnable
 			 *            x-coordinate of the epicenter
 			 * @param y
 			 *            x-coordinate of the epicenter
-			 * @param width
-			 *            width of the spread of the blast wave
-			 * @param isOutward
-			 *            direction of the spread of the blast wave:
-			 *            {@code true} is outward, {@code false} is inward
+			 * @param wave
+			 *            number of the blast wave
 			 */
-			void blast(int x, int y, int width, boolean isOutward) {
-				int halfWidth = width / 2;
+			void blast(int x, int y, int wave) {
+				// converts the coordinates of the epicenter to the coordinates
+				// of the lower left corner
+				int lowerLeftX = x - (waves[wave][0].length / 2);
+				int lowerLeftY = y - (waves[wave].length / 2);
 
-				// draw the perimeter of the blast wave with Cell.Full
-				for (int i = x - halfWidth; i <= x + halfWidth; i++) {
-					for (int j = y - halfWidth; j <= y + halfWidth; j++) {
-						board.setCell(Cell.Full, i, j);
-					}
-				}
-				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				insertCells(waves[wave], lowerLeftX, lowerLeftY);
 
-				// if is outward direction then erase the inner part of the
-				// blast wave, else erase the outside
-				int k = ((isOutward) ? -1 : 1);
-				for (int i = x - (halfWidth + k); i <= x + (halfWidth + k); i++) {
-					for (int j = y - (halfWidth + k); j <= y + (halfWidth + k); j++) {
-						board.setCell(Cell.Empty, i, j);
-					}
-				}
-				fireBoardChanged(board);
-				justSleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY * 2);
 			}
 		}
 
 		// diameter of the explosion
 		// must be an odd number
-		int EXPLODE_SIZE = 5;
-
+		final int EXPLODE_SIZE = 5;
+		
+		final int BLAST_WAVE_PASSES = 4;
+		
 		int newX = x;
 		int newY = y;
 
@@ -612,14 +641,11 @@ public class Game extends Thread { // implements Runnable
 		}
 
 		Kaboom kaboom = new Kaboom();
-		for (int i = 0; i < 3; i++) {
-			// outward blast wave
-			for (int k = 1; k <= EXPLODE_SIZE; k++) {
-				kaboom.blast(newX, newY, k, true);
-			}
-			// inward blast wave
-			for (int k = EXPLODE_SIZE - 2; k > 0; k--) {
-				kaboom.blast(newX, newY, k, false);
+
+		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
+			// draw the blast waves
+			for (int k = 0; k < kaboom.waves.length; k++) {
+				kaboom.blast(newX, newY, k);
 			}
 		}
 	}
@@ -670,7 +696,7 @@ public class Game extends Thread { // implements Runnable
 	 * @param millis
 	 *            the length of time to sleep in milliseconds
 	 */
-	public void justSleep(long millis) {
+	public static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
