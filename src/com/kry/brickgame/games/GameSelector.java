@@ -268,7 +268,10 @@ public class GameSelector extends Game {
 		} else {
 			letter = 'A';
 		}
-		drawAll();
+		if (drawAll())
+			setStatus(Status.DoSomeWork);
+		else
+			setStatus(Status.ComingSoon);
 	}
 
 	/**
@@ -280,7 +283,10 @@ public class GameSelector extends Game {
 		} else {
 			letter = 'X';
 		}
-		drawAll();
+		if (drawAll())
+			setStatus(Status.DoSomeWork);
+		else
+			setStatus(Status.ComingSoon);
 	}
 
 	/**
@@ -303,7 +309,7 @@ public class GameSelector extends Game {
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
 	 */
-	private void drawAll() {
+	private boolean drawAll() {
 		// stop the splash animation timer
 		if (splashTimer != null)
 			splashTimer.cancel();
@@ -313,8 +319,8 @@ public class GameSelector extends Game {
 		c = gamesList.get(letter);
 
 		if (c != null) {
+			// trying to get number of subtypes from the class of the game
 			try {
-				// trying to get number of subtypes from the class of the game
 				maxNumber = c.getField("subtypesNumber").getInt(c);
 			} catch (IllegalArgumentException | IllegalAccessException
 					| NoSuchFieldException | SecurityException e) {
@@ -322,20 +328,10 @@ public class GameSelector extends Game {
 				// if unable - sets 1
 				maxNumber = 1;
 			}
-		} else {
-			maxNumber = 1;
-		}
 
-		// checks that the current number does not exceed the maximum number
-		if (number > maxNumber) {
-			number = 1;
-		}
-		drawNumber(number);
-
-		if (c != null) {
+			// trying to get the splash screen instance from the class of
+			// the game
 			try {
-				// trying to get the splash screen instance from the class of
-				// the game
 				splash = (Splash) c.getField("splash").get(c);
 			} catch (IllegalArgumentException | IllegalAccessException
 					| NoSuchFieldException | SecurityException e) {
@@ -361,8 +357,17 @@ public class GameSelector extends Game {
 				drawGameSplash(null);
 			}
 		} else {
+			maxNumber = 1;
 			drawGameSplash(null);
 		}
+
+		// checks that the current number does not exceed the maximum number
+		if (number > maxNumber) {
+			number = 1;
+		}
+		drawNumber(number);
+
+		return (c != null);
 	}
 
 	/**
@@ -386,7 +391,10 @@ public class GameSelector extends Game {
 
 	public void start() {
 		super.start();
-		drawAll();
+		if (drawAll())
+			setStatus(Status.DoSomeWork);
+		else
+			setStatus(Status.ComingSoon);
 	}
 
 	/**
@@ -397,13 +405,14 @@ public class GameSelector extends Game {
 		if (c != null) {
 			try {
 				// gets constructor(speed, level)
-				Class[] paramTypes = new Class[] { int.class, int.class };
+				Class[] paramTypes = new Class[] { int.class, int.class,
+						int.class };
 				Constructor<Game> constructor = (Constructor<Game>) c
 						.getConstructor(paramTypes);
 
 				// gets parameters
 				Object[] args = new Object[] { new Integer(getSpeed()),
-						new Integer(getLevel()) };
+						new Integer(getLevel()), new Integer(number) };
 				// creates an instance of the game
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer
@@ -412,7 +421,7 @@ public class GameSelector extends Game {
 				// starts the selected game
 				Main.setGame(game);
 			} catch (Exception e) {
-				e.printStackTrace();
+				setStatus(Status.ComingSoon);
 			}
 		}
 	}

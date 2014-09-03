@@ -1,6 +1,5 @@
 package com.kry.brickgame;
 
-import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,7 +17,6 @@ import javax.swing.JPanel;
 
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.games.Game.Status;
-import com.sun.xml.internal.bind.v2.TODO;
 
 /**
  * @author noLive
@@ -45,6 +43,13 @@ public class Draw extends JPanel implements GameListener {
 	private static final String ROTATE = "ROTATE";
 	private static final String PAUSE = "PAUSE";
 	private static final String GAME_OVER = "GAME OVER";
+	private static final String COMING_SOON = "COMING SOON";
+
+	/* ICONS */
+	private static final String ICON_MUSIC = "\ue602";
+	private static final String ICON_ROTATE_RIGTH = "\ue600";
+	private static final String ICON_ROTATE_LEFT = "\ue601";
+	private static final String ICON_PAUSE = "\ue603";
 
 	private Board board = null;
 	private Board preview = null;
@@ -523,7 +528,8 @@ public class Draw extends JPanel implements GameListener {
 		space = fm.stringWidth(HI + SCORE) + indent * 4;
 
 		if (iconFont != null)
-			drawTextOnCanvas(canvas, "\ue602", "\ue602", iconFont, x + space, y);
+			drawTextOnCanvas(canvas, ICON_MUSIC, ICON_MUSIC, iconFont, x
+					+ space, y);
 		/* --- */
 
 		/* Next/Lines labels */
@@ -568,12 +574,12 @@ public class Draw extends JPanel implements GameListener {
 		space = fm.stringWidth(ROTATE) + indent;
 
 		if (iconFont != null) {
-			drawTextOnCanvas(canvas, "\ue600", "", iconFont, x + space, y
-					- indent);
+			drawTextOnCanvas(canvas, ICON_ROTATE_RIGTH, "", iconFont,
+					x + space, y - indent);
 
-			space = fm.stringWidth(ROTATE + "\ue600") + indent * 2 + 1;
-			drawTextOnCanvas(canvas, "\ue601", "", iconFont, x + space, y
-					+ indent);
+			space = fm.stringWidth(ROTATE + ICON_ROTATE_RIGTH) + indent * 2 + 1;
+			drawTextOnCanvas(canvas, ICON_ROTATE_LEFT, "", iconFont, x + space,
+					y + indent);
 		}
 		/* --- */
 
@@ -590,10 +596,9 @@ public class Draw extends JPanel implements GameListener {
 		space = fm.stringWidth(PAUSE);
 
 		if (iconFont != null)
-			drawTextOnCanvas(canvas, "\ue603",
-					((showPauseIcon) ? "\ue603" : ""),
-					iconFont.deriveFont((float) digitalFontSize), x + space, y
-							+ digitalFontSize);
+			drawTextOnCanvas(canvas, ICON_PAUSE, ((showPauseIcon) ? ICON_PAUSE
+					: ""), iconFont.deriveFont((float) digitalFontSize), x
+					+ space, y + digitalFontSize);
 		/* --- */
 
 		/* Game Over label */
@@ -602,6 +607,18 @@ public class Draw extends JPanel implements GameListener {
 		drawTextOnCanvas(canvas, GAME_OVER,
 				((status == Status.GameOver) ? GAME_OVER : ""), biggerTextFont,
 				x, y);
+		/* --- */
+
+		/* Coming Soon label */
+		fm = getGraphics().getFontMetrics(digitalFont);
+		space = fm.stringWidth(COMING_SOON);
+
+		x = boardCanvas.getWidth() / 2 - space / 2;
+		y = boardCanvas.getHeight() / 2;
+		if (status == Status.ComingSoon) {
+			drawTextOnCanvas(canvas, COMING_SOON, COMING_SOON, digitalFont, x,
+					y);
+		}
 		/* --- */
 	}
 
