@@ -16,5 +16,7 @@ public class ArkanoidGame extends Game {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 8;
+	
+	
 
 }

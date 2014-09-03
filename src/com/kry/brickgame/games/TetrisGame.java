@@ -3,6 +3,7 @@ package com.kry.brickgame.games;
 import java.util.Random;
 
 import com.kry.brickgame.Board;
+import com.kry.brickgame.Main;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Tetrominoes;
@@ -44,10 +45,13 @@ public class TetrisGame extends Game {
 	 */
 	private int curY;
 
-	public TetrisGame(int speed, int level) {
-		super(speed, level);
+	public TetrisGame(int speed, int level, int type) {
+		super(speed, level, type);
 
-		setStatus(Status.None);
+		if (type == 1)
+			setStatus(Status.None);
+		else
+			setStatus(Status.ComingSoon);
 
 		curPiece = new TetrisShape();
 		nextPiece = new TetrisShape();
@@ -58,6 +62,10 @@ public class TetrisGame extends Game {
 	 */
 	@Override
 	public void start() {
+		if (getStatus() == Status.ComingSoon) {
+			ExitToMainMenu();
+		}
+
 		super.start();
 
 		// getLevel() - 1 - because on the first level doesn't need to add line
@@ -65,8 +73,6 @@ public class TetrisGame extends Game {
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
-
-		setScore(95);
 
 		// Create the "next" figure
 		nextPiece.setRandomShapeAndRotate();

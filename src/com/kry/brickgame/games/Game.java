@@ -56,6 +56,7 @@ public class Game extends Thread { // implements Runnable
 	private int level;
 	private int score;
 	private int lives;
+	private int type;
 
 	/**
 	 * Width of the board
@@ -77,7 +78,7 @@ public class Game extends Thread { // implements Runnable
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
 	public static enum Status {
-		None, Running, Paused, GameOver, DoSomeWork
+		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
 	};
 
 	/**
@@ -96,11 +97,26 @@ public class Game extends Thread { // implements Runnable
 
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
-	public Game(int speed, int level, Board board, Board preview) {
+	/**
+	 * The Game
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param board
+	 *            main board
+	 * @param preview
+	 *            preview board
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, Board board, Board preview, int type) {
 		this.speed = speed;
 		this.level = level;
 		this.board = board;
 		this.preview = preview;
+		this.type = type;
 
 		this.score = 0;
 		this.lives = 4;
@@ -111,13 +127,23 @@ public class Game extends Thread { // implements Runnable
 		previewHeight = preview.getHeight();
 	}
 
-	public Game(int speed, int level) {
+	/**
+	 * The Game
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, int type) {
 		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
-				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));// preview
+				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), type);// preview
 	}
 
 	public Game() {
-		this(1, 1);
+		this(1, 1, 1);
 	}
 
 	public static synchronized void addGameListener(GameListener listener) {
@@ -295,6 +321,10 @@ public class Game extends Thread { // implements Runnable
 			}
 		}
 		firePreviewChanged(preview);
+	}
+
+	public int getType() {
+		return type;
 	}
 
 	protected Board getBoard() {
@@ -516,7 +546,7 @@ public class Game extends Thread { // implements Runnable
 	}
 
 	/**
-	 * Draws the figure on the board
+	 * Drawing the figure on the board
 	 * 
 	 * @param board
 	 *            the board for drawing
@@ -530,7 +560,7 @@ public class Game extends Thread { // implements Runnable
 	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
 	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * 
-	 * @return - the board with the figure
+	 * @return the board with the figure
 	 */
 	protected Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
 		for (int i = 0; i < shape.getCoords().length; i++) {
@@ -540,10 +570,45 @@ public class Game extends Thread { // implements Runnable
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
-				// draws the figure on the board
-				board.setCell(fill, board_x, board_y);
+				// draws the point of the figure on the board
+				drawPoint(board, board_x, board_y, fill);
 			}
 		}
+		return board;
+	}
+
+	/**
+	 * Drawing the point of the figure on the board.
+	 * <p>
+	 * If the point is outside the borders of the board, then drawing it on the
+	 * other side of the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param x
+	 *            x-coordinate position on the board of the figure
+	 * @param y
+	 *            y-coordinate position on the board of the figure
+	 * @param fill
+	 *            type of fill the point
+	 * @return the board with the point
+	 */
+	protected Board drawPoint(Board board, int x, int y, Cell fill) {
+		int board_x = x;
+		int board_y = y;
+
+		// check if the point is outside the borders of the board
+		if (board_x < 0)
+			board_x = board.getWidth() + board_x;
+		else if (board_x >= board.getWidth())
+			board_x = board_x - board.getWidth();
+		if (board_y < 0)
+			board_y = board.getHeight() + board_y;
+		else if (board_y >= board.getHeight())
+			board_y = board_y - board.getHeight();
+
+		board.setCell(fill, board_x, board_y);
+
 		return board;
 	}
 
@@ -620,9 +685,9 @@ public class Game extends Thread { // implements Runnable
 		// diameter of the explosion
 		// must be an odd number
 		final int EXPLODE_SIZE = 5;
-		
+
 		final int BLAST_WAVE_PASSES = 4;
-		
+
 		int newX = x;
 		int newY = y;
 

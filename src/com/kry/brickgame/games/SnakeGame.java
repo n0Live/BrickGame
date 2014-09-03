@@ -23,7 +23,7 @@ public class SnakeGame extends Game {
 	/**
 	 * Number of subtypes
 	 */
-	public static final int subtypesNumber = 2;
+	public static final int subtypesNumber = 4;
 
 	// ** Direction constants **
 	private static final RotationAngle LEFT = RotationAngle.d270;
@@ -45,16 +45,25 @@ public class SnakeGame extends Game {
 	 */
 	private int curY;
 
-	public SnakeGame(int speed, int level) {
-		super(speed, level);
-
+	/**
+	 * The Snake
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param type
+	 *            type of the game type of the game:
+	 *            <ol>
+	 *            <li>regular snake with standard obstacles
+	 *            <li>snake on a toroidal field with standard obstacles
+	 *            <li>regular snake with randomly generated obstacles
+	 *            <li>snake on a toroidal field with randomly generated
+	 *            obstacles
+	 */
+	public SnakeGame(int speed, int level, int type) {
+		super(speed, level, type);
 		setStatus(Status.None);
-
-		snake = new SnakeShape();
-
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 - snake.getLength() / 2;
-		curY = 0;
 	}
 
 	/**
@@ -67,10 +76,7 @@ public class SnakeGame extends Game {
 		setStatus(Status.Running);
 		setLives(4);
 
-		tryMove(snake.getDirection());
-		//prepareBoard();
-		loadPreparedObstacle();
-		addApple();
+		loadLevel();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// moving of the snake
@@ -80,6 +86,7 @@ public class SnakeGame extends Game {
 					kaboom(curX, curY);
 					setLives(getLives() - 1);
 					if (getLives() > 0) {
+						animatedClearBoard(true);// fast
 						loadLevel();
 					} else {
 						gameOver();
@@ -88,6 +95,7 @@ public class SnakeGame extends Game {
 				// when the snake has reached the maximum length
 				if (snake.getLength() >= snake.getMaxLength()) {
 					// increases level and load it
+					animatedClearBoard(true);// fast
 					incLevel();
 					loadLevel();
 				}
@@ -102,7 +110,7 @@ public class SnakeGame extends Game {
 	 */
 	private void prepareBoard() {
 		if (getLevel() > 1) {
-			// from 2 to 5 - 1, from 6 to 20 - 2
+			// from 2 to 4 - 1 obstacle, from 5 to 9 - 2, on 10 - 3
 			int obstaclesMultiplier = (getLevel() / 5) + 1;
 
 			for (int i = 0; i < obstaclesMultiplier; i++) {
@@ -110,6 +118,26 @@ public class SnakeGame extends Game {
 					generateObstacle(k);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Generating borders for the toroidal field
+	 */
+	private void prepareBorders() {
+		Cell fill;
+
+		// generates the vertical borders
+		for (int i = 0; i < boardHeight; i++) {
+			fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
+			getBoard().setCell(fill, 0, i);
+			getBoard().setCell(fill, boardWidth - 1, i);
+		}
+		// generates the horizontal borders
+		for (int i = 0; i < boardWidth; i++) {
+			fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
+			getBoard().setCell(fill, i, 0);
+			getBoard().setCell(fill, i, boardHeight - 1);
 		}
 	}
 
@@ -126,23 +154,25 @@ public class SnakeGame extends Game {
 		Obstacle obstacle = new Obstacle(type);
 		obstacle.setRandomRotate();
 
+		// in line at the borders of the board shall not be put an obstacle
+		int k = (type == 3) ? 1 : 2; // count of empty line at the borders
+
 		// finds empty cells
 		do {
-			// in line at the borders of the board shall not be put an obstacle
-			x = r.nextInt(boardWidth - obstacle.getWidth() - 2) + 1;
-			y = r.nextInt(boardHeight - obstacle.getHeight() - 2)
-					+ obstacle.getHeight() + 1;
+			x = r.nextInt(boardWidth - obstacle.getWidth() - k * 2) + k;
+			y = r.nextInt(boardHeight - obstacle.getHeight() - k * 2)
+					+ obstacle.getHeight() + k;
 		} while (checkCollision(getBoard(), obstacle, x, y));
 
 		setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
 	}
-	
+
 	/**
 	 * Loading predefined obstacles
 	 */
-	private void loadPreparedObstacle(){
+	private void loadPreparedObstacle() {
 		Obstacle obstacle;
-	
+
 		switch (getLevel()) {
 		case 2:
 			obstacle = new Obstacle(1);
@@ -234,15 +264,19 @@ public class SnakeGame extends Game {
 	 * Loading or reloading the specified level
 	 */
 	private void loadLevel() {
-		animatedClearBoard(true);// fast
-
 		snake = new SnakeShape();
+		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - snake.getLength() / 2;
-		curY = 0;
+		curY = ((getType() == 2) || (getType() == 4)) ? 1 : 0;
 
 		tryMove(snake.getDirection());
-		//prepareBoard();
-		loadPreparedObstacle();
+
+		if ((getType() == 2) || (getType() == 4))
+			prepareBorders();
+		if (getType() < 3)
+			loadPreparedObstacle();
+		else
+			prepareBoard();
 		addApple();
 	}
 
@@ -260,11 +294,10 @@ public class SnakeGame extends Game {
 	 */
 	private Board drawSnake(Board board, SnakeShape snake, int x, int y) {
 		for (int i = 0; i < snake.getLength(); i++) {
-			int board_x = x + snake.x(i);
-			int board_y = y + snake.y(i);
 			// draws the snake on the board
 			// the head of the snake is blinking
-			board.setCell(((i == 0) ? Cell.Blink : Cell.Full), board_x, board_y);
+			drawPoint(board, x + snake.x(i), y + snake.y(i),
+					((i == 0) ? Cell.Blink : Cell.Full));
 		}
 		return board;
 	}
@@ -299,8 +332,25 @@ public class SnakeGame extends Game {
 		headOfSnake.setCoord(0, snake.getCoord(0));
 
 		// check the out off the board
-		if (checkBoardCollision(headOfSnake, newX, newY))
-			return false;
+		if (checkBoardCollision(headOfSnake, newX, newY)) {
+			if ((getType() == 2) || (getType() == 4)) {
+				if (newX < 0)
+					newX = boardWidth + newX;
+				else if (newX >= boardWidth)
+					newX = newX - boardWidth;
+				if (newY < 0)
+					newY = boardHeight + newY;
+				else if (newY >= boardHeight)
+					newY = newY - boardHeight;
+
+				/*
+				 * newX = ((newX < 0) || (newX >= boardWidth)) ? (boardWidth - 1
+				 * - curX) : newX; newY = ((newY < 0) || (newY >= boardHeight))
+				 * ? (boardHeight - 1 - curY) : newY;
+				 */
+			} else
+				return false;
+		}
 
 		boolean isAppleAhead = (getBoard().getCell(newX, newY) == Cell.Blink);
 
@@ -320,7 +370,7 @@ public class SnakeGame extends Game {
 		// move and the tail will interfere with checks
 		int board_x = curX + snake.x(snake.tail());
 		int board_y = curY + snake.y(snake.tail());
-		board.setCell(Cell.Empty, board_x, board_y);
+		drawPoint(board, board_x, board_y, Cell.Empty);
 
 		// if it was an apple in front then erase it
 		if (isAppleAhead) {
@@ -333,8 +383,7 @@ public class SnakeGame extends Game {
 		}
 
 		// draw the new snake on the board
-		setBoard(board.clone());
-		setBoard(drawSnake(getBoard(), newSnake, newX, newY));
+		setBoard(drawSnake(board.clone(), newSnake, newX, newY));
 
 		if (isAppleAhead) {
 			// increases score
@@ -417,7 +466,7 @@ public class SnakeGame extends Game {
 			ExitToMainMenu();
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
 			pause();
