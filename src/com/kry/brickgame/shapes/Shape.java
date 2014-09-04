@@ -69,12 +69,26 @@ public class Shape {
 	 * 
 	 * @param length
 	 *            number of the points of the figure
+	 * @param rotationAngle
+	 *            rotation angle of the figure
+	 * @param fill
+	 *            type of fill of the figure
+	 */
+	public Shape(int length, RotationAngle rotationAngle, Cell fill) {
+		this.coords = new int[length][2];
+		this.rotationAngle = rotationAngle;
+		this.fill = fill;
+	}
+
+	/**
+	 * Constructor of the shape
+	 * 
+	 * @param length
+	 *            number of the points of the figure
+	 * 
 	 */
 	public Shape(int length) {
-		super();
-		coords = new int[length][2];
-		rotationAngle = RotationAngle.d0;
-		fill = Cell.Empty;
+		this(length, RotationAngle.d0, Cell.Empty);
 	}
 
 	/**
@@ -93,13 +107,22 @@ public class Shape {
 			this.coords[i] = aShape.coords[i].clone();
 		}
 	}
+	
+	public Shape clone() {
+		Shape newShape = new Shape(this);
+		return newShape;
+	}
+
 
 	public int[][] getCoords() {
 		return coords;
 	}
 
 	protected void setCoords(int[][] coords) {
-		this.coords = coords;
+		this.coords = new int[coords.length][coords[0].length];
+		for (int i = 0; i < coords.length; i++) {
+			this.coords[i] = coords[i].clone();
+		}
 	}
 
 	/**
@@ -111,7 +134,7 @@ public class Shape {
 	 *            coordinate value
 	 */
 	public void setCoord(int i, int[] value) {
-		this.coords[i] = value;
+		this.coords[i] = value.clone();
 	}
 
 	/**
@@ -305,7 +328,8 @@ public class Shape {
 				for (int k = 0; k < getCoords().length; k++) {
 					if ((getCoords()[k][0] == x) && (getCoords()[k][1] == y)) {
 						// see previous comment
-						line[x + (0 - min_x)] = (getFill() == Cell.Blink) ? '*' : '0';
+						line[x + (0 - min_x)] = (getFill() == Cell.Blink) ? '*'
+								: '0';
 						break;
 					}
 				}

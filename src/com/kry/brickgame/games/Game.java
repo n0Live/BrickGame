@@ -380,18 +380,18 @@ public class Game extends Thread { // implements Runnable
 	}
 
 	/**
-	 * Collision check of a new figure with a filled cells on a board
+	 * Collision check of the new figure with a filled cells on the board
 	 * 
-	 * @param board
-	 *            - a board
-	 * @param piece
-	 *            - a new figure
-	 * @param x
-	 *            - x-coordinate figures
-	 * @param y
-	 *            - y-coordinate figures
 	 * @return true if there is a collision
-	 * 
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            the new figure
+	 * @param x
+	 *            x-coordinate of the figure
+	 * @param y
+	 *            y-coordinate of the figure
+	 * @return {@code true} if there is a collision
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
@@ -417,10 +417,10 @@ public class Game extends Thread { // implements Runnable
 	 * @param piece
 	 *            the new figure
 	 * @param y
-	 *            y-coordinate figures
+	 *            y-coordinate of the figure
 	 * @param checkTopBoundary
 	 *            is it necessary to check the upper boundary
-	 * @return true if there is a collision
+	 * @return {@code true} if there is a collision
 	 * 
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollision
@@ -436,14 +436,14 @@ public class Game extends Thread { // implements Runnable
 	}
 
 	/**
-	 * Collision check of a new figure with the horizontal boundaries of the
+	 * Collision check of the new figure with the horizontal boundaries of the
 	 * board
 	 * 
 	 * @param piece
-	 *            - a new figure
+	 *            - the new figure
 	 * @param x
-	 *            - x-coordinate figures
-	 * @return true if there is a collision
+	 *            - x-coordinate of the figure
+	 * @return {@code true} if there is a collision
 	 * 
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
@@ -456,18 +456,18 @@ public class Game extends Thread { // implements Runnable
 	}
 
 	/**
-	 * Collision check of a new figure with the
+	 * Collision check of the new figure with the
 	 * {@link Game#checkBoardCollisionVertical vertical} and the
 	 * {@link Game#checkBoardCollisionHorizontal horizontal} boundaries of the
 	 * board
 	 * 
 	 * @param piece
-	 *            - a new figure
+	 *            - the new figure
 	 * @param x
-	 *            - x-coordinate figures
+	 *            - x-coordinate of the figures
 	 * @param y
-	 *            - y-coordinate figures
-	 * @return true if there is a collision
+	 *            - y-coordinate of the figures
+	 * @return {@code true} if there is a collision
 	 * 
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollisionHorisontal
@@ -482,7 +482,7 @@ public class Game extends Thread { // implements Runnable
 	 * Animated clearing of the board (upwards then downwards)
 	 * 
 	 * @param isFast
-	 *            if true then animation speed is increased twice
+	 *            if {@code true} then animation speed is increased twice
 	 */
 	protected void animatedClearBoard(boolean isFast) {
 		int k = (isFast ? 2 : 1);
@@ -612,6 +612,14 @@ public class Game extends Thread { // implements Runnable
 		return board;
 	}
 
+	/**
+	 * Drawing effect of the explosion
+	 * 
+	 * @param x
+	 *            x-coordinate of the epicenter
+	 * @param y
+	 *            x-coordinate of the epicenter
+	 */
 	protected void kaboom(int x, int y) {
 		/**
 		 * Inner class to draw an explosion

@@ -266,7 +266,7 @@ public class SnakeGame extends Game {
 	private void loadLevel() {
 		snake = new SnakeShape();
 		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 - snake.getLength() / 2;
+		curX = boardWidth / 2;
 		curY = ((getType() == 2) || (getType() == 4)) ? 1 : 0;
 
 		tryMove(snake.getDirection());
