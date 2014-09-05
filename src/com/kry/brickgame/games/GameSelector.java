@@ -439,10 +439,10 @@ public class GameSelector extends Game {
 			nextLetter();
 			break;
 		case KeyUp:
-			prevNumber();
+			nextNumber();
 			break;
 		case KeyDown:
-			nextNumber();
+			prevNumber();
 			break;
 		case KeyStart:
 			changeGame();

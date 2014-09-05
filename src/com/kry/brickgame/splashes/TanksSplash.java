@@ -1,6 +1,5 @@
 package com.kry.brickgame.splashes;
 
-import com.kry.brickgame.Board.Cell;
 
 /**
  * @author noLive

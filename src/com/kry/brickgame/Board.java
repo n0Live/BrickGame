@@ -83,7 +83,7 @@ public class Board {
 	}
 
 	public Cell getCell(int x, int y) {
-		return this.board[x][y];
+ 		return this.board[x][y];
 	}
 
 	public void setCell(Cell cell, int x, int y) {

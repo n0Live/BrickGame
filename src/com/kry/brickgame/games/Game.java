@@ -398,7 +398,7 @@ public class Game extends Thread { // implements Runnable
 	 */
 	protected boolean checkCollision(Board board, Shape piece, int x, int y) {
 		try {
-			for (int i = 0; i < piece.getCoords().length; i++) {
+			for (int i = 0; i < piece.getLength(); i++) {
 				int board_x = x + piece.x(i);
 				int board_y = y + piece.y(i);
 				if (board.getCell(board_x, board_y) != Cell.Empty)
@@ -563,7 +563,7 @@ public class Game extends Thread { // implements Runnable
 	 * @return the board with the figure
 	 */
 	protected Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
-		for (int i = 0; i < shape.getCoords().length; i++) {
+		for (int i = 0; i < shape.getLength(); i++) {
 			int board_x = x + shape.x(i);
 			int board_y = y + shape.y(i);
 
@@ -663,6 +663,12 @@ public class Game extends Thread { // implements Runnable
 					{ E, E, E, E, E },//
 					{ E, E, E, E, E },//
 					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }, {
+					// 6
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
 					{ E, E, E, E, E },//
 					{ E, E, E, E, E } }
 

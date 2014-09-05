@@ -2,7 +2,6 @@ package com.kry.brickgame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,7 +12,6 @@ import javax.swing.event.MouseInputListener;
 
 import com.kry.brickgame.games.Game;
 import com.kry.brickgame.splashes.SplashScreen;
-import com.sun.awt.AWTUtilities;
 
 public class Window extends JFrame implements MouseInputListener {
 	private static final long serialVersionUID = 3466619047314091863L;

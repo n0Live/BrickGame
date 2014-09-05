@@ -65,7 +65,60 @@ public class TetrisGame extends Game {
 	 *            <li>tetris with super point and super mud gun;
 	 *            <li>tetris with super gun and super mud gun;
 	 *            <li>tetris with super point, super gun and super mud gun;
-	 *            <li>more..
+	 *            <li>tetris with super bomb - a figure that explode all around
+	 *            after dropping down;
+	 *            <li>tetris with super point and super bomb;
+	 *            <li>tetris with super gun and super bomb;
+	 *            <li>tetris with super point, super gun and super bomb;
+	 *            <li>tetris with super mud gun and super bomb;
+	 *            <li>tetris with super point, super mud gun and super bomb;
+	 *            <li>tetris with super gun, super mud gun and super bomb;
+	 *            <li>tetris with super point, super gun, super mud gun and
+	 *            super bomb;
+	 *            <li>tetris with a liquid (crumbly) figures;
+	 *            <li>tetris with a liquid figures and super point;
+	 *            <li>tetris with a liquid figures and super gun;
+	 *            <li>tetris with a liquid figures, super point and super gun;
+	 *            <li>tetris with a liquid figures and super mud gun;
+	 *            <li>tetris with a liquid figures, super point and super mud
+	 *            gun;
+	 *            <li>tetris with a liquid figures, super gun and super mud gun;
+	 *            <li>tetris with a liquid figures, super point, super gun and
+	 *            super mud gun;
+	 *            <li>tetris with a liquid figures and super bomb;
+	 *            <li>tetris with a liquid figures, super point and super bomb;
+	 *            <li>tetris with a liquid figures, super gun and super bomb;
+	 *            <li>tetris with a liquid figures, super point, super gun and
+	 *            super bomb;
+	 *            <li>tetris with a liquid figures, super mud gun and super
+	 *            bomb;
+	 *            <li>tetris with a liquid figures, super point, super mud gun
+	 *            and super bomb;
+	 *            <li>tetris with a liquid figures, super gun, super mud gun and
+	 *            super bomb;
+	 *            <li>tetris with a liquid figures, super point, super gun,
+	 *            super mud gun and super bomb;
+	 *            <li>tetris with a acid figures;
+	 *            <li>tetris with a acid figures and super point;
+	 *            <li>tetris with a acid figures and super gun;
+	 *            <li>tetris with a acid figures, super point and super gun;
+	 *            <li>tetris with a acid figures and super mud gun;
+	 *            <li>tetris with a acid figures, super point and super mud gun;
+	 *            <li>tetris with a acid figures, super gun and super mud gun;
+	 *            <li>tetris with a acid figures, super point, super gun and
+	 *            super mud gun;
+	 *            <li>tetris with a acid figures and super bomb;
+	 *            <li>tetris with a acid figures, super point and super bomb;
+	 *            <li>tetris with a acid figures, super gun and super bomb;
+	 *            <li>tetris with a acid figures, super point, super gun and
+	 *            super bomb;
+	 *            <li>tetris with a acid figures, super mud gun and super bomb;
+	 *            <li>tetris with a acid figures, super point, super mud gun and
+	 *            super bomb;
+	 *            <li>tetris with a acid figures, super gun, super mud gun and
+	 *            super bomb;
+	 *            <li>tetris with a acid figures, super point, super gun, super
+	 *            mud gun and super bomb.
 	 */
 	public TetrisGame(int speed, int level, int type) {
 		super(speed, level, type);
@@ -129,11 +182,9 @@ public class TetrisGame extends Game {
 			if (r.nextInt(8) == 0) {
 				switch (getType()) {
 				case 2:
-					// nextPiece.setShape(Tetrominoes.SuperPoint, Cell.Blink);
 					nextPiece.setRandomSuperShape(new int[] { 0 });
 					break;
 				case 3:
-					// nextPiece.setShape(Tetrominoes.SuperGun, Cell.Blink);
 					nextPiece.setRandomSuperShape(new int[] { 1 });
 					break;
 				case 4:
@@ -150,6 +201,137 @@ public class TetrisGame extends Game {
 					break;
 				case 8:
 					nextPiece.setRandomSuperShape(new int[] { 0, 1, 2 });
+					break;
+				case 9:
+					nextPiece.setRandomSuperShape(new int[] { 3 });
+					break;
+				case 10:
+					nextPiece.setRandomSuperShape(new int[] { 0, 3 });
+					break;
+				case 11:
+					nextPiece.setRandomSuperShape(new int[] { 1, 3 });
+					break;
+				case 12:
+					nextPiece.setRandomSuperShape(new int[] { 0, 1, 3 });
+					break;
+				case 13:
+					nextPiece.setRandomSuperShape(new int[] { 2, 3 });
+					break;
+				case 14:
+					nextPiece.setRandomSuperShape(new int[] { 0, 2, 3 });
+					break;
+				case 15:
+					nextPiece.setRandomSuperShape(new int[] { 1, 2, 3 });
+					break;
+				case 16:
+					nextPiece.setRandomSuperShape(new int[] { 0, 1, 2, 3 });
+					break;
+				case 17:
+				case 33:
+					nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 18:
+				case 34:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 19:
+				case 35:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 1 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 20:
+				case 36:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 1 });
+					break;
+				case 21:
+				case 37:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 2 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 22:
+				case 38:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 2 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 23:
+				case 39:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 1, 2 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 24:
+				case 40:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 1, 2 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 25:
+				case 41:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 26:
+				case 42:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 27:
+				case 43:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 1, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 28:
+				case 44:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 1, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 29:
+				case 45:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 2, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 30:
+				case 46:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 2, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 31:
+				case 47:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 1, 2, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
+					break;
+				case 32:
+				case 48:
+					if (r.nextBoolean())
+						nextPiece.setRandomSuperShape(new int[] { 0, 1, 2, 3 });
+					else
+						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
 					break;
 				default:
 					nextPiece.setRandomShapeAndRotate();
@@ -287,7 +469,7 @@ public class TetrisGame extends Game {
 	 *            x-coordinate position on the board of the figure
 	 * @param y
 	 *            y-coordinate position on the board of the figure
-	 * @param shape
+	 * @param piece
 	 *            the figure
 	 * @param fill
 	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
@@ -295,13 +477,13 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board with the figure
 	 */
-	private Board drawShape(Board board, int x, int y, TetrisShape shape,
+	private Board drawShape(Board board, int x, int y, TetrisShape piece,
 			Cell fill) {
-		Cell[] boardFill = new Cell[shape.getLength()];
+		Cell[] boardFill = new Cell[piece.getLength()];
 
-		for (int i = 0; i < shape.getLength(); i++) {
-			int board_x = x + shape.x(i);
-			int board_y = y + shape.y(i);
+		for (int i = 0; i < piece.getLength(); i++) {
+			int board_x = x + piece.x(i);
+			int board_y = y + piece.y(i);
 
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
@@ -316,7 +498,7 @@ public class TetrisGame extends Game {
 				boardFill[i] = Cell.Empty;
 			}
 		}
-		shape.setBoardFill(boardFill);
+		piece.setBoardFill(boardFill);
 
 		return board;
 	}
@@ -331,24 +513,24 @@ public class TetrisGame extends Game {
 	 *            x-coordinate position on the board of the figure
 	 * @param y
 	 *            y-coordinate position on the board of the figure
-	 * @param shape
+	 * @param piece
 	 *            the figure
 	 * 
 	 * @return the board without the figure
 	 */
-	private Board eraseShape(Board board, int x, int y, TetrisShape shape) {
-		if (shape.getShape() == Tetrominoes.NoShape)
+	private Board eraseShape(Board board, int x, int y, TetrisShape piece) {
+		if (piece.getShape() == Tetrominoes.NoShape)
 			return board;
 
-		for (int i = 0; i < shape.getLength(); i++) {
-			int board_x = x + shape.x(i);
-			int board_y = y + shape.y(i);
+		for (int i = 0; i < piece.getLength(); i++) {
+			int board_x = x + piece.x(i);
+			int board_y = y + piece.y(i);
 
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
 				// draws the original point on the board
-				drawPoint(board, board_x, board_y, shape.getBoardFill()[i]);
+				drawPoint(board, board_x, board_y, piece.getBoardFill()[i]);
 			}
 		}
 		return board;
@@ -379,11 +561,23 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
-		// for super figures
+		// if guns
 		if ((curPiece.getShape() == Tetrominoes.SuperGun)
 				|| (curPiece.getShape() == Tetrominoes.SuperMudGun)) {
 			// erase it
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
+			// if bomb
+		} else if (curPiece.getShape() == Tetrominoes.SuperBomb) {
+			// explode it
+			kaboom(curX + 1, curY + 1);
+			// if the crumbly figure
+		} else if ((getType() >= 17) && (getType() <= 32)
+				&& (curPiece.getFill() == Cell.Blink)) {
+			flowDown(getBoard(), curX, curY, curPiece, false);
+			// if the acid figure
+		} else if ((getType() >= 32) && (getType() <= 48)
+				&& (curPiece.getFill() == Cell.Blink)) {
+			flowDown(getBoard(), curX, curY, curPiece, true);
 		} else {
 			// add the figure to the board
 			// Cells.Full instead curPiece.getFill() because is Blink should
@@ -632,6 +826,44 @@ public class TetrisGame extends Game {
 		removeFullLines();
 	}
 
+	private void flowDown(Board board, int x, int y, TetrisShape piece,
+			boolean isAcid) {
+
+		int[][] sortedPoints = new int[piece.getLength()][2];
+		int n = 0;
+		for (int j = piece.minY(); j <= piece.maxY(); j++) {
+			for (int i = piece.minX(); i <= piece.maxX(); i++) {
+				for (int k = 0; k < piece.getLength(); k++) {
+					if ((piece.x(k) == i) && (piece.y(k) == j)) {
+						sortedPoints[n++] = piece.getCoord(k);
+						break;
+					}
+				}
+			}
+		}
+
+		for (int i = 0; i < sortedPoints.length; i++) {
+			int board_x = x + sortedPoints[i][0];
+			int board_y = y + sortedPoints[i][1];
+
+			while ((board_y > 0)
+					&& (board.getCell(board_x, board_y - 1) == Cell.Empty)) {
+				drawPoint(board, board_x, board_y - 1, piece.getFill());
+				drawPoint(board, board_x, board_y, Cell.Empty);
+				board_y--;
+				setBoard(board);
+				sleep(ANIMATION_DELAY);
+			}
+			if (isAcid && (board_y > 0)) {
+				drawPoint(board, board_x, board_y - 1, piece.getFill());
+				drawPoint(board, board_x, board_y, Cell.Empty);
+				sleep(ANIMATION_DELAY * 2);
+				drawPoint(board, board_x, board_y - 1, Cell.Empty);
+			} else
+				drawPoint(board, board_x, board_y, Cell.Full);
+		}
+	}
+
 	/**
 	 * Processing of key presses
 	 */
@@ -678,6 +910,10 @@ public class TetrisGame extends Game {
 			if (keys.contains(KeyPressed.KeyDown)) {
 				oneLineDown();
 				sleep(ANIMATION_DELAY);
+			}
+			if (keys.contains(KeyPressed.KeyUp)) {
+				dropDown();
+				keys.remove(KeyPressed.KeyUp);
 			}
 		}
 	}
