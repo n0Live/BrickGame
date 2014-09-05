@@ -11,12 +11,13 @@ import com.kry.brickgame.Board.Cell;
 public class TetrisShape extends Shape implements Cloneable {
 
 	/**
-	 * Number of the points of the figures ({@value} )
+	 * Maximal number of the points of the figures ({@value} )
 	 */
-	private final static int LENGTH = 4;
+	private final static int MAX_LENGTH = 5;
 
 	public static enum Tetrominoes {
-		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, SuperPoint, SuperGun, SuperMudGun
+		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, //
+		SuperPoint, SuperGun, SuperMudGun, SuperBomb, SuperLine
 	};
 
 	private Tetrominoes shape;
@@ -35,7 +36,8 @@ public class TetrisShape extends Shape implements Cloneable {
 			{ { 0, -1 }, { 1, -1 }, { 0, 0 }, { 0, 1 } }, // MirroredLShape
 			{ { 0, 0 } }, // SuperPoint
 			{ { 0, 0 }, { 0, 1 } }, // SuperGun
-			{ { 0, 0 }, { 0, 1 }, { 0, 2 } } // SuperMudGun
+			{ { 0, 0 }, { 0, 1 }, { 0, 2 } }, // SuperMudGun
+			{ { 0, 0 }, { 0, 2 }, { 1, 1 }, { 2, 0 }, { 2, 2 } } // SuperBomb
 	};
 
 	/**
@@ -44,8 +46,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	private Cell[] boardFill;
 
 	public TetrisShape() {
-		super(LENGTH);
-		boardFill = new Cell[LENGTH];
+		super(MAX_LENGTH);
+		boardFill = new Cell[MAX_LENGTH];
 		setShape(Tetrominoes.NoShape);
 	}
 
@@ -100,7 +102,9 @@ public class TetrisShape extends Shape implements Cloneable {
 				break;
 			}
 		}
-
+	
+		setLength(getLength(shape));
+		
 		// not for super shape
 		if (shape.ordinal() <= 7) {
 			// Center the figures, which were shifted to aside after rotation
@@ -118,9 +122,7 @@ public class TetrisShape extends Shape implements Cloneable {
 		}
 
 		// initializing board fill
-		for (int i = 0; i < boardFill.length; i++) {
-			boardFill[i] = Cell.Empty;
-		}
+		clearBoardFill();
 
 		this.shape = shape;
 		this.setRotationAngle(rotationAngle);
@@ -130,7 +132,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Selection of the figure (with type of fill is {@code Full})
+	 * Selection of the figure (with current fill)
 	 * 
 	 * @param shape
 	 *            the figure
@@ -138,7 +140,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            rotation angle of the figure
 	 */
 	public TetrisShape setShape(Tetrominoes shape, RotationAngle rotationAngle) {
-		return setShape(shape, rotationAngle, Cell.Full);
+		return setShape(shape, rotationAngle, getFill());
 	}
 
 	/**
@@ -154,7 +156,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
-	 * Selection of the figure (without rotation and type of fill is
+	 * Selection of the figure (without rotation and current fill is
 	 * {@code Full})
 	 * 
 	 * @param shape
@@ -175,11 +177,27 @@ public class TetrisShape extends Shape implements Cloneable {
 	public void setBoardFill(Cell[] boardFill) {
 		this.boardFill = boardFill.clone();
 	}
+	
+	/**
+	 * Filling the {@code boardFill} parameter with empty values
+	 * @see #boardFill
+	 */
+	private void clearBoardFill(){
+		for (int i = 0; i < boardFill.length; i++) {
+			boardFill[i] = Cell.Empty;
+		}
+	}
 
+	/**
+	 * Getting points number of the specified figure 
+	 * @param shape the figure
+	 * @return number of the points
+	 */
 	private int getLength(Tetrominoes shape) {
 		return coordsTable[shape.ordinal()].length;
 	}
 
+	@Override
 	public int getLength() {
 		return getLength(this.shape);
 	}
@@ -194,6 +212,10 @@ public class TetrisShape extends Shape implements Cloneable {
 		return setShape(values[x]);
 	}
 
+	/**
+	 * Selection of a random super figure given in the {@code shapes} array
+	 * @param shapes the array of numbered figures (0 to 3) 
+	 */
 	public TetrisShape setRandomSuperShape(int[] shapes) {
 		Random r = new Random();
 		int x = shapes[r.nextInt(shapes.length)] + 8;
@@ -204,9 +226,12 @@ public class TetrisShape extends Shape implements Cloneable {
 		Tetrominoes[] values = Tetrominoes.values();
 		return setShape(values[x], RotationAngle.d0, Cell.Blink);
 	}
-	
+
+	/**
+	 * Selection of a random super figure
+	 */
 	public TetrisShape setRandomSuperShape() {
-		return setRandomSuperShape(new int[] {0, 1, 2});
+		return setRandomSuperShape(new int[] { 0, 1, 2, 3 });
 	}
 
 	/**

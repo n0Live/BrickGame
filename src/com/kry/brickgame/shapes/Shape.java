@@ -2,7 +2,6 @@ package com.kry.brickgame.shapes;
 
 import java.util.Arrays;
 
-import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
 
 /**
@@ -57,6 +56,10 @@ public class Shape {
 	 * Type of fill of the figure
 	 */
 	private Cell fill;
+	/**
+	 * Number of the points of the figure
+	 */
+	private int length;
 
 	/**
 	 * A set of coordinates of a points of a figures:
@@ -67,15 +70,17 @@ public class Shape {
 	/**
 	 * Constructor of the shape
 	 * 
-	 * @param length
-	 *            number of the points of the figure
+	 * @param maxLength
+	 *            maximal number of the points of the figure
 	 * @param rotationAngle
 	 *            rotation angle of the figure
 	 * @param fill
 	 *            type of fill of the figure
 	 */
-	public Shape(int length, RotationAngle rotationAngle, Cell fill) {
-		this.coords = new int[length][2];
+	public Shape(int maxLength, int length, RotationAngle rotationAngle,
+			Cell fill) {
+		this.coords = new int[maxLength][2];
+		this.length = length;
 		this.rotationAngle = rotationAngle;
 		this.fill = fill;
 	}
@@ -83,12 +88,12 @@ public class Shape {
 	/**
 	 * Constructor of the shape
 	 * 
-	 * @param length
-	 *            number of the points of the figure
+	 * @param maxLength
+	 *            maximal number of the points of the figure
 	 * 
 	 */
-	public Shape(int length) {
-		this(length, RotationAngle.d0, Cell.Empty);
+	public Shape(int maxLength) {
+		this(maxLength, maxLength, RotationAngle.d0, Cell.Empty);
 	}
 
 	/**
@@ -107,12 +112,11 @@ public class Shape {
 			this.coords[i] = aShape.coords[i].clone();
 		}
 	}
-	
+
 	public Shape clone() {
 		Shape newShape = new Shape(this);
 		return newShape;
 	}
-
 
 	public int[][] getCoords() {
 		return coords;
@@ -212,9 +216,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int minX() {
-		int result = getCoords()[0][0];
-		for (int i = 0; i < getCoords().length; i++) {
-			result = Math.min(result, getCoords()[i][0]);
+		int result = x(0);
+		for (int i = 0; i < length; i++) {
+			result = Math.min(result, x(i));
 		}
 		return result;
 	}
@@ -224,9 +228,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int minY() {
-		int result = getCoords()[0][1];
-		for (int i = 0; i < getCoords().length; i++) {
-			result = Math.min(result, getCoords()[i][1]);
+		int result = y(0);
+		for (int i = 0; i < length; i++) {
+			result = Math.min(result, y(i));
 		}
 		return result;
 	}
@@ -236,9 +240,9 @@ public class Shape {
 	 *         figure
 	 */
 	public int maxX() {
-		int result = getCoords()[0][0];
-		for (int i = 0; i < getCoords().length; i++) {
-			result = Math.max(result, getCoords()[i][0]);
+		int result = x(0);
+		for (int i = 0; i < length; i++) {
+			result = Math.max(result, x(i));
 		}
 		return result;
 	}
@@ -248,11 +252,22 @@ public class Shape {
 	 *         figure
 	 */
 	public int maxY() {
-		int result = getCoords()[0][1];
-		for (int i = 0; i < getCoords().length; i++) {
-			result = Math.max(result, getCoords()[i][1]);
+		int result = y(0);
+		for (int i = 0; i < length; i++) {
+			result = Math.max(result, y(i));
 		}
 		return result;
+	}
+
+	/**
+	 * Getting points number of the current figure 
+	 */
+	public int getLength() {
+		return length;
+	}
+
+	protected void setLength(int length) {
+		this.length = length;
 	}
 
 	/**
@@ -277,7 +292,7 @@ public class Shape {
 	public Shape rotateLeft() {
 		Shape originalShape = new Shape(this);
 
-		for (int i = 0; i < getCoords().length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			setX(i, -originalShape.y(i));
 			setY(i, originalShape.x(i));
 		}
@@ -293,7 +308,7 @@ public class Shape {
 	public Shape rotateRight() {
 		Shape originalShape = new Shape(this);
 
-		for (int i = 0; i < getCoords().length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			setX(i, originalShape.y(i));
 			setY(i, -originalShape.x(i));
 		}
@@ -325,8 +340,8 @@ public class Shape {
 				// [x + (0 - min_x)]: because x can be less than 0, then x is
 				// shifted to 0
 				line[x + (0 - min_x)] = ' ';
-				for (int k = 0; k < getCoords().length; k++) {
-					if ((getCoords()[k][0] == x) && (getCoords()[k][1] == y)) {
+				for (int k = 0; k < getLength(); k++) {
+					if ((x(k) == x) && (y(k) == y)) {
 						// see previous comment
 						line[x + (0 - min_x)] = (getFill() == Cell.Blink) ? '*'
 								: '0';
