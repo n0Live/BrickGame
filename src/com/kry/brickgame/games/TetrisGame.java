@@ -168,7 +168,7 @@ public class TetrisGame extends Game {
 		curPiece.setShape(Tetrominoes.NoShape);
 
 		// X-coordinate - middle of the board
-		curX = boardWidth / 2;
+		curX = boardWidth / 2 - 1;
 		// Y-coordinate - top edge, and so that the bottom edge of the figure
 		// was at the top of the border
 		curY = boardHeight - 1 - nextPiece.minY();
@@ -401,8 +401,13 @@ public class TetrisGame extends Game {
 
 		// for super figures
 		if (newPiece.getShape() == Tetrominoes.SuperPoint) {
-			if (specialCheckCollision(board, newPiece, prepX, newY))
-				return false;
+			if (checkCollision(board, newPiece, prepX, newY)) {
+				// checking whether filled line at the current (old) figure
+				if (checkForFullLines(getBoard(), curPiece, curX, curY))
+					return false;
+				if (specialCheckCollision(board, newPiece, prepX, newY))
+					return false;
+			}
 		} else { // for ordinal figures
 			if (checkCollision(board, newPiece, prepX, newY))
 				return false;
@@ -458,6 +463,35 @@ public class TetrisGame extends Game {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Checking whether filled line at the figure
+	 * 
+	 * @param board
+	 *            the board for check
+	 * @param piece
+	 *            the figure for check
+	 * @param x
+	 *            x-coordinate of the figure
+	 * @param y
+	 *            y-coordinate of the figure
+	 * @return {@code true} if at least one line is full
+	 */
+	private boolean checkForFullLines(Board board, TetrisShape piece, int x,
+			int y) {
+
+		for (int j = y + piece.minY(); j <= y + piece.maxY(); j++) {
+			boolean hasFullLine = true;
+			for (int i = 0; i < boardWidth; i++) {
+				// true - only if all cells is full
+				hasFullLine &= (board.getCell(i, j) != Cell.Empty);
+			}
+			// exits if at least one line is full
+			if (hasFullLine)
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -561,16 +595,16 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
-		// if guns
+		// if the guns
 		if ((curPiece.getShape() == Tetrominoes.SuperGun)
 				|| (curPiece.getShape() == Tetrominoes.SuperMudGun)) {
 			// erase it
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
-			// if bomb
+			// if the bomb
 		} else if (curPiece.getShape() == Tetrominoes.SuperBomb) {
 			// explode it
 			kaboom(curX + 1, curY + 1);
-			// if the crumbly figure
+			// if the liquid (crumbly) figure
 		} else if ((getType() >= 17) && (getType() <= 32)
 				&& (curPiece.getFill() == Cell.Blink)) {
 			flowDown(getBoard(), curX, curY, curPiece, false);
@@ -585,25 +619,11 @@ public class TetrisGame extends Game {
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
 
-		curPiece.setShape(Tetrominoes.NoShape);
-
-		int oldHundreds = getScore() / 100;
+		// curPiece.setShape(Tetrominoes.NoShape);
 
 		isFallingFinished = true;
 
 		removeFullLines();
-
-		// when a sufficient number of points changes the speed and the level
-		if (getScore() / 100 > oldHundreds) {
-			setSpeed(getSpeed() + 1);
-			if (getSpeed() == 1) {
-				setLevel(getLevel() + 1);
-				for (int i = 0; i < getLevel() - 1; i++) {
-					sleep(ANIMATION_DELAY * 4);
-					addLines();
-				}
-			}
-		}
 
 		// check for game over
 		if ((curY + curPiece.maxY()) >= boardHeight)
@@ -614,7 +634,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Removal of a filled lines
 	 */
-	private void removeFullLines() {
+	private int removeFullLines() {
 		Board board = getBoard();
 
 		int numFullLines = 0;
@@ -635,8 +655,8 @@ public class TetrisGame extends Game {
 				// animated clearing of a full line
 				animatedClearLine(y, curX);
 
-				// erase the current figure before dropping downs lines
-				if (curPiece.getShape() != Tetrominoes.NoShape)
+				// if mud gun, than erase it before dropping downs lines
+				if (curPiece.getShape() == Tetrominoes.SuperMudGun)
 					eraseShape(board, curX, curY, curPiece);
 
 				// drop the lines down on the filled line
@@ -645,8 +665,8 @@ public class TetrisGame extends Game {
 						board.setCell(board.getCell(x, k + 1), x, k);
 				}
 
-				// restore the current figure after dropping downs lines
-				if (curPiece.getShape() != Tetrominoes.NoShape)
+				// restore it after dropping downs lines
+				if (curPiece.getShape() == Tetrominoes.SuperMudGun)
 					drawShape(board, curX, curY, curPiece, curPiece.getFill());
 
 				// return to one line back (because we removed the filled line)
@@ -673,6 +693,7 @@ public class TetrisGame extends Game {
 				break;
 			}
 		}
+		return numFullLines;
 	}
 
 	/**
@@ -861,6 +882,25 @@ public class TetrisGame extends Game {
 				drawPoint(board, board_x, board_y - 1, Cell.Empty);
 			} else
 				drawPoint(board, board_x, board_y, Cell.Full);
+		}
+	}
+
+	@Override
+	protected void setScore(int score) {
+		int oldHundreds = getScore() / 100;
+
+		super.setScore(score);
+
+		// when a sufficient number of points changes the speed and the level
+		if (getScore() / 100 > oldHundreds) {
+			setSpeed(getSpeed() + 1);
+			if (getSpeed() == 1) {
+				setLevel(getLevel() + 1);
+				for (int i = 0; i < getLevel() - 1; i++) {
+					sleep(ANIMATION_DELAY * 4);
+					addLines();
+				}
+			}
 		}
 	}
 
