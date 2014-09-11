@@ -84,7 +84,7 @@ public class GameSelector extends Game {
 		}
 		try {
 			gamesList.put('J',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameJ"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('J', null);
 		}
