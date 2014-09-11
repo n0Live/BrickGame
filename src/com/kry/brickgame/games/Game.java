@@ -2,6 +2,7 @@ package com.kry.brickgame.games;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import com.kry.brickgame.Board;
@@ -52,10 +53,11 @@ public class Game extends Thread { // implements Runnable
 	private static final int TENTH_LEVEL_SPEED = 80;
 	/*---MAGIC NUMBERS---*/
 
-	private int speed;
-	private int level;
-	private int score;
-	private int lives;
+	private volatile int speed;
+	private volatile int level;
+	private volatile int score;
+	private volatile int lives;
+
 	private int type;
 
 	/**
@@ -200,15 +202,15 @@ public class Game extends Thread { // implements Runnable
 		}
 	}
 
-	public Splash getSplash() {
+	public static Splash getSplash() {
 		return splash;
 	}
 
-	protected Status getStatus() {
+	protected synchronized Status getStatus() {
 		return status;
 	}
 
-	protected void setStatus(Status status) {
+	protected synchronized void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
 	}
@@ -221,7 +223,7 @@ public class Game extends Thread { // implements Runnable
 	 * @return if genuine than return genuine speed in millisecond else return
 	 *         speed level 1-10
 	 */
-	protected int getSpeed(boolean genuine) {
+	protected synchronized int getSpeed(boolean genuine) {
 		if (genuine) {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
@@ -236,7 +238,7 @@ public class Game extends Thread { // implements Runnable
 	 * 
 	 * @return speed level 1-10
 	 */
-	protected int getSpeed() {
+	protected synchronized int getSpeed() {
 		return getSpeed(false);
 	}
 
@@ -246,7 +248,7 @@ public class Game extends Thread { // implements Runnable
 	 * @param speed
 	 *            speed level 1-10
 	 */
-	protected void setSpeed(int speed) {
+	protected synchronized void setSpeed(int speed) {
 		if (speed < 1) {
 			this.speed = 10;
 		} else if (speed > 10) {
@@ -261,7 +263,7 @@ public class Game extends Thread { // implements Runnable
 	 * 
 	 * @return level 1-10
 	 */
-	protected int getLevel() {
+	protected synchronized int getLevel() {
 		return level;
 	}
 
@@ -271,7 +273,7 @@ public class Game extends Thread { // implements Runnable
 	 * @param level
 	 *            level 1-10
 	 */
-	protected void setLevel(int level) {
+	protected synchronized void setLevel(int level) {
 		if (level < 1) {
 			this.level = 10;
 		} else if (level > 10) {
@@ -281,12 +283,15 @@ public class Game extends Thread { // implements Runnable
 		fireLevelChanged(this.level);
 	}
 
-	protected int getScore() {
+	protected synchronized int getScore() {
 		return score;
 	}
 
-	protected void setScore(int score) {
-		this.score = score;
+	protected synchronized void setScore(int score) {
+		if ((score > 19999) || (score < 0))
+			this.score = 0;
+		else
+			this.score = score;
 		fireInfoChanged(String.valueOf(score));
 	}
 
@@ -295,7 +300,7 @@ public class Game extends Thread { // implements Runnable
 	 * 
 	 * @return lives 0 - 4
 	 */
-	protected int getLives() {
+	protected synchronized int getLives() {
 		return lives;
 	}
 
@@ -305,7 +310,7 @@ public class Game extends Thread { // implements Runnable
 	 * @param lives
 	 *            lives 0 - 4
 	 */
-	protected void setLives(int lives) {
+	protected synchronized void setLives(int lives) {
 		if (lives > 4) {
 			this.lives = 4;
 		} else if (lives < 0) {
@@ -327,20 +332,20 @@ public class Game extends Thread { // implements Runnable
 		return type;
 	}
 
-	protected Board getBoard() {
+	protected synchronized Board getBoard() {
 		return board;
 	}
 
-	protected void setBoard(Board board) {
+	protected synchronized void setBoard(Board board) {
 		this.board = board;
 		fireBoardChanged(board);
 	}
 
-	protected Board getPreview() {
+	protected synchronized Board getPreview() {
 		return preview;
 	}
 
-	protected void setPreview(Board preview) {
+	protected synchronized void setPreview(Board preview) {
 		this.preview = preview;
 		firePreviewChanged(preview);
 	}
@@ -396,7 +401,8 @@ public class Game extends Thread { // implements Runnable
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 */
-	protected boolean checkCollision(Board board, Shape piece, int x, int y) {
+	protected static boolean checkCollision(Board board, Shape piece, int x,
+			int y) {
 		try {
 			for (int i = 0; i < piece.getLength(); i++) {
 				int board_x = x + piece.x(i);
@@ -479,6 +485,30 @@ public class Game extends Thread { // implements Runnable
 	}
 
 	/**
+	 * Animated clearing of a full line
+	 * 
+	 * @param x
+	 *            point, on both sides of which cells will be removed
+	 *            (x-coordinate)
+	 * @param y
+	 *            number of the line to be removed (y-coordinate)
+	 */
+	protected void animatedClearLine(Board board, int x, int y) {
+		int x1 = x - 1; // left direction
+		int x2 = x; // right direction
+
+		while ((x1 >= 0) || (x2 < board.getWidth())) {
+			if (x1 >= 0)
+				board.setCell(Cell.Empty, x1--, y);
+			if (x2 < board.getWidth())
+				board.setCell(Cell.Empty, x2++, y);
+
+			fireBoardChanged(board);
+			sleep(ANIMATION_DELAY);
+		}
+	}
+
+	/**
 	 * Animated clearing of the board (upwards then downwards)
 	 * 
 	 * @param isFast
@@ -511,6 +541,51 @@ public class Game extends Thread { // implements Runnable
 	 */
 	protected void animatedClearBoard() {
 		animatedClearBoard(false);
+	}
+
+	/**
+	 * Shift the contents of the board horizontally on the delta x
+	 * 
+	 * @param board
+	 *            the board for horizontal shift
+	 * @param dX
+	 *            delta x, if {@code dX > 0} then shift to the right, otherwise
+	 *            shift to the left
+	 * @return the board after horizontal shift
+	 */
+	protected static Board horizontalShift(Board board, int dX) {
+		// If dX is greater than the width of the board, it is reduced
+		int reducedDX = dX % board.getWidth();
+
+		if (reducedDX == 0)
+			return board;
+
+		Board resultBoard = board.clone();
+
+		for (int i = 0; i < Math.abs(reducedDX); i++) {
+			// if shift to the right, then get the first column as temporary,
+			// otherwise get the last column
+			Cell[] tempColumn = (reducedDX > 0) ? board.getColumn(board
+					.getWidth() - 1) : board.getColumn(0);
+
+			for (int j = 0; j < board.getWidth(); j++) {
+				Cell[] nextColumn = null;
+				// replace the column on the side of the board to the
+				// appropriate column on the other side
+				if (((j == 0) && (reducedDX > 0))
+						|| ((j == board.getWidth() - 1) && (reducedDX < 0))) {
+					nextColumn = tempColumn;
+				} else {
+					// replace the column in the middle of the board to the
+					// appropriate adjacent column
+					nextColumn = board.getColumn(j
+							+ ((reducedDX > 0) ? (-1) : 1));
+				}
+				resultBoard.setColumn(nextColumn, j);
+			}
+		}
+
+		return resultBoard;
 	}
 
 	/**
@@ -562,7 +637,8 @@ public class Game extends Thread { // implements Runnable
 	 * 
 	 * @return the board with the figure
 	 */
-	protected Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
+	protected static Board drawShape(Board board, int x, int y, Shape shape,
+			Cell fill) {
 		for (int i = 0; i < shape.getLength(); i++) {
 			int board_x = x + shape.x(i);
 			int board_y = y + shape.y(i);
@@ -593,7 +669,7 @@ public class Game extends Thread { // implements Runnable
 	 *            type of fill the point
 	 * @return the board with the point
 	 */
-	protected Board drawPoint(Board board, int x, int y, Cell fill) {
+	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
 		int board_x = x;
 		int board_y = y;
 
@@ -727,6 +803,85 @@ public class Game extends Thread { // implements Runnable
 				kaboom.blast(newX, newY, k);
 			}
 		}
+	}
+
+	/**
+	 * Add randomly generated lines on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param fromLine
+	 *            line, which starts the addition
+	 * @param linesCount
+	 *            count of added lines
+	 * @param isUpwardDirection
+	 *            if {@code true}, then the bottom-up direction of addition
+	 * @return the board after adding lines
+	 */
+	protected static Board addLines(Board board, int fromLine, int linesCount,
+			boolean isUpwardDirection) {
+		if ((linesCount < 1)//
+				|| (fromLine < 0) || (fromLine >= board.getHeight()))//
+			return board;
+
+		// checks whether there are full cells at a distance of
+		// <i>linesCount</i> from the top or the bottom of the board
+		for (int i = 0; i < board.getWidth(); i++) {
+			if (isUpwardDirection) {
+				if (((fromLine + linesCount - 1) > board.getHeight())
+						|| (board.getCell(i,
+								(board.getHeight() - 1 - linesCount)) == Cell.Full))
+					return board;
+			} else {
+				if (((fromLine - linesCount + 1) < 0)
+						|| (board.getCell(i, (linesCount - 1)) == Cell.Full))
+					return board;
+			}
+		}
+
+		Random r = new Random();
+		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
+
+		// picks up or downs the lines of the board
+		if (isUpwardDirection) {
+			for (int y = board.getHeight() - 1; y > fromLine + (linesCount - 1); y--) {
+				for (int x = 0; x < board.getWidth(); x++)
+					board.setCell(board.getCell(x, y - 1), x, y);
+			}
+		} else {
+			for (int y = 1; y < fromLine - (linesCount - 1); y++) {
+				for (int x = 0; x < board.getWidth(); x++)
+					board.setCell(board.getCell(x, y + 1), x, y);
+			}
+		}
+
+		// generates a new lines
+		for (int line = 0; line < linesCount; line++) {
+			boolean hasEmpty = false;
+			boolean hasFull = false;
+
+			for (int i = 0; i < board.getWidth(); i++) {
+				if (r.nextBoolean()) {
+					newLines[line][i] = Cell.Empty;
+					hasEmpty = true;
+				} else {
+					newLines[line][i] = Cell.Full;
+					hasFull = true;
+				}
+			}
+
+			// if all the cells were empty, creates a full one in a random place
+			// of the line
+			if (!hasEmpty || !hasFull) {
+				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty
+						: Cell.Full);
+			}
+
+			// adds the created line to the board
+			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line
+					: fromLine - line));
+		}
+		return board;
 	}
 
 	/**
