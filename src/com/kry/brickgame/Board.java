@@ -90,27 +90,51 @@ public class Board {
 		this.board[x][y] = cell;
 	}
 
-	public Cell[] getLine(int y) {
-		Cell line[] = new Cell[this.getWidth()];
+	public Cell[] getRow(int y) {
+		Cell row[] = new Cell[this.getWidth()];
 
-		for (int i = 0; i < line.length; i++) {
-			line[i] = this.board[i][y];
+		for (int i = 0; i < row.length; i++) {
+			row[i] = this.board[i][y];
 		}
 
-		return line;
+		return row;
 	}
 
 	/**
-	 * Replacing a single line of the board
+	 * Replacing a single row of the board
 	 * 
-	 * @param line
-	 *            new line
+	 * @param row
+	 *            new row
 	 * @param y
-	 *            y-coordinate of the line
+	 *            y-coordinate of the row
 	 */
-	public void setLine(Cell[] line, int y) {
-		for (int i = 0; i < line.length; i++) {
-			this.board[i][y] = line[i];
+	public void setRow(Cell[] row, int y) {
+		for (int i = 0; i < row.length; i++) {
+			this.board[i][y] = row[i];
+		}
+	}
+
+	public Cell[] getColumn(int x) {
+		Cell column[] = new Cell[this.getHeight()];
+
+		for (int i = 0; i < column.length; i++) {
+			column[i] = this.board[x][i];
+		}
+
+		return column;
+	}
+
+	/**
+	 * Replacing a single column of the board
+	 * 
+	 * @param column
+	 *            new column
+	 * @param x
+	 *            x-coordinate of the column
+	 */
+	public void setColumn(Cell[] column, int x) {
+		for (int i = 0; i < column.length; i++) {
+			this.board[x][i] = column[i];
 		}
 	}
 
