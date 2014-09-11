@@ -226,7 +226,7 @@ public class GameSelector extends Game {
 	 */
 	protected void drawLetter(char letter) {
 		BoardLetters boardLetter = new BoardLetters();
-		boardLetter.setLetter(boardLetter.charToLetters(letter));
+		boardLetter.setLetter(BoardLetters.charToLetters(letter));
 		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
 				boardHeight - BoardLetters.height);// y
 	}
@@ -249,12 +249,12 @@ public class GameSelector extends Game {
 		BoardNumbers boardNumber = new BoardNumbers();
 
 		// 1st number
-		boardNumber.setNumber(boardNumber.intToNumbers(number_1));
+		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
 		insertBoard(boardNumber, (boardWidth / 2 - BoardNumbers.width - 1),// x
 				0);// y
 
 		// 2nd number
-		boardNumber.setNumber(boardNumber.intToNumbers(number_2));
+		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
 		insertBoard(boardNumber, (boardWidth / 2),// x
 				0);// y
 	}
