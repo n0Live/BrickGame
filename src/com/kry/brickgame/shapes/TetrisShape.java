@@ -10,14 +10,9 @@ import com.kry.brickgame.Board.Cell;
  */
 public class TetrisShape extends Shape implements Cloneable {
 
-	/**
-	 * Maximal number of the points of the figures ({@value} )
-	 */
-	private final static int MAX_LENGTH = 5;
-
 	public static enum Tetrominoes {
 		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, //
-		SuperPoint, SuperGun, SuperMudGun, SuperBomb, SuperLine
+		SuperPoint, SuperGun, SuperMudGun, SuperBomb
 	};
 
 	private Tetrominoes shape;
@@ -45,10 +40,11 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	private Cell[] boardFill;
 
-	public TetrisShape() {
-		super(MAX_LENGTH);
-		boardFill = new Cell[MAX_LENGTH];
-		setShape(Tetrominoes.NoShape);
+	public TetrisShape(Tetrominoes shape) {
+		super(getLength(shape));
+		boardFill = new Cell[getLength(shape)];
+		clearBoardFill();
+		setShape(shape, RotationAngle.d0, Cell.Full);
 	}
 
 	/**
@@ -58,16 +54,14 @@ public class TetrisShape extends Shape implements Cloneable {
 	 *            a TetrisShape object for copying
 	 */
 	public TetrisShape(TetrisShape aTetrisShape) {
-		this();
+		super(getLength(aTetrisShape.shape));
+		setBoardFill(aTetrisShape.getBoardFill());
 		setShape(aTetrisShape.shape, aTetrisShape.getRotationAngle(),
 				aTetrisShape.getFill());
-		setBoardFill(aTetrisShape.getBoardFill());
 	}
 
 	public TetrisShape clone() {
-		TetrisShape newTetrisShape = new TetrisShape(this);
-		return newTetrisShape;
-
+		return new TetrisShape(this);
 	}
 
 	/**
@@ -80,8 +74,8 @@ public class TetrisShape extends Shape implements Cloneable {
 	 * @param fill
 	 *            type of fill of the figure
 	 */
-	public TetrisShape setShape(Tetrominoes shape, RotationAngle rotationAngle,
-			Cell fill) {
+	private TetrisShape setShape(Tetrominoes shape,
+			RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < getLength(shape); i++) {
 			switch (rotationAngle) {
 			case d0:
@@ -102,9 +96,7 @@ public class TetrisShape extends Shape implements Cloneable {
 				break;
 			}
 		}
-	
-		setLength(getLength(shape));
-		
+
 		// not for super shape
 		if (shape.ordinal() <= 7) {
 			// Center the figures, which were shifted to aside after rotation
@@ -121,49 +113,11 @@ public class TetrisShape extends Shape implements Cloneable {
 			}
 		}
 
-		// initializing board fill
-		clearBoardFill();
-
 		this.shape = shape;
 		this.setRotationAngle(rotationAngle);
 		this.setFill(fill);
 
 		return this;
-	}
-
-	/**
-	 * Selection of the figure (with current fill)
-	 * 
-	 * @param shape
-	 *            the figure
-	 * @param rotationAngle
-	 *            rotation angle of the figure
-	 */
-	public TetrisShape setShape(Tetrominoes shape, RotationAngle rotationAngle) {
-		return setShape(shape, rotationAngle, getFill());
-	}
-
-	/**
-	 * Selection of the figure (without rotation)
-	 * 
-	 * @param shape
-	 *            the figure
-	 * @param fill
-	 *            type of fill of the figure
-	 */
-	public TetrisShape setShape(Tetrominoes shape, Cell fill) {
-		return setShape(shape, RotationAngle.d0, fill);
-	}
-
-	/**
-	 * Selection of the figure (without rotation and current fill is
-	 * {@code Full})
-	 * 
-	 * @param shape
-	 *            the figure
-	 */
-	public TetrisShape setShape(Tetrominoes shape) {
-		return setShape(shape, RotationAngle.d0, Cell.Full);
 	}
 
 	public Tetrominoes getShape() {
@@ -177,82 +131,94 @@ public class TetrisShape extends Shape implements Cloneable {
 	public void setBoardFill(Cell[] boardFill) {
 		this.boardFill = boardFill.clone();
 	}
-	
+
 	/**
 	 * Filling the {@code boardFill} parameter with empty values
+	 * 
 	 * @see #boardFill
 	 */
-	private void clearBoardFill(){
+	private void clearBoardFill() {
 		for (int i = 0; i < boardFill.length; i++) {
 			boardFill[i] = Cell.Empty;
 		}
 	}
 
 	/**
-	 * Getting points number of the specified figure 
-	 * @param shape the figure
+	 * Getting points number of the specified figure
+	 * 
+	 * @param shape
+	 *            the figure
 	 * @return number of the points
 	 */
-	private int getLength(Tetrominoes shape) {
+	private static int getLength(Tetrominoes shape) {
 		return coordsTable[shape.ordinal()].length;
 	}
 
-	@Override
-	public int getLength() {
-		return getLength(this.shape);
-	}
-
 	/**
-	 * Selection of a random figure
+	 * Get instance of a random figure
 	 */
-	public TetrisShape setRandomShape() {
+	public static TetrisShape getRandomShapeInstance() {
 		Random r = new Random();
 		int x = r.nextInt(7) + 1;
 		Tetrominoes[] values = Tetrominoes.values();
-		return setShape(values[x]);
+		return new TetrisShape(values[x]);
 	}
 
 	/**
-	 * Selection of a random super figure given in the {@code shapes} array
-	 * @param shapes the array of numbered figures (0 to 3) 
+	 * Get instance of a random figure given in the {@code shapes} array
+	 * 
+	 * @param shapes
+	 *            the array of numbered figures
 	 */
-	public TetrisShape setRandomSuperShape(int[] shapes) {
+	public static TetrisShape getRandomShapeOfSpecified(int[] shapes) {
 		Random r = new Random();
-		int x = shapes[r.nextInt(shapes.length)] + 8;
+		int x = shapes[r.nextInt(shapes.length)];
 
-		if (x >= Tetrominoes.values().length)
+		if ((x < 0) || (x >= Tetrominoes.values().length))
 			x = 0;
 
 		Tetrominoes[] values = Tetrominoes.values();
-		return setShape(values[x], RotationAngle.d0, Cell.Blink);
+
+		TetrisShape newTetrisShape = new TetrisShape(values[x]);
+		// for super figures
+		if (x >= 8)
+			newTetrisShape.setFill(Cell.Blink);
+		return newTetrisShape;
 	}
 
 	/**
-	 * Selection of a random super figure
+	 * Get instance of a random super figure given in the {@code shapes} array
 	 */
-	public TetrisShape setRandomSuperShape() {
-		return setRandomSuperShape(new int[] { 0, 1, 2, 3 });
+	public static TetrisShape getRandomSuperShape(int[] shapes) {
+		return getRandomShapeOfSpecified(shapes);
 	}
 
 	/**
-	 * Selection of a random rotation angle
+	 * Get instance of a random super figure
+	 */
+	public static TetrisShape getRandomSuperShape() {
+		return getRandomShapeOfSpecified(new int[] { 8, 9, 10, 11 });
+	}
+
+	/**
+	 * Set a random rotation angle
 	 */
 	public TetrisShape setRandomRotate() {
 		Random r = new Random();
 		int x = r.nextInt(4);
 		RotationAngle[] values = RotationAngle.values();
-		return setShape(getShape(), values[x]);
+		return setShape(getShape(), values[x], getFill());
 	}
 
 	/**
-	 * Selection of a {@link #setRandomShape random figure} and a
+	 * Get instance of a {@link #setRandomShape random figure} with a
 	 * {@link #setRandomRotate random rotation angle}
 	 * 
 	 * @see #setRandomShape
 	 * @see #setRandomRotate
 	 */
-	public TetrisShape setRandomShapeAndRotate() {
-		return setRandomShape().setRandomRotate();
+	public static TetrisShape getRandomShapeAndRotate() {
+		return getRandomShapeInstance().setRandomRotate();
 	}
 
 	/**
@@ -261,8 +227,10 @@ public class TetrisShape extends Shape implements Cloneable {
 	@Override
 	public TetrisShape rotateLeft() {
 		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() <= 7))
-			setShape(getShape(), this.getRotationAngle().getLeft());
+				&& (getShape().ordinal() <= 7)) {
+			setShape(getShape(), this.getRotationAngle().getLeft(), getFill());
+			clearBoardFill();
+		}
 		return this;
 	}
 
@@ -272,8 +240,10 @@ public class TetrisShape extends Shape implements Cloneable {
 	@Override
 	public TetrisShape rotateRight() {
 		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() <= 7))
-			setShape(getShape(), this.getRotationAngle().getRight());
+				&& (getShape().ordinal() <= 7)) {
+			setShape(getShape(), this.getRotationAngle().getRight(), getFill());
+			clearBoardFill();
+		}
 		return this;
 	}
 

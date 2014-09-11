@@ -20,9 +20,9 @@ public class Obstacle extends Shape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] obstaclesTable = new int[][][] {
-			{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // Type0
-			{ { 1, 0 }, { 0, 0 }, { 0, 1 } }, // Type1
-			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, // Type2
+			{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // 0 - square
+			{ { 1, 0 }, { 0, 0 }, { 0, 1 } }, // 1 - corner
+			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, // 2 - rectangle
 	}; //
 
 	/**
@@ -33,8 +33,7 @@ public class Obstacle extends Shape {
 	 */
 	public Obstacle(int type) {
 		super(obstaclesTable[type].length);
-		this.type = type;
-		setType(type);
+		setType(type, RotationAngle.d0, Cell.Full);
 	}
 
 	/**
@@ -47,7 +46,7 @@ public class Obstacle extends Shape {
 	 * @param fill
 	 *            type of fill of the obstacle
 	 */
-	public Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
+	private Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < obstaclesTable[type].length; i++) {
 			setX(i, obstaclesTable[type][i][0]);
 			setY(i, obstaclesTable[type][i][1]);
@@ -88,29 +87,6 @@ public class Obstacle extends Shape {
 	}
 
 	/**
-	 * Selection of the obstacle (with type of fill is {@code Full})
-	 * 
-	 * @param type
-	 *            type of the obstacle
-	 * @param rotationAngle
-	 *            rotation angle of the obstacle
-	 */
-	public Obstacle setType(int type, RotationAngle rotationAngle) {
-		return setType(type, rotationAngle, Cell.Full);
-	}
-
-	/**
-	 * Selection of the obstacle (without rotation and type of fill is
-	 * {@code Full})
-	 * 
-	 * @param type
-	 *            type of the obstacle
-	 */
-	public Obstacle setType(int type) {
-		return setType(type, RotationAngle.d0, Cell.Full);
-	}
-
-	/**
 	 * @return type of the obstacle
 	 */
 	public int getType() {
@@ -122,33 +98,33 @@ public class Obstacle extends Shape {
 	}
 
 	/**
-	 * Selection of a random obstacle
+	 * Get instance of a random obstacle
 	 */
-	public Obstacle setRandomType() {
+	public static Obstacle getRandomTypeInstance() {
 		Random r = new Random();
 		int x = r.nextInt(obstaclesTable.length - 1) + 1;
-		return setType(x);
+		return new Obstacle(x);
 	}
 
 	/**
-	 * Selection of a random rotation angle
+	 * Set a random rotation angle
 	 */
 	public Obstacle setRandomRotate() {
 		Random r = new Random();
 		int x = Math.abs(r.nextInt()) % 4;
 		RotationAngle[] values = RotationAngle.values();
-		return setType(getType(), values[x]);
+		return setType(getType(), values[x], getFill());
 	}
 
 	/**
-	 * Selection of a {@link #setRandomShape random obstacle} and a
+	 * Get instance of a {@link #setRandomShape random obstacle} and a
 	 * {@link #setRandomRotate random rotation angle}
 	 * 
 	 * @see #setRandomShape
 	 * @see #setRandomRotate
 	 */
-	public Obstacle setRandomShapeAndRotate() {
-		return setRandomType().setRandomRotate();
+	public static Obstacle setRandomShapeAndRotate() {
+		return getRandomTypeInstance().setRandomRotate();
 	}
 
 	@Override

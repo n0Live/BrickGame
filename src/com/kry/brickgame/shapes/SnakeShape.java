@@ -72,7 +72,7 @@ public class SnakeShape extends Shape {
 	/**
 	 * Gets the maximum possible length of the snake
 	 */
-	public int getMaxLength() {
+	public static int getMaxLength() {
 		return MAX_LENGTH;
 	}
 
@@ -102,7 +102,7 @@ public class SnakeShape extends Shape {
 	 *            the specified direction
 	 * @return the opposite direction
 	 */
-	public RotationAngle getOppositeDirection(RotationAngle direction) {
+	public static RotationAngle getOppositeDirection(RotationAngle direction) {
 		return direction.getRight().getRight();
 	}
 
@@ -116,7 +116,7 @@ public class SnakeShape extends Shape {
 	public SnakeShape eatApple(RotationAngle direction) {
 		SnakeShape newSnake = this.clone();
 
-		if (newSnake.getLength() != newSnake.getMaxLength()) {
+		if (newSnake.getLength() != getMaxLength()) {
 			int shiftX = getShiftX(direction);
 			int shiftY = getShiftY(direction);
 
@@ -175,7 +175,7 @@ public class SnakeShape extends Shape {
 	 *            direction of movement of the snake
 	 * @return the offset for the x-coordinate
 	 */
-	public int getShiftX(RotationAngle direction) {
+	public static int getShiftX(RotationAngle direction) {
 		switch (direction) {
 		case d0:
 			return 0;
@@ -197,7 +197,7 @@ public class SnakeShape extends Shape {
 	 *            direction of movement of the snake
 	 * @return the offset for the y-coordinate
 	 */
-	public int getShiftY(RotationAngle direction) {
+	public static int getShiftY(RotationAngle direction) {
 		switch (direction) {
 		case d0:
 			return 1;

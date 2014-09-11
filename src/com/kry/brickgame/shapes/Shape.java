@@ -56,10 +56,6 @@ public class Shape {
 	 * Type of fill of the figure
 	 */
 	private Cell fill;
-	/**
-	 * Number of the points of the figure
-	 */
-	private int length;
 
 	/**
 	 * A set of coordinates of a points of a figures:
@@ -70,17 +66,16 @@ public class Shape {
 	/**
 	 * Constructor of the shape
 	 * 
-	 * @param maxLength
+	 * @param length
 	 *            maximal number of the points of the figure
 	 * @param rotationAngle
 	 *            rotation angle of the figure
 	 * @param fill
 	 *            type of fill of the figure
 	 */
-	public Shape(int maxLength, int length, RotationAngle rotationAngle,
+	public Shape(int length, RotationAngle rotationAngle,
 			Cell fill) {
-		this.coords = new int[maxLength][2];
-		this.length = length;
+		this.coords = new int[length][2];
 		this.rotationAngle = rotationAngle;
 		this.fill = fill;
 	}
@@ -88,12 +83,12 @@ public class Shape {
 	/**
 	 * Constructor of the shape
 	 * 
-	 * @param maxLength
+	 * @param length
 	 *            maximal number of the points of the figure
 	 * 
 	 */
-	public Shape(int maxLength) {
-		this(maxLength, maxLength, RotationAngle.d0, Cell.Empty);
+	public Shape(int length) {
+		this(length, RotationAngle.d0, Cell.Empty);
 	}
 
 	/**
@@ -166,7 +161,7 @@ public class Shape {
 	 *            new rotation angle of the figure
 	 * @return the figure after rotation
 	 */
-	public Shape setRotationAngle(RotationAngle rotationAngle) {
+	protected Shape setRotationAngle(RotationAngle rotationAngle) {
 		this.rotationAngle = rotationAngle;
 		return this;
 	}
@@ -217,7 +212,7 @@ public class Shape {
 	 */
 	public int minX() {
 		int result = x(0);
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			result = Math.min(result, x(i));
 		}
 		return result;
@@ -229,7 +224,7 @@ public class Shape {
 	 */
 	public int minY() {
 		int result = y(0);
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			result = Math.min(result, y(i));
 		}
 		return result;
@@ -241,7 +236,7 @@ public class Shape {
 	 */
 	public int maxX() {
 		int result = x(0);
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			result = Math.max(result, x(i));
 		}
 		return result;
@@ -253,7 +248,7 @@ public class Shape {
 	 */
 	public int maxY() {
 		int result = y(0);
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < getLength(); i++) {
 			result = Math.max(result, y(i));
 		}
 		return result;
@@ -263,11 +258,7 @@ public class Shape {
 	 * Getting points number of the current figure 
 	 */
 	public int getLength() {
-		return length;
-	}
-
-	protected void setLength(int length) {
-		this.length = length;
+		return coords.length;
 	}
 
 	/**
