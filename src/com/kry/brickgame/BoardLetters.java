@@ -195,7 +195,7 @@ public class BoardLetters extends Board {
 	 * @param str
 	 *            - string like "A", "B", "C", ...
 	 */
-	protected Letters stringToLetters(String str) {
+	protected static Letters stringToLetters(String str) {
 		Letters result = Letters.None;
 
 		try {
@@ -213,7 +213,7 @@ public class BoardLetters extends Board {
 	 * @param ch
 	 *            - character like 'A', 'B', 'C', ...
 	 */
-	public Letters charToLetters(char ch) {
+	public static Letters charToLetters(char ch) {
 		Letters result = Letters.None;
 
 		try {

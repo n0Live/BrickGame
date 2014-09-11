@@ -111,7 +111,7 @@ public class BoardNumbers extends Board {
 	 * @param str
 	 *            - string like "0" .. "9"
 	 */
-	protected Numbers stringToNumbers(String str) {
+	protected static Numbers stringToNumbers(String str) {
 		Numbers result = Numbers.None;
 
 		try {
@@ -129,7 +129,7 @@ public class BoardNumbers extends Board {
 	 * @param i
 	 *            - integer from 0 to 9
 	 */
-	public Numbers intToNumbers(int i) {
+	public static Numbers intToNumbers(int i) {
 		return stringToNumbers(String.valueOf(i));
 	}
 

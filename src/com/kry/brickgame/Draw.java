@@ -201,7 +201,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @return the width of the board in pixels
 	 * @see #boardHeightInPixels
 	 */
-	int boardWidthInPixels(Board board) {
+	private static int boardWidthInPixels(Board board) {
 		return board.getWidth() * SQUARE_SIZE;
 	}
 
@@ -214,7 +214,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @return the height of the board in pixels
 	 * @see #boardWidthInPixels
 	 */
-	int boardHeightInPixels(Board board) {
+	private static int boardHeightInPixels(Board board) {
 		return board.getHeight() * SQUARE_SIZE;
 	}
 
@@ -267,7 +267,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @param height
 	 *            height of the created canvas
 	 */
-	private BufferedImage initCanvas(int width, int height) {
+	private static BufferedImage initCanvas(int width, int height) {
 		return new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	}
 
@@ -280,7 +280,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @return {@code null} if the board is not defined, otherwise - the new
 	 *         canvas
 	 */
-	private BufferedImage initCanvas(Board board) {
+	private static BufferedImage initCanvas(Board board) {
 		if (board == null)
 			return null;
 
@@ -297,7 +297,7 @@ public class Draw extends JPanel implements GameListener {
 	 * @param bgColor
 	 *            the background color
 	 */
-	protected void clearCanvas(BufferedImage canvas, Color bgColor) {
+	protected static void clearCanvas(BufferedImage canvas, Color bgColor) {
 		if (canvas == null)
 			return;
 
