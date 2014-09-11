@@ -30,19 +30,19 @@ public class TetrisGame extends Game {
 	/**
 	 * The current figure
 	 */
-	private TetrisShape curPiece;
+	protected TetrisShape curPiece;
 	/**
 	 * The "next" figure
 	 */
-	private TetrisShape nextPiece;
+	protected TetrisShape nextPiece;
 	/**
 	 * X-coordinate position on the board of the current figure
 	 */
-	private int curX;
+	protected int curX;
 	/**
 	 * Y-coordinate position on the board of the current figure
 	 */
-	private int curY;
+	protected int curY;
 
 	/**
 	 * The Tetris
@@ -572,7 +572,7 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board with the figure
 	 */
-	private static Board drawShape(Board board, int x, int y,
+	protected static Board drawShape(Board board, int x, int y,
 			TetrisShape piece, Cell fill) {
 		Cell[] boardFill = new Cell[piece.getLength()];
 
@@ -613,7 +613,7 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board without the figure
 	 */
-	private static Board eraseShape(Board board, int x, int y, TetrisShape piece) {
+	protected static Board eraseShape(Board board, int x, int y, TetrisShape piece) {
 		if (piece.getShape() == Tetrominoes.NoShape)
 			return board;
 
@@ -656,6 +656,9 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
+		Status currentStatus = getStatus(); 
+		setStatus(Status.DoSomeWork);
+
 		if (curPiece.getShape() == Tetrominoes.SuperPoint) {// super point
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		} else if ((curPiece.getShape() == Tetrominoes.SuperGun)
@@ -673,6 +676,8 @@ public class TetrisGame extends Game {
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
 
+		setStatus(currentStatus);
+
 		isFallingFinished = true;
 
 		removeFullLines();
@@ -686,6 +691,9 @@ public class TetrisGame extends Game {
 	 * Removal of a filled lines
 	 */
 	private int removeFullLines() {
+		Status currentStatus = getStatus();
+		setStatus(Status.DoSomeWork);
+		
 		Board board = getBoard();
 
 		int numFullLines = 0;
@@ -744,6 +752,8 @@ public class TetrisGame extends Game {
 				break;
 			}
 		}
+		
+		setStatus(currentStatus);
 		return numFullLines;
 	}
 
