@@ -93,7 +93,7 @@ public class SnakeGame extends Game {
 					}
 				}
 				// when the snake has reached the maximum length
-				if (snake.getLength() >= snake.getMaxLength()) {
+				if (snake.getLength() >= SnakeShape.getMaxLength()) {
 					// increases level and load it
 					animatedClearBoard(true);// fast
 					incLevel();
@@ -124,18 +124,26 @@ public class SnakeGame extends Game {
 	/**
 	 * Generating borders for the toroidal field
 	 */
-	private void prepareBorders() {
+	private void prepareBorders(boolean hasRandomGates) {
 		Cell fill;
 
 		// generates the vertical borders
 		for (int i = 0; i < boardHeight; i++) {
-			fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates) {
+				Random r = new Random();
+				fill = (r.nextInt(boardHeight) == 0) ? Cell.Empty : Cell.Full;
+			} else
+				fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
 			getBoard().setCell(fill, 0, i);
 			getBoard().setCell(fill, boardWidth - 1, i);
 		}
 		// generates the horizontal borders
 		for (int i = 0; i < boardWidth; i++) {
-			fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates) {
+				Random r = new Random();
+				fill = (r.nextInt(boardWidth) == 0) ? Cell.Empty : Cell.Full;
+			} else
+				fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
 			getBoard().setCell(fill, i, 0);
 			getBoard().setCell(fill, i, boardHeight - 1);
 		}
@@ -271,8 +279,10 @@ public class SnakeGame extends Game {
 
 		tryMove(snake.getDirection());
 
-		if ((getType() == 2) || (getType() == 4))
-			prepareBorders();
+		if (getType() == 2)
+			prepareBorders(false);
+		else if (getType() == 4)
+			prepareBorders(true);
 		if (getType() < 3)
 			loadPreparedObstacle();
 		else
@@ -292,7 +302,7 @@ public class SnakeGame extends Game {
 	 * 
 	 * @return - the board with the snake
 	 */
-	private Board drawSnake(Board board, SnakeShape snake, int x, int y) {
+	private static Board drawSnake(Board board, SnakeShape snake, int x, int y) {
 		for (int i = 0; i < snake.getLength(); i++) {
 			// draws the snake on the board
 			// the head of the snake is blinking
@@ -316,7 +326,7 @@ public class SnakeGame extends Game {
 	private boolean tryMove(RotationAngle direction) {
 		int newX;
 		int newY;
-		boolean isReversal = (direction == snake.getOppositeDirection(snake
+		boolean isReversal = (direction == SnakeShape.getOppositeDirection(snake
 				.getDirection()));
 
 		if (isReversal) {
@@ -389,7 +399,7 @@ public class SnakeGame extends Game {
 			// increases score
 			setScore(getScore() + 1);
 			// add a new apple
-			if (newSnake.getLength() < newSnake.getMaxLength())
+			if (newSnake.getLength() < SnakeShape.getMaxLength())
 				addApple();
 		}
 
@@ -432,7 +442,7 @@ public class SnakeGame extends Game {
 			return snake.x(snake.tail());
 		} else {
 			// otherwise gets the offset in dependence on the direction
-			return snake.getShiftX(direction);
+			return SnakeShape.getShiftX(direction);
 		}
 	}
 
@@ -450,7 +460,7 @@ public class SnakeGame extends Game {
 			return snake.y(snake.tail());
 		} else {
 			// otherwise gets the offset in dependence on the direction
-			return snake.getShiftY(direction);
+			return SnakeShape.getShiftY(direction);
 		}
 	}
 

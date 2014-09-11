@@ -122,11 +122,7 @@ public class TetrisGame extends Game {
 	 */
 	public TetrisGame(int speed, int level, int type) {
 		super(speed, level, type);
-
 		setStatus(Status.None);
-
-		curPiece = new TetrisShape();
-		nextPiece = new TetrisShape();
 	}
 
 	/**
@@ -137,27 +133,30 @@ public class TetrisGame extends Game {
 		super.start();
 
 		// getLevel() - 1 - because on the first level doesn't need to add line
-		addLines(getLevel() - 1);
+		setBoard(addLines(getBoard(), 0, getLevel() - 1, true));
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
 
 		// Create the "next" figure
-		nextPiece.setRandomShapeAndRotate();
+		nextPiece = TetrisShape.getRandomShapeAndRotate();
 		newPiece();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			// dropping of a figure
-			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-				if (isFallingFinished) {
-					isFallingFinished = false;
-					newPiece();
-				} else {
-					oneLineDown();
+			if (getStatus() != Status.DoSomeWork) {
+				// dropping of a figure
+				if ((getStatus() != Status.Paused)
+						&& (elapsedTime(getSpeed(true)))) {
+					if (isFallingFinished) {
+						isFallingFinished = false;
+						newPiece();
+					} else {
+						oneLineDown();
+					}
 				}
+				// processing of key presses
+				processKeys();
 			}
-			// processing of key presses
-			processKeys();
 		}
 	}
 
@@ -165,7 +164,7 @@ public class TetrisGame extends Game {
 	 * Creation of a new figure
 	 */
 	private void newPiece() {
-		curPiece.setShape(Tetrominoes.NoShape);
+		curPiece = new TetrisShape(Tetrominoes.NoShape);
 
 		// X-coordinate - middle of the board
 		curX = boardWidth / 2 - 1;
@@ -178,167 +177,229 @@ public class TetrisGame extends Game {
 		} else {
 			Random r = new Random();
 
-			// chance to drop a super figure is 1 to 8
-			if (r.nextInt(8) == 0) {
-				switch (getType()) {
-				case 2:
-					nextPiece.setRandomSuperShape(new int[] { 0 });
-					break;
-				case 3:
-					nextPiece.setRandomSuperShape(new int[] { 1 });
-					break;
-				case 4:
-					nextPiece.setRandomSuperShape(new int[] { 0, 1 });
-					break;
-				case 5:
-					nextPiece.setRandomSuperShape(new int[] { 2 });
-					break;
-				case 6:
-					nextPiece.setRandomSuperShape(new int[] { 0, 2 });
-					break;
-				case 7:
-					nextPiece.setRandomSuperShape(new int[] { 1, 2 });
-					break;
-				case 8:
-					nextPiece.setRandomSuperShape(new int[] { 0, 1, 2 });
-					break;
-				case 9:
-					nextPiece.setRandomSuperShape(new int[] { 3 });
-					break;
-				case 10:
-					nextPiece.setRandomSuperShape(new int[] { 0, 3 });
-					break;
-				case 11:
-					nextPiece.setRandomSuperShape(new int[] { 1, 3 });
-					break;
-				case 12:
-					nextPiece.setRandomSuperShape(new int[] { 0, 1, 3 });
-					break;
-				case 13:
-					nextPiece.setRandomSuperShape(new int[] { 2, 3 });
-					break;
-				case 14:
-					nextPiece.setRandomSuperShape(new int[] { 0, 2, 3 });
-					break;
-				case 15:
-					nextPiece.setRandomSuperShape(new int[] { 1, 2, 3 });
-					break;
-				case 16:
-					nextPiece.setRandomSuperShape(new int[] { 0, 1, 2, 3 });
-					break;
-				case 17:
-				case 33:
-					nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 18:
-				case 34:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 19:
-				case 35:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 1 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 20:
-				case 36:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 1 });
-					break;
-				case 21:
-				case 37:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 2 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 22:
-				case 38:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 2 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 23:
-				case 39:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 1, 2 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 24:
-				case 40:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 1, 2 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 25:
-				case 41:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 26:
-				case 42:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 27:
-				case 43:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 1, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 28:
-				case 44:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 1, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 29:
-				case 45:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 2, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 30:
-				case 46:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 2, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 31:
-				case 47:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 1, 2, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				case 32:
-				case 48:
-					if (r.nextBoolean())
-						nextPiece.setRandomSuperShape(new int[] { 0, 1, 2, 3 });
-					else
-						nextPiece.setRandomShapeAndRotate().setFill(Cell.Blink);
-					break;
-				default:
-					nextPiece.setRandomShapeAndRotate();
-					break;
+			switch (getType()) {
+			case 2:
+				// (1,2,3,4,5,6,7) - ordinal shapes, (shape >= 8) - super shapes
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8 });
+				break;
+			case 3:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 9 });
+				break;
+			case 4:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 9 });
+				break;
+			case 5:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 10 });
+				break;
+			case 6:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 10 });
+				break;
+			case 7:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 9, 10 });
+				break;
+			case 8:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+				break;
+			case 9:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 11 });
+				break;
+			case 10:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 11 });
+				break;
+			case 11:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 9, 11 });
+				break;
+			case 12:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 9, 11 });
+				break;
+			case 13:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 10, 11 });
+				break;
+			case 14:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 10, 11 });
+				break;
+			case 15:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 9, 10, 11 });
+				break;
+			case 16:
+				nextPiece = TetrisShape.getRandomShapeOfSpecified(new int[] {
+						1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 });
+				break;
+			case 17:
+			case 33:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
 				}
-			} else
-				nextPiece.setRandomShapeAndRotate();
+				break;
+			case 18:
+			case 34:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8 });
+				break;
+			case 19:
+			case 35:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 9 });
+				break;
+			case 20:
+			case 36:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 9 });
+				break;
+			case 21:
+			case 37:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 10 });
+				break;
+			case 22:
+			case 38:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 10 });
+				break;
+			case 23:
+			case 39:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 9, 10 });
+				break;
+			case 24:
+			case 40:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 9, 10 });
+				break;
+			case 25:
+			case 41:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 11 });
+				break;
+			case 26:
+			case 42:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 11 });
+				break;
+			case 27:
+			case 43:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 9, 11 });
+				break;
+			case 28:
+			case 44:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 9, 11 });
+				break;
+			case 29:
+			case 45:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 10, 11 });
+				break;
+			case 30:
+			case 46:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 10, 11 });
+				break;
+			case 31:
+			case 47:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 9, 10, 11 });
+				break;
+			case 32:
+			case 48:
+				if (r.nextInt(7) == 0) {
+					nextPiece = TetrisShape.getRandomShapeAndRotate();
+					nextPiece.setFill(Cell.Blink);
+				} else
+					nextPiece = TetrisShape
+							.getRandomShapeOfSpecified(new int[] { 1, 2, 3, 4,
+									5, 6, 7, 8, 9, 10, 11 });
+				break;
+			default:
+				nextPiece = TetrisShape.getRandomShapeAndRotate();
+				break;
+			}
 
 			clearPreview();
 
@@ -439,8 +500,8 @@ public class TetrisGame extends Game {
 	 * @return {@code true} if there is a collision
 	 * @see Game#checkCollision
 	 */
-	private boolean specialCheckCollision(Board board, TetrisShape piece,
-			int x, int y) {
+	private static boolean specialCheckCollision(Board board,
+			TetrisShape piece, int x, int y) {
 		try {
 			boolean isNotCollision = false;
 			int board_x;
@@ -511,8 +572,8 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board with the figure
 	 */
-	private Board drawShape(Board board, int x, int y, TetrisShape piece,
-			Cell fill) {
+	private static Board drawShape(Board board, int x, int y,
+			TetrisShape piece, Cell fill) {
 		Cell[] boardFill = new Cell[piece.getLength()];
 
 		for (int i = 0; i < piece.getLength(); i++) {
@@ -552,7 +613,7 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board without the figure
 	 */
-	private Board eraseShape(Board board, int x, int y, TetrisShape piece) {
+	private static Board eraseShape(Board board, int x, int y, TetrisShape piece) {
 		if (piece.getShape() == Tetrominoes.NoShape)
 			return board;
 
@@ -595,31 +656,22 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
-		// if the guns
-		if ((curPiece.getShape() == Tetrominoes.SuperGun)
-				|| (curPiece.getShape() == Tetrominoes.SuperMudGun)) {
-			// erase it
+		if (curPiece.getShape() == Tetrominoes.SuperPoint) {// super point
+			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
+		} else if ((curPiece.getShape() == Tetrominoes.SuperGun)
+				|| (curPiece.getShape() == Tetrominoes.SuperMudGun)) { // guns
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
-			// if the bomb
-		} else if (curPiece.getShape() == Tetrominoes.SuperBomb) {
-			// explode it
+		} else if (curPiece.getShape() == Tetrominoes.SuperBomb) {// bomb
 			kaboom(curX + 1, curY + 1);
-			// if the liquid (crumbly) figure
 		} else if ((getType() >= 17) && (getType() <= 32)
-				&& (curPiece.getFill() == Cell.Blink)) {
+				&& (curPiece.getFill() == Cell.Blink)) {// liquid figure
 			flowDown(getBoard(), curX, curY, curPiece, false);
-			// if the acid figure
 		} else if ((getType() >= 32) && (getType() <= 48)
-				&& (curPiece.getFill() == Cell.Blink)) {
+				&& (curPiece.getFill() == Cell.Blink)) {// acid figure
 			flowDown(getBoard(), curX, curY, curPiece, true);
-		} else {
-			// add the figure to the board
-			// Cells.Full instead curPiece.getFill() because is Blink should
-			// change to Full when lying on the board
+		} else { // ordinal figure
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
-
-		// curPiece.setShape(Tetrominoes.NoShape);
 
 		isFallingFinished = true;
 
@@ -628,7 +680,6 @@ public class TetrisGame extends Game {
 		// check for game over
 		if ((curY + curPiece.maxY()) >= boardHeight)
 			gameOver();
-
 	}
 
 	/**
@@ -653,7 +704,7 @@ public class TetrisGame extends Game {
 				numFullLines++;
 
 				// animated clearing of a full line
-				animatedClearLine(y, curX);
+				animatedClearLine(getBoard(), curX, y);
 
 				// if mud gun, than erase it before dropping downs lines
 				if (curPiece.getShape() == Tetrominoes.SuperMudGun)
@@ -697,101 +748,10 @@ public class TetrisGame extends Game {
 	}
 
 	/**
-	 * Animated clearing of a full line
-	 * 
-	 * @param line
-	 *            number of the line to be removed (y-coordinate)
-	 * @param startPoint
-	 *            point, on both sides of which cells will be removed
-	 *            (x-coordinate)
-	 */
-	private void animatedClearLine(int line, int startPoint) {
-		final Board board = getBoard();
-
-		int x1 = startPoint - 1; // left direction
-		int x2 = startPoint; // right direction
-
-		while ((x1 >= 0) || (x2 < boardWidth)) {
-			if (x1 >= 0)
-				board.setCell(Cell.Empty, x1--, line);
-			if (x2 < boardWidth)
-				board.setCell(Cell.Empty, x2++, line);
-
-			sleep(ANIMATION_DELAY);
-			setBoard(board);
-		}
-	}
-
-	/**
-	 * Adds randomly generated lines at the bottom of the board
-	 * 
-	 * @param linesCount
-	 *            count of added lines
-	 * @return if {@code linesCount < 0} or when adding the lines, the board
-	 *         reaches the upper border, then return {@code false}, otherwise
-	 *         the lines adds and returns {@code true}
-	 */
-	private boolean addLines(int linesCount) {
-		if (linesCount < 1)
-			return false;
-
-		Board board = getBoard();
-
-		// checks whether there are full cells at a distance of
-		// <i>linesCount</i> from the top of the board
-		for (int i = 0; i < boardWidth; i++) {
-			if (board.getCell(i, (boardHeight - linesCount)) == Cell.Full)
-				return false;
-		}
-
-		Random r = new Random();
-		Cell newLines[][] = new Cell[linesCount][boardWidth];
-
-		// picks up the lines of the board
-		for (int y = boardHeight - 1; y >= linesCount; y--) {
-			for (int x = 0; x < boardWidth; x++)
-				board.setCell(board.getCell(x, y - 1), x, y);
-		}
-
-		// generates a new lines
-		for (int line = 0; line < linesCount; line++) {
-			boolean hasEmpty = false;
-			boolean hasFull = false;
-
-			for (int i = 0; i < boardWidth; i++) {
-				if ((Math.abs(r.nextInt()) % 2) == 0) {
-					newLines[line][i] = Cell.Empty;
-					hasEmpty = true;
-				} else {
-					newLines[line][i] = Cell.Full;
-					hasFull = true;
-				}
-			}
-
-			// if all the cells were empty, creates a full one in a random place
-			// of the line
-			if (!hasEmpty || !hasFull) {
-				newLines[line][Math.abs(r.nextInt(boardWidth))] = ((!hasEmpty) ? Cell.Empty
-						: Cell.Full);
-			}
-
-			// adds the created line to the board
-			board.setLine(newLines[line], line);
-		}
-
-		setBoard(board);
-		return true;
-	}
-
-	/**
 	 * Adds one randomly generated line at the bottom of the board
-	 * 
-	 * @return if when adding the line, the board reaches the upper border, then
-	 *         return {@code false}, otherwise the line adds and returns
-	 *         {@code true}
 	 */
-	private boolean addLines() {
-		return addLines(1);
+	protected void addLines() {
+		setBoard(addLines(getBoard(), 0, 1, true));
 	}
 
 	/**
@@ -873,7 +833,7 @@ public class TetrisGame extends Game {
 				drawPoint(board, board_x, board_y, Cell.Empty);
 				board_y--;
 				setBoard(board);
-				sleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY * 2);
 			}
 			if (isAcid && (board_y > 0)) {
 				drawPoint(board, board_x, board_y - 1, piece.getFill());
