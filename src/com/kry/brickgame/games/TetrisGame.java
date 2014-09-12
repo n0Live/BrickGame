@@ -26,7 +26,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
-	private volatile boolean isFallingFinished;
+	private boolean isFallingFinished;
 	/**
 	 * The current figure
 	 */
@@ -143,21 +143,24 @@ public class TetrisGame extends Game {
 		newPiece();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if (getStatus() != Status.DoSomeWork) {
-				// dropping of a figure
-				if ((getStatus() != Status.Paused)
-						&& (elapsedTime(getSpeed(true)))) {
-					if (isFallingFinished) {
-						isFallingFinished = false;
-						newPiece();
-					} else {
-						oneLineDown();
-					}
-				}
-				// processing of key presses
-				processKeys();
+			doRepetitiveWork();
+		}
+	}
+
+	/**
+	 * Do the work that needs to be repeated until the end of the game
+	 */
+	protected void doRepetitiveWork() {
+		if ((getStatus() == Status.Running) && (elapsedTime(getSpeed(true)))) {
+			if (isFallingFinished) {
+				isFallingFinished = false;
+				newPiece();
+			} else {
+				oneLineDown();
 			}
 		}
+		// processing of key presses
+		processKeys();
 	}
 
 	/**
@@ -613,7 +616,8 @@ public class TetrisGame extends Game {
 	 * 
 	 * @return the board without the figure
 	 */
-	protected static Board eraseShape(Board board, int x, int y, TetrisShape piece) {
+	protected static Board eraseShape(Board board, int x, int y,
+			TetrisShape piece) {
 		if (piece.getShape() == Tetrominoes.NoShape)
 			return board;
 
@@ -656,9 +660,6 @@ public class TetrisGame extends Game {
 	 * Ending of falling of the figure
 	 */
 	private void pieceDropped() {
-		Status currentStatus = getStatus(); 
-		setStatus(Status.DoSomeWork);
-
 		if (curPiece.getShape() == Tetrominoes.SuperPoint) {// super point
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		} else if ((curPiece.getShape() == Tetrominoes.SuperGun)
@@ -676,8 +677,6 @@ public class TetrisGame extends Game {
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
 
-		setStatus(currentStatus);
-
 		isFallingFinished = true;
 
 		removeFullLines();
@@ -691,9 +690,6 @@ public class TetrisGame extends Game {
 	 * Removal of a filled lines
 	 */
 	private int removeFullLines() {
-		Status currentStatus = getStatus();
-		setStatus(Status.DoSomeWork);
-		
 		Board board = getBoard();
 
 		int numFullLines = 0;
@@ -752,16 +748,22 @@ public class TetrisGame extends Game {
 				break;
 			}
 		}
-		
-		setStatus(currentStatus);
 		return numFullLines;
 	}
 
 	/**
 	 * Adds one randomly generated line at the bottom of the board
 	 */
-	protected void addLines() {
-		setBoard(addLines(getBoard(), 0, 1, true));
+	protected boolean addLines() {
+		Board board = getBoard().clone();
+
+		board = addLines(board, 0, 1, true);
+
+		if (!board.equals(getBoard())) {
+			setBoard(board);
+			return true;
+		} else
+			return false;
 	}
 
 	/**
