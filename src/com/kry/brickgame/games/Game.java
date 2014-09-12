@@ -851,7 +851,7 @@ public class Game extends Thread { // implements Runnable
 				board.setRow(board.getRow(y - 1), y);
 			}
 		} else {
-			for (int y = 0; y < (fromLine - (linesCount - 1)) - 1; y++) {
+			for (int y = 0; y < (fromLine - (linesCount - 1)); y++) {
 				board.setRow(board.getRow(y + 1), y);
 			}
 		}
