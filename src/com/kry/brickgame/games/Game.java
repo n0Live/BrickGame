@@ -820,23 +820,26 @@ public class Game extends Thread { // implements Runnable
 	 */
 	protected static Board addLines(Board board, int fromLine, int linesCount,
 			boolean isUpwardDirection) {
+
 		if ((linesCount < 1)//
-				|| (fromLine < 0) || (fromLine >= board.getHeight()))//
+				|| ((isUpwardDirection) && //
+				((fromLine + (linesCount - 1)) > board.getHeight()))//
+				//
+				|| ((!isUpwardDirection) && //
+				((fromLine - (linesCount - 1)) < 0)))
 			return board;
 
 		// checks whether there are full cells at a distance of
 		// <i>linesCount</i> from the top or the bottom of the board
 		for (int i = 0; i < board.getWidth(); i++) {
-			if (isUpwardDirection) {
-				if (((fromLine + linesCount - 1) > board.getHeight())
-						|| (board.getCell(i,
-								(board.getHeight() - 1 - linesCount)) == Cell.Full))
-					return board;
-			} else {
-				if (((fromLine - linesCount + 1) < 0)
-						|| (board.getCell(i, (linesCount - 1)) == Cell.Full))
-					return board;
-			}
+			if (//
+					((isUpwardDirection) && //
+					(board.getCell(i, ((board.getHeight() - 1) - linesCount)) == Cell.Full))//
+					//
+					|| ((!isUpwardDirection) && //
+					(board.getCell(i, (linesCount - 1)) == Cell.Full))//
+			)
+				return board;
 		}
 
 		Random r = new Random();
@@ -844,14 +847,12 @@ public class Game extends Thread { // implements Runnable
 
 		// picks up or downs the lines of the board
 		if (isUpwardDirection) {
-			for (int y = board.getHeight() - 1; y > fromLine + (linesCount - 1); y--) {
-				for (int x = 0; x < board.getWidth(); x++)
-					board.setCell(board.getCell(x, y - 1), x, y);
+			for (int y = (board.getHeight() - 1) - 1; y > fromLine + (linesCount - 1); y--) {
+				board.setRow(board.getRow(y - 1), y);
 			}
 		} else {
-			for (int y = 1; y < fromLine - (linesCount - 1); y++) {
-				for (int x = 0; x < board.getWidth(); x++)
-					board.setCell(board.getCell(x, y + 1), x, y);
+			for (int y = 0; y < (fromLine - (linesCount - 1)) - 1; y++) {
+				board.setRow(board.getRow(y + 1), y);
 			}
 		}
 
