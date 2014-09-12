@@ -8,9 +8,17 @@ import java.util.TimerTask;
  * 
  */
 public class TetrisGameJ extends TetrisGame {
+	final int TIME_BETWEEN_ADDING_LINE = 30;
+	volatile int time;
+	volatile boolean isTimeToAddLine;
 
+	/**
+	 * The Tetris with the addition of new lines every few seconds
+	 */
 	public TetrisGameJ(int speed, int level, int type) {
 		super(speed, level, type);
+		isTimeToAddLine = false;
+		time = TIME_BETWEEN_ADDING_LINE;
 	}
 
 	@Override
@@ -18,23 +26,16 @@ public class TetrisGameJ extends TetrisGame {
 
 		// create timer for addition of lines
 		Timer addLineTimer = new Timer("AddLineTicTac", true);
-		addLineTimer.schedule(new TimerTask() {
-			final int TIME_BETWEEN_ADDING_LINE = 5;
-			int time = TIME_BETWEEN_ADDING_LINE;
-
+		addLineTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				if (getStatus() == Status.Running) {
-					setStatus(Status.DoSomeWork);
-					fireInfoChanged("-" + String.valueOf(time) + "-");
+					fireInfoChanged("-" + String.format("%02d", time) + "-");
 					if (time == 0) {
-						addLines();
-						time = TIME_BETWEEN_ADDING_LINE;
-						sleep(ANIMATION_DELAY);
+						isTimeToAddLine = true;
 					} else {
 						time--;
 					}
-					setStatus(Status.Running);
 				}
 			}
 		}, 0, 1000);
@@ -45,11 +46,24 @@ public class TetrisGameJ extends TetrisGame {
 	}
 
 	@Override
-	protected void addLines() {
-		super.addLines();
-		// the current y-coordinate lifts by one cell upward
-		if (curY < boardHeight)
+	protected void doRepetitiveWork() {
+		// if it's time to add a line, trying to add a line
+		if ((isTimeToAddLine) && (tryAddLine())) {
+			time = TIME_BETWEEN_ADDING_LINE;
+			isTimeToAddLine = false;
+		} else {
+			super.doRepetitiveWork();
+		}
+	}
+
+	protected boolean tryAddLine() {
+		if ((!checkBoardCollisionVertical(curPiece, curY + 1, true))
+				&& (addLines())) {
+			// the current y-coordinate lifts by one cell upward
 			curY++;
+			return true;
+		} else
+			return false;
 	}
 
 }
