@@ -96,79 +96,79 @@ public class GameSelector extends Game {
 		}
 		try {
 			gamesList.put('L',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameL"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('L', null);
 		}
 		try {
 			gamesList.put('M',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameM"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('M', null);
 		}
 		try {
 			gamesList.put('N',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameN"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('N', null);
 		}
 		try {
 			gamesList.put('O',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameO"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('O', null);
 		}
 		try {
 			gamesList.put('P',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameP"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('P', null);
 		}
 		try {
 			gamesList.put('Q',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameQ"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('Q', null);
 		}
 		try {
 			gamesList.put('R',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameR"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('R', null);
 		}
 		try {
 			gamesList.put('S',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameS"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('S', null);
 		}
 		try {
 			gamesList.put('T',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameT"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('T', null);
 		}
 		try {
 			gamesList.put('U',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameU"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('U', null);
 		}
 		try {
 			gamesList.put('V',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameV"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('V', null);
 		}
 		try {
 			gamesList.put('W',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameW"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('W', null);
 		}
 		try {
 			gamesList.put('X',
-					Class.forName("com.kry.brickgame.games.TetrisGame"));
+					Class.forName("com.kry.brickgame.games.TetrisGameX"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('X', null);
 		}
