@@ -123,6 +123,11 @@ public class TetrisGame extends Game {
 	 *            super bomb;
 	 *            <li>tetris with a acid figures, super point, super gun, super
 	 *            mud gun and super bomb.
+	 *            <li>tetris with a figures that can pass through an obstacles,
+	 *            super point, super gun, super mud gun and super bomb.
+	 *            <li>tetris with a super point, super gun, super mud gun, super
+	 *            bomb and randomly: liquid figures, acid figures or throughfall
+	 *            figures.
 	 */
 	public TetrisGame(int speed, int level, int type) {
 		super(speed, level, type);
@@ -674,7 +679,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Ending of falling of the figure
 	 */
-	private void pieceDropped() {
+	protected void pieceDropped() {
 		if (curPiece.getShape() == Tetrominoes.SuperPoint) {// super point
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		} else if ((curPiece.getShape() == Tetrominoes.SuperGun)

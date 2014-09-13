@@ -3,8 +3,15 @@ package com.kry.brickgame.games;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Tetrominoes;
 
+/**
+ * @author noLive
+ * 
+ */
 public class TetrisGameK extends TetrisGame {
 
+	/**
+	 * The Tetris with the changing of the figures instead of rotating
+	 */
 	public TetrisGameK(int speed, int level, int type) {
 		super(speed, level, type);
 	}
