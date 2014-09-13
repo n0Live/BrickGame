@@ -8,7 +8,7 @@ import com.kry.brickgame.Board.Cell;
  * @author noLive
  * 
  */
-public class Shape {
+public class Shape implements Cloneable {
 
 	/**
 	 * Rotation angle of a figure (in degrees)
@@ -32,7 +32,7 @@ public class Shape {
 		d270;
 
 		/**
-		 * The next clockwise rotation angle
+		 * The next counterclockwise rotation angle
 		 */
 		public RotationAngle getLeft() {
 			return this.ordinal() > 0 ? RotationAngle.values()[this.ordinal() - 1]
@@ -40,7 +40,7 @@ public class Shape {
 		}
 
 		/**
-		 * The next counterclockwise rotation angle
+		 * The next clockwise rotation angle
 		 */
 		public RotationAngle getRight() {
 			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle

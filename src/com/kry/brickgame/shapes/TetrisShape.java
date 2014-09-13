@@ -8,11 +8,13 @@ import com.kry.brickgame.Board.Cell;
  * @author noLive
  * 
  */
-public class TetrisShape extends Shape implements Cloneable {
+public class TetrisShape extends Shape {
 
 	public static enum Tetrominoes {
 		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, //
-		SuperPoint, SuperGun, SuperMudGun, SuperBomb
+		SuperPoint, SuperGun, SuperMudGun, SuperBomb;
+
+		public final static int REF_TO_FIRST_SUPER_SHAPE = 8;
 	};
 
 	private Tetrominoes shape;
@@ -40,11 +42,15 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	private Cell[] boardFill;
 
-	public TetrisShape(Tetrominoes shape) {
+	public TetrisShape(Tetrominoes shape, RotationAngle rotationAngle, Cell fill) {
 		super(getLength(shape));
 		boardFill = new Cell[getLength(shape)];
 		clearBoardFill();
-		setShape(shape, RotationAngle.d0, Cell.Full);
+		setShape(shape, rotationAngle, fill);
+	}
+
+	public TetrisShape(Tetrominoes shape) {
+		this(shape, RotationAngle.d0, Cell.Full);
 	}
 
 	/**
@@ -159,7 +165,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	 */
 	public static TetrisShape getRandomShapeInstance() {
 		Random r = new Random();
-		int x = r.nextInt(7) + 1;
+		int x = r.nextInt(Tetrominoes.REF_TO_FIRST_SUPER_SHAPE - 1) + 1;
 		Tetrominoes[] values = Tetrominoes.values();
 		return new TetrisShape(values[x]);
 	}
@@ -181,7 +187,7 @@ public class TetrisShape extends Shape implements Cloneable {
 
 		TetrisShape newTetrisShape = new TetrisShape(values[x]);
 		// for super figures
-		if (x >= 8)
+		if (x >= Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)
 			newTetrisShape.setFill(Cell.Blink);
 		return newTetrisShape;
 	}
@@ -222,12 +228,72 @@ public class TetrisShape extends Shape implements Cloneable {
 	}
 
 	/**
+	 * Get instance of next shape in {@link Tetrominoes}. If the {@code shape}
+	 * is the last item in Tetrominoes, then returns the first item with the
+	 * next rotation angle.
+	 * 
+	 * @param aTetrisShape the figure for which get the next
+	 * @param includingSuperShapes whether to include the super figure in the result
+	 * @return the next figure from {@code shape}
+	 */
+	public static TetrisShape getNextShape(TetrisShape aTetrisShape,
+			boolean includingSuperShapes) {
+		Tetrominoes shape;
+		RotationAngle rotationAngle;
+		
+		int lastItem = (includingSuperShapes) ? Tetrominoes.REF_TO_FIRST_SUPER_SHAPE
+				: Tetrominoes.values().length;
+		
+		if (aTetrisShape.getShape().ordinal() < lastItem - 1) {
+			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() + 1];
+			rotationAngle = aTetrisShape.getRotationAngle();
+		} else {
+			shape = Tetrominoes.values()[1];
+			rotationAngle = aTetrisShape.getRotationAngle().getRight();
+		}
+		
+		TetrisShape newTetrisShape = new TetrisShape(shape,
+				rotationAngle, aTetrisShape.getFill());
+		return newTetrisShape;
+	}
+
+	/**
+	 * Get instance of previous shape in {@link Tetrominoes}. If the {@code shape}
+	 * is the first item in Tetrominoes, then returns the last item with the
+	 * previous rotation angle.
+	 * 
+	 * @param aTetrisShape the figure for which get the previous
+	 * @param includingSuperShapes whether to include the super figure in the result
+	 * @return the previous figure from {@code shape}
+	 */
+	public static TetrisShape getPrevShape(TetrisShape aTetrisShape,
+			boolean includingSuperShapes) {
+		Tetrominoes shape;
+		RotationAngle rotationAngle;
+		
+		int lastItem = (includingSuperShapes) ? Tetrominoes.REF_TO_FIRST_SUPER_SHAPE
+				: Tetrominoes.values().length;
+		
+		if (aTetrisShape.getShape().ordinal() > 1) {
+			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() - 1];
+			rotationAngle = aTetrisShape.getRotationAngle();
+		} else {
+			shape = Tetrominoes.values()[lastItem];
+			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
+		}
+		
+		TetrisShape newTetrisShape = new TetrisShape(shape,
+				rotationAngle, aTetrisShape.getFill());
+		return newTetrisShape;
+	}
+
+	/**
 	 * Counterclockwise rotation of the figure
 	 */
 	@Override
 	public TetrisShape rotateLeft() {
 		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() <= 7)) {
+				&& (getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)) {
 			setShape(getShape(), this.getRotationAngle().getLeft(), getFill());
 			clearBoardFill();
 		}
@@ -240,7 +306,7 @@ public class TetrisShape extends Shape implements Cloneable {
 	@Override
 	public TetrisShape rotateRight() {
 		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() <= 7)) {
+				&& (getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)) {
 			setShape(getShape(), this.getRotationAngle().getRight(), getFill());
 			clearBoardFill();
 		}

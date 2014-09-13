@@ -408,7 +408,7 @@ public class TetrisGame extends Game {
 
 			int previewX, previewY;
 			// not for super figures
-			if (nextPiece.getShape().ordinal() <= 7) {
+			if (nextPiece.getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE) {
 				// X-coordinate:
 				// (middle of the board)-(half the width of the
 				// figure)-(offset of the leftmost x-coordinate from zero)

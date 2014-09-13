@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author noLive
  * 
  */
-public class Board {
+public class Board implements Cloneable {
 
 	/**
 	 * Cell type
