@@ -21,7 +21,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Number of subtypes
 	 */
-	public static final int subtypesNumber = 48;
+	public static final int subtypesNumber = 50;
 
 	/**
 	 * Flag to check the completion of falling of a figure
@@ -43,6 +43,10 @@ public class TetrisGame extends Game {
 	 * Y-coordinate position on the board of the current figure
 	 */
 	protected int curY;
+	/**
+	 * Type of a Super shape (0-2). Applies only when {@code type = 50}
+	 */
+	private int typeOfSuperShape;
 
 	/**
 	 * The Tetris
@@ -391,6 +395,8 @@ public class TetrisGame extends Game {
 				break;
 			case 32:
 			case 48:
+			case 49:
+			case 50:
 				if (r.nextInt(7) == 0) {
 					nextPiece = TetrisShape.getRandomShapeAndRotate();
 					nextPiece.setFill(Cell.Blink);
@@ -403,6 +409,9 @@ public class TetrisGame extends Game {
 				nextPiece = TetrisShape.getRandomShapeAndRotate();
 				break;
 			}
+
+			if ((getType() == 50) && (nextPiece.getFill() == Cell.Blink))
+				typeOfSuperShape = r.nextInt(3);
 
 			clearPreview();
 
@@ -463,8 +472,14 @@ public class TetrisGame extends Game {
 		if (checkBoardCollisionVertical(newPiece, newY, false))
 			return false;
 
-		// for super figures
-		if (newPiece.getShape() == Tetrominoes.SuperPoint) {
+		if (// for super point
+		(newPiece.getShape() == Tetrominoes.SuperPoint)//
+				|| ((newPiece.getShape().ordinal() <= 7) && //
+				// all blink shapes (except super) in type 49
+				(((getType() == 49) && (newPiece.getFill() == Cell.Blink))
+				// some blink shapes (except super) in type 50
+				|| ((getType() == 50) && (newPiece.getFill() == Cell.Blink) && (typeOfSuperShape == 2))))//
+		) {
 			if (checkCollision(board, newPiece, prepX, newY)) {
 				// checking whether filled line at the current (old) figure
 				if (checkForFullLines(getBoard(), curPiece, curX, curY))
@@ -666,11 +681,15 @@ public class TetrisGame extends Game {
 				|| (curPiece.getShape() == Tetrominoes.SuperMudGun)) { // guns
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
 		} else if (curPiece.getShape() == Tetrominoes.SuperBomb) {// bomb
-			kaboom(curX + 1, curY + 1);
-		} else if ((getType() >= 17) && (getType() <= 32)
+			kaboom(curX + 1, curY); // shift the epicenter to the bottom edge
+		} else if (//
+		(((getType() >= 17) && (getType() <= 32))//
+				|| ((getType() == 50) && (typeOfSuperShape == 0)))
 				&& (curPiece.getFill() == Cell.Blink)) {// liquid figure
 			flowDown(getBoard(), curX, curY, curPiece, false);
-		} else if ((getType() >= 32) && (getType() <= 48)
+		} else if (//
+		(((getType() >= 32) && (getType() <= 48))//
+				|| ((getType() == 50) && (typeOfSuperShape == 1)))
 				&& (curPiece.getFill() == Cell.Blink)) {// acid figure
 			flowDown(getBoard(), curX, curY, curPiece, true);
 		} else { // ordinal figure
@@ -802,12 +821,13 @@ public class TetrisGame extends Game {
 			return;
 
 		Board board = getBoard();
+
 		for (int i = y - 1; i >= 0; i--) {
 			if (board.getCell(x, i) != Cell.Empty) {
 				if (board.getCell(x, i + 1) == Cell.Empty) {
 					board.setCell(Cell.Full, x, i + 1);
-					break;
 				}
+				break;
 			}
 			// if there were no obstacles then create a full cell at the border
 			// of the board
