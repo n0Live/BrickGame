@@ -241,8 +241,8 @@ public class TetrisShape extends Shape {
 		Tetrominoes shape;
 		RotationAngle rotationAngle;
 		
-		int lastItem = (includingSuperShapes) ? Tetrominoes.REF_TO_FIRST_SUPER_SHAPE
-				: Tetrominoes.values().length;
+		int lastItem = (includingSuperShapes) ? Tetrominoes.values().length
+				: Tetrominoes.REF_TO_FIRST_SUPER_SHAPE;
 		
 		if (aTetrisShape.getShape().ordinal() < lastItem - 1) {
 			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() + 1];
@@ -271,8 +271,8 @@ public class TetrisShape extends Shape {
 		Tetrominoes shape;
 		RotationAngle rotationAngle;
 		
-		int lastItem = (includingSuperShapes) ? Tetrominoes.REF_TO_FIRST_SUPER_SHAPE
-				: Tetrominoes.values().length;
+		int lastItem = (includingSuperShapes) ? Tetrominoes.values().length
+				: Tetrominoes.REF_TO_FIRST_SUPER_SHAPE;
 		
 		if (aTetrisShape.getShape().ordinal() > 1) {
 			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() - 1];
