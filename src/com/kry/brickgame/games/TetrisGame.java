@@ -26,7 +26,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
-	private boolean isFallingFinished;
+	protected boolean isFallingFinished;
 	/**
 	 * The current figure
 	 */
@@ -454,7 +454,7 @@ public class TetrisGame extends Game {
 	 *            y-coordinate position on the board of the figure
 	 * @return {@code true} if the movement succeeded, otherwise {@code false}
 	 */
-	private boolean tryMove(TetrisShape newPiece, int newX, int newY) {
+	protected boolean tryMove(TetrisShape newPiece, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
 
@@ -474,7 +474,7 @@ public class TetrisGame extends Game {
 
 		if (// for super point
 		(newPiece.getShape() == Tetrominoes.SuperPoint)//
-				|| ((newPiece.getShape().ordinal() <= 7) && //
+				|| ((newPiece.getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE) && //
 				// all blink shapes (except super) in type 49
 				(((getType() == 49) && (newPiece.getFill() == Cell.Blink))
 				// some blink shapes (except super) in type 50
@@ -653,7 +653,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Dropping on one line down
 	 */
-	private void oneLineDown() {
+	protected void oneLineDown() {
 		if (!tryMove(curPiece, curX, curY - 1))
 			pieceDropped();
 	}
@@ -661,7 +661,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Rapidly drops of the figure to the bottom of the board
 	 */
-	private void dropDown() {
+	protected void dropDown() {
 		int newY = curY;
 		while (newY > 0) {
 			if (!tryMove(curPiece, curX, newY - 1))
@@ -794,7 +794,7 @@ public class TetrisGame extends Game {
 	 * @param y
 	 *            y-coordinate of the cell from where shot will be made
 	 */
-	private void shoot(int x, int y) {
+	protected void shoot(int x, int y) {
 		if ((y <= 0) || (y > boardHeight))
 			return;
 
@@ -816,7 +816,7 @@ public class TetrisGame extends Game {
 	 * @param y
 	 *            y-coordinate of the cell from where shot will be made
 	 */
-	private void mudShoot(int x, int y) {
+	protected void mudShoot(int x, int y) {
 		if ((y <= 0) || (y > boardHeight))
 			return;
 
@@ -899,7 +899,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Processing of key presses
 	 */
-	private void processKeys() {
+	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
@@ -915,9 +915,7 @@ public class TetrisGame extends Game {
 			return;
 		}
 
-		if (getStatus() != Status.Running)
-			return;
-		if (!isFallingFinished) {
+		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
 				sleep(ANIMATION_DELAY * 3);
