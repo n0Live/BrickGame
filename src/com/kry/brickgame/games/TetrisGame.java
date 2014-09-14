@@ -799,12 +799,15 @@ public class TetrisGame extends Game {
 			return;
 
 		Board board = getBoard();
+
 		for (int i = y - 1; i >= 0; i--) {
 			if (board.getCell(x, i) != Cell.Empty) {
 				board.setCell(Cell.Empty, x, i);
 				break;
 			}
 		}
+
+		setBoard(board);
 	}
 
 	/**
@@ -835,6 +838,9 @@ public class TetrisGame extends Game {
 				board.setCell(Cell.Full, x, 0);
 			}
 		}
+
+		setBoard(board);
+
 		// check for full lines
 		removeFullLines();
 	}
@@ -874,6 +880,7 @@ public class TetrisGame extends Game {
 				drawPoint(board, board_x, board_y - 1, Cell.Empty);
 			} else
 				drawPoint(board, board_x, board_y, Cell.Full);
+			setBoard(board);
 		}
 	}
 
