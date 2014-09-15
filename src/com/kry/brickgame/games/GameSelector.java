@@ -21,6 +21,7 @@ import com.kry.brickgame.splashes.SplashScreen;
  * @author noLive
  * 
  */
+@SuppressWarnings("rawtypes")
 public class GameSelector extends Game {
 	/**
 	 * List of games with the letters associated with them
@@ -321,6 +322,7 @@ public class GameSelector extends Game {
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean drawAll() {
 		// stop the splash animation timer
 		if (splashTimer != null)
