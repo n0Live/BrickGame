@@ -229,6 +229,7 @@ public class TetrisGame extends Game {
 	 *            the type of game
 	 * @return the new shape
 	 */
+	@SuppressWarnings("static-method")
 	protected TetrisShape setPieceFromType(int type) {
 		TetrisShape newPiece = null;
 		Random r = new Random();
