@@ -7,7 +7,7 @@ package com.kry.brickgame;
 public class BoardLetters extends Board {
 
 	enum Letters {
-		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X
+		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
 	};
 
 	public final static int width = 5;
@@ -168,7 +168,21 @@ public class BoardLetters extends Board {
 			{ E, F, E, F, E },//
 			{ E, E, F, E, E },//
 			{ E, F, E, F, E },//
-			{ F, E, E, E, F } } };
+			{ F, E, E, E, F } }, {
+			// Y
+			{ F, E, E, E, F },//
+			{ E, F, E, F, E },//
+			{ E, E, F, E, E },//
+			{ E, E, F, E, E },//
+			{ E, E, F, E, E } }, {
+			// Z
+			{ F, F, F, F, F },//
+			{ E, E, E, F, E },//
+			{ E, E, F, E, E },//
+			{ E, F, E, E, E },//
+			{ F, F, F, F, F } }
+
+	};
 
 	public BoardLetters() {
 		super(width, height);

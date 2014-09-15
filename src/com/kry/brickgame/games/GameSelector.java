@@ -172,6 +172,18 @@ public class GameSelector extends Game {
 		} catch (ClassNotFoundException e) {
 			gamesList.put('X', null);
 		}
+		try {
+			gamesList.put('Y',
+					Class.forName("com.kry.brickgame.games.PentixGame"));
+		} catch (ClassNotFoundException e) {
+			gamesList.put('Y', null);
+		}
+		try {
+			gamesList.put('Z',
+					Class.forName("com.kry.brickgame.games.PentixGameZ"));
+		} catch (ClassNotFoundException e) {
+			gamesList.put('Z', null);
+		}
 	}
 
 	/**
@@ -263,7 +275,7 @@ public class GameSelector extends Game {
 	 * Next allowable letter
 	 */
 	private void nextLetter() {
-		if (letter < 'X') {
+		if (letter < 'Z') {
 			letter++;
 		} else {
 			letter = 'A';
@@ -281,7 +293,7 @@ public class GameSelector extends Game {
 		if (letter > 'A') {
 			letter--;
 		} else {
-			letter = 'X';
+			letter = 'Z';
 		}
 		if (drawAll())
 			setStatus(Status.DoSomeWork);
