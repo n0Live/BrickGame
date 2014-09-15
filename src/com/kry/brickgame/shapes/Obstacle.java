@@ -20,7 +20,7 @@ public class Obstacle extends Shape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] obstaclesTable = new int[][][] {
-			{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }, // 0 - square
+			{ { 0, 0 } }, // 0 - square
 			{ { 1, 0 }, { 0, 0 }, { 0, 1 } }, // 1 - corner
 			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, // 2 - rectangle
 	}; //

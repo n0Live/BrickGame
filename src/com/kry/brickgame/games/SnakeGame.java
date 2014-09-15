@@ -110,13 +110,9 @@ public class SnakeGame extends Game {
 	 */
 	private void prepareBoard() {
 		if (getLevel() > 1) {
-			// from 2 to 4 - 1 obstacle, from 5 to 9 - 2, on 10 - 3
-			int obstaclesMultiplier = (getLevel() / 5) + 1;
-
-			for (int i = 0; i < obstaclesMultiplier; i++) {
-				for (int k = 1; k <= 2; k++) {
-					generateObstacle(k);
-				}
+			//plus one random obstacle each level
+			for (int i = 0; i < getLevel() - 1; i++) {
+				generateObstacle(new Random().nextInt(3));
 			}
 		}
 	}
@@ -129,7 +125,8 @@ public class SnakeGame extends Game {
 
 		// generates the vertical borders
 		for (int i = 0; i < boardHeight; i++) {
-			if (hasRandomGates) {
+			// except for the corner points
+			if ((hasRandomGates) && (i != 0) && (i != boardHeight - 1)) {
 				Random r = new Random();
 				fill = (r.nextInt(boardHeight) == 0) ? Cell.Empty : Cell.Full;
 			} else
@@ -139,7 +136,8 @@ public class SnakeGame extends Game {
 		}
 		// generates the horizontal borders
 		for (int i = 0; i < boardWidth; i++) {
-			if (hasRandomGates) {
+			// except for the corner points
+			if ((hasRandomGates) && (i != 0) && (i != boardWidth - 1)) {
 				Random r = new Random();
 				fill = (r.nextInt(boardWidth) == 0) ? Cell.Empty : Cell.Full;
 			} else
@@ -163,7 +161,8 @@ public class SnakeGame extends Game {
 		obstacle.setRandomRotate();
 
 		// in line at the borders of the board shall not be put an obstacle
-		int k = (type == 3) ? 1 : 2; // count of empty line at the borders
+		// k - count of empty line at the borders
+		int k = (getType() % 2 == 0) ? 2 : 1;
 
 		// finds empty cells
 		do {
@@ -275,7 +274,7 @@ public class SnakeGame extends Game {
 		snake = new SnakeShape();
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2;
-		curY = ((getType() == 2) || (getType() == 4)) ? 1 : 0;
+		curY = (getType() % 2 == 0) ? 1 : 0;
 
 		tryMove(snake.getDirection());
 
@@ -326,8 +325,8 @@ public class SnakeGame extends Game {
 	private boolean tryMove(RotationAngle direction) {
 		int newX;
 		int newY;
-		boolean isReversal = (direction == SnakeShape.getOppositeDirection(snake
-				.getDirection()));
+		boolean isReversal = (direction == SnakeShape
+				.getOppositeDirection(snake.getDirection()));
 
 		if (isReversal) {
 			newX = curX + snake.x(snake.tail());
@@ -343,7 +342,7 @@ public class SnakeGame extends Game {
 
 		// check the out off the board
 		if (checkBoardCollision(headOfSnake, newX, newY)) {
-			if ((getType() == 2) || (getType() == 4)) {
+			if (getType() % 2 == 0) {
 				if (newX < 0)
 					newX = boardWidth + newX;
 				else if (newX >= boardWidth)
@@ -353,11 +352,6 @@ public class SnakeGame extends Game {
 				else if (newY >= boardHeight)
 					newY = newY - boardHeight;
 
-				/*
-				 * newX = ((newX < 0) || (newX >= boardWidth)) ? (boardWidth - 1
-				 * - curX) : newX; newY = ((newY < 0) || (newY >= boardHeight))
-				 * ? (boardHeight - 1 - curY) : newY;
-				 */
 			} else
 				return false;
 		}

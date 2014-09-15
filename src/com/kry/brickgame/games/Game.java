@@ -49,9 +49,18 @@ public class Game extends Thread { // implements Runnable
 	 */
 	protected static final int ANIMATION_DELAY = 30;
 
-	private static final int FIRST_LEVEL_SPEED = 500;
-	private static final int TENTH_LEVEL_SPEED = 80;
+	private final int FIRST_LEVEL_SPEED = 500;
+	private final int TENTH_LEVEL_SPEED = 80;
+	
 	/*---MAGIC NUMBERS---*/
+
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
 
 	private volatile int speed;
 	private volatile int level;
@@ -227,7 +236,7 @@ public class Game extends Thread { // implements Runnable
 		if (genuine) {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
-			return (FIRST_LEVEL_SPEED - (FIRST_LEVEL_SPEED - TENTH_LEVEL_SPEED)
+			return (getFIRST_LEVEL_SPEED() - (getFIRST_LEVEL_SPEED() - getTENTH_LEVEL_SPEED())
 					/ (10 - 1) * (speed - 1));
 		}
 		return speed;

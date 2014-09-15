@@ -40,7 +40,22 @@ public class GunGame extends Game {
 	 */
 	private volatile int[][] bullets;
 
+	// decrease speed from the original
+	private final int FIRST_LEVEL_SPEED = 600;
+	private final int TENTH_LEVEL_SPEED = 240;
+
+	@Override
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	@Override
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
+
 	boolean isCreationMode;
+	boolean hasTwoSmokingBarrels;
 
 	/**
 	 * The Gun Game
@@ -95,21 +110,16 @@ public class GunGame extends Game {
 
 		loadLevel();
 
-		switch (getType()) {
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 13:
-		case 14:
-		case 15:
-		case 16:
+		if (((getType() >= 5) && (getType() <= 8))
+				|| ((getType() >= 13) && (getType() <= 16)))
 			isCreationMode = true;
-			break;
-		default:
+		else
 			isCreationMode = false;
-			break;
-		}
+
+		if ((getType() % 4 == 0) || (getType() + 1 % 4 == 0))
+			hasTwoSmokingBarrels = true;
+		else
+			hasTwoSmokingBarrels = false;
 
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
@@ -124,9 +134,20 @@ public class GunGame extends Game {
 		}, 0, ANIMATION_DELAY / 2);
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
+
+			int currentSpeed = getSpeed(true);
+
+			// increase speed in CreationMode
+			if (isCreationMode) {
+				currentSpeed *= 5;
+				// decrease speed if has two guns
+			} else if (hasTwoSmokingBarrels) {
+				currentSpeed -= ANIMATION_DELAY * 2;
+			}
+
 			if (getStatus() != Status.Paused) {
 				// moving
-				if (elapsedTime(getSpeed(true) * 3)) {
+				if (elapsedTime(currentSpeed)) {
 					// try drop down lines
 					if (!droppingDown()) {
 						kaboom(curX, curY);
@@ -332,6 +353,7 @@ public class GunGame extends Game {
 						if (board.getCell(x, bullets[y][x] + 1) == Cell.Full) {
 							// stop the bullet before the cell
 							board.setCell(Cell.Full, x, bullets[y][x]);
+							setScore(getScore() + 1);
 							// check for a filled lines
 							removeFullLines(bullets[y][x]);
 							// remove the bullet
@@ -343,6 +365,11 @@ public class GunGame extends Game {
 					} else if (bullets[y][x] == boardHeight - 1) {
 						// stop the bullet on the border of the board
 						board.setCell(Cell.Full, x, bullets[y][x]);
+						setScore(getScore() + 1);
+						// check for a filled lines
+						removeFullLines(bullets[y][x]);
+						// remove the bullet
+						bullets[y][x] = 0;
 					}
 					fireBoardChanged(board);
 				}
@@ -469,8 +496,8 @@ public class GunGame extends Game {
 	@Override
 	protected synchronized void fireBoardChanged(Board board) {
 		Board newBoard = board.clone();
-		
-		//draws the inverted board
+
+		// draws the inverted board
 		if (getType() > 8) {
 			for (int i = 0; i < board.getHeight(); i++) {
 				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
@@ -504,34 +531,27 @@ public class GunGame extends Game {
 
 		if (keys.contains(KeyPressed.KeyLeft)) {
 			moveGun(curX - 1, curY);
-			sleep(ANIMATION_DELAY * 2);
+			if (isCreationMode)
+				keys.remove(KeyPressed.KeyLeft);
+			else
+				sleep(ANIMATION_DELAY * 2);
 		}
 		if (keys.contains(KeyPressed.KeyRight)) {
 			moveGun(curX + 1, curY);
-			sleep(ANIMATION_DELAY * 2);
+			if (isCreationMode)
+				keys.remove(KeyPressed.KeyRight);
+			else
+				sleep(ANIMATION_DELAY * 2);
 		}
-		if (keys.contains(KeyPressed.KeyDown)) {
+		if ((keys.contains(KeyPressed.KeyDown))
+				|| (keys.contains(KeyPressed.KeyUp))) {
 			droppingDown();
 			sleep(ANIMATION_DELAY * 2);
 		}
 		if (keys.contains(KeyPressed.KeyRotate)) {
-			switch (getType()) {
-			case 3:
-			case 4:
-			case 7:
-			case 8:
-			case 11:
-			case 12:
-			case 15:
-			case 16:
-				fire(curX, curY + gun.maxY() + 1, true); // two guns
-				break;
-			default:
-				fire(curX, curY + gun.maxY() + 1, false);// one gun
-				break;
-			}
+			fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels); // two guns
 			if (isCreationMode)
-				sleep(ANIMATION_DELAY * 3);
+				keys.remove(KeyPressed.KeyRotate);
 			else
 				sleep(ANIMATION_DELAY);
 		}
