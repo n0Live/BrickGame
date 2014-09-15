@@ -28,7 +28,7 @@ public class TetrisShape extends Shape {
 		public final static int REF_TO_FIRST_SUPER_SHAPE = 27;
 	};
 
-	private static enum Polyominoes {
+	public static enum Polyominoes {
 		Trominoes, Tetraminoes, Pentominoes
 	}
 
@@ -225,12 +225,9 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random figure given in the specified Polyominoes and
 	 * the {@code superShapes} array
 	 * 
-	 * @param allTrominoes
-	 *            including all figures Trominoes
-	 * @param allTetraminoes
-	 *            including all figures Tetraminoes
-	 * @param allPentominoes
-	 *            including all figures Pentominoes
+	 * @param polyominoes
+	 *            list of types of Polyominoes figures to be included in the
+	 *            selection
 	 * @param superShapes
 	 *            the array of numbered super figures (from 0 to 4)
 	 * @return instance of a random figure
@@ -301,6 +298,18 @@ public class TetrisShape extends Shape {
 		polyominoes.add(Polyominoes.Pentominoes);
 
 		return getRandomPolyominoesAndSuper(polyominoes, null);
+	}
+
+	/**
+	 * Get instance of a random Polyominoes figure or super figure
+	 */
+	public static TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
+		polyominoes.add(Polyominoes.Trominoes);
+		polyominoes.add(Polyominoes.Tetraminoes);
+		polyominoes.add(Polyominoes.Pentominoes);
+
+		return getRandomPolyominoesAndSuper(polyominoes, superShapes);
 	}
 
 	/**

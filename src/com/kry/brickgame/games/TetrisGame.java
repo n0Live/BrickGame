@@ -222,7 +222,14 @@ public class TetrisGame extends Game {
 		}
 	}
 
-	protected static TetrisShape setPieceFromType(int type) {
+	/**
+	 * Sets a new shape, depending on the type of game
+	 * 
+	 * @param type
+	 *            the type of game
+	 * @return the new shape
+	 */
+	protected TetrisShape setPieceFromType(int type) {
 		TetrisShape newPiece = null;
 		Random r = new Random();
 
