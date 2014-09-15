@@ -304,9 +304,9 @@ public class TetrisShape extends Shape {
 	}
 
 	/**
-	 * Get instance of a random Tetrominoes figure
+	 * Get instance of a random Tetraminoes figure
 	 */
-	public static TetrisShape getRandomTetrominoes() {
+	public static TetrisShape getRandomTetraminoes() {
 		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
 		polyominoes.add(Polyominoes.Tetraminoes);
 
@@ -314,12 +314,12 @@ public class TetrisShape extends Shape {
 	}
 
 	/**
-	 * Get instance of a random Tetrominoes figure and specified super figures
+	 * Get instance of a random Tetraminoes figure and specified super figures
 	 * 
 	 * @param superShapes
 	 *            the array of numbered super figures (from 0 to 4)
 	 */
-	public static TetrisShape getRandomTetrominoesAndSuper(int[] superShapes) {
+	public static TetrisShape getRandomTetraminoesAndSuper(int[] superShapes) {
 		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
 		polyominoes.add(Polyominoes.Tetraminoes);
 
