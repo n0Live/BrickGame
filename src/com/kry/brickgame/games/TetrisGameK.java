@@ -50,8 +50,8 @@ public class TetrisGameK extends TetrisGame {
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
 				} else {
-					TetrisShape rotatedPiece = TetrisShape.getNextShape(
-							curPiece, false);
+					TetrisShape rotatedPiece = TetrisShape
+							.getNextTetraminoes(curPiece);
 					tryMove(rotatedPiece, curX, curY);
 				}
 				keys.remove(KeyPressed.KeyRotate);
