@@ -148,7 +148,7 @@ public class TetrisGame extends Game {
 		isFallingFinished = false;
 
 		// Create the "next" figure
-		nextPiece = TetrisShape.getRandomShapeAndRotate();
+		nextPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 		newPiece();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
@@ -290,14 +290,16 @@ public class TetrisGame extends Game {
 		case 17:
 		case 33:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			}
 			break;
 		case 18:
 		case 34:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape
@@ -306,7 +308,8 @@ public class TetrisGame extends Game {
 		case 19:
 		case 35:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape
@@ -315,7 +318,8 @@ public class TetrisGame extends Game {
 		case 20:
 		case 36:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -324,7 +328,8 @@ public class TetrisGame extends Game {
 		case 21:
 		case 37:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape
@@ -333,7 +338,8 @@ public class TetrisGame extends Game {
 		case 22:
 		case 38:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+				;
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -342,7 +348,7 @@ public class TetrisGame extends Game {
 		case 23:
 		case 39:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -351,7 +357,7 @@ public class TetrisGame extends Game {
 		case 24:
 		case 40:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -360,7 +366,7 @@ public class TetrisGame extends Game {
 		case 25:
 		case 41:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape
@@ -369,7 +375,7 @@ public class TetrisGame extends Game {
 		case 26:
 		case 42:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -378,7 +384,7 @@ public class TetrisGame extends Game {
 		case 27:
 		case 43:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -387,7 +393,7 @@ public class TetrisGame extends Game {
 		case 28:
 		case 44:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -396,7 +402,7 @@ public class TetrisGame extends Game {
 		case 29:
 		case 45:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -405,7 +411,7 @@ public class TetrisGame extends Game {
 		case 30:
 		case 46:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -414,7 +420,7 @@ public class TetrisGame extends Game {
 		case 31:
 		case 47:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
@@ -425,14 +431,15 @@ public class TetrisGame extends Game {
 		case 49:
 		case 50:
 			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomShapeAndRotate();
+				newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
 				newPiece.setFill(Cell.Blink);
 			} else
 				newPiece = TetrisShape.getRandomTetrominoesAndSuper(new int[] {
 						0, 1, 2, 3 });
 			break;
 		default:
-			newPiece = TetrisShape.getRandomShapeAndRotate();
+			newPiece = TetrisShape.getRandomTetrominoes().setRandomRotate();
+			;
 			break;
 		}
 
