@@ -10,27 +10,59 @@ import com.kry.brickgame.Board.Cell;
  */
 public class TetrisShape extends Shape {
 
-	public static enum Tetrominoes {
-		NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, //
-		SuperPoint, SuperGun, SuperMudGun, SuperBomb;
+	public static enum Figures {
+		NoShape, //
+		TroLineShape, CornerShape, // Trominoes
+		ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, // Tetraminoes
+		PentoPShape, MirroredPentoPShape, PentoQShape, MirroredPentoQShape, PentoRShape, //
+		MirroredPentoRShape, PentoSShape, MirroredPentoSShape, PentoTShape, PentoUShape, //
+		PentoVShape, PentoWShape, PentoXShape, PentoYShape, MirroredPentoYShape, //
+		PentoZShape, MirroredPentoZShape, // Pentominoes
+		SuperPoint, SuperGun, SuperMudGun, SuperBomb;// SuperFigures
 
-		public final static int REF_TO_FIRST_SUPER_SHAPE = 8;
+		public final static int REF_TO_FIRST_TROMINOES = 1;
+		public final static int REF_TO_FIRST_TETRAMINOES = 3;
+		public final static int REF_TO_FIRST_PENTOMINOES = 10;
+		public final static int REF_TO_FIRST_SUPER_SHAPE = 27;
 	};
 
-	private Tetrominoes shape;
+	private Figures shape;
 
 	/**
 	 * A set of coordinates of a points of the figures:
 	 * [shapeIndex][pointIndex][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] coordsTable = new int[][][] { { { 0, 0 } }, // NoShape
-			{ { -1, 0 }, { 0, -1 }, { 0, 0 }, { -1, 1 } }, // ZShape
-			{ { -1, -1 }, { 0, 0 }, { -1, 0 }, { 0, 1 } }, // SShape
+			// Trominoes
+			{ { -1, -1 }, { 0, 0 }, { 1, 1 } }, // TroLineShape
+			{ { 0, 1 }, { 0, 0 }, { 1, 0 } }, // CornerShape
+			// Tetraminoes
+			{ { -1, 1 }, { -1, 0 }, { 0, 0 }, { 0, -1 } }, // ZShape
+			{ { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, 1 } }, // SShape
 			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, // LineShape
 			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // TShape
 			{ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // SquareShape
 			{ { 0, -1 }, { 1, 0 }, { 1, -1 }, { 1, 1 } }, // LShape
 			{ { 0, -1 }, { 1, -1 }, { 0, 0 }, { 0, 1 } }, // MirroredLShape
+			// Pentominoes
+			{ { 0, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // PentoPShape
+			{ { 1, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoPShape
+			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 2 } }, // PentoQShape
+			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } }, // MirroredPentoQShape
+			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 0 }, { 2, 1 } }, // PentoRShape
+			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 2, 0 }, { 0, 1 } }, // MirroredPentoRShape
+			{ { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // PentoSShape
+			{ { -1, 1 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoSShape
+			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { -1, 1 }, { 1, 1 } }, // PentoTShape
+			{ { -1, 0 }, { -1, 1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, // PentoUShape
+			{ { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 }, { 2, 0 } }, // PentoVShape
+			{ { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoWShape
+			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } }, // PentoXShape
+			{ { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 } }, // PentoYShape
+			{ { -1, 0 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoYShape
+			{ { -1, 1 }, { 0, 1 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoZShape
+			{ { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoZShape
+			// SuperFigures
 			{ { 0, 0 } }, // SuperPoint
 			{ { 0, 0 }, { 0, 1 } }, // SuperGun
 			{ { 0, 0 }, { 0, 1 }, { 0, 2 } }, // SuperMudGun
@@ -42,14 +74,14 @@ public class TetrisShape extends Shape {
 	 */
 	private Cell[] boardFill;
 
-	public TetrisShape(Tetrominoes shape, RotationAngle rotationAngle, Cell fill) {
+	public TetrisShape(Figures shape, RotationAngle rotationAngle, Cell fill) {
 		super(getLength(shape));
 		boardFill = new Cell[getLength(shape)];
 		clearBoardFill();
 		setShape(shape, rotationAngle, fill);
 	}
 
-	public TetrisShape(Tetrominoes shape) {
+	public TetrisShape(Figures shape) {
 		this(shape, RotationAngle.d0, Cell.Full);
 	}
 
@@ -80,8 +112,8 @@ public class TetrisShape extends Shape {
 	 * @param fill
 	 *            type of fill of the figure
 	 */
-	private TetrisShape setShape(Tetrominoes shape,
-			RotationAngle rotationAngle, Cell fill) {
+	private TetrisShape setShape(Figures shape, RotationAngle rotationAngle,
+			Cell fill) {
 		for (int i = 0; i < getLength(shape); i++) {
 			switch (rotationAngle) {
 			case d0:
@@ -106,7 +138,7 @@ public class TetrisShape extends Shape {
 		// not for super shape
 		if (shape.ordinal() <= 7) {
 			// Center the figures, which were shifted to aside after rotation
-			if ((shape != Tetrominoes.LineShape) // except LineShape
+			if ((shape != Figures.LineShape) // except LineShape
 					&& ((minX() < -1) || (maxX() <= 0))) {
 				for (int i = 0; i < getLength(shape); i++) {
 					setX(i, x(i) + 1);
@@ -126,7 +158,7 @@ public class TetrisShape extends Shape {
 		return this;
 	}
 
-	public Tetrominoes getShape() {
+	public Figures getShape() {
 		return shape;
 	}
 
@@ -156,18 +188,8 @@ public class TetrisShape extends Shape {
 	 *            the figure
 	 * @return number of the points
 	 */
-	private static int getLength(Tetrominoes shape) {
+	private static int getLength(Figures shape) {
 		return coordsTable[shape.ordinal()].length;
-	}
-
-	/**
-	 * Get instance of a random figure
-	 */
-	public static TetrisShape getRandomShapeInstance() {
-		Random r = new Random();
-		int x = r.nextInt(Tetrominoes.REF_TO_FIRST_SUPER_SHAPE - 1) + 1;
-		Tetrominoes[] values = Tetrominoes.values();
-		return new TetrisShape(values[x]);
 	}
 
 	/**
@@ -175,21 +197,115 @@ public class TetrisShape extends Shape {
 	 * 
 	 * @param shapes
 	 *            the array of numbered figures
+	 * @return instance of a random figure
 	 */
 	public static TetrisShape getRandomShapeOfSpecified(int[] shapes) {
 		Random r = new Random();
 		int x = shapes[r.nextInt(shapes.length)];
 
-		if ((x < 0) || (x >= Tetrominoes.values().length))
+		if ((x < 0) || (x >= Figures.values().length))
 			x = 0;
 
-		Tetrominoes[] values = Tetrominoes.values();
+		Figures[] values = Figures.values();
 
 		TetrisShape newTetrisShape = new TetrisShape(values[x]);
 		// for super figures
-		if (x >= Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)
+		if (x >= Figures.REF_TO_FIRST_SUPER_SHAPE)
 			newTetrisShape.setFill(Cell.Blink);
 		return newTetrisShape;
+	}
+
+	/**
+	 * Get instance of a random figure given in the specified Polyominoes and
+	 * the {@code superShapes} array
+	 * 
+	 * @param allTrominoes
+	 *            including all figures Trominoes
+	 * @param allTetraminoes
+	 *            including all figures Tetraminoes
+	 * @param allPentominoes
+	 *            including all figures Pentominoes
+	 * @param superShapes
+	 *            the array of numbered super figures (from 0 to 4)
+	 * @return instance of a random figure
+	 */
+	public static TetrisShape getRandomPolyominoesAndSuper(
+			boolean allTrominoes, boolean allTetraminoes,
+			boolean allPentominoes, int[] superShapes) {
+
+		if ((!allTrominoes) && (!allTetraminoes) && (!allPentominoes))
+			return getRandomShapeOfSpecified(superShapes);
+
+		int[] shapes = new int[//
+		// length of Trominoes
+		(allTrominoes ? (Figures.REF_TO_FIRST_TETRAMINOES - Figures.REF_TO_FIRST_TROMINOES)
+				: 0)
+				// length of Tetraminoes
+				+ (allTetraminoes ? (Figures.REF_TO_FIRST_PENTOMINOES - Figures.REF_TO_FIRST_TETRAMINOES)
+						: 0)
+				// length of Pentominoes
+				+ (allPentominoes ? (Figures.REF_TO_FIRST_SUPER_SHAPE - Figures.REF_TO_FIRST_PENTOMINOES)
+						: 0)
+				// length of SuperFigures
+				+ ((superShapes != null) ? superShapes.length : 0)];
+
+		int i = 0;
+		while (i < shapes.length) {
+			// fill in the values of Trominoes
+			if (allTrominoes) {
+				for (int j = 0; j < (Figures.REF_TO_FIRST_TETRAMINOES - Figures.REF_TO_FIRST_TROMINOES); j++) {
+					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_TROMINOES
+							+ j].ordinal();
+				}
+			}
+			// fill in the values of Tetraminoes
+			if (allTetraminoes) {
+				for (int j = 0; j < (Figures.REF_TO_FIRST_PENTOMINOES - Figures.REF_TO_FIRST_TETRAMINOES); j++) {
+					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_TETRAMINOES
+							+ j].ordinal();
+				}
+			}
+			// fill in the values of Pentominoes
+			if (allPentominoes) {
+				for (int j = 0; j < (Figures.REF_TO_FIRST_SUPER_SHAPE - Figures.REF_TO_FIRST_PENTOMINOES); j++) {
+					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_PENTOMINOES
+							+ j].ordinal();
+				}
+			}
+			// fill in the values of specified SuperFigures
+			if ((superShapes != null)) {
+				for (int j = 0; j < superShapes.length; j++) {
+					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_SUPER_SHAPE
+							+ j].ordinal();
+				}
+			}
+		}
+
+		return getRandomShapeOfSpecified(shapes);
+	}
+
+	/**
+	 * Get instance of a random figure
+	 */
+	public static TetrisShape getRandomShapeInstance() {
+		return getRandomPolyominoesAndSuper(true, true, true, null);
+	}
+
+	/**
+	 * Get instance of a random Tetrominoes figure
+	 */
+	public static TetrisShape getRandomTetrominoesInstance() {
+		return getRandomPolyominoesAndSuper(false, true, false, null);
+	}
+
+	/**
+	 * Get instance of a random Tetrominoes figure and specified super figures
+	 * 
+	 * @param superShapes
+	 *            the array of numbered super figures (from 0 to 4)
+	 */
+	public static TetrisShape getRandomTetrominoesAndSuper(int[] superShapes) {
+		return getRandomPolyominoesAndSuper(false, true, false, superShapes);
 	}
 
 	/**
@@ -203,7 +319,12 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random super figure
 	 */
 	public static TetrisShape getRandomSuperShape() {
-		return getRandomShapeOfSpecified(new int[] { 8, 9, 10, 11 });
+		int[] superShapes = new int[4];
+		for (int i = 0; i < superShapes.length; i++) {
+			superShapes[i] = Figures.REF_TO_FIRST_SUPER_SHAPE + i;
+		}
+
+		return getRandomShapeOfSpecified(superShapes);
 	}
 
 	/**
@@ -228,62 +349,66 @@ public class TetrisShape extends Shape {
 	}
 
 	/**
-	 * Get instance of next shape in {@link Tetrominoes}. If the {@code shape}
-	 * is the last item in Tetrominoes, then returns the first item with the
-	 * next rotation angle.
+	 * Get instance of next shape in {@link Figures}. If the {@code shape} is
+	 * the last item in Figures, then returns the first item with the next
+	 * rotation angle.
 	 * 
-	 * @param aTetrisShape the figure for which get the next
-	 * @param includingSuperShapes whether to include the super figure in the result
+	 * @param aTetrisShape
+	 *            the figure for which get the next
+	 * @param includingSuperShapes
+	 *            whether to include the super figure in the result
 	 * @return the next figure from {@code shape}
 	 */
 	public static TetrisShape getNextShape(TetrisShape aTetrisShape,
 			boolean includingSuperShapes) {
-		Tetrominoes shape;
+		Figures shape;
 		RotationAngle rotationAngle;
-		
-		int lastItem = (includingSuperShapes) ? Tetrominoes.values().length
-				: Tetrominoes.REF_TO_FIRST_SUPER_SHAPE;
-		
+
+		int lastItem = (includingSuperShapes) ? Figures.values().length
+				: Figures.REF_TO_FIRST_SUPER_SHAPE;
+
 		if (aTetrisShape.getShape().ordinal() < lastItem - 1) {
-			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() + 1];
+			shape = Figures.values()[aTetrisShape.getShape().ordinal() + 1];
 			rotationAngle = aTetrisShape.getRotationAngle();
 		} else {
-			shape = Tetrominoes.values()[1];
+			shape = Figures.values()[1];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape,
-				rotationAngle, aTetrisShape.getFill());
+
+		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle,
+				aTetrisShape.getFill());
 		return newTetrisShape;
 	}
 
 	/**
-	 * Get instance of previous shape in {@link Tetrominoes}. If the {@code shape}
-	 * is the first item in Tetrominoes, then returns the last item with the
+	 * Get instance of previous shape in {@link Figures}. If the {@code shape}
+	 * is the first item in Figures, then returns the last item with the
 	 * previous rotation angle.
 	 * 
-	 * @param aTetrisShape the figure for which get the previous
-	 * @param includingSuperShapes whether to include the super figure in the result
+	 * @param aTetrisShape
+	 *            the figure for which get the previous
+	 * @param includingSuperShapes
+	 *            whether to include the super figure in the result
 	 * @return the previous figure from {@code shape}
 	 */
 	public static TetrisShape getPrevShape(TetrisShape aTetrisShape,
 			boolean includingSuperShapes) {
-		Tetrominoes shape;
+		Figures shape;
 		RotationAngle rotationAngle;
-		
-		int lastItem = (includingSuperShapes) ? Tetrominoes.values().length
-				: Tetrominoes.REF_TO_FIRST_SUPER_SHAPE;
-		
+
+		int lastItem = (includingSuperShapes) ? Figures.values().length
+				: Figures.REF_TO_FIRST_SUPER_SHAPE;
+
 		if (aTetrisShape.getShape().ordinal() > 1) {
-			shape = Tetrominoes.values()[aTetrisShape.getShape().ordinal() - 1];
+			shape = Figures.values()[aTetrisShape.getShape().ordinal() - 1];
 			rotationAngle = aTetrisShape.getRotationAngle();
 		} else {
-			shape = Tetrominoes.values()[lastItem];
+			shape = Figures.values()[lastItem];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape,
-				rotationAngle, aTetrisShape.getFill());
+
+		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle,
+				aTetrisShape.getFill());
 		return newTetrisShape;
 	}
 
@@ -292,8 +417,9 @@ public class TetrisShape extends Shape {
 	 */
 	@Override
 	public TetrisShape rotateLeft() {
-		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)) {
+		if ((getShape() != Figures.SquareShape)
+				&& (getShape() != Figures.PentoXShape)
+				&& (getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE)) {
 			setShape(getShape(), this.getRotationAngle().getLeft(), getFill());
 			clearBoardFill();
 		}
@@ -305,8 +431,9 @@ public class TetrisShape extends Shape {
 	 */
 	@Override
 	public TetrisShape rotateRight() {
-		if ((getShape() != Tetrominoes.SquareShape)
-				&& (getShape().ordinal() < Tetrominoes.REF_TO_FIRST_SUPER_SHAPE)) {
+		if ((getShape() != Figures.SquareShape)
+				&& (getShape() != Figures.PentoXShape)
+				&& (getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE)) {
 			setShape(getShape(), this.getRotationAngle().getRight(), getFill());
 			clearBoardFill();
 		}

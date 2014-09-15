@@ -1,7 +1,7 @@
 package com.kry.brickgame.games;
 
 import com.kry.brickgame.shapes.TetrisShape;
-import com.kry.brickgame.shapes.TetrisShape.Tetrominoes;
+import com.kry.brickgame.shapes.TetrisShape.Figures;
 
 /**
  * @author noLive
@@ -45,10 +45,10 @@ public class TetrisGameT extends TetrisGameR {
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				// if we have the super gun
-				if (curPiece.getShape() == Tetrominoes.SuperGun) {
+				if (curPiece.getShape() == Figures.SuperGun) {
 					// than shoot of it
 					shoot(curX, curY + curPiece.minY());
-				} else if (curPiece.getShape() == Tetrominoes.SuperMudGun) {
+				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
 				} else {
 					TetrisShape rotatedPiece = TetrisShape.getNextShape(
