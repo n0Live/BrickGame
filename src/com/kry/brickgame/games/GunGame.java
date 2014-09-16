@@ -26,14 +26,6 @@ public class GunGame extends Game {
 	public static final int subtypesNumber = 16;
 
 	private ÑharacterShape gun;
-	/**
-	 * X-coordinate position on the board of the gun
-	 */
-	private int curX;
-	/**
-	 * Y-coordinate position on the board of the gun
-	 */
-	private int curY;
 
 	/**
 	 * Array that stores the coordinates of the bullets

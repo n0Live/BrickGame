@@ -51,7 +51,7 @@ public class Game extends Thread { // implements Runnable
 
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
-	
+
 	/*---MAGIC NUMBERS---*/
 
 	protected int getFIRST_LEVEL_SPEED() {
@@ -85,6 +85,15 @@ public class Game extends Thread { // implements Runnable
 	 * Height of the preview board
 	 */
 	protected int previewHeight;
+
+	/**
+	 * X-coordinate position on the board
+	 */
+	protected int curX;
+	/**
+	 * Y-coordinate position on the board
+	 */
+	protected int curY;
 
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
@@ -131,6 +140,9 @@ public class Game extends Thread { // implements Runnable
 
 		this.score = 0;
 		this.lives = 4;
+
+		this.curX = 0;
+		this.curY = 0;
 
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
@@ -842,7 +854,7 @@ public class Game extends Thread { // implements Runnable
 		// <i>linesCount</i> from the top or the bottom of the board
 		for (int i = 0; i < board.getWidth(); i++) {
 			if (//
-					((isUpwardDirection) && //
+			((isUpwardDirection) && //
 					(board.getCell(i, ((board.getHeight() - 1) - linesCount)) == Cell.Full))//
 					//
 					|| ((!isUpwardDirection) && //
@@ -856,7 +868,8 @@ public class Game extends Thread { // implements Runnable
 
 		// picks up or downs the lines of the board
 		if (isUpwardDirection) {
-			for (int y = (board.getHeight() - 1) - 1; y > fromLine + (linesCount - 1); y--) {
+			for (int y = (board.getHeight() - 1) - 1; y > fromLine
+					+ (linesCount - 1); y--) {
 				board.setRow(board.getRow(y - 1), y);
 			}
 		} else {

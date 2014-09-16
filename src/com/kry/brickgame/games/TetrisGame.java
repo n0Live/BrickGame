@@ -36,14 +36,6 @@ public class TetrisGame extends Game {
 	 */
 	protected TetrisShape nextPiece;
 	/**
-	 * X-coordinate position on the board of the current figure
-	 */
-	protected int curX;
-	/**
-	 * Y-coordinate position on the board of the current figure
-	 */
-	protected int curY;
-	/**
 	 * Type of a Super shape (0-2). Applies only when {@code type = 50}
 	 */
 	private int typeOfSuperShape;

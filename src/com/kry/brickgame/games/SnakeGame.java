@@ -36,14 +36,6 @@ public class SnakeGame extends Game {
 	 * The snake
 	 */
 	private SnakeShape snake;
-	/**
-	 * The current x-coordinate position on the board of the snake's head
-	 */
-	private int curX;;
-	/**
-	 * The current y-coordinate position on the board of the snake's head
-	 */
-	private int curY;
 
 	/**
 	 * The Snake
