@@ -37,7 +37,7 @@ public class Board implements Cloneable {
 		this.width = width;
 		this.height = height;
 		this.board = new Cell[width][height];
-		
+
 		clearBoard();
 	}
 
@@ -85,7 +85,7 @@ public class Board implements Cloneable {
 	}
 
 	public Cell getCell(int x, int y) {
- 		return this.board[x][y];
+		return this.board[x][y];
 	}
 
 	public void setCell(Cell cell, int x, int y) {
@@ -112,7 +112,11 @@ public class Board implements Cloneable {
 	 */
 	public void setRow(Cell[] row, int y) {
 		for (int i = 0; i < row.length; i++) {
-			this.board[i][y] = row[i];
+			try {
+				this.board[i][y] = row[i];
+			} catch (IndexOutOfBoundsException e) {
+				continue;
+			}
 		}
 	}
 
@@ -136,7 +140,11 @@ public class Board implements Cloneable {
 	 */
 	public void setColumn(Cell[] column, int x) {
 		for (int i = 0; i < column.length; i++) {
-			this.board[x][i] = column[i];
+			try {
+				this.board[x][i] = column[i];
+			} catch (IndexOutOfBoundsException e) {
+				continue;
+			}
 		}
 	}
 
