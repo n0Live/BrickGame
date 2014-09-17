@@ -17,7 +17,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public class Game extends Thread { // implements Runnable
+public abstract class Game extends Thread { // implements Runnable
 	/**
 	 * Animated splash for game
 	 */
@@ -715,7 +715,7 @@ public class Game extends Thread { // implements Runnable
 	 * @param x
 	 *            x-coordinate of the epicenter
 	 * @param y
-	 *            x-coordinate of the epicenter
+	 *            y-coordinate of the epicenter
 	 */
 	protected void kaboom(int x, int y) {
 		/**
@@ -777,7 +777,7 @@ public class Game extends Thread { // implements Runnable
 			 * @param x
 			 *            x-coordinate of the epicenter
 			 * @param y
-			 *            x-coordinate of the epicenter
+			 *            y-coordinate of the epicenter
 			 * @param wave
 			 *            number of the blast wave
 			 */
