@@ -20,7 +20,7 @@ public class SnakeShape extends Shape {
 	private int length;
 
 	/**
-	 * Direction of movement of the snake
+	 * Direction of the movement of the snake
 	 */
 	private RotationAngle direction;
 
