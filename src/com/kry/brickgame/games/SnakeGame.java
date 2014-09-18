@@ -306,12 +306,8 @@ public class SnakeGame extends Game {
 	/**
 	 * Tries to move the snake
 	 * 
-	 * @param snake
-	 *            the snake after the rotating or movement
-	 * @param newX
-	 *            x-coordinate position on the board of the snake's head
-	 * @param newY
-	 *            y-coordinate position on the board of the snake's head
+	 * @param direction
+	 *            the direction of the movement of the snake
 	 * @return {@code true} if the movement succeeded otherwise {@code false}
 	 */
 	private boolean tryMove(RotationAngle direction) {
