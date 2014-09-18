@@ -2,7 +2,7 @@ package com.kry.brickgame.splashes;
 
 import com.kry.brickgame.Board;
 
-public class Splash extends Board {
+public abstract class Splash extends Board {
 
 	public final static int width = 10;
 	public final static int height = 8;
