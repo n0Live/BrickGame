@@ -564,10 +564,10 @@ public class TetrisGame extends Game {
 			int y) {
 
 		for (int j = y + piece.minY(); j <= y + piece.maxY(); j++) {
-			//check leaving from the board
+			// check leaving from the board
 			if (j >= boardHeight)
 				break;
-			
+
 			boolean hasFullLine = true;
 			for (int i = 0; i < boardWidth; i++) {
 				// true - only if all cells is full
@@ -858,7 +858,7 @@ public class TetrisGame extends Game {
 		int[][] sortedPoints = new int[piece.getLength()][2];
 		int n = 0;
 		for (int j = piece.minY(); j <= piece.maxY(); j++) {
-			//check leaving from the board
+			// check leaving from the board
 			if (j >= boardHeight)
 				break;
 
@@ -949,7 +949,8 @@ public class TetrisGame extends Game {
 					shoot(curX, curY + curPiece.minY());
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
-				} else {
+					// if the super point, than do nothing
+				} else if (curPiece.getShape() == Figures.SuperPoint) {
 					TetrisShape rotatedPiece = curPiece.clone().rotateRight();
 					tryMove(rotatedPiece, curX, curY);
 				}

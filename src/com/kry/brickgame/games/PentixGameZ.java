@@ -127,7 +127,8 @@ public class PentixGameZ extends PentixGame {
 					shoot(curX, curY + curPiece.minY());
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
-				} else {
+					// if the super point, than do nothing
+				} else if (curPiece.getShape() == Figures.SuperPoint) {
 					TetrisShape rotatedPiece = TetrisShape.getNextShape(
 							curPiece, false);
 					tryMove(rotatedPiece, curX, curY);
