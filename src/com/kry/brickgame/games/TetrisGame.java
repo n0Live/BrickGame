@@ -4,8 +4,6 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.KeyPressed;
-import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
@@ -689,6 +687,7 @@ public class TetrisGame extends Game {
 		} else if ((curPiece.getShape() == Figures.SuperGun)
 				|| (curPiece.getShape() == Figures.SuperMudGun)) { // guns
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
+			curPiece = new TetrisShape(Figures.NoShape);
 		} else if (curPiece.getShape() == Figures.SuperBomb) {// bomb
 			kaboom(curX + 1, curY); // shift the epicenter to the bottom edge
 		} else if (//

@@ -4,13 +4,12 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape;
-import com.kry.brickgame.shapes.SnakeShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
-import com.kry.brickgame.splashes.Splash;
+import com.kry.brickgame.shapes.SnakeShape;
 import com.kry.brickgame.splashes.SnakeSplash;
+import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
