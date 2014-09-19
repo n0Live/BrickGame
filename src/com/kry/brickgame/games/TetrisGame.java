@@ -564,6 +564,10 @@ public class TetrisGame extends Game {
 			int y) {
 
 		for (int j = y + piece.minY(); j <= y + piece.maxY(); j++) {
+			//check leaving from the board
+			if (j >= boardHeight)
+				break;
+			
 			boolean hasFullLine = true;
 			for (int i = 0; i < boardWidth; i++) {
 				// true - only if all cells is full
@@ -854,6 +858,10 @@ public class TetrisGame extends Game {
 		int[][] sortedPoints = new int[piece.getLength()][2];
 		int n = 0;
 		for (int j = piece.minY(); j <= piece.maxY(); j++) {
+			//check leaving from the board
+			if (j >= boardHeight)
+				break;
+
 			for (int i = piece.minX(); i <= piece.maxX(); i++) {
 				for (int k = 0; k < piece.getLength(); k++) {
 					if ((piece.x(k) == i) && (piece.y(k) == j)) {
