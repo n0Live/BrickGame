@@ -4,6 +4,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
+import com.kry.brickgame.games.Game.KeyPressed;
+import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 
@@ -128,7 +130,7 @@ public class PentixGameZ extends PentixGame {
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
-				} else if (curPiece.getShape() == Figures.SuperPoint) {
+				} else if (curPiece.getShape() != Figures.SuperPoint) {
 					TetrisShape rotatedPiece = TetrisShape.getNextShape(
 							curPiece, false);
 					tryMove(rotatedPiece, curX, curY);

@@ -4,6 +4,8 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.KeyPressed;
+import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
@@ -917,22 +919,13 @@ public class TetrisGame extends Game {
 	/**
 	 * Processing of key presses
 	 */
+	@Override
 	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
-		if (keys.contains(KeyPressed.KeyReset)) {
-			keys.remove(KeyPressed.KeyReset);
-			ExitToMainMenu();
-			return;
-		}
-
-		if (keys.contains(KeyPressed.KeyStart)) {
-			keys.remove(KeyPressed.KeyStart);
-			pause();
-			return;
-		}
-
+		super.processKeys();
+		
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
@@ -950,7 +943,7 @@ public class TetrisGame extends Game {
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
-				} else if (curPiece.getShape() == Figures.SuperPoint) {
+				} else if (curPiece.getShape() != Figures.SuperPoint) {
 					TetrisShape rotatedPiece = curPiece.clone().rotateRight();
 					tryMove(rotatedPiece, curX, curY);
 				}

@@ -373,18 +373,18 @@ public class FroggerGame extends Game {
 
 		int tractLength = tracts[0].length;
 
-		//determines the position for the shift
+		// determines the position for the shift
 		for (int i = 0; i < roadPositions.length; i++) {
 			if (isRoadWithOncomingTraffic && oncomingTraffic.contains(i)) {
-				//for oncoming traffic
+				// for oncoming traffic
 				roadPositions[i] = (isLeftToRight) ? roadPositions[i] + 1
 						: roadPositions[i] - 1;
 			} else {
-				//for direct traffic
+				// for direct traffic
 				roadPositions[i] = (isLeftToRight) ? roadPositions[i] - 1
 						: roadPositions[i] + 1;
 			}
-			
+
 			if (roadPositions[i] < 0)
 				roadPositions[i] = tractLength - 1;
 			else if (roadPositions[i] >= tractLength)
@@ -412,7 +412,7 @@ public class FroggerGame extends Game {
 		}
 		insertCells(road.getBoard(), 0, 1);
 
-		//shifting the frog with the road
+		// shifting the frog with the road
 		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
 			if (isRoadWithOncomingTraffic
 					&& oncomingTraffic.contains((curY - 1) / 2))
@@ -421,7 +421,7 @@ public class FroggerGame extends Game {
 				curX = (isLeftToRight) ? curX + 1 : curX - 1;
 		}
 
-		//checks for collision with the frog and an obstacles 
+		// checks for collision with the frog and an obstacles
 		boolean isFrogMustDie = (checkBoardCollisionHorizontal(frog, curX) || checkCollision(
 				board, frog, curX, curY));
 
@@ -474,7 +474,7 @@ public class FroggerGame extends Game {
 	 * Drawing effect of the collisions and decreasing lives
 	 */
 	private void dieFrog() {
-		//saves the upper row with the frogs, who went over the road
+		// saves the upper row with the frogs, who went over the road
 		Cell[] frogs = getBoard().getRow(boardHeight - 1);
 
 		// kaboom and decrease lives
@@ -488,7 +488,7 @@ public class FroggerGame extends Game {
 			gameOver();
 		}
 
-		//restores the frogs' row
+		// restores the frogs' row
 		getBoard().setRow(frogs, boardHeight - 1);
 	}
 
@@ -497,7 +497,7 @@ public class FroggerGame extends Game {
 	 */
 	private void checkForWin() {
 		boolean isVictory = true;
-		//victory when filled the entire upper row
+		// victory when filled the entire upper row
 		for (int i = 0; i < boardWidth; i++) {
 			if (getBoard().getCell(i, boardHeight - 1) == Cell.Empty) {
 				isVictory = false;
@@ -506,7 +506,7 @@ public class FroggerGame extends Game {
 		}
 
 		setScore(getScore() + 1);
-		
+
 		if (isVictory) {
 			setLevel(getLevel() + 1);
 			if (getLevel() == 1)
@@ -539,62 +539,54 @@ public class FroggerGame extends Game {
 	/**
 	 * Processing of key presses
 	 */
-	private void processKeys() {
-		int dY;
-
+	@Override
+	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
-		if (keys.contains(KeyPressed.KeyReset)) {
-			keys.remove(KeyPressed.KeyReset);
-			ExitToMainMenu();
-			return;
-		}
+		super.processKeys();
 
-		if (keys.contains(KeyPressed.KeyStart)) {
-			keys.remove(KeyPressed.KeyStart);
-			pause();
-			return;
-		}
+		if (getStatus() == Status.Running) {
 
-		if (getStatus() != Status.Running)
-			return;
+			if (keys.contains(KeyPressed.KeyLeft)) {
+				if (!jumpFrog(curX - 1, curY))
+					dieFrog();
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (keys.contains(KeyPressed.KeyRight)) {
+				if (!jumpFrog(curX + 1, curY))
+					dieFrog();
+				keys.remove(KeyPressed.KeyRight);
+			}
 
-		if (keys.contains(KeyPressed.KeyLeft)) {
-			if (!jumpFrog(curX - 1, curY))
-				dieFrog();
-			keys.remove(KeyPressed.KeyLeft);
-		}
-		if (keys.contains(KeyPressed.KeyRight)) {
-			if (!jumpFrog(curX + 1, curY))
-				dieFrog();
-			keys.remove(KeyPressed.KeyRight);
-		}
-		if (keys.contains(KeyPressed.KeyDown)) {
-			if (drawInvertedBoard)
+			int dY;
+
+			if (keys.contains(KeyPressed.KeyDown)) {
+				if (drawInvertedBoard)
+					dY = (curY < boardHeight - 2) ? 2 : 1;
+				else
+					dY = -2;
+
+				if (!jumpFrog(curX, curY + dY))
+					dieFrog();
+				keys.remove(KeyPressed.KeyDown);
+			}
+			if (keys.contains(KeyPressed.KeyUp)) {
+				if (drawInvertedBoard)
+					dY = -2;
+				else
+					dY = (curY < boardHeight - 2) ? 2 : 1;
+
+				if (!jumpFrog(curX, curY + dY))
+					dieFrog();
+				keys.remove(KeyPressed.KeyUp);
+			}
+			if (keys.contains(KeyPressed.KeyRotate)) {
 				dY = (curY < boardHeight - 2) ? 2 : 1;
-			else
-				dY = -2;
-			
-			if (!jumpFrog(curX, curY +dY))
-				dieFrog();
-			keys.remove(KeyPressed.KeyDown);
-		}
-		if (keys.contains(KeyPressed.KeyUp)) {
-			if (drawInvertedBoard)
-				dY = -2;
-			else
-				dY = (curY < boardHeight - 2) ? 2 : 1;
-			
-			if (!jumpFrog(curX, curY + dY))
-				dieFrog();
-			keys.remove(KeyPressed.KeyUp);
-		}
-		if (keys.contains(KeyPressed.KeyRotate)) {
-			dY = (curY < boardHeight - 2) ? 2 : 1;
-			if (!jumpFrog(curX, curY + dY))
-				dieFrog();
-			keys.remove(KeyPressed.KeyRotate);
+				if (!jumpFrog(curX, curY + dY))
+					dieFrog();
+				keys.remove(KeyPressed.KeyRotate);
+			}
 		}
 	}
 

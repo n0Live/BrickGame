@@ -980,5 +980,25 @@ public abstract class Game extends Thread { // implements Runnable
 	public void keyReleased(KeyPressed key) {
 		keys.remove(key);
 	}
+	
+	/**
+	 * Processing of key presses
+	 */
+	protected void processKeys() {
+		if (getStatus() == Status.None)
+			return;
+
+		if (keys.contains(KeyPressed.KeyReset)) {
+			keys.remove(KeyPressed.KeyReset);
+			ExitToMainMenu();
+			return;
+		}
+
+		if (keys.contains(KeyPressed.KeyStart)) {
+			keys.remove(KeyPressed.KeyStart);
+			pause();
+			return;
+		}
+	}
 
 }

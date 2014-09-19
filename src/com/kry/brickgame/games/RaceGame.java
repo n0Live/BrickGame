@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.RaceSplash;
@@ -370,41 +371,32 @@ public class RaceGame extends Game {
 	/**
 	 * Processing of key presses
 	 */
-	private void processKeys() {
+	@Override
+	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
-		if (keys.contains(KeyPressed.KeyReset)) {
-			keys.remove(KeyPressed.KeyReset);
-			ExitToMainMenu();
-			return;
-		}
+		super.processKeys();
 
-		if (keys.contains(KeyPressed.KeyStart)) {
-			keys.remove(KeyPressed.KeyStart);
-			pause();
-			return;
-		}
+		if (getStatus() == Status.Running) {
 
-		if (getStatus() != Status.Running)
-			return;
-
-		if (keys.contains(KeyPressed.KeyLeft)) {
-			moveCar(curPosition - 1);
-			keys.remove(KeyPressed.KeyLeft);
-		}
-		if (keys.contains(KeyPressed.KeyRight)) {
-			moveCar(curPosition + 1);
-			keys.remove(KeyPressed.KeyRight);
-		}
-		if ((keys.contains(KeyPressed.KeyDown))
-				|| (keys.contains(KeyPressed.KeyUp))) {
-			moveOn();
-			sleep(ANIMATION_DELAY);
-		}
-		if (keys.contains(KeyPressed.KeyRotate)) {
-			moveOn();
-			sleep(ANIMATION_DELAY);
+			if (keys.contains(KeyPressed.KeyLeft)) {
+				moveCar(curPosition - 1);
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (keys.contains(KeyPressed.KeyRight)) {
+				moveCar(curPosition + 1);
+				keys.remove(KeyPressed.KeyRight);
+			}
+			if ((keys.contains(KeyPressed.KeyDown))
+					|| (keys.contains(KeyPressed.KeyUp))) {
+				moveOn();
+				sleep(ANIMATION_DELAY);
+			}
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				moveOn();
+				sleep(ANIMATION_DELAY);
+			}
 		}
 	}
 

@@ -216,7 +216,8 @@ public class SplashScreen extends Game {
 	/**
 	 * Processing of key presses
 	 */
-	private void processKeys() {
+	@Override
+	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 		if (!keys.isEmpty())

@@ -6,6 +6,7 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.GunSplash;
@@ -49,7 +50,8 @@ public class GunGame extends Game {
 	/**
 	 * Kind of game
 	 * <p>
-	 * {@code true} - the shot creates a new cell, {@code false} - the shot destroys a cell
+	 * {@code true} - the shot creates a new cell, {@code false} - the shot
+	 * destroys a cell
 	 */
 	boolean isCreationMode;
 	/**
@@ -520,50 +522,41 @@ public class GunGame extends Game {
 	/**
 	 * Processing of key presses
 	 */
-	private void processKeys() {
+	@Override
+	protected void processKeys() {
 		if (getStatus() == Status.None)
 			return;
 
-		if (keys.contains(KeyPressed.KeyReset)) {
-			keys.remove(KeyPressed.KeyReset);
-			ExitToMainMenu();
-			return;
-		}
+		super.processKeys();
 
-		if (keys.contains(KeyPressed.KeyStart)) {
-			keys.remove(KeyPressed.KeyStart);
-			pause();
-			return;
-		}
+		if (getStatus() == Status.Running) {
 
-		if (getStatus() != Status.Running)
-			return;
-
-		if (keys.contains(KeyPressed.KeyLeft)) {
-			moveGun(curX - 1, curY);
-			if (isCreationMode)
-				keys.remove(KeyPressed.KeyLeft);
-			else
+			if (keys.contains(KeyPressed.KeyLeft)) {
+				moveGun(curX - 1, curY);
+				if (isCreationMode)
+					keys.remove(KeyPressed.KeyLeft);
+				else
+					sleep(ANIMATION_DELAY * 2);
+			}
+			if (keys.contains(KeyPressed.KeyRight)) {
+				moveGun(curX + 1, curY);
+				if (isCreationMode)
+					keys.remove(KeyPressed.KeyRight);
+				else
+					sleep(ANIMATION_DELAY * 2);
+			}
+			if ((keys.contains(KeyPressed.KeyDown))
+					|| (keys.contains(KeyPressed.KeyUp))) {
+				droppingDown();
 				sleep(ANIMATION_DELAY * 2);
-		}
-		if (keys.contains(KeyPressed.KeyRight)) {
-			moveGun(curX + 1, curY);
-			if (isCreationMode)
-				keys.remove(KeyPressed.KeyRight);
-			else
-				sleep(ANIMATION_DELAY * 2);
-		}
-		if ((keys.contains(KeyPressed.KeyDown))
-				|| (keys.contains(KeyPressed.KeyUp))) {
-			droppingDown();
-			sleep(ANIMATION_DELAY * 2);
-		}
-		if (keys.contains(KeyPressed.KeyRotate)) {
-			fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels); // two guns
-			if (isCreationMode)
-				keys.remove(KeyPressed.KeyRotate);
-			else
-				sleep(ANIMATION_DELAY);
+			}
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels); 
+				if (isCreationMode)
+					keys.remove(KeyPressed.KeyRotate);
+				else
+					sleep(ANIMATION_DELAY);
+			}
 		}
 	}
 

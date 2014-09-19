@@ -51,7 +51,7 @@ public class TetrisGameT extends TetrisGameR {
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
-				} else if (curPiece.getShape() == Figures.SuperPoint) {
+				} else if (curPiece.getShape() != Figures.SuperPoint) {
 					TetrisShape rotatedPiece = TetrisShape
 							.getNextTetraminoes(curPiece);
 					tryMove(rotatedPiece, curX, curY);
