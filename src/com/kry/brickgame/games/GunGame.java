@@ -46,8 +46,26 @@ public class GunGame extends Game {
 		return TENTH_LEVEL_SPEED;
 	}
 
+	/**
+	 * Kind of game
+	 * <p>
+	 * {@code true} - the shot creates a new cell, {@code false} - the shot destroys a cell
+	 */
 	boolean isCreationMode;
+	/**
+	 * Number of barrels
+	 * <p>
+	 * {@code true} - two barrels, {@code false} - one barrel
+	 */
 	boolean hasTwoSmokingBarrels;
+	/**
+	 * Whether to shift the board?
+	 */
+	boolean isShiftingBoard;
+	/**
+	 * Whether to draw the board upside down?
+	 */
+	private boolean drawInvertedBoard;
 
 	/**
 	 * The Gun Game
@@ -88,6 +106,17 @@ public class GunGame extends Game {
 
 		bullets = new int[boardHeight - gun.getHeight()][boardWidth];
 		initBullets(bullets);
+
+		// ==define the parameters of the types of game==
+		// for types 5-8 and 13-16
+		isCreationMode = ((getType() >= 5) && (getType() <= 8))
+				|| ((getType() >= 13) && (getType() <= 16));
+		// for every 3rd and 4th type of game
+		hasTwoSmokingBarrels = ((getType() % 4 == 3) || (getType() % 4 == 0));
+		// for every even type of game
+		isShiftingBoard = (getType() % 2 == 0);
+		// for types 8-16
+		drawInvertedBoard = (getType() > 8);
 	}
 
 	/**
@@ -101,17 +130,6 @@ public class GunGame extends Game {
 		setLives(4);
 
 		loadLevel();
-
-		if (((getType() >= 5) && (getType() <= 8))
-				|| ((getType() >= 13) && (getType() <= 16)))
-			isCreationMode = true;
-		else
-			isCreationMode = false;
-
-		if ((getType() % 4 == 0) || (getType() + 1 % 4 == 0))
-			hasTwoSmokingBarrels = true;
-		else
-			hasTwoSmokingBarrels = false;
 
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
@@ -218,7 +236,7 @@ public class GunGame extends Game {
 		setBoard(board);
 
 		// for even types of game, shifts the board
-		if (getType() % 2 == 0) {
+		if (isShiftingBoard) {
 			sleep(ANIMATION_DELAY);
 			shiftBoard();
 		}
@@ -490,7 +508,7 @@ public class GunGame extends Game {
 		Board newBoard = board.clone();
 
 		// draws the inverted board
-		if (getType() > 8) {
+		if (drawInvertedBoard) {
 			for (int i = 0; i < board.getHeight(); i++) {
 				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
 			}
