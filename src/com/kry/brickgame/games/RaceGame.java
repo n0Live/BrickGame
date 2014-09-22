@@ -6,7 +6,6 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.RaceSplash;
@@ -46,6 +45,16 @@ public class RaceGame extends Game {
 	 * Current position of the border shift
 	 */
 	private int borderPosition;
+	/**
+	 * Number of traffic lanes:
+	 * <p>
+	 * {@code true} - three-lane, {@code false} - two-lane
+	 */
+	private boolean isThreelaneTraffic;
+	/**
+	 * Whether to draw the board upside down?
+	 */
+	private boolean drawInvertedBoard;
 
 	/**
 	 * The Race
@@ -83,6 +92,11 @@ public class RaceGame extends Game {
 		for (int i = 0; i < positions.length; i++) {
 			positions[i] = startPoint + i * car.getWidth();
 		}
+
+		// for every even type of game
+		isThreelaneTraffic = (getType() % 2 == 0);
+		// for types 3-4
+		drawInvertedBoard = (getType() >= 3);
 	}
 
 	/**
@@ -99,7 +113,7 @@ public class RaceGame extends Game {
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 
-			int currentSpeed = (getType() % 2 == 0) ? getSpeed(true) / 2
+			int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
 					: getSpeed(true) / 3;
 
 			if (getStatus() != Status.Paused) {
@@ -141,7 +155,7 @@ public class RaceGame extends Game {
 	private void moveOn() {
 		Board board = getBoard();
 		// draw borders
-		setBoard(drawBorder(board, (getType() % 2) != 0));
+		setBoard(drawBorder(board, !isThreelaneTraffic));
 		// draw opponents
 		Iterator<int[]> it = opponents.iterator();
 
@@ -210,8 +224,8 @@ public class RaceGame extends Game {
 			coordY = lastOpponentY + distance - car.minY();
 
 			// for levels with 3 positions;
-			if ((getType() % 2 == 0)
-			// chance from 1/10 - on level 1, to 1/5 - on level 10
+			if (isThreelaneTraffic
+			// and chance from 1/10 - on level 1, to 1/5 - on level 10
 					&& (r.nextInt(10 - getLevel() / 2) == 0)) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
@@ -359,7 +373,7 @@ public class RaceGame extends Game {
 		Board newBoard = board.clone();
 
 		// draws the inverted board
-		if (getType() > 2) {
+		if (drawInvertedBoard) {
 			for (int i = 0; i < board.getHeight(); i++) {
 				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
 			}
