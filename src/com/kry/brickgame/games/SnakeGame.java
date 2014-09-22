@@ -38,6 +38,15 @@ public class SnakeGame extends Game {
 	private SnakeShape snake;
 
 	/**
+	 * Whether the snake can teleporting from one side of the board to another?
+	 */
+	private boolean isToroidalField;
+	/**
+	 * Use preloaded levels or generate new ones?
+	 */
+	private boolean usePreloadedLevels;
+
+	/**
 	 * The Snake
 	 * 
 	 * @param speed
@@ -56,6 +65,10 @@ public class SnakeGame extends Game {
 	public SnakeGame(int speed, int level, int type) {
 		super(speed, level, type);
 		setStatus(Status.None);
+		// for every even type of game
+		isToroidalField = (getType() % 2 == 0);
+		// for types 1-2
+		usePreloadedLevels = (getType() <= 2);
 	}
 
 	/**
@@ -111,6 +124,10 @@ public class SnakeGame extends Game {
 
 	/**
 	 * Generating borders for the toroidal field
+	 * 
+	 * @param hasRandomGates
+	 *            {@code true} - to generate a random gates, {@code false} - to
+	 *            generate a gates, placed in the middle of the border
 	 */
 	private void prepareBorders(boolean hasRandomGates) {
 		Cell fill;
@@ -154,7 +171,7 @@ public class SnakeGame extends Game {
 
 		// in line at the borders of the board shall not be put an obstacle
 		// k - count of empty line at the borders
-		int k = (getType() % 2 == 0) ? 2 : 1;
+		int k = (isToroidalField) ? 2 : 1;
 
 		// finds empty cells
 		do {
@@ -266,15 +283,15 @@ public class SnakeGame extends Game {
 		snake = new SnakeShape();
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2;
-		curY = (getType() % 2 == 0) ? 1 : 0;
+		curY = (isToroidalField) ? 1 : 0;
 
 		tryMove(snake.getDirection());
 
-		if (getType() == 2)
-			prepareBorders(false);
-		else if (getType() == 4)
-			prepareBorders(true);
-		if (getType() < 3)
+		if (isToroidalField) {
+			prepareBorders(!usePreloadedLevels);
+		}
+
+		if (usePreloadedLevels)
 			loadPreparedObstacle();
 		else
 			prepareBoard();
@@ -330,7 +347,7 @@ public class SnakeGame extends Game {
 
 		// check the out off the board
 		if (checkBoardCollision(headOfSnake, newX, newY)) {
-			if (getType() % 2 == 0) {
+			if (isToroidalField) {
 				if (newX < 0)
 					newX = boardWidth + newX;
 				else if (newX >= boardWidth)

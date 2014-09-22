@@ -36,9 +36,21 @@ public class TetrisGame extends Game {
 	 */
 	protected TetrisShape nextPiece;
 	/**
-	 * Type of a Super shape (0-2). Applies only when {@code type = 50}
+	 * Has the liquid (crumbly) figures
 	 */
-	private int typeOfSuperShape;
+	private boolean hasLiquidFigures;
+	/**
+	 * Has the acid figures
+	 */
+	private boolean hasAcidFigures;
+	/**
+	 * Has the figures that can pass through an obstacles
+	 */
+	private boolean hasThroughfallFigures;
+	/**
+	 * Has the random figures: liquid, acid or throughfall
+	 */
+	private boolean hasRandomFigures;
 
 	/**
 	 * The Tetris
@@ -124,6 +136,15 @@ public class TetrisGame extends Game {
 	public TetrisGame(int speed, int level, int type) {
 		super(speed, level, type);
 		setStatus(Status.None);
+
+		// for types 17-32
+		hasLiquidFigures = ((getType() >= 17) && (getType() <= 32));
+		// for types 33-48
+		hasAcidFigures = ((getType() >= 33) && (getType() <= 48));
+		// for type 49
+		hasThroughfallFigures = (getType() == 49);
+		// for type 50
+		hasRandomFigures = (getType() == 50);
 	}
 
 	/**
@@ -176,13 +197,37 @@ public class TetrisGame extends Game {
 		// was at the top of the border
 		curY = boardHeight - 1 - nextPiece.minY();
 
+		// select random type of figures
+		if (hasRandomFigures) {
+			if (nextPiece.getFill() == Cell.Blink) {
+				switch (new Random().nextInt(3)) {
+				case 0:
+					hasLiquidFigures = true;
+					hasAcidFigures = false;
+					hasThroughfallFigures = false;
+					break;
+				case 1:
+					hasLiquidFigures = false;
+					hasAcidFigures = true;
+					hasThroughfallFigures = false;
+					break;
+				case 2:
+					hasLiquidFigures = false;
+					hasAcidFigures = false;
+					hasThroughfallFigures = true;
+					break;
+				}
+			} else {
+				hasLiquidFigures = false;
+				hasAcidFigures = false;
+				hasThroughfallFigures = false;
+			}
+		}
+
 		if (!tryMove(nextPiece, curX, curY)) {
 			gameOver();
 		} else {
 			nextPiece = setPieceFromType(getType());
-
-			if ((getType() == 50) && (nextPiece.getFill() == Cell.Blink))
-				typeOfSuperShape = new Random().nextInt(3);
 
 			clearPreview();
 
@@ -442,7 +487,6 @@ public class TetrisGame extends Game {
 			;
 			break;
 		}
-
 		return newPiece;
 	}
 
@@ -478,10 +522,8 @@ public class TetrisGame extends Game {
 		if (// for super point
 		(newPiece.getShape() == Figures.SuperPoint)//
 				|| ((newPiece.getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE) && //
-				// all blink shapes (except super) in type 49
-				(((getType() == 49) && (newPiece.getFill() == Cell.Blink))
-				// some blink shapes (except super) in type 50
-				|| ((getType() == 50) && (newPiece.getFill() == Cell.Blink) && (typeOfSuperShape == 2))))//
+				// all blink shapes (except super) in type 49 and 50 (some)
+				(hasThroughfallFigures && (newPiece.getFill() == Cell.Blink)))//
 		) {
 			if (checkCollision(board, newPiece, prepX, newY)) {
 				// checking whether filled line at the current (old) figure
@@ -690,15 +732,11 @@ public class TetrisGame extends Game {
 			curPiece = new TetrisShape(Figures.NoShape);
 		} else if (curPiece.getShape() == Figures.SuperBomb) {// bomb
 			kaboom(curX + 1, curY); // shift the epicenter to the bottom edge
-		} else if (//
-		(((getType() >= 17) && (getType() <= 32))//
-				|| ((getType() == 50) && (typeOfSuperShape == 0)))
-				&& (curPiece.getFill() == Cell.Blink)) {// liquid figure
+		} else if (hasLiquidFigures // liquid figure
+				&& (curPiece.getFill() == Cell.Blink)) {
 			flowDown(getBoard(), curX, curY, curPiece, false);
-		} else if (//
-		(((getType() >= 32) && (getType() <= 48))//
-				|| ((getType() == 50) && (typeOfSuperShape == 1)))
-				&& (curPiece.getFill() == Cell.Blink)) {// acid figure
+		} else if (hasAcidFigures // acid figure
+				&& (curPiece.getFill() == Cell.Blink)) {
 			flowDown(getBoard(), curX, curY, curPiece, true);
 		} else { // ordinal figure
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
@@ -924,7 +962,7 @@ public class TetrisGame extends Game {
 			return;
 
 		super.processKeys();
-		
+
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
