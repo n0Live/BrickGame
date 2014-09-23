@@ -610,9 +610,11 @@ public abstract class Game extends Thread { // implements Runnable
 	}
 
 	/**
-	 * Insert the cells in the basic board. Coordinate ( {@code x, y}) is set a
-	 * point, which gets the lower left corner of the {@code cells}
+	 * Insert the cells to the board. Coordinate ( {@code x, y}) is set a point,
+	 * which gets the lower left corner of the {@code cells}
 	 * 
+	 * @param board
+	 *            the board for insertion
 	 * @param cells
 	 *            the cells to insert
 	 * @param x
@@ -621,12 +623,12 @@ public abstract class Game extends Thread { // implements Runnable
 	 *            y-coordinate for the insertion
 	 * @return {@code true} if the insertion is success, otherwise {@code false}
 	 */
-	protected boolean insertCells(Cell[][] cells, int x, int y) {
-		Board board = getBoard();
-
+	protected static boolean insertCells(Board board, Cell[][] cells, int x,
+			int y) {
 		if ((x < 0) || (y < 0)) {
 			return false;
 		}
+
 		if ((x + cells.length > board.getWidth())
 				|| (y + cells[0].length > board.getHeight())) {
 			return false;
@@ -637,7 +639,8 @@ public abstract class Game extends Thread { // implements Runnable
 				board.setCell(cells[i][j], x + i, y + j);
 			}
 		}
-		fireBoardChanged(board);
+
+		// fireBoardChanged(board);
 		return true;
 	}
 
@@ -787,7 +790,8 @@ public abstract class Game extends Thread { // implements Runnable
 				int lowerLeftX = x - (waves[wave][0].length / 2);
 				int lowerLeftY = y - (waves[wave].length / 2);
 
-				insertCells(waves[wave], lowerLeftX, lowerLeftY);
+				insertCells(getBoard(), waves[wave], lowerLeftX, lowerLeftY);
+				fireBoardChanged(getBoard());
 
 				sleep(ANIMATION_DELAY * 2);
 			}
@@ -980,7 +984,7 @@ public abstract class Game extends Thread { // implements Runnable
 	public void keyReleased(KeyPressed key) {
 		keys.remove(key);
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */

@@ -231,7 +231,7 @@ public class GameSelector extends Game {
 	 * 
 	 */
 	private void insertBoard(Board boardToInsert, int x, int y) {
-		insertCells(boardToInsert.getBoard(), x, y);
+		insertCells(getBoard(), boardToInsert.getBoard(), x, y);
 	}
 
 	/**

@@ -206,7 +206,7 @@ public class FroggerGame extends Game {
 	private void loadLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
-		insertCells(road.getBoard(), 0, 1);
+		insertCells(getBoard(), road.getBoard(), 0, 1);
 		// initialize the frog
 		setFrog();
 	}
@@ -410,7 +410,7 @@ public class FroggerGame extends Game {
 				road.setRow(tract, i);
 			}
 		}
-		insertCells(road.getBoard(), 0, 1);
+		insertCells(board, road.getBoard(), 0, 1);
 
 		// shifting the frog with the road
 		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
