@@ -7,7 +7,7 @@ import com.kry.brickgame.Board.Cell;
 public class ÑharacterShape extends Shape {
 
 	public static enum Ñharacters {
-		Platform, Gun, Car, DanceShape
+		Platform1, Platform2, Platform3, Platform4, Gun, Car, DanceShape
 	};
 
 	/**
@@ -20,7 +20,10 @@ public class ÑharacterShape extends Shape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] charactersTable = new int[][][] {
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // platform
+			{ { 0, 0 } }, // platform1
+			{ { 0, 0 }, { 1, 0 } }, // platform2
+			{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // platform3
+			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // platform4
 			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // gun
 			{ { -1, -1 }, { 1, -1 }, { 0, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
 					{ 0, 2 } }, // car
@@ -50,8 +53,8 @@ public class ÑharacterShape extends Shape {
 	 * @param fill
 	 *            type of fill of the character
 	 */
-	private ÑharacterShape setType(Ñharacters type, RotationAngle rotationAngle,
-			Cell fill) {
+	private ÑharacterShape setType(Ñharacters type,
+			RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < charactersTable[type.ordinal()].length; i++) {
 			setX(i, charactersTable[type.ordinal()][i][0]);
 			setY(i, charactersTable[type.ordinal()][i][1]);
