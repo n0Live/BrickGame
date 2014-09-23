@@ -46,6 +46,13 @@ public class Shape implements Cloneable {
 			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle
 					.values()[this.ordinal() + 1] : RotationAngle.values()[0];
 		}
+		
+		/**
+		 * The direction opposite to the current direction
+		 */
+		public RotationAngle getOpposite() {
+			return getRight().getRight();
+		}
 	};
 
 	/**
