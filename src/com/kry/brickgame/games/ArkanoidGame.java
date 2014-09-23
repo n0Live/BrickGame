@@ -24,10 +24,10 @@ public class ArkanoidGame extends Game {
 	public static final int subtypesNumber = 8;
 
 	// ** Direction constants **
-	private static final RotationAngle UP_RIGHT = RotationAngle.d0;
-	private static final RotationAngle DOWN_LEFT = RotationAngle.d180;
-	private static final RotationAngle UP_LEFT = RotationAngle.d270;
-	private static final RotationAngle DOWN_RIGHT = RotationAngle.d90;
+	private static final RotationAngle LEFT = RotationAngle.d270;
+	private static final RotationAngle RIGHT = RotationAngle.d90;
+	private static final RotationAngle UP = RotationAngle.d0;
+	private static final RotationAngle DOWN = RotationAngle.d180;
 	// **
 
 	private ÑharacterShape platform;
@@ -38,7 +38,9 @@ public class ArkanoidGame extends Game {
 
 	private int ballY;
 
-	private RotationAngle ballDirection;
+	private RotationAngle ballVerticalDirection;
+
+	private RotationAngle ballHorizontalDirection;
 
 	private Board bricks;
 
@@ -69,7 +71,7 @@ public class ArkanoidGame extends Game {
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-				moveBall(ballDirection);
+				moveBall();
 			}
 			// processing of key presses
 			processKeys();
@@ -85,7 +87,8 @@ public class ArkanoidGame extends Game {
 
 		ballX = curX;
 		ballY = curY + 1;
-		ballDirection = UP_RIGHT;
+		ballVerticalDirection = UP;
+		ballHorizontalDirection = RIGHT;
 
 		drawBall(ballX, ballY);
 		movePlatform(curX);
@@ -147,43 +150,23 @@ public class ArkanoidGame extends Game {
 		return board;
 	}
 
-	private boolean moveBall(RotationAngle direction) {
+	private boolean moveBall() {
 		int newX = ballX;
 		int newY = ballY;
-		RotationAngle newDirection = direction;
 
-		do {
-			switch (newDirection) {
-			case d0:// UP_RIGHT
-				newY = ballY + 1;
-				newX = ballX + 1;
-				break;
-			case d90:// DOWN_RIGHT
-				newY = ballY - 1;
-				newX = ballX + 1;
-				break;
-			case d180:// DOWN_LEFT
-				newY = ballY - 1;
-				newX = ballX - 1;
-				break;
-			case d270:// UP_LEFT
-				newY = ballY + 1;
-				newX = ballX - 1;
-				break;
-			}
+		newX = ballX + ((ballVerticalDirection == RIGHT) ? 1 : -1);
+		newY = ballY + ((ballVerticalDirection == UP) ? 1 : -1);
 
-			if ((newX < 0) || (newX >= boardWidth) || (newY < 0)
-					|| (newY >= boardHeight)) {
-				if ((newDirection == UP_LEFT) || (newDirection == DOWN_LEFT))
-					newDirection = newDirection.getRight();
-				else
-					newDirection = newDirection.getLeft();
-			}
+		if (newY >= boardHeight) {
+			ballVerticalDirection = DOWN;
+			newY = ballY - 1;
+		}
+		if ((newX < 0) || (newX >= boardWidth)) {
+			ballHorizontalDirection = ballHorizontalDirection.getRight()
+					.getRight();
+			newX = ballX - (newX - ballX);
+		}
 
-		} while ((newX < 0) || (newX >= boardWidth) || (newY < 0)
-				|| (newY >= boardHeight));
-
-		ballDirection = newDirection;
 		drawBall(newX, newY);
 
 		return false;
