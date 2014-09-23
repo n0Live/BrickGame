@@ -55,16 +55,18 @@ public class SplashScreen extends Game {
 
 		boardNumber.setNumber(BoardNumbers.intToNumbers(9));
 
-		insertCells(boardNumber.getBoard(),// upper left
+		insertCells(board, boardNumber.getBoard(),// upper left
 				1, board.getHeight() - boardNumber.getHeight() - 1);
-		insertCells(boardNumber.getBoard(),// lower left
+		insertCells(board, boardNumber.getBoard(),// lower left
 				1, boardNumber.getHeight());
-		insertCells(
+		insertCells(board, 
 				boardNumber.getBoard(),// upper right
 				board.getWidth() - boardNumber.getWidth() - 1,
 				board.getHeight() - boardNumber.getHeight() * 2);
-		insertCells(boardNumber.getBoard(),// lower right
+		insertCells(board, boardNumber.getBoard(),// lower right
 				board.getWidth() - boardNumber.getWidth() - 1, 1);
+		
+		setBoard(board);
 	}
 
 	/**
