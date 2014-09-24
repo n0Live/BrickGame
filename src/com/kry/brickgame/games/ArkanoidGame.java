@@ -1,6 +1,8 @@
 package com.kry.brickgame.games;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
@@ -57,7 +59,7 @@ public class ArkanoidGame extends Game {
 	/**
 	 * The bricks wall
 	 */
-	private Board bricks;
+	private volatile Board bricks;
 	/**
 	 * Number of bricks is not broken at the current level
 	 */
@@ -66,6 +68,14 @@ public class ArkanoidGame extends Game {
 	 * Y-coordinate position on the board for the second platform
 	 */
 	private int secY;
+	/**
+	 * X-coordinate for insertion of the bricks wall
+	 */
+	private int bricksX;
+	/**
+	 * Y-coordinate for insertion of the bricks wall
+	 */
+	private int bricksY;
 	/**
 	 * Use preloaded bricks wall or generate new ones?
 	 */
@@ -132,21 +142,38 @@ public class ArkanoidGame extends Game {
 	public void start() {
 		super.start();
 
-		setStatus(Status.Running);
 		setLives(4);
 
 		loadLevel(true);
 
-		// if the size of the platform is 1, decrease the speed
-		int currentSpeed = (platform.getType() == Ñharacters.Platform1) ? getSpeed(true)
-				: getSpeed(true) / 2;
+		// create timer for shift the bricks
+		Timer shiftBricksTimer = new Timer("ShiftBricksTimer", true);
+		if (isShiftingBricks) {
+			shiftBricksTimer.scheduleAtFixedRate(new TimerTask() {
+				@Override
+				public void run() {
+					if (getStatus() == Status.Running) {
+						shiftBricks();
+					}
+				}
+			}, 0, getFIRST_LEVEL_SPEED());
+		}
 
+		int currentSpeed;
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			// if the size of the platform is 1, decrease the speed
+			currentSpeed = (platform.getType() == Ñharacters.Platform1) ? getSpeed(true)
+					: getSpeed(true) / 2;
+
 			if ((getStatus() != Status.Paused) && (elapsedTime(currentSpeed))) {
 				moveBall();
 			}
 			// processing of key presses
 			processKeys();
+		}
+
+		if (isShiftingBricks) {
+			shiftBricksTimer.cancel();
 		}
 	}
 
@@ -171,8 +198,8 @@ public class ArkanoidGame extends Game {
 			bricks = (usePreloadedBricks) ? setPreloadedBricks()
 					: generateBricks();
 
-			int bricksX = 0;
-			int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
+			bricksX = 0;
+			bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
 					.getHeight()) / 2) : (boardHeight - bricks.getHeight());
 
 			insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
@@ -181,6 +208,8 @@ public class ArkanoidGame extends Game {
 		drawBall(getBoard(), ballX, ballY);
 		// init platform
 		movePlatform(curX);
+
+		setStatus(Status.Running);
 	}
 
 	/**
@@ -351,6 +380,18 @@ public class ArkanoidGame extends Game {
 	}
 
 	/**
+	 * Shift the bricks wall horizontally
+	 */
+	private synchronized void shiftBricks() {
+		// shift bricks
+		bricks = horizontalShift(bricks, 1);
+		// insert shifted bricks to the board
+		insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
+		// re-drawing the ball
+		setBoard(drawBall(getBoard(), ballX, ballY));
+	}
+
+	/**
 	 * Move the platform to a new location
 	 * 
 	 * @param x
@@ -441,6 +482,9 @@ public class ArkanoidGame extends Game {
 			newX = ballX - (newX - ballX);
 		}
 
+		// try to break brick under current position of the ball
+		breakBrick(board, ballX, ballY);
+
 		// check collision with the bricks or the platform
 		if ((board.getCell(newX, ballY) != Cell.Empty)
 				|| (board.getCell(ballX, newY) != Cell.Empty)
@@ -495,19 +539,24 @@ public class ArkanoidGame extends Game {
 	 *            y-coordinate of the brick for breaking
 	 */
 	private void breakBrick(Board board, int x, int y) {
-		int bricksX = 0;
-		int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
-				.getHeight()) / 2) : (boardHeight - bricks.getHeight());
-		
 		// coordinates are given to the bricks wall's grid
-		bricks.setCell(Cell.Empty, x - bricksX, y - bricksY);
+		int givenX = x - bricksX;
+		int givenY = y - bricksY;
 
-		insertCells(board, bricks.getBoard(), bricksX, bricksY);
+		if ((givenX < 0) || (givenX >= bricks.getWidth()) || (givenY < 0)
+				|| (givenY >= bricks.getHeight()))
+			return;
 
-		// increase scores
-		setScore(getScore() + 1);
-		// decrease bricks count
-		bricksCount--;
+		if (bricks.getCell(givenX, givenY) != Cell.Empty) {
+			bricks.setCell(Cell.Empty, givenX, givenY);
+
+			insertCells(board, bricks.getBoard(), bricksX, bricksY);
+
+			// increase scores
+			setScore(getScore() + 1);
+			// decrease bricks count
+			bricksCount--;
+		}
 	}
 
 	/**
@@ -530,11 +579,10 @@ public class ArkanoidGame extends Game {
 	 * Drawing effect of the explosion and decreasing lives
 	 */
 	private void loss() {
+		setStatus(Status.DoSomeWork);
+
 		// saves current bricks wall
 		Board curBricks = bricks.clone();
-		int bricksX = 0;
-		int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
-				.getHeight()) / 2) : (boardHeight - bricks.getHeight());
 
 		// kaboom and decrease lives
 		kaboom(ballX, ballY);
@@ -555,6 +603,8 @@ public class ArkanoidGame extends Game {
 	 * Increase the level and load it
 	 */
 	private void win() {
+		setStatus(Status.DoSomeWork);
+
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1)
 			setSpeed(getSpeed() + 1);
