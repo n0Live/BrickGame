@@ -52,17 +52,17 @@ public class GunGame extends Game {
 	 * {@code true} - the shot creates a new cell, {@code false} - the shot
 	 * destroys a cell
 	 */
-	boolean isCreationMode;
+	private boolean isCreationMode;
 	/**
 	 * Number of barrels
 	 * <p>
 	 * {@code true} - two barrels, {@code false} - one barrel
 	 */
-	boolean hasTwoSmokingBarrels;
+	private boolean hasTwoSmokingBarrels;
 	/**
 	 * Whether to shift the board?
 	 */
-	boolean isShiftingBoard;
+	private boolean isShiftingBoard;
 	/**
 	 * Whether to draw the board upside down?
 	 */
