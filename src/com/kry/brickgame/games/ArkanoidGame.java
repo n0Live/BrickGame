@@ -26,10 +26,8 @@ public class ArkanoidGame extends Game {
 	public static final int subtypesNumber = 64;
 
 	// ** Direction constants **
-	private static final RotationAngle LEFT = RotationAngle.d270;
-	private static final RotationAngle RIGHT = RotationAngle.d90;
 	private static final RotationAngle UP = RotationAngle.d0;
-	private static final RotationAngle DOWN = RotationAngle.d180;
+	private static final RotationAngle RIGHT = RotationAngle.d90;
 	// **
 
 	/**
@@ -65,9 +63,25 @@ public class ArkanoidGame extends Game {
 	 */
 	private int bricksCount;
 	/**
+	 * Y-coordinate position on the board for the second platform
+	 */
+	private int secY;
+	/**
 	 * Use preloaded bricks wall or generate new ones?
 	 */
 	private boolean usePreloadedBricks;
+	/**
+	 * Whether to shift the bricks wall?
+	 */
+	private boolean isShiftingBricks;
+	/**
+	 * Use the platform on both sides of the board?
+	 */
+	private boolean useDoubleSidedPlatform;
+	/**
+	 * Whether to draw the board upside down?
+	 */
+	private boolean drawInvertedBoard;
 
 	/**
 	 * The Arkanoid
@@ -100,8 +114,15 @@ public class ArkanoidGame extends Game {
 		ball.setCoord(0, new int[] { 0, 0 });
 		ball.setFill(Cell.Full);
 
-		// for types 1-32
-		usePreloadedBricks = (getType() <= 32);
+		// for types 1-16 and 33-48
+		usePreloadedBricks = ((getType() <= 16))
+				|| ((getType() >= 33) && (getType() <= 48));
+		// for every 4-8 types
+		isShiftingBricks = ((getType() % 8 >= 5) || (getType() % 8 == 0));
+		// for every 9-16 types
+		useDoubleSidedPlatform = ((getType() % 16 >= 9) || (getType() % 16 == 0));
+		// for types 8-16
+		drawInvertedBoard = (getType() > 32);
 	}
 
 	/**
@@ -138,6 +159,7 @@ public class ArkanoidGame extends Game {
 	private void loadLevel(boolean setBricks) {
 		curX = boardWidth / 2 - 1;
 		curY = 0;
+		secY = boardHeight - 1;
 
 		ballX = curX;
 		ballY = curY + 1;
@@ -148,8 +170,12 @@ public class ArkanoidGame extends Game {
 		if (setBricks) {
 			bricks = (usePreloadedBricks) ? setPreloadedBricks()
 					: generateBricks();
-			insertCells(getBoard(), bricks.getBoard(), 0,
-					boardHeight - bricks.getHeight());
+
+			int bricksX = 0;
+			int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
+					.getHeight()) / 2) : (boardHeight - bricks.getHeight());
+
+			insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		}
 		// init ball
 		drawBall(getBoard(), ballX, ballY);
@@ -341,11 +367,17 @@ public class ArkanoidGame extends Game {
 		// Erase the platform and draw on the new place
 		board = drawShape(board, curX, curY, platform, Cell.Empty);
 		board = drawShape(board, x, curY, platform, Cell.Full);
+		if (useDoubleSidedPlatform) {
+			board = drawShape(board, curX, secY, platform, Cell.Empty);
+			board = drawShape(board, x, secY, platform, Cell.Full);
+		}
 
 		// Move the ball, if it upon the platform
-		if ((ballY == curY + 1)//
+		if (((ballY == curY + 1)//
+				|| (useDoubleSidedPlatform && (ballY == secY - 1)))//
 				&& ((ballX >= curX + platform.minX())//
 				&& (ballX <= curX + platform.maxX()))) {
+
 			int newBallX = ballX + (x - curX);
 			board = drawBall(board, newBallX, ballY);
 		}
@@ -394,14 +426,14 @@ public class ArkanoidGame extends Game {
 		newY = ballY + ((ballVerticalDirection == UP) ? 1 : -1);
 
 		// if the ball fall off the board then loss live
-		if (newY < 0) {
+		if ((newY < 0) || (useDoubleSidedPlatform && (newY >= boardHeight))) {
 			loss();
 			return;
 		}
 
 		// check collision with the board's borders
-		if (newY >= boardHeight) {
-			ballVerticalDirection = DOWN;
+		if ((newY < 0) || (newY >= boardHeight)) {
+			ballVerticalDirection = ballVerticalDirection.getOpposite();
 			newY = ballY - 1;
 		}
 		if ((newX < 0) || (newX >= boardWidth)) {
@@ -421,17 +453,13 @@ public class ArkanoidGame extends Game {
 					ballHorizontalDirection = ballHorizontalDirection
 							.getOpposite();
 					if (!isPlatform(newX, ballY)) {
-						board.setCell(Cell.Empty, newX, ballY);
-						setScore(getScore() + 1);
-						bricksCount--;
+						breakBrick(board, newX, ballY);
 					}
 				}
 				if (board.getCell(ballX, newY) != Cell.Empty) {
 					ballVerticalDirection = ballVerticalDirection.getOpposite();
 					if (!isPlatform(ballX, newY)) {
-						board.setCell(Cell.Empty, ballX, newY);
-						setScore(getScore() + 1);
-						bricksCount--;
+						breakBrick(board, ballX, newY);
 					}
 				}
 				// if there are none,then processed the cell with whom the ball
@@ -440,9 +468,7 @@ public class ArkanoidGame extends Game {
 				ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 				ballVerticalDirection = ballVerticalDirection.getOpposite();
 				if (!isPlatform(newX, newY)) {
-					board.setCell(Cell.Empty, newX, newY);
-					setScore(getScore() + 1);
-					bricksCount--;
+					breakBrick(board, newX, newY);
 				}
 			}
 
@@ -459,6 +485,32 @@ public class ArkanoidGame extends Game {
 	}
 
 	/**
+	 * Processing breaking bricks
+	 * 
+	 * @param board
+	 *            the board for drawing the bricks wall after breaking bricks
+	 * @param x
+	 *            x-coordinate of the brick for breaking
+	 * @param y
+	 *            y-coordinate of the brick for breaking
+	 */
+	private void breakBrick(Board board, int x, int y) {
+		int bricksX = 0;
+		int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
+				.getHeight()) / 2) : (boardHeight - bricks.getHeight());
+		
+		// coordinates are given to the bricks wall's grid
+		bricks.setCell(Cell.Empty, x - bricksX, y - bricksY);
+
+		insertCells(board, bricks.getBoard(), bricksX, bricksY);
+
+		// increase scores
+		setScore(getScore() + 1);
+		// decrease bricks count
+		bricksCount--;
+	}
+
+	/**
 	 * Checks for the platform to the coordinates {@code x, y}
 	 * 
 	 * @param x
@@ -469,7 +521,9 @@ public class ArkanoidGame extends Game {
 	 *         {@code false}
 	 */
 	private boolean isPlatform(int x, int y) {
-		return ((x >= curX + platform.minX()) && (x <= curX + platform.maxX()) && (y == curY));
+		return ((x >= curX + platform.minX())//
+				&& (x <= curX + platform.maxX())//
+		&& ((y == curY) || (useDoubleSidedPlatform && (y == secY))));
 	}
 
 	/**
@@ -478,10 +532,9 @@ public class ArkanoidGame extends Game {
 	private void loss() {
 		// saves current bricks wall
 		Board curBricks = bricks.clone();
-		for (int i = 0; i < bricks.getHeight(); i++) {
-			curBricks.setRow(
-					getBoard().getRow(i + boardHeight - bricks.getHeight()), i);
-		}
+		int bricksX = 0;
+		int bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
+				.getHeight()) / 2) : (boardHeight - bricks.getHeight());
 
 		// kaboom and decrease lives
 		kaboom(ballX, ballY);
@@ -495,8 +548,7 @@ public class ArkanoidGame extends Game {
 		}
 
 		// restores saved bricks wall
-		insertCells(getBoard(), curBricks.getBoard(), 0,
-				boardHeight - bricks.getHeight());
+		insertCells(getBoard(), curBricks.getBoard(), bricksX, bricksY);
 	}
 
 	/**
@@ -509,6 +561,20 @@ public class ArkanoidGame extends Game {
 
 		animatedClearBoard(true);
 		loadLevel(true);
+	}
+
+	@Override
+	protected synchronized void fireBoardChanged(Board board) {
+		Board newBoard = board.clone();
+
+		// draws the inverted board
+		if (drawInvertedBoard) {
+			for (int i = 0; i < board.getHeight(); i++) {
+				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
+			}
+		}
+
+		super.fireBoardChanged(newBoard);
 	}
 
 	/**
