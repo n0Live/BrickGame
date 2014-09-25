@@ -39,7 +39,7 @@ public class TetrisGameK extends TetrisGame {
 				tryMove(rotatedPiece, curX, curY);
 			}
 		} else
-			keys.add(key);
+			super.keyPressed(key);
 	}
 
 }
