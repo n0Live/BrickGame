@@ -1,11 +1,9 @@
-package com.kry.brickgame.splashes;
+package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board;
+import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game;
-import com.kry.brickgame.games.GameSelector;
 
 /**
  * @author noLive
@@ -59,13 +57,13 @@ public class SplashScreen extends Game {
 				1, board.getHeight() - boardNumber.getHeight() - 1);
 		insertCells(board, boardNumber.getBoard(),// lower left
 				1, boardNumber.getHeight());
-		insertCells(board, 
+		insertCells(board,
 				boardNumber.getBoard(),// upper right
 				board.getWidth() - boardNumber.getWidth() - 1,
 				board.getHeight() - boardNumber.getHeight() * 2);
 		insertCells(board, boardNumber.getBoard(),// lower right
 				board.getWidth() - boardNumber.getWidth() - 1, 1);
-		
+
 		setBoard(board);
 	}
 

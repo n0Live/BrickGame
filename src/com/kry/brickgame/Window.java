@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
 import com.kry.brickgame.games.Game;
-import com.kry.brickgame.splashes.SplashScreen;
+import com.kry.brickgame.games.SplashScreen;
 
 public class Window extends JFrame implements MouseInputListener {
 	private static final long serialVersionUID = 3466619047314091863L;
