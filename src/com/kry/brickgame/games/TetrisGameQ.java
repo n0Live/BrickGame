@@ -10,9 +10,11 @@ public class TetrisGameQ extends TetrisGame {
 
 	/**
 	 * The Tetris with the board is upside down
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameQ(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameQ(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 	}
 
 	@Override
@@ -26,7 +28,7 @@ public class TetrisGameQ extends TetrisGame {
 
 		super.fireBoardChanged(newBoard);
 	}
-	
+
 	@Override
 	protected synchronized void firePreviewChanged(Board board) {
 		Board newBoard = board.clone();

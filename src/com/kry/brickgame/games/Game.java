@@ -264,7 +264,7 @@ public abstract class Game extends Thread {
 	protected void fireRotationChanged(Rotation rotation) {
 		GameEvent event = new GameEvent(this, rotation);
 		for (GameListener listener : listeners) {
-			listener.levelChanged(event);
+			listener.rotationChanged(event);
 		}
 	}
 

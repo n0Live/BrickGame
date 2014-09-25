@@ -11,9 +11,11 @@ public class TetrisGameS extends TetrisGameK {
 	/**
 	 * The Tetris with the board is upside down and the changing of the figures
 	 * instead of rotating
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameS(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameS(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 	}
 
 	@Override

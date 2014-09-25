@@ -13,7 +13,6 @@ import com.kry.brickgame.BoardLetters;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
 import com.kry.brickgame.splashes.Splash;
-import com.kry.brickgame.splashes.SplashScreen;
 
 /**
  * The selection screen of a game
@@ -420,15 +419,29 @@ public class GameSelector extends Game {
 		// if the class for the current game was found
 		if (c != null) {
 			try {
-				// gets constructor(speed, level)
-				Class[] paramTypes = new Class[] { int.class, int.class,
-						Rotation.class, int.class };
-				Constructor<Game> constructor = (Constructor<Game>) c
-						.getConstructor(paramTypes);
+				Class[] paramTypes;
+				Constructor<Game> constructor;
+				Object[] args;
+				
+				try {
+					// gets constructor(speed, level, rotation, type)
+					paramTypes = new Class[] { int.class, int.class,
+							Rotation.class, int.class };
+					constructor = (Constructor<Game>) c
+							.getConstructor(paramTypes);
+					// gets parameters
+					args = new Object[] { getSpeed(), getLevel(),
+							getRotation(), number };
+				} catch (NoSuchMethodException e) {
+					// if constructor with rotation is not exist,
+					// gets constructor(speed, level, type)
+					paramTypes = new Class[] { int.class, int.class, int.class };
+					constructor = (Constructor<Game>) c
+							.getConstructor(paramTypes);
+					// gets parameters without rotation
+					args = new Object[] { getSpeed(), getLevel(), number };
+				}
 
-				// gets parameters
-				Object[] args = new Object[] { getSpeed(), getLevel(),
-						getRotation(), number };
 				// creates an instance of the game
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer

@@ -14,9 +14,11 @@ public class TetrisGameJ extends TetrisGame {
 
 	/**
 	 * The Tetris with the addition of new lines every few seconds
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameJ(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameJ(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 		isTimeToAddLine = false;
 		time = TIME_BETWEEN_ADDING_LINE;
 	}

@@ -550,7 +550,7 @@ public class GunGame extends Game {
 				sleep(ANIMATION_DELAY * 2);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels); 
+				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
 				if (isCreationMode)
 					keys.remove(KeyPressed.KeyRotate);
 				else

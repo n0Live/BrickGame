@@ -10,9 +10,11 @@ public class TetrisGameU extends TetrisGameQ {
 
 	/**
 	 * The Tetris with the board is upside down and the shifting board content
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameU(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameU(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 	}
 
 	@Override

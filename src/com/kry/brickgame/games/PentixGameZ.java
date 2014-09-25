@@ -20,9 +20,11 @@ public class PentixGameZ extends PentixGame {
 	 * The Tetris with the Pentominoes figures, the addition of new lines every
 	 * few seconds, the changing of the figures instead of rotating and the
 	 * shifting board content
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public PentixGameZ(int speed, int level, int type) {
-		super(speed, level, type);
+	public PentixGameZ(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 		isTimeToAddLine = false;
 		time = TIME_BETWEEN_ADDING_LINE;
 	}

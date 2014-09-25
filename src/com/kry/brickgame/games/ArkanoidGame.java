@@ -29,7 +29,9 @@ public class ArkanoidGame extends Game {
 
 	// ** Direction constants **
 	private static final RotationAngle UP = RotationAngle.d0;
+	private static final RotationAngle DOWN = RotationAngle.d180;
 	private static final RotationAngle RIGHT = RotationAngle.d90;
+	private static final RotationAngle LEFT = RotationAngle.d270;
 	// **
 
 	/**
@@ -100,13 +102,142 @@ public class ArkanoidGame extends Game {
 	 *            initial value of the speed
 	 * @param level
 	 *            initial value of the level
+	 * @param rotation
+	 *            direction of rotation
 	 * @param type
-	 *            type of the game type of the game:
+	 *            type of the game:
 	 *            <ol>
-	 *            <li>...;
+	 *            <li>arkanoid with a 4-cell platform and preloaded bricks;
+	 *            <li>arkanoid with a 3-cell platform and preloaded bricks;
+	 *            <li>arkanoid with a 2-cell platform and preloaded bricks;
+	 *            <li>arkanoid with a 1-cell platform and preloaded bricks;
+	 *            <li>arkanoid with a 4-cell platform, preloaded and shifting
+	 *            bricks;
+	 *            <li>arkanoid with a 3-cell platform, preloaded and shifting
+	 *            bricks;
+	 *            <li>arkanoid with a 2-cell platform, preloaded and shifting
+	 *            bricks;
+	 *            <li>arkanoid with a 1-cell platform, preloaded and shifting
+	 *            bricks;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board
+	 *            and preloaded bricks;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board
+	 *            and preloaded bricks;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board
+	 *            and preloaded bricks;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board
+	 *            and preloaded bricks;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks;
+	 *            <li>arkanoid with a 4-cell platform and randomly generated
+	 *            bricks;
+	 *            <li>arkanoid with a 3-cell platform and randomly generated
+	 *            bricks;
+	 *            <li>arkanoid with a 2-cell platform and randomly generated
+	 *            bricks;
+	 *            <li>arkanoid with a 1-cell platform and randomly generated
+	 *            bricks;
+	 *            <li>arkanoid with a 4-cell platform, randomly generated and
+	 *            shifting bricks;
+	 *            <li>arkanoid with a 3-cell platform, randomly generated and
+	 *            shifting bricks;
+	 *            <li>arkanoid with a 2-cell platform, randomly generated and
+	 *            shifting bricks;
+	 *            <li>arkanoid with a 1-cell platform, randomly generated and
+	 *            shifting bricks;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board
+	 *            and randomly generated bricks;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board
+	 *            and randomly generated bricks;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board
+	 *            and randomly generated bricks;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board
+	 *            and randomly generated bricks;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks;
+	 *            <li>arkanoid with a 4-cell platform and preloaded bricks, the
+	 *            board is upside down;
+	 *            <li>arkanoid with a 3-cell platform and preloaded bricks, the
+	 *            board is upside down;
+	 *            <li>arkanoid with a 2-cell platform and preloaded bricks, the
+	 *            board is upside down;
+	 *            <li>arkanoid with a 1-cell platform and preloaded bricks, the
+	 *            board is upside down;
+	 *            <li>arkanoid with a 4-cell platform, preloaded and shifting
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 3-cell platform, preloaded and shifting
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 2-cell platform, preloaded and shifting
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 1-cell platform, preloaded and shifting
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board
+	 *            and preloaded bricks, the board is upside down;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board
+	 *            and preloaded bricks, the board is upside down;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board
+	 *            and preloaded bricks, the board is upside down;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board
+	 *            and preloaded bricks, the board is upside down;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks, the board is upside down;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks, the board is upside down;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks, the board is upside down;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board,
+	 *            preloaded and shifting bricks, the board is upside down;
+	 *            <li>arkanoid with a 4-cell platform and randomly generated
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 3-cell platform and randomly generated
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 2-cell platform and randomly generated
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 1-cell platform and randomly generated
+	 *            bricks, the board is upside down;
+	 *            <li>arkanoid with a 4-cell platform, randomly generated and
+	 *            shifting bricks, the board is upside down;
+	 *            <li>arkanoid with a 3-cell platform, randomly generated and
+	 *            shifting bricks, the board is upside down;
+	 *            <li>arkanoid with a 2-cell platform, randomly generated and
+	 *            shifting bricks, the board is upside down;
+	 *            <li>arkanoid with a 1-cell platform, randomly generated and
+	 *            shifting bricks, the board is upside down;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board
+	 *            and randomly generated bricks, the board is upside down;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board
+	 *            and randomly generated bricks, the board is upside down;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board
+	 *            and randomly generated bricks, the board is upside down;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board
+	 *            and randomly generated bricks, the board is upside down;
+	 *            <li>arkanoid with 4-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks, the board is upside
+	 *            down;
+	 *            <li>arkanoid with 3-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks, the board is upside
+	 *            down;
+	 *            <li>arkanoid with 2-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks, the board is upside
+	 *            down;
+	 *            <li>arkanoid with 1-cell platforms on both sides of the board,
+	 *            randomly generated and shifting bricks, the board is upside
+	 *            down;
 	 */
-	public ArkanoidGame(int speed, int level, int type) {
-		super(speed, level, type);
+	public ArkanoidGame(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 		setStatus(Status.None);
 
 		// platform size depends on the type of game
@@ -191,7 +322,8 @@ public class ArkanoidGame extends Game {
 		ballX = curX;
 		ballY = curY + 1;
 		ballVerticalDirection = UP;
-		ballHorizontalDirection = RIGHT;
+		ballHorizontalDirection = (getRotation() == Rotation.Clockwise) ? RIGHT
+				: LEFT;
 
 		// create the bricks wall
 		if (setBricks) {
@@ -384,7 +516,8 @@ public class ArkanoidGame extends Game {
 	 */
 	private synchronized void shiftBricks() {
 		// shift bricks
-		bricks = horizontalShift(bricks, 1);
+		bricks = horizontalShift(bricks,
+				(getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board
 		insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
@@ -473,8 +606,8 @@ public class ArkanoidGame extends Game {
 		}
 
 		// check collision with the board's borders
-		if ((newY < 0) || (newY >= boardHeight)) {
-			ballVerticalDirection = ballVerticalDirection.getOpposite();
+		if (newY < 0) {
+			ballVerticalDirection = DOWN;
 			newY = ballY - 1;
 		}
 		if ((newX < 0) || (newX >= boardWidth)) {

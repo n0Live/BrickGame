@@ -11,9 +11,11 @@ public class TetrisGameR extends TetrisGameJ {
 	/**
 	 * The Tetris with the board is upside down and the addition of new lines
 	 * every few seconds
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameR(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameR(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 	}
 
 	@Override

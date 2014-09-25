@@ -59,6 +59,8 @@ public class TetrisGame extends Game {
 	 *            initial value of the speed
 	 * @param level
 	 *            initial value of the level
+	 * @param rotation
+	 *            direction of rotation
 	 * @param type
 	 *            type of the game type of the game:
 	 *            <ol>
@@ -133,8 +135,8 @@ public class TetrisGame extends Game {
 	 *            bomb and randomly: liquid figures, acid figures or throughfall
 	 *            figures.
 	 */
-	public TetrisGame(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGame(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 		setStatus(Status.None);
 
 		// for types 17-32
@@ -200,23 +202,11 @@ public class TetrisGame extends Game {
 		// select random type of figures
 		if (hasRandomFigures) {
 			if (nextPiece.getFill() == Cell.Blink) {
-				switch (new Random().nextInt(3)) {
-				case 0:
-					hasLiquidFigures = true;
-					hasAcidFigures = false;
-					hasThroughfallFigures = false;
-					break;
-				case 1:
-					hasLiquidFigures = false;
-					hasAcidFigures = true;
-					hasThroughfallFigures = false;
-					break;
-				case 2:
-					hasLiquidFigures = false;
-					hasAcidFigures = false;
-					hasThroughfallFigures = true;
-					break;
-				}
+				int typeOfSuperShape = new Random().nextInt(3);
+
+				hasLiquidFigures = (typeOfSuperShape == 0) ? true : false;
+				hasAcidFigures = (typeOfSuperShape == 1) ? true : false;
+				hasThroughfallFigures = (typeOfSuperShape == 2) ? true : false;
 			} else {
 				hasLiquidFigures = false;
 				hasAcidFigures = false;
@@ -966,11 +956,11 @@ public class TetrisGame extends Game {
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				sleep(ANIMATION_DELAY * 2);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				tryMove(curPiece, curX + 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				sleep(ANIMATION_DELAY * 2);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				// if we have the super gun
@@ -981,7 +971,11 @@ public class TetrisGame extends Game {
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
 				} else if (curPiece.getShape() != Figures.SuperPoint) {
-					TetrisShape rotatedPiece = curPiece.clone().rotateRight();
+					TetrisShape rotatedPiece;
+					if (getRotation() == Rotation.Counterclockwise)
+						rotatedPiece = curPiece.clone().rotateLeft();
+					else
+						rotatedPiece = curPiece.clone().rotateRight();
 					tryMove(rotatedPiece, curX, curY);
 				}
 				keys.remove(KeyPressed.KeyRotate);

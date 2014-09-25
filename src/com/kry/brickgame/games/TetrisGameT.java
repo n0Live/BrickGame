@@ -12,9 +12,11 @@ public class TetrisGameT extends TetrisGameR {
 	/**
 	 * The Tetris with the board is upside down, the addition of new lines every
 	 * few seconds and the changing of the figures instead of rotating
+	 * 
+	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
 	 */
-	public TetrisGameT(int speed, int level, int type) {
-		super(speed, level, type);
+	public TetrisGameT(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 	}
 
 	@Override
