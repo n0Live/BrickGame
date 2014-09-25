@@ -20,4 +20,6 @@ public interface GameListener extends EventListener {
 
 	public void levelChanged(GameEvent event);
 
+	public void rotationChanged(GameEvent event);
+
 }
