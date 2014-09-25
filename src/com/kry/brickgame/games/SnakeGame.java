@@ -282,10 +282,11 @@ public class SnakeGame extends Game {
 	 * Loading or reloading the specified level
 	 */
 	private void loadLevel() {
-		snake = new SnakeShape(
-				(getRotation() == Rotation.Counterclockwise) ? RIGHT : LEFT);
+		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
+				: LEFT);
 		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2;
+		curX = boardWidth / 2 + ((snake.getDirection() == RIGHT) ? -1 : 1);
+
 		curY = (isToroidalField) ? 1 : 0;
 
 		tryMove(snake.getDirection());

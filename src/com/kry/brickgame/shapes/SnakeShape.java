@@ -34,8 +34,24 @@ public class SnakeShape extends Shape {
 
 		// Initialization of the snake
 		for (int i = 0; i < getLength(); i++) {
-			setX(i, i);
-			setY(i, 0);
+			switch (direction) {
+			case d0:// up
+				setX(i, 0);
+				setY(i, -i);
+				break;
+			case d90:// right
+				setX(i, -i);
+				setY(i, 0);
+				break;
+			case d180:// down
+				setX(i, 0);
+				setY(i, i);
+				break;
+			case d270:// left
+				setX(i, i);
+				setY(i, 0);
+				break;
+			}
 		}
 	}
 
