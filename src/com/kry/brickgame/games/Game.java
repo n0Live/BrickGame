@@ -6,10 +6,10 @@ import java.util.Random;
 import java.util.Set;
 
 import com.kry.brickgame.Board;
+import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.Splash;
 
@@ -17,7 +17,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public abstract class Game extends Thread { // implements Runnable
+public abstract class Game extends Thread {
 	/**
 	 * Animated splash for game
 	 */
@@ -106,6 +106,22 @@ public abstract class Game extends Thread { // implements Runnable
 	 */
 	private volatile Status status;
 
+	public static enum Rotation {
+		None, Clockwise, Counterclockwise;
+
+		public Rotation getNext() {
+			// if None then getNext() return None
+			if (this == Rotation.None)
+				return this;
+			else
+				return this.ordinal() < Rotation.values().length - 1 ? Rotation
+						.values()[this.ordinal() + 1] : Rotation.values()[1];
+		}
+
+	};
+
+	private Rotation rotation;
+
 	private long timePoint = System.currentTimeMillis();
 
 	private volatile Board board;
@@ -128,18 +144,23 @@ public abstract class Game extends Thread { // implements Runnable
 	 *            main board
 	 * @param preview
 	 *            preview board
+	 * @param rotation
+	 *            direction of rotation
 	 * @param type
 	 *            type of the game
 	 */
-	public Game(int speed, int level, Board board, Board preview, int type) {
-		this.speed = speed;
-		this.level = level;
-		this.board = board;
-		this.preview = preview;
+	public Game(int speed, int level, Board board, Board preview,
+			Rotation rotation, int type) {
 		this.type = type;
 
-		this.score = 0;
-		this.lives = 4;
+		setSpeed(speed);
+		setLevel(level);
+		setBoard(board);
+		setPreview(preview);
+		setRotation(rotation);
+
+		setScore(0);
+		setLives(4);
 
 		this.curX = 0;
 		this.curY = 0;
@@ -157,12 +178,29 @@ public abstract class Game extends Thread { // implements Runnable
 	 *            initial value of the speed
 	 * @param level
 	 *            initial value of the level
+	 * @param rotation
+	 *            direction of rotation
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, Rotation rotation, int type) {
+		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
+				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), rotation, type);// preview
+	}
+
+	/**
+	 * The Game without rotation
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
 	 * @param type
 	 *            type of the game
 	 */
 	public Game(int speed, int level, int type) {
 		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
-				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), type);// preview
+				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), Rotation.None, type);// preview
 	}
 
 	public Game() {
@@ -218,6 +256,13 @@ public abstract class Game extends Thread { // implements Runnable
 
 	protected synchronized void fireLevelChanged(int level) {
 		GameEvent event = new GameEvent(this, level);
+		for (GameListener listener : listeners) {
+			listener.levelChanged(event);
+		}
+	}
+
+	protected void fireRotationChanged(Rotation rotation) {
+		GameEvent event = new GameEvent(this, rotation);
 		for (GameListener listener : listeners) {
 			listener.levelChanged(event);
 		}
@@ -349,8 +394,24 @@ public abstract class Game extends Thread { // implements Runnable
 		firePreviewChanged(preview);
 	}
 
-	public int getType() {
+	protected int getType() {
 		return type;
+	}
+
+	protected Rotation getRotation() {
+		return rotation;
+	}
+
+	protected void setRotation(Rotation rotation) {
+		this.rotation = rotation;
+		fireRotationChanged(rotation);
+	}
+
+	/**
+	 * Select another rotation
+	 */
+	protected void changeRotation() {
+		setRotation(rotation.getNext());
 	}
 
 	protected synchronized Board getBoard() {
@@ -1002,6 +1063,13 @@ public abstract class Game extends Thread { // implements Runnable
 			keys.remove(KeyPressed.KeyStart);
 			pause();
 			return;
+		}
+
+		if (getStatus() == Status.Paused) {
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				keys.remove(KeyPressed.KeyRotate);
+				changeRotation();
+			}
 		}
 	}
 
