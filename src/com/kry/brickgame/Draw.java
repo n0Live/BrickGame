@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.Rotation;
 import com.kry.brickgame.games.Game.Status;
 
 /**
@@ -53,6 +54,8 @@ public class Draw extends JPanel implements GameListener {
 
 	private Board board = null;
 	private Board preview = null;
+
+	private Rotation rotation;
 
 	/**
 	 * Color of inactive elements
@@ -168,7 +171,7 @@ public class Draw extends JPanel implements GameListener {
 		scores = "0";
 		speed = "1";
 		level = "1";
-
+		rotation = Rotation.None;
 	}
 
 	protected Board getBoard() {
@@ -566,7 +569,8 @@ public class Draw extends JPanel implements GameListener {
 		x = indent * 4 + boardCanvas.getWidth();
 		y = (SQUARE_SIZE / 2) + (13 * SQUARE_SIZE) + textFontSize;
 
-		drawTextOnCanvas(canvas, ROTATE, "", textFont, x, y);
+		drawTextOnCanvas(canvas, ROTATE, ((rotation != Rotation.None) ? ROTATE
+				: ""), textFont, x, y);
 		/* --- */
 
 		/* Rotate icons (left/right) */
@@ -574,12 +578,16 @@ public class Draw extends JPanel implements GameListener {
 		space = fm.stringWidth(ROTATE) + indent;
 
 		if (iconFont != null) {
-			drawTextOnCanvas(canvas, ICON_ROTATE_RIGTH, "", iconFont,
-					x + space, y - indent);
+			drawTextOnCanvas(
+					canvas,
+					ICON_ROTATE_RIGTH,
+					((rotation == Rotation.Clockwise) ? ICON_ROTATE_RIGTH : ""),
+					iconFont, x + space, y - indent);
 
 			space = fm.stringWidth(ROTATE + ICON_ROTATE_RIGTH) + indent * 2 + 1;
-			drawTextOnCanvas(canvas, ICON_ROTATE_LEFT, "", iconFont, x + space,
-					y + indent);
+			drawTextOnCanvas(canvas, ICON_ROTATE_LEFT,
+					((rotation == Rotation.Counterclockwise) ? ICON_ROTATE_LEFT
+							: ""), iconFont, x + space, y + indent);
 		}
 		/* --- */
 
@@ -679,6 +687,11 @@ public class Draw extends JPanel implements GameListener {
 	@Override
 	public void levelChanged(GameEvent event) {
 		level = String.valueOf(event.getLevel());
+	}
+
+	@Override
+	public void rotationChanged(GameEvent event) {
+		rotation = event.getRotation();
 	}
 
 }
