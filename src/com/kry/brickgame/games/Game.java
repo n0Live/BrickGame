@@ -478,6 +478,59 @@ public abstract class Game extends Thread {
 	 *            x-coordinate of the figure
 	 * @param y
 	 *            y-coordinate of the figure
+	 * @param withBorder
+	 *            include in the check collision the area which one cell sized
+	 *            around the figure
+	 * @return {@code true} if there is a collision
+	 * @see #checkBoardCollisionHorisontal
+	 * @see #checkBoardCollisionVertical
+	 * @see #checkBoardCollision
+	 */
+	protected static boolean checkCollision(Board board, Shape piece, int x,
+			int y, boolean withBorder) {
+		try {
+			int board_x, board_y;
+			if (withBorder) {
+				for (int k = 0; k < piece.getLength(); k++) {
+					for (int i = -1; i <= 1; i++) {
+						for (int j = -1; j <= 1; j++) {
+							board_x = x + piece.x(k) + i;
+							board_y = y + piece.y(k) + j;
+							if ((board_x < 0) || (board_x >= board.getWidth())
+									|| (board_y < 0)
+									|| (board_y >= board.getHeight()))
+								continue;
+							if (board.getCell(board_x, board_y) != Cell.Empty)
+								return true;
+						}
+					}
+				}
+			} else {
+				for (int i = 0; i < piece.getLength(); i++) {
+					board_x = x + piece.x(i);
+					board_y = y + piece.y(i);
+					if (board.getCell(board_x, board_y) != Cell.Empty)
+						return true;
+				}
+			}
+		} catch (IndexOutOfBoundsException e) {
+			// do nothing - it's ok
+		}
+		return false;
+	}
+
+	/**
+	 * Collision check of the new figure with a filled cells on the board
+	 * 
+	 * @return true if there is a collision
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            the new figure
+	 * @param x
+	 *            x-coordinate of the figure
+	 * @param y
+	 *            y-coordinate of the figure
 	 * @return {@code true} if there is a collision
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkBoardCollisionVertical
@@ -485,17 +538,7 @@ public abstract class Game extends Thread {
 	 */
 	protected static boolean checkCollision(Board board, Shape piece, int x,
 			int y) {
-		try {
-			for (int i = 0; i < piece.getLength(); i++) {
-				int board_x = x + piece.x(i);
-				int board_y = y + piece.y(i);
-				if (board.getCell(board_x, board_y) != Cell.Empty)
-					return true;
-			}
-		} catch (IndexOutOfBoundsException e) {
-			// do nothing - it's ok
-		}
-		return false;
+		return checkCollision(board, piece, x, y, false);
 	}
 
 	/**

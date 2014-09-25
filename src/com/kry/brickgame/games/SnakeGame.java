@@ -1,10 +1,10 @@
 package com.kry.brickgame.games;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
@@ -92,13 +92,13 @@ public class SnakeGame extends Game {
 				if (!tryMove(snake.getDirection())) {
 					loss();
 				}
-				// when the snake has reached the maximum length
-				if (snake.getLength() >= SnakeShape.getMaxLength()) {
-					// increases level and load it
-					animatedClearBoard(true);// fast
-					incLevel();
-					loadLevel();
-				}
+			}
+			// when the snake has reached the maximum length
+			if (snake.getLength() >= SnakeShape.getMaxLength()) {
+				// increases level and load it
+				animatedClearBoard(true);// fast
+				incLevel();
+				loadLevel();
 			}
 			// processing of key presses
 			processKeys();
@@ -125,27 +125,57 @@ public class SnakeGame extends Game {
 	 *            generate a gates, placed in the middle of the border
 	 */
 	private void prepareBorders(boolean hasRandomGates) {
+		Random r = new Random();
+
 		Cell fill;
+
+		int gatesCount;
+		int[] gates;
+
+		gatesCount = r.nextInt(3) + 1;// 1-3
+		gates = new int[gatesCount];
+		// calculates the coordinates for the symmetrical arrangement
+		// array must be sorted for Arrays.binarySearch()
+		if (gatesCount > 1) {
+			int gateCoord = r.nextInt(boardHeight / 2 - 1) + 1;
+			gates[0] = gateCoord;
+			if (gatesCount > 2) {
+				gates[1] = boardHeight / 2;
+				gates[2] = boardHeight - 1 - gateCoord;
+			} else
+				gates[1] = boardHeight - 1 - gateCoord;
+		}
 
 		// generates the vertical borders
 		for (int i = 0; i < boardHeight; i++) {
-			// except for the corner points
-			if ((hasRandomGates) && (i != 0) && (i != boardHeight - 1)) {
-				Random r = new Random();
-				fill = (r.nextInt(boardHeight) == 0) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates && (gatesCount > 1)) {
+				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty
+						: Cell.Full;
 			} else
 				fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
+
 			getBoard().setCell(fill, 0, i);
 			getBoard().setCell(fill, boardWidth - 1, i);
 		}
+
+		gatesCount = r.nextInt(2) + 1;// 1-2
+		gates = new int[gatesCount];
+		// calculates the coordinates for the symmetrical arrangement of the
+		// gates
+		if (gatesCount > 1) {
+			int gateCoord = r.nextInt(boardWidth / 2 - 1) + 1;
+			gates[0] = gateCoord;
+			gates[1] = boardWidth - 1 - gateCoord;
+		}
+
 		// generates the horizontal borders
 		for (int i = 0; i < boardWidth; i++) {
-			// except for the corner points
-			if ((hasRandomGates) && (i != 0) && (i != boardWidth - 1)) {
-				Random r = new Random();
-				fill = (r.nextInt(boardWidth) == 0) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates && (gatesCount > 1)) {
+				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty
+						: Cell.Full;
 			} else
 				fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
+
 			getBoard().setCell(fill, i, 0);
 			getBoard().setCell(fill, i, boardHeight - 1);
 		}
@@ -162,20 +192,20 @@ public class SnakeGame extends Game {
 		int x, y;
 
 		Obstacle obstacle = new Obstacle(type);
-		obstacle.setRandomRotate();
-
-		// in line at the borders of the board shall not be put an obstacle
-		// k - count of empty line at the borders
-		int k = (isToroidalField) ? 2 : 1;
 
 		// finds empty cells
+		int k = 20; // maximum of attempts
 		do {
-			x = r.nextInt(boardWidth - obstacle.getWidth() - k * 2) + k;
-			y = r.nextInt(boardHeight - obstacle.getHeight() - k * 2)
-					+ obstacle.getHeight() + k;
-		} while (checkCollision(getBoard(), obstacle, x, y));
+			obstacle.setRandomRotate();
 
-		setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
+			x = r.nextInt(boardWidth - obstacle.getWidth());
+			y = r.nextInt(boardHeight - obstacle.getHeight());
+
+			k--;
+		} while ((checkCollision(getBoard(), obstacle, x, y, true)) && (k > 0));
+
+		if (k > 0)
+			setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
 	}
 
 	/**
@@ -402,6 +432,9 @@ public class SnakeGame extends Game {
 		this.snake = newSnake.clone();
 		curX = newX;
 		curY = newY;
+
+		//reset timer
+		elapsedTime(1);
 
 		return true;
 	}
