@@ -27,10 +27,10 @@ public class SnakeShape extends Shape {
 	/**
 	 * Constructor of the SnakeShape
 	 */
-	public SnakeShape() {
+	public SnakeShape(RotationAngle direction) {
 		super(MAX_LENGTH);
 		this.length = INITIAL_LENGTH;
-		this.setDirection(RotationAngle.d270);
+		this.setDirection(direction);
 
 		// Initialization of the snake
 		for (int i = 0; i < getLength(); i++) {
@@ -93,17 +93,6 @@ public class SnakeShape extends Shape {
 	private SnakeShape setDirection(RotationAngle direction) {
 		this.direction = direction;
 		return this;
-	}
-
-	/**
-	 * Returns the direction opposite to the specified direction
-	 * 
-	 * @param direction
-	 *            the specified direction
-	 * @return the opposite direction
-	 */
-	public static RotationAngle getOppositeDirection(RotationAngle direction) {
-		return direction.getRight().getRight();
 	}
 
 	/**
@@ -271,7 +260,7 @@ public class SnakeShape extends Shape {
 	 * @return the instance of the snake after moving
 	 */
 	protected SnakeShape turn(RotationAngle direction, boolean isAppleAhead) {
-		if (direction == getOppositeDirection(getDirection())) {
+		if (direction == getDirection().getOpposite()) {
 			return turnReversal();
 		} else {
 			if (isAppleAhead) {

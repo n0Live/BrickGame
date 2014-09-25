@@ -53,6 +53,8 @@ public class SnakeGame extends Game {
 	 *            initial value of the speed
 	 * @param level
 	 *            initial value of the level
+	 * @param rotation
+	 *            direction of rotation
 	 * @param type
 	 *            type of the game type of the game:
 	 *            <ol>
@@ -62,8 +64,8 @@ public class SnakeGame extends Game {
 	 *            <li>snake on a toroidal field with randomly generated
 	 *            obstacles
 	 */
-	public SnakeGame(int speed, int level, int type) {
-		super(speed, level, type);
+	public SnakeGame(int speed, int level, Rotation rotation, int type) {
+		super(speed, level, rotation, type);
 		setStatus(Status.None);
 		// for every even type of game
 		isToroidalField = (getType() % 2 == 0);
@@ -280,7 +282,8 @@ public class SnakeGame extends Game {
 	 * Loading or reloading the specified level
 	 */
 	private void loadLevel() {
-		snake = new SnakeShape();
+		snake = new SnakeShape(
+				(getRotation() == Rotation.Counterclockwise) ? RIGHT : LEFT);
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2;
 		curY = (isToroidalField) ? 1 : 0;
@@ -330,8 +333,7 @@ public class SnakeGame extends Game {
 	private boolean tryMove(RotationAngle direction) {
 		int newX;
 		int newY;
-		boolean isReversal = (direction == SnakeShape
-				.getOppositeDirection(snake.getDirection()));
+		boolean isReversal = (direction == snake.getDirection().getOpposite());
 
 		if (isReversal) {
 			newX = curX + snake.x(snake.tail());
@@ -436,7 +438,7 @@ public class SnakeGame extends Game {
 	 */
 	private int getShiftX(RotationAngle direction) {
 		// if snake made a 180-degree turn
-		if (direction == snake.getDirection().getRight().getRight()) {
+		if (direction == snake.getDirection().getOpposite()) {
 			// than returns the last cell (tail) of the snake as the offset
 			return snake.x(snake.tail());
 		} else {
@@ -454,7 +456,7 @@ public class SnakeGame extends Game {
 	 */
 	private int getShiftY(RotationAngle direction) {
 		// if snake made a 180-degree turn
-		if (direction == snake.getDirection().getRight().getRight()) {
+		if (direction == snake.getDirection().getOpposite()) {
 			// than returns the last cell (tail) of the snake as the offset
 			return snake.y(snake.tail());
 		} else {
