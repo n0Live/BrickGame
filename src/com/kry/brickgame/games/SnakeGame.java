@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
@@ -89,15 +90,7 @@ public class SnakeGame extends Game {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (!tryMove(snake.getDirection())) {
-					// kaboom and decrease lives
-					kaboom(curX, curY);
-					setLives(getLives() - 1);
-					if (getLives() > 0) {
-						animatedClearBoard(true);// fast
-						loadLevel();
-					} else {
-						gameOver();
-					}
+					loss();
 				}
 				// when the snake has reached the maximum length
 				if (snake.getLength() >= SnakeShape.getMaxLength()) {
@@ -467,6 +460,21 @@ public class SnakeGame extends Game {
 	}
 
 	/**
+	 * Drawing effect of the explosion and decreasing lives
+	 */
+	private void loss() {
+		// kaboom and decrease lives
+		kaboom(curX, curY);
+		setLives(getLives() - 1);
+		if (getLives() > 0) {
+			animatedClearBoard(true);// fast
+			loadLevel();
+		} else {
+			gameOver();
+		}
+	}
+
+	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -479,23 +487,28 @@ public class SnakeGame extends Game {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				tryMove(LEFT);
+				if (!tryMove(LEFT))
+					loss();
 				sleep(ANIMATION_DELAY * 4);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				tryMove(RIGHT);
+				if (!tryMove(RIGHT))
+					loss();
 				sleep(ANIMATION_DELAY * 4);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
-				tryMove(DOWN);
+				if (!tryMove(DOWN))
+					loss();
 				sleep(ANIMATION_DELAY * 4);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
-				tryMove(UP);
+				if (!tryMove(UP))
+					loss();
 				sleep(ANIMATION_DELAY * 4);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				tryMove(snake.getDirection());
+				if (!tryMove(snake.getDirection()))
+					loss();
 				sleep(ANIMATION_DELAY * 2);
 			}
 		}
