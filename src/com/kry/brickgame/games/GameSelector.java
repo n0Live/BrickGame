@@ -215,6 +215,8 @@ public class GameSelector extends Game {
 		super();
 		this.letter = 'A';
 		this.number = 1;
+
+		setRotation(Rotation.Clockwise);
 	}
 
 	/**
@@ -420,13 +422,13 @@ public class GameSelector extends Game {
 			try {
 				// gets constructor(speed, level)
 				Class[] paramTypes = new Class[] { int.class, int.class,
-						int.class };
+						Rotation.class, int.class };
 				Constructor<Game> constructor = (Constructor<Game>) c
 						.getConstructor(paramTypes);
 
 				// gets parameters
-				Object[] args = new Object[] { new Integer(getSpeed()),
-						new Integer(getLevel()), new Integer(number) };
+				Object[] args = new Object[] { getSpeed(), getLevel(),
+						getRotation(), number };
 				// creates an instance of the game
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer
@@ -450,7 +452,10 @@ public class GameSelector extends Game {
 			setLevel(getLevel() + 1);
 			break;
 		case KeyRotate:
-			nextLetter();
+			if (getRotation() == Rotation.Counterclockwise)
+				prevLetter();
+			else
+				nextLetter();
 			break;
 		case KeyUp:
 			nextNumber();
