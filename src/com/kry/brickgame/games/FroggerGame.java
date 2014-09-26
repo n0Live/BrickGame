@@ -14,7 +14,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public class FroggerGame extends Game {
+public class FroggerGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */

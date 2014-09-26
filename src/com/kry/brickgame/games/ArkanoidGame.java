@@ -17,7 +17,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public class ArkanoidGame extends Game {
+public class ArkanoidGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */

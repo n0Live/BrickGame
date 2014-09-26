@@ -16,7 +16,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public class SnakeGame extends Game {
+public class SnakeGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */

@@ -65,7 +65,6 @@ public abstract class Game extends Thread {
 	private volatile int speed;
 	private volatile int level;
 	private volatile int score;
-	private volatile int lives;
 
 	private int type;
 
@@ -160,7 +159,6 @@ public abstract class Game extends Thread {
 		setRotation(rotation);
 
 		setScore(0);
-		setLives(4);
 
 		this.curX = 0;
 		this.curY = 0;
@@ -359,39 +357,6 @@ public abstract class Game extends Thread {
 		else
 			this.score = score;
 		fireInfoChanged(String.valueOf(score));
-	}
-
-	/**
-	 * Lives
-	 * 
-	 * @return lives 0 - 4
-	 */
-	protected synchronized int getLives() {
-		return lives;
-	}
-
-	/**
-	 * Set lives
-	 * 
-	 * @param lives
-	 *            lives 0 - 4
-	 */
-	protected synchronized void setLives(int lives) {
-		if (lives > 4) {
-			this.lives = 4;
-		} else if (lives < 0) {
-			this.lives = 0;
-		} else {
-			this.lives = lives;
-		}
-		clearPreview();
-		if (this.lives > 0) {
-			for (int i = 0; i < lives; i++) {
-				preview.setCell(Cell.Full, 1, i);
-				preview.setCell(Cell.Full, 2, i);
-			}
-		}
-		firePreviewChanged(preview);
 	}
 
 	protected int getType() {

@@ -15,7 +15,7 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public class GunGame extends Game {
+public class GunGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
