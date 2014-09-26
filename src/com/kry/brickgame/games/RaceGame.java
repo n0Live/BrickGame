@@ -10,6 +10,7 @@ import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.RaceSplash;
 import com.kry.brickgame.splashes.Splash;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive

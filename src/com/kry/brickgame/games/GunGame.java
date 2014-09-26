@@ -10,6 +10,7 @@ import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.GunSplash;
 import com.kry.brickgame.splashes.Splash;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -205,7 +206,7 @@ public class GunGame extends GameWithLives {
 		// remove bullets from the board
 		clearBullets(board);
 		// shifts the board
-		board = horizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
+		board = boardHorizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
 		// return the gun to the board
 		board = drawShape(board, curX, curY, gun, Cell.Full);
 		setBoard(board);
@@ -471,7 +472,7 @@ public class GunGame extends GameWithLives {
 	private Board addLines(Board board, int linesCount) {
 		// clear bullets
 		clearBullets(board);
-		return addLines(board, boardHeight - 1, linesCount, false);
+		return addLinesToBoard(board, boardHeight - 1, linesCount, false);
 	}
 
 	@Override

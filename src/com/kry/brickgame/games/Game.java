@@ -1,8 +1,9 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import com.kry.brickgame.Board;
@@ -10,7 +11,6 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.Splash;
 
 /**
@@ -52,8 +52,6 @@ public abstract class Game extends Thread {
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
 
-	/*---MAGIC NUMBERS---*/
-
 	protected int getFIRST_LEVEL_SPEED() {
 		return FIRST_LEVEL_SPEED;
 	}
@@ -62,12 +60,23 @@ public abstract class Game extends Thread {
 		return TENTH_LEVEL_SPEED;
 	}
 
+	/*------*/
+	/**
+	 * Speed
+	 */
 	private volatile int speed;
+	/**
+	 * Level
+	 */
 	private volatile int level;
+	/**
+	 * Score
+	 */
 	private volatile int score;
-
+	/**
+	 * Type of game
+	 */
 	private int type;
-
 	/**
 	 * Width of the board
 	 */
@@ -84,7 +93,6 @@ public abstract class Game extends Thread {
 	 * Height of the preview board
 	 */
 	protected int previewHeight;
-
 	/**
 	 * X-coordinate position on the board
 	 */
@@ -108,6 +116,13 @@ public abstract class Game extends Thread {
 	public static enum Rotation {
 		None, Clockwise, Counterclockwise;
 
+		/**
+		 * Get the next rotation
+		 * <p>
+		 * If current rotation is {@code None}, then return {@code None}
+		 * 
+		 * @return the next rotation
+		 */
 		public Rotation getNext() {
 			// if None then getNext() return None
 			if (this == Rotation.None)
@@ -119,17 +134,30 @@ public abstract class Game extends Thread {
 
 	};
 
+	/**
+	 * Direction of rotation
+	 */
 	private Rotation rotation;
-
+	/**
+	 * The time base for the {@link #elapsedTime(int)}
+	 */
 	private long timePoint = System.currentTimeMillis();
-
+	/**
+	 * The main (base) board
+	 */
 	private volatile Board board;
+	/**
+	 * The preview board
+	 */
 	private volatile Board preview;
 
 	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
 
+	/**
+	 * Set of the pressed keys
+	 */
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
 	/**
@@ -148,7 +176,7 @@ public abstract class Game extends Thread {
 	 * @param type
 	 *            type of the game
 	 */
-	public Game(int speed, int level, Board board, Board preview,
+	protected Game(int speed, int level, Board board, Board preview,
 			Rotation rotation, int type) {
 		this.type = type;
 
@@ -201,6 +229,9 @@ public abstract class Game extends Thread {
 				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), Rotation.None, type);// preview
 	}
 
+	/**
+	 * The Game
+	 */ 
 	public Game() {
 		this(1, 1, 1);
 	}
@@ -266,14 +297,30 @@ public abstract class Game extends Thread {
 		}
 	}
 
-	public static Splash getSplash() {
+	/**
+	 * Get the splash screen for game
+	 * 
+	 * @return the splash
+	 */
+	protected static Splash getSplash() {
 		return splash;
 	}
 
+	/**
+	 * Get the status of game
+	 * 
+	 * @return the status
+	 */
 	protected synchronized Status getStatus() {
 		return status;
 	}
 
+	/**
+	 * Set the status of game and fire the {@link #fireStatusChanged(Status)} event
+	 * 
+	 * @param status
+	 *            the status of game
+	 */
 	protected synchronized void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
@@ -307,7 +354,7 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Set speed level
+	 * Set speed level and fire the {@link #fireSpeedChanged(int)} event
 	 * 
 	 * @param speed
 	 *            speed level 1-10
@@ -332,7 +379,7 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Set level
+	 * Set level and fire the {@link #fireLevelChanged(int)} event
 	 * 
 	 * @param level
 	 *            level 1-10
@@ -347,10 +394,21 @@ public abstract class Game extends Thread {
 		fireLevelChanged(this.level);
 	}
 
+	/**
+	 * Get the score
+	 * 
+	 * @return the score
+	 */
 	protected synchronized int getScore() {
 		return score;
 	}
 
+	/**
+	 * Set the score and fire the {@link #fireInfoChanged(String)} event
+	 * 
+	 * @param score
+	 *            score 0 - 19999
+	 */
 	protected synchronized void setScore(int score) {
 		if ((score > 19999) || (score < 0))
 			this.score = 0;
@@ -359,14 +417,30 @@ public abstract class Game extends Thread {
 		fireInfoChanged(String.valueOf(score));
 	}
 
+	/**
+	 * Get the type of game
+	 * 
+	 * @return the type
+	 */
 	protected int getType() {
 		return type;
 	}
 
+	/**
+	 * Get the direction of rotation
+	 * 
+	 * @return the direction of rotation
+	 */
 	protected Rotation getRotation() {
 		return rotation;
 	}
 
+	/**
+	 * Set the direction of rotation and fire the {@link #fireRotationChanged(Rotation)} event
+	 * 
+	 * @param rotation
+	 *            the direction of rotation
+	 */
 	protected void setRotation(Rotation rotation) {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
@@ -379,19 +453,41 @@ public abstract class Game extends Thread {
 		setRotation(rotation.getNext());
 	}
 
+	/**
+	 * Get the main board
+	 * 
+	 * @return the main board
+	 */
 	protected synchronized Board getBoard() {
 		return board;
 	}
 
+	/**
+	 * Set the main board and fire the {@link #fireBoardChanged(Board)} event
+	 * 
+	 * @param board
+	 *            the main board
+	 */
 	protected synchronized void setBoard(Board board) {
 		this.board = board;
 		fireBoardChanged(board);
 	}
 
+	/**
+	 * Get the preview board
+	 * 
+	 * @return the preview board
+	 */
 	protected synchronized Board getPreview() {
 		return preview;
 	}
 
+	/**
+	 * Set the main preview and fire the {@link #firePreviewChanged(Board)} event
+	 * 
+	 * @param preview
+	 *            the preview board
+	 */
 	protected synchronized void setPreview(Board preview) {
 		this.preview = preview;
 		firePreviewChanged(preview);
@@ -414,8 +510,8 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Clears the cells of the board and raises the {@code fireBoardChanged}
-	 * event
+	 * Clears the cells of the board and fire the
+	 * {@link #fireBoardChanged(Board)} event
 	 */
 	protected void clearBoard() {
 		board.clearBoard();
@@ -423,155 +519,12 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Clears the cells of the preview and raises the {@code firePreviewChanged}
-	 * event
+	 * Clears the cells of the preview and fire the
+	 * {@link #firePreviewChanged(Board)} event
 	 */
 	protected void clearPreview() {
 		preview.clearBoard();
 		firePreviewChanged(preview);
-	}
-
-	/**
-	 * Collision check of the new figure with a filled cells on the board
-	 * 
-	 * @return true if there is a collision
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            the new figure
-	 * @param x
-	 *            x-coordinate of the figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @param withBorder
-	 *            include in the check collision the area which one cell sized
-	 *            around the figure
-	 * @return {@code true} if there is a collision
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
-	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y, boolean withBorder) {
-		try {
-			int board_x, board_y;
-			if (withBorder) {
-				for (int k = 0; k < piece.getLength(); k++) {
-					for (int i = -1; i <= 1; i++) {
-						for (int j = -1; j <= 1; j++) {
-							board_x = x + piece.x(k) + i;
-							board_y = y + piece.y(k) + j;
-							if ((board_x < 0) || (board_x >= board.getWidth())
-									|| (board_y < 0)
-									|| (board_y >= board.getHeight()))
-								continue;
-							if (board.getCell(board_x, board_y) != Cell.Empty)
-								return true;
-						}
-					}
-				}
-			} else {
-				for (int i = 0; i < piece.getLength(); i++) {
-					board_x = x + piece.x(i);
-					board_y = y + piece.y(i);
-					if (board.getCell(board_x, board_y) != Cell.Empty)
-						return true;
-				}
-			}
-		} catch (IndexOutOfBoundsException e) {
-			// do nothing - it's ok
-		}
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with a filled cells on the board
-	 * 
-	 * @return true if there is a collision
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            the new figure
-	 * @param x
-	 *            x-coordinate of the figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @return {@code true} if there is a collision
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
-	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y) {
-		return checkCollision(board, piece, x, y, false);
-	}
-
-	/**
-	 * Collision check of the new figure with the vertical boundaries of the
-	 * board
-	 * 
-	 * @param piece
-	 *            the new figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @param checkTopBoundary
-	 *            is it necessary to check the upper boundary
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollision
-	 * @see #checkCollision
-	 */
-	protected boolean checkBoardCollisionVertical(Shape piece, int y,
-			boolean checkTopBoundary) {
-		if (checkTopBoundary && ((y + piece.maxY()) >= boardHeight))
-			return true;
-		if ((y + piece.minY()) < 0)
-			return true;
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with the horizontal boundaries of the
-	 * board
-	 * 
-	 * @param piece
-	 *            - the new figure
-	 * @param x
-	 *            - x-coordinate of the figure
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
-	 * @see #checkCollision
-	 */
-	protected boolean checkBoardCollisionHorizontal(Shape piece, int x) {
-		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= boardWidth)
-			return true;
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with the
-	 * {@link Game#checkBoardCollisionVertical vertical} and the
-	 * {@link Game#checkBoardCollisionHorizontal horizontal} boundaries of the
-	 * board
-	 * 
-	 * @param piece
-	 *            - the new figure
-	 * @param x
-	 *            - x-coordinate of the figures
-	 * @param y
-	 *            - y-coordinate of the figures
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkCollision
-	 */
-	protected boolean checkBoardCollision(Shape piece, int x, int y) {
-		return checkBoardCollisionVertical(piece, y, true)
-				|| checkBoardCollisionHorizontal(piece, x);
 	}
 
 	/**
@@ -634,154 +587,6 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Shift the contents of the board horizontally on the delta x
-	 * 
-	 * @param board
-	 *            the board for horizontal shift
-	 * @param dX
-	 *            delta x, if {@code dX > 0} then shift to the right, otherwise
-	 *            shift to the left
-	 * @return the board after horizontal shift
-	 */
-	protected static Board horizontalShift(Board board, int dX) {
-		// If dX is greater than the width of the board, it is reduced
-		int reducedDX = dX % board.getWidth();
-
-		if (reducedDX == 0)
-			return board;
-
-		Board resultBoard = board.clone();
-
-		for (int i = 0; i < Math.abs(reducedDX); i++) {
-			// if shift to the right, then get the first column as temporary,
-			// otherwise get the last column
-			Cell[] tempColumn = (reducedDX > 0) ? board.getColumn(board
-					.getWidth() - 1) : board.getColumn(0);
-
-			for (int j = 0; j < board.getWidth(); j++) {
-				Cell[] nextColumn = null;
-				// replace the column on the side of the board to the
-				// appropriate column on the other side
-				if (((j == 0) && (reducedDX > 0))
-						|| ((j == board.getWidth() - 1) && (reducedDX < 0))) {
-					nextColumn = tempColumn;
-				} else {
-					// replace the column in the middle of the board to the
-					// appropriate adjacent column
-					nextColumn = board.getColumn(j
-							+ ((reducedDX > 0) ? (-1) : 1));
-				}
-				resultBoard.setColumn(nextColumn, j);
-			}
-		}
-
-		return resultBoard;
-	}
-
-	/**
-	 * Insert the cells to the board. Coordinate ( {@code x, y}) is set a point,
-	 * which gets the lower left corner of the {@code cells}
-	 * 
-	 * @param board
-	 *            the board for insertion
-	 * @param cells
-	 *            the cells to insert
-	 * @param x
-	 *            x-coordinate for the insertion
-	 * @param y
-	 *            y-coordinate for the insertion
-	 * @return {@code true} if the insertion is success, otherwise {@code false}
-	 */
-	protected static boolean insertCells(Board board, Cell[][] cells, int x,
-			int y) {
-		if ((x < 0) || (y < 0)) {
-			return false;
-		}
-
-		if ((x + cells.length > board.getWidth())
-				|| (y + cells[0].length > board.getHeight())) {
-			return false;
-		}
-
-		for (int i = 0; i < cells.length; i++) {
-			for (int j = 0; j < cells[0].length; j++) {
-				board.setCell(cells[i][j], x + i, y + j);
-			}
-		}
-
-		// fireBoardChanged(board);
-		return true;
-	}
-
-	/**
-	 * Drawing the figure on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param x
-	 *            x-coordinate position on the board of the figure
-	 * @param y
-	 *            y-coordinate position on the board of the figure
-	 * @param shape
-	 *            the figure
-	 * @param fill
-	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
-	 *            figure, {@code Cells.Empty} - to erase the figure
-	 * 
-	 * @return the board with the figure
-	 */
-	protected static Board drawShape(Board board, int x, int y, Shape shape,
-			Cell fill) {
-		for (int i = 0; i < shape.getLength(); i++) {
-			int board_x = x + shape.x(i);
-			int board_y = y + shape.y(i);
-
-			// if the figure does not leave off the board
-			if (((board_y < board.getHeight()) && (board_y >= 0))
-					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
-				// draws the point of the figure on the board
-				drawPoint(board, board_x, board_y, fill);
-			}
-		}
-		return board;
-	}
-
-	/**
-	 * Drawing the point of the figure on the board.
-	 * <p>
-	 * If the point is outside the borders of the board, then drawing it on the
-	 * other side of the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param x
-	 *            x-coordinate position on the board of the figure
-	 * @param y
-	 *            y-coordinate position on the board of the figure
-	 * @param fill
-	 *            type of fill the point
-	 * @return the board with the point
-	 */
-	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
-		int board_x = x;
-		int board_y = y;
-
-		// check if the point is outside the borders of the board
-		if (board_x < 0)
-			board_x = board.getWidth() + board_x;
-		else if (board_x >= board.getWidth())
-			board_x = board_x - board.getWidth();
-		if (board_y < 0)
-			board_y = board.getHeight() + board_y;
-		else if (board_y >= board.getHeight())
-			board_y = board_y - board.getHeight();
-
-		board.setCell(fill, board_x, board_y);
-
-		return board;
-	}
-
-	/**
 	 * Drawing effect of the explosion
 	 * 
 	 * @param x
@@ -791,7 +596,7 @@ public abstract class Game extends Thread {
 	 */
 	protected void kaboom(int x, int y) {
 		/**
-		 * Inner class to draw an explosion
+		 * Nested (inner) class to draw an explosion
 		 */
 		class Kaboom {
 			final Cell E = Cell.Empty;
@@ -859,7 +664,8 @@ public abstract class Game extends Thread {
 				int lowerLeftX = x - (waves[wave][0].length / 2);
 				int lowerLeftY = y - (waves[wave].length / 2);
 
-				insertCells(getBoard(), waves[wave], lowerLeftX, lowerLeftY);
+				insertCellsToBoard(getBoard(), waves[wave], lowerLeftX,
+						lowerLeftY);
 				fireBoardChanged(getBoard());
 
 				sleep(ANIMATION_DELAY * 2);
@@ -900,87 +706,6 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Add randomly generated lines on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param fromLine
-	 *            line, which starts the addition
-	 * @param linesCount
-	 *            count of added lines
-	 * @param isUpwardDirection
-	 *            if {@code true}, then the bottom-up direction of addition
-	 * @return the board after adding lines
-	 */
-	protected static Board addLines(Board board, int fromLine, int linesCount,
-			boolean isUpwardDirection) {
-
-		if ((linesCount < 1)//
-				|| ((isUpwardDirection) && //
-				((fromLine + (linesCount - 1)) > board.getHeight()))//
-				//
-				|| ((!isUpwardDirection) && //
-				((fromLine - (linesCount - 1)) < 0)))
-			return board;
-
-		// checks whether there are full cells at a distance of
-		// <i>linesCount</i> from the top or the bottom of the board
-		for (int i = 0; i < board.getWidth(); i++) {
-			if (//
-			((isUpwardDirection) && //
-					(board.getCell(i, ((board.getHeight() - 1) - linesCount)) == Cell.Full))//
-					//
-					|| ((!isUpwardDirection) && //
-					(board.getCell(i, (linesCount - 1)) == Cell.Full))//
-			)
-				return board;
-		}
-
-		Random r = new Random();
-		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
-
-		// picks up or downs the lines of the board
-		if (isUpwardDirection) {
-			for (int y = (board.getHeight() - 1) - 1; y > fromLine
-					+ (linesCount - 1); y--) {
-				board.setRow(board.getRow(y - 1), y);
-			}
-		} else {
-			for (int y = 0; y < (fromLine - (linesCount - 1)); y++) {
-				board.setRow(board.getRow(y + 1), y);
-			}
-		}
-
-		// generates a new lines
-		for (int line = 0; line < linesCount; line++) {
-			boolean hasEmpty = false;
-			boolean hasFull = false;
-
-			for (int i = 0; i < board.getWidth(); i++) {
-				if (r.nextBoolean()) {
-					newLines[line][i] = Cell.Empty;
-					hasEmpty = true;
-				} else {
-					newLines[line][i] = Cell.Full;
-					hasFull = true;
-				}
-			}
-
-			// if all the cells were empty, creates a full one in a random place
-			// of the line
-			if (!hasEmpty || !hasFull) {
-				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty
-						: Cell.Full);
-			}
-
-			// adds the created line to the board
-			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line
-					: fromLine - line));
-		}
-		return board;
-	}
-
-	/**
 	 * Pause / Resume
 	 */
 	protected void pause() {
@@ -1010,6 +735,7 @@ public abstract class Game extends Thread {
 		Main.setGame(Main.gameSelector);
 	}
 
+	@Override
 	public void start() {
 		clearBoard();
 		clearPreview();

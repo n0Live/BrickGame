@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import com.kry.brickgame.Board;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -68,7 +69,7 @@ public class PentixGameZ extends PentixGame {
 	}
 
 	protected boolean tryAddLine() {
-		if ((!checkBoardCollisionVertical(curPiece, curY + 1, true))
+		if ((!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true))
 				&& (addLines())) {
 			// the current y-coordinate lifts by one cell upward
 			curY++;
@@ -85,7 +86,7 @@ public class PentixGameZ extends PentixGame {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
 			Board board = getBoard().clone();
-			board = horizontalShift(board, 1);
+			board = boardHorizontalShift(board, 1);
 			setBoard(board);
 		}
 	}

@@ -8,6 +8,7 @@ import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
 import com.kry.brickgame.splashes.TetrisSplash;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -157,7 +158,7 @@ public class TetrisGame extends Game {
 		super.start();
 
 		// getLevel() - 1 - because on the first level doesn't need to add line
-		setBoard(addLines(getBoard(), 0, getLevel() - 1, true));
+		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
 
 		setStatus(Status.Running);
 		isFallingFinished = false;
@@ -502,11 +503,11 @@ public class TetrisGame extends Game {
 		// If a collision from the new figure with the side boundary of the
 		// board then trying to move aside
 		int prepX = newX;
-		while (checkBoardCollisionHorizontal(newPiece, prepX)) {
+		while (checkBoardCollisionHorizontal(board, newPiece, prepX)) {
 			prepX = ((prepX + newPiece.minX()) < 0) ? prepX + 1 : prepX - 1;
 		}
 		// Checks
-		if (checkBoardCollisionVertical(newPiece, newY, false))
+		if (checkBoardCollisionVertical(board, newPiece, newY, false))
 			return false;
 
 		if (// for super point
@@ -812,7 +813,7 @@ public class TetrisGame extends Game {
 	protected boolean addLines() {
 		Board board = getBoard().clone();
 
-		board = addLines(board, 0, 1, true);
+		board = addLinesToBoard(board, 0, 1, true);
 
 		if (!board.equals(getBoard())) {
 			setBoard(board);

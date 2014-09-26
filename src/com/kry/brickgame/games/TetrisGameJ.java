@@ -2,6 +2,7 @@ package com.kry.brickgame.games;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -59,7 +60,7 @@ public class TetrisGameJ extends TetrisGame {
 	}
 
 	protected boolean tryAddLine() {
-		if ((!checkBoardCollisionVertical(curPiece, curY + 1, true))
+		if ((!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true))
 				&& (addLines())) {
 			// the current y-coordinate lifts by one cell upward
 			curY++;

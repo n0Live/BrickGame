@@ -11,6 +11,7 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.SnakeShape;
 import com.kry.brickgame.splashes.SnakeSplash;
 import com.kry.brickgame.splashes.Splash;
+import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -359,6 +360,9 @@ public class SnakeGame extends GameWithLives {
 		int newY;
 		boolean isReversal = (direction == snake.getDirection().getOpposite());
 
+		// create a temporary board, a copy of the basic board
+		Board board = getBoard().clone();
+
 		if (isReversal) {
 			newX = curX + snake.x(snake.tail());
 			newY = curY + snake.y(snake.tail());
@@ -372,7 +376,7 @@ public class SnakeGame extends GameWithLives {
 		headOfSnake.setCoord(0, snake.getCoord(0));
 
 		// check the out off the board
-		if (checkBoardCollision(headOfSnake, newX, newY)) {
+		if (checkBoardCollision(board, headOfSnake, newX, newY)) {
 			if (isToroidalField) {
 				if (newX < 0)
 					newX = boardWidth + newX;
@@ -387,7 +391,7 @@ public class SnakeGame extends GameWithLives {
 				return false;
 		}
 
-		boolean isAppleAhead = (getBoard().getCell(newX, newY) == Cell.Blink);
+		boolean isAppleAhead = (board.getCell(newX, newY) == Cell.Blink);
 
 		SnakeShape newSnake = snake.moveTo(direction, isAppleAhead);
 
@@ -397,9 +401,6 @@ public class SnakeGame extends GameWithLives {
 			newX = curX;
 			newY = curY;
 		}
-
-		// create a temporary board, a copy of the basic board
-		Board board = getBoard().clone();
 
 		// cut off the tail of the old snake, because the snake should already
 		// move and the tail will interfere with checks
@@ -418,7 +419,7 @@ public class SnakeGame extends GameWithLives {
 		}
 
 		// draw the new snake on the board
-		setBoard(drawSnake(board.clone(), newSnake, newX, newY));
+		setBoard(drawSnake(board, newSnake, newX, newY)); //TODO board.clone()
 
 		if (isAppleAhead) {
 			// increases score

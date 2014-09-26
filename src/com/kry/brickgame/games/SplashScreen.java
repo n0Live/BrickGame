@@ -5,6 +5,8 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
 
+import static com.kry.brickgame.games.GameUtils.*;
+
 /**
  * @author noLive
  * 
@@ -53,15 +55,15 @@ public class SplashScreen extends Game {
 
 		boardNumber.setNumber(BoardNumbers.intToNumbers(9));
 
-		insertCells(board, boardNumber.getBoard(),// upper left
+		insertCellsToBoard(board, boardNumber.getBoard(),// upper left
 				1, board.getHeight() - boardNumber.getHeight() - 1);
-		insertCells(board, boardNumber.getBoard(),// lower left
+		insertCellsToBoard(board, boardNumber.getBoard(),// lower left
 				1, boardNumber.getHeight());
-		insertCells(board,
+		insertCellsToBoard(board,
 				boardNumber.getBoard(),// upper right
 				board.getWidth() - boardNumber.getWidth() - 1,
 				board.getHeight() - boardNumber.getHeight() * 2);
-		insertCells(board, boardNumber.getBoard(),// lower right
+		insertCellsToBoard(board, boardNumber.getBoard(),// lower right
 				board.getWidth() - boardNumber.getWidth() - 1, 1);
 
 		setBoard(board);

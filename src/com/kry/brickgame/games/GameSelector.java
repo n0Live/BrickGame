@@ -14,6 +14,8 @@ import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
 import com.kry.brickgame.splashes.Splash;
 
+import static com.kry.brickgame.games.GameUtils.*;
+
 /**
  * The selection screen of a game
  * 
@@ -232,7 +234,7 @@ public class GameSelector extends Game {
 	 * 
 	 */
 	private void insertBoard(Board boardToInsert, int x, int y) {
-		insertCells(getBoard(), boardToInsert.getBoard(), x, y);
+		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
 	}
 
 	/**

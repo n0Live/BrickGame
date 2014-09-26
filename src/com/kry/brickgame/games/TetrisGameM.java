@@ -2,6 +2,8 @@ package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board;
 
+import static com.kry.brickgame.games.GameUtils.*;
+
 /**
  * @author noLive
  * 
@@ -22,7 +24,7 @@ public class TetrisGameM extends TetrisGame {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
 			Board board = getBoard().clone();
-			board = horizontalShift(board, 1);
+			board = boardHorizontalShift(board, 1);
 			setBoard(board);
 		}
 	}

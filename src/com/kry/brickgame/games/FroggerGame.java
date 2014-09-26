@@ -10,6 +10,8 @@ import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;
 import com.kry.brickgame.splashes.Splash;
 
+import static com.kry.brickgame.games.GameUtils.*;
+
 /**
  * @author noLive
  * 
@@ -206,7 +208,7 @@ public class FroggerGame extends GameWithLives {
 	private void loadLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
-		insertCells(getBoard(), road.getBoard(), 0, 1);
+		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
 		// initialize the frog
 		setFrog();
 	}
@@ -410,7 +412,7 @@ public class FroggerGame extends GameWithLives {
 				road.setRow(tract, i);
 			}
 		}
-		insertCells(board, road.getBoard(), 0, 1);
+		insertCellsToBoard(board, road.getBoard(), 0, 1);
 
 		// shifting the frog with the road
 		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
@@ -422,7 +424,7 @@ public class FroggerGame extends GameWithLives {
 		}
 
 		// checks for collision with the frog and an obstacles
-		boolean isFrogMustDie = (checkBoardCollisionHorizontal(frog, curX) || checkCollision(
+		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog, curX) || checkCollision(
 				board, frog, curX, curY));
 
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));

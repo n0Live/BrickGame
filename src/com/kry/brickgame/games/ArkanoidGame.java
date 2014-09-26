@@ -13,6 +13,8 @@ import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.ArkanoidSplash;
 import com.kry.brickgame.splashes.Splash;
 
+import static com.kry.brickgame.games.GameUtils.*;
+
 /**
  * @author noLive
  * 
@@ -334,7 +336,7 @@ public class ArkanoidGame extends GameWithLives {
 			bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
 					.getHeight()) / 2) : (boardHeight - bricks.getHeight());
 
-			insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
+			insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		}
 		// init ball
 		drawBall(getBoard(), ballX, ballY);
@@ -516,10 +518,10 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	private synchronized void shiftBricks() {
 		// shift bricks
-		bricks = horizontalShift(bricks,
+		bricks = boardHorizontalShift(bricks,
 				(getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board
-		insertCells(getBoard(), bricks.getBoard(), bricksX, bricksY);
+		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
 		setBoard(drawBall(getBoard(), ballX, ballY));
 	}
@@ -683,7 +685,7 @@ public class ArkanoidGame extends GameWithLives {
 		if (bricks.getCell(givenX, givenY) != Cell.Empty) {
 			bricks.setCell(Cell.Empty, givenX, givenY);
 
-			insertCells(board, bricks.getBoard(), bricksX, bricksY);
+			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
 			// increase scores
 			setScore(getScore() + 1);
@@ -729,7 +731,7 @@ public class ArkanoidGame extends GameWithLives {
 		}
 
 		// restores saved bricks wall
-		insertCells(getBoard(), curBricks.getBoard(), bricksX, bricksY);
+		insertCellsToBoard(getBoard(), curBricks.getBoard(), bricksX, bricksY);
 	}
 
 	/**
