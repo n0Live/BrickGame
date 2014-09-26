@@ -1,5 +1,8 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.checkCollision;
+import static com.kry.brickgame.games.GameUtils.drawShape;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -10,7 +13,6 @@ import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.RaceSplash;
 import com.kry.brickgame.splashes.Splash;
-import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -106,9 +108,7 @@ public class RaceGame extends GameWithLives {
 	@Override
 	public void start() {
 		super.start();
-
 		setStatus(Status.Running);
-		setLives(4);
 
 		loadLevel();
 

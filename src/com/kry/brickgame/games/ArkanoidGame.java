@@ -1,5 +1,9 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.boardHorizontalShift;
+import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,8 +16,6 @@ import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.ArkanoidSplash;
 import com.kry.brickgame.splashes.Splash;
-
-import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -274,8 +276,7 @@ public class ArkanoidGame extends GameWithLives {
 	@Override
 	public void start() {
 		super.start();
-
-		setLives(4);
+		setStatus(Status.Running);
 
 		loadLevel(true);
 
