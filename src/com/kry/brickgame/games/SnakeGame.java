@@ -115,7 +115,8 @@ public class SnakeGame extends GameWithLives {
 		if (getLevel() > 1) {
 			// plus one random obstacle each level
 			for (int i = 0; i < getLevel() - 1; i++) {
-				generateObstacle(new Random().nextInt(3));
+				while (!generateObstacle(new Random().nextInt(3)))
+					;
 			}
 		}
 	}
@@ -131,24 +132,11 @@ public class SnakeGame extends GameWithLives {
 		Random r = new Random();
 
 		Cell fill;
-
 		int gatesCount;
 		int[] gates;
 
 		gatesCount = r.nextInt(3) + 1;// 1-3
-		gates = new int[gatesCount];
-		// calculates the coordinates for the symmetrical arrangement
-		// array must be sorted for Arrays.binarySearch()
-		if (gatesCount > 1) {
-			int gateCoord = r.nextInt(boardHeight / 2 - 1) + 1;
-			gates[0] = gateCoord;
-			if (gatesCount > 2) {
-				gates[1] = boardHeight / 2;
-				gates[2] = boardHeight - 1 - gateCoord;
-			} else
-				gates[1] = boardHeight - 1 - gateCoord;
-		}
-
+		gates = generateGates(gatesCount, true);
 		// generates the vertical borders
 		for (int i = 0; i < boardHeight; i++) {
 			if (hasRandomGates && (gatesCount > 1)) {
@@ -162,7 +150,7 @@ public class SnakeGame extends GameWithLives {
 		}
 
 		gatesCount = r.nextInt(2) + 1;// 1-2
-		gates = new int[gatesCount];
+		gates = generateGates(gatesCount, false);
 		// calculates the coordinates for the symmetrical arrangement of the
 		// gates
 		if (gatesCount > 1) {
@@ -185,19 +173,48 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
+	 * Generate the random coordinates for placing the gates
+	 * 
+	 * @param gatesCount
+	 *            count of the gates (must be > 0)
+	 * @param isVertical
+	 *            {@code true} - for vertical borders, {@code false} - for
+	 *            horizontal borders
+	 * @return array containing the coordinates of the gates
+	 */
+	private int[] generateGates(int gatesCount, boolean isVertical) {
+		Random r = new Random();
+		int line = (isVertical) ? boardHeight : boardWidth;
+		int[] gates = new int[gatesCount];
+
+		// calculates the coordinates for the symmetrical arrangement
+		// array must be sorted for Arrays.binarySearch()
+		if (gatesCount > 0) {
+			for (int i = 0; i < gatesCount / 2; i++) {
+				gates[i] = r.nextInt(line / 2 - 1) + 1;
+				gates[gatesCount - 1 - i] = boardHeight - 1 - gates[i];
+			}
+			if (gatesCount % 2 != 0)
+				gates[gatesCount / 2] = line / 2;
+		}
+		return gates;
+	}
+
+	/**
 	 * Creates the obstacle and places it on the board randomly
 	 * 
 	 * @param type
 	 *            type of the obstacle
+	 * @return {@code true} if successfully added the obstacle
 	 */
-	private void generateObstacle(int type) {
+	private boolean generateObstacle(int type) {
 		Random r = new Random();
 		int x, y;
 
 		Obstacle obstacle = new Obstacle(type);
 
 		// finds empty cells
-		int k = 20; // maximum of attempts
+		int k = 10; // maximum of attempts
 		do {
 			obstacle.setRandomRotate();
 
@@ -207,8 +224,11 @@ public class SnakeGame extends GameWithLives {
 			k--;
 		} while ((checkCollision(getBoard(), obstacle, x, y, true)) && (k > 0));
 
-		if (k > 0)
+		if (k > 0) {
 			setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
+			return true;
+		} else
+			return false;
 	}
 
 	/**
@@ -421,7 +441,7 @@ public class SnakeGame extends GameWithLives {
 		}
 
 		// draw the new snake on the board
-		setBoard(drawSnake(board, newSnake, newX, newY)); // TODO board.clone()
+		setBoard(drawSnake(board, newSnake, newX, newY));
 
 		if (isAppleAhead) {
 			// increases score
@@ -525,22 +545,22 @@ public class SnakeGame extends GameWithLives {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (!tryMove(LEFT))
 					loss();
-				sleep(ANIMATION_DELAY * 4);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				if (!tryMove(RIGHT))
 					loss();
-				sleep(ANIMATION_DELAY * 4);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
 				if (!tryMove(DOWN))
 					loss();
-				sleep(ANIMATION_DELAY * 4);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
 				if (!tryMove(UP))
 					loss();
-				sleep(ANIMATION_DELAY * 4);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				if (!tryMove(snake.getDirection()))
