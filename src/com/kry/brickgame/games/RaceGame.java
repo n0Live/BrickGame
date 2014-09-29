@@ -130,7 +130,7 @@ public class RaceGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	private void loadLevel() {
+	protected void loadLevel() {
 		// set position
 		curPosition = 1;
 		curX = positions[curPosition];
@@ -178,7 +178,7 @@ public class RaceGame extends GameWithLives {
 
 				if (isAccident) {
 					setBoard(board);
-					accident(curX, curY + car.maxY());
+					loss(curX, curY + car.maxY());
 					return;
 				}
 			} else {
@@ -329,28 +329,7 @@ public class RaceGame extends GameWithLives {
 		curPosition = position;
 
 		if (isAccident)
-			accident(curX, curY);
-	}
-
-	/**
-	 * Drawing effect of the accident and decreasing lives
-	 * 
-	 * @param x
-	 *            x-coordinate of the epicenter of the explosion
-	 * @param y
-	 *            y-coordinate of the epicenter of the explosion
-	 */
-	private void accident(int x, int y) {
-		// kaboom and decrease lives
-		kaboom(x, y);
-		setLives(getLives() - 1);
-
-		if (getLives() > 0) {
-			animatedClearBoard(true);
-			loadLevel();
-		} else {
-			gameOver();
-		}
+			loss(curX, curY);
 	}
 
 	@Override

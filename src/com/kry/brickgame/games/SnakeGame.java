@@ -93,7 +93,7 @@ public class SnakeGame extends GameWithLives {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (!tryMove(snake.getDirection())) {
-					loss();
+					loss(curX, curY);
 				}
 			}
 			// when the snake has reached the maximum length
@@ -327,7 +327,7 @@ public class SnakeGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	private void loadLevel() {
+	protected void loadLevel() {
 		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
 				: LEFT);
 		// starting position - the middle of the bottom border of the board
@@ -516,21 +516,6 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Drawing effect of the explosion and decreasing lives
-	 */
-	private void loss() {
-		// kaboom and decrease lives
-		kaboom(curX, curY);
-		setLives(getLives() - 1);
-		if (getLives() > 0) {
-			animatedClearBoard(true);// fast
-			loadLevel();
-		} else {
-			gameOver();
-		}
-	}
-
-	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -544,27 +529,27 @@ public class SnakeGame extends GameWithLives {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (!tryMove(LEFT))
-					loss();
+					loss(curX, curY);
 				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				if (!tryMove(RIGHT))
-					loss();
+					loss(curX, curY);
 				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
 				if (!tryMove(DOWN))
-					loss();
+					loss(curX, curY);
 				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
 				if (!tryMove(UP))
-					loss();
+					loss(curX, curY);
 				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				if (!tryMove(snake.getDirection()))
-					loss();
+					loss(curX, curY);
 				sleep(ANIMATION_DELAY * 2);
 			}
 		}

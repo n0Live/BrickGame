@@ -345,6 +345,11 @@ public class ArkanoidGame extends GameWithLives {
 
 		setStatus(Status.Running);
 	}
+	
+	@Override
+	protected void loadLevel() {
+		loadLevel(false);
+	}
 
 	/**
 	 * Creating the randomly generated bricks wall
@@ -714,21 +719,10 @@ public class ArkanoidGame extends GameWithLives {
 	 * Drawing effect of the explosion and decreasing lives
 	 */
 	private void loss() {
-		setStatus(Status.DoSomeWork);
-
 		// saves current bricks wall
 		Board curBricks = bricks.clone();
 
-		// kaboom and decrease lives
-		kaboom(ballX, ballY);
-		setLives(getLives() - 1);
-
-		if (getLives() > 0) {
-			animatedClearBoard(true);
-			loadLevel(false);
-		} else {
-			gameOver();
-		}
+		super.loss(ballX, ballY);
 
 		// restores saved bricks wall
 		insertCellsToBoard(getBoard(), curBricks.getBoard(), bricksX, bricksY);

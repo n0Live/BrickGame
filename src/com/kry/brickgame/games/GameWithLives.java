@@ -1,6 +1,7 @@
 package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.games.Game.Status;
 
 /**
  * @author noLive
@@ -79,6 +80,30 @@ public abstract class GameWithLives extends Game {
 			}
 		}
 		firePreviewChanged(getPreview());
+	}
+	
+	protected abstract void loadLevel();
+	
+	/**
+	 * Drawing effect of the explosion and decreasing lives
+	 * 
+	 * @param x
+	 *            x-coordinate of the epicenter of the explosion
+	 * @param y
+	 *            y-coordinate of the epicenter of the explosion
+	 */
+	protected void loss(int x, int y) {
+		setStatus(Status.DoSomeWork);
+
+		// kaboom and decrease lives
+		kaboom(x, y);
+		setLives(getLives() - 1);
+		if (getLives() > 0) {
+			animatedClearBoard(true);// fast
+			loadLevel();
+		} else {
+			gameOver();
+		}
 	}
 
 }

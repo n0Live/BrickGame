@@ -202,7 +202,7 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	private void loadLevel() {
+	protected void loadLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
@@ -427,7 +427,7 @@ public class FroggerGame extends GameWithLives {
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 
 		if (isFrogMustDie)
-			dieFrog();
+			loss();
 	}
 
 	/**
@@ -472,20 +472,11 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Drawing effect of the collisions and decreasing lives
 	 */
-	private void dieFrog() {
+	private void loss() {
 		// saves the upper row with the frogs, who went over the road
 		Cell[] frogs = getBoard().getRow(boardHeight - 1);
 
-		// kaboom and decrease lives
-		kaboom(curX, curY);
-		setLives(getLives() - 1);
-
-		if (getLives() > 0) {
-			animatedClearBoard(true);
-			loadLevel();
-		} else {
-			gameOver();
-		}
+		super.loss(curX, curY);
 
 		// restores the frogs' row
 		getBoard().setRow(frogs, boardHeight - 1);
@@ -549,12 +540,12 @@ public class FroggerGame extends GameWithLives {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (!jumpFrog(curX - 1, curY))
-					dieFrog();
+					loss();
 				keys.remove(KeyPressed.KeyLeft);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				if (!jumpFrog(curX + 1, curY))
-					dieFrog();
+					loss();
 				keys.remove(KeyPressed.KeyRight);
 			}
 
@@ -567,7 +558,7 @@ public class FroggerGame extends GameWithLives {
 					dY = -2;
 
 				if (!jumpFrog(curX, curY + dY))
-					dieFrog();
+					loss();
 				keys.remove(KeyPressed.KeyDown);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
@@ -577,13 +568,13 @@ public class FroggerGame extends GameWithLives {
 					dY = (curY < boardHeight - 2) ? 2 : 1;
 
 				if (!jumpFrog(curX, curY + dY))
-					dieFrog();
+					loss();
 				keys.remove(KeyPressed.KeyUp);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				dY = (curY < boardHeight - 2) ? 2 : 1;
 				if (!jumpFrog(curX, curY + dY))
-					dieFrog();
+					loss();
 				keys.remove(KeyPressed.KeyRotate);
 			}
 		}
