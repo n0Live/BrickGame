@@ -109,7 +109,7 @@ public class RaceGame extends GameWithLives {
 		super.start();
 		setStatus(Status.Running);
 
-		loadLevel();
+		loadNewLevel();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 
@@ -130,7 +130,8 @@ public class RaceGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	protected void loadLevel() {
+	@Override
+	protected void loadNewLevel() {
 		// set position
 		curPosition = 1;
 		curX = positions[curPosition];
@@ -147,6 +148,7 @@ public class RaceGame extends GameWithLives {
 		// draw the opponents and the borders
 		moveOn();
 
+		setStatus(Status.Running);
 	}
 
 	/**

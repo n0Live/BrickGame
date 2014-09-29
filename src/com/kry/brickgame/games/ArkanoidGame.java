@@ -345,9 +345,14 @@ public class ArkanoidGame extends GameWithLives {
 
 		setStatus(Status.Running);
 	}
-	
+
 	@Override
-	protected void loadLevel() {
+	protected void loadNewLevel() {
+		loadLevel(true);
+	}
+
+	@Override
+	protected void reloadLevel() {
 		loadLevel(false);
 	}
 
@@ -726,20 +731,6 @@ public class ArkanoidGame extends GameWithLives {
 
 		// restores saved bricks wall
 		insertCellsToBoard(getBoard(), curBricks.getBoard(), bricksX, bricksY);
-	}
-
-	/**
-	 * Increase the level and load it
-	 */
-	private void win() {
-		setStatus(Status.DoSomeWork);
-
-		setLevel(getLevel() + 1);
-		if (getLevel() == 1)
-			setSpeed(getSpeed() + 1);
-
-		animatedClearBoard(true);
-		loadLevel(true);
 	}
 
 	@Override

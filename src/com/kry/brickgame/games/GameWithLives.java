@@ -1,7 +1,6 @@
 package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.Status;
 
 /**
  * @author noLive
@@ -81,9 +80,19 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-	
-	protected abstract void loadLevel();
-	
+
+	/**
+	 * Loading the specified level
+	 */
+	protected abstract void loadNewLevel();
+
+	/**
+	 * Reloading the specified level
+	 */
+	protected void reloadLevel() {
+		loadNewLevel();
+	}
+
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -100,10 +109,25 @@ public abstract class GameWithLives extends Game {
 		setLives(getLives() - 1);
 		if (getLives() > 0) {
 			animatedClearBoard(true);// fast
-			loadLevel();
+			reloadLevel();
 		} else {
 			gameOver();
 		}
+	}
+
+	/**
+	 * Increase the level and load it
+	 */
+	protected void win() {
+		setStatus(Status.DoSomeWork);
+
+		animatedClearBoard(true);
+
+		setLevel(getLevel() + 1);
+		if (getLevel() == 1)
+			setSpeed(getSpeed() + 1);
+
+		loadNewLevel();
 	}
 
 }

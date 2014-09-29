@@ -87,7 +87,7 @@ public class SnakeGame extends GameWithLives {
 		super.start();
 		setStatus(Status.Running);
 
-		loadLevel();
+		loadNewLevel();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// moving of the snake
@@ -98,10 +98,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			// when the snake has reached the maximum length
 			if (snake.getLength() >= SnakeShape.getMaxLength()) {
-				// increases level and load it
-				animatedClearBoard(true);// fast
-				incLevel();
-				loadLevel();
+				win();
 			}
 			// processing of key presses
 			processKeys();
@@ -316,18 +313,9 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Increases level and speed
-	 */
-	private void incLevel() {
-		setLevel(getLevel() + 1);
-		if (getLevel() == 1)
-			setSpeed(getSpeed() + 1);
-	}
-
-	/**
 	 * Loading or reloading the specified level
 	 */
-	protected void loadLevel() {
+	protected void loadNewLevel() {
 		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
 				: LEFT);
 		// starting position - the middle of the bottom border of the board
@@ -346,6 +334,8 @@ public class SnakeGame extends GameWithLives {
 		else
 			prepareBoard();
 		addApple();
+
+		setStatus(Status.Running);
 	}
 
 	/**

@@ -117,7 +117,7 @@ public class GunGame extends GameWithGun {
 		super.start();
 		setStatus(Status.Running);
 
-		loadLevel();
+		loadNewLevel();
 
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
@@ -148,14 +148,7 @@ public class GunGame extends GameWithGun {
 				if (elapsedTime(currentSpeed)) {
 					// try drop down lines
 					if (!droppingDown()) {
-						kaboom(curX, curY);
-						setLives(getLives() - 1);
-						if (getLives() > 0) {
-							animatedClearBoard(true);// fast
-							loadLevel();
-						} else {
-							gameOver();
-						}
+						loss(curX, curY);
 					}
 				}
 			}
@@ -169,7 +162,8 @@ public class GunGame extends GameWithGun {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	private void loadLevel() {
+	@Override
+	protected void loadNewLevel() {
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;

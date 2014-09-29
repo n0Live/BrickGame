@@ -1,5 +1,10 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
+import static com.kry.brickgame.games.GameUtils.checkCollision;
+import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -9,8 +14,6 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;
 import com.kry.brickgame.splashes.Splash;
-
-import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
@@ -187,7 +190,7 @@ public class FroggerGame extends GameWithLives {
 		super.start();
 		setStatus(Status.Running);
 
-		loadLevel();
+		loadNewLevel();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused)
@@ -202,12 +205,15 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	protected void loadLevel() {
+	@Override
+	protected void loadNewLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
 		// initialize the frog
 		setFrog();
+
+		setStatus(Status.Running);
 	}
 
 	/**
@@ -421,8 +427,8 @@ public class FroggerGame extends GameWithLives {
 		}
 
 		// checks for collision with the frog and an obstacles
-		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog, curX) || checkCollision(
-				board, frog, curX, curY));
+		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog,
+				curX) || checkCollision(board, frog, curX, curY));
 
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 
@@ -498,15 +504,10 @@ public class FroggerGame extends GameWithLives {
 		setScore(getScore() + 1);
 
 		if (isVictory) {
-			setLevel(getLevel() + 1);
-			if (getLevel() == 1)
-				setSpeed(getSpeed() + 1);
-
 			animatedClearLine(getBoard(), curX, boardHeight - 1);
 			sleep(ANIMATION_DELAY);
 
-			animatedClearBoard(true);
-			loadLevel();
+			win();
 		} else {
 			setFrog();
 		}
