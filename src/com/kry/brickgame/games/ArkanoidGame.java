@@ -757,16 +757,20 @@ public class ArkanoidGame extends GameWithLives {
 
 		super.processKeys();
 
+		// decreasing the platfom's movement speed for the 1-cell platform
+		int movementDelay = (platform.getType() == Ñharacters.Platform1) ? ANIMATION_DELAY * 3
+				: ANIMATION_DELAY;
+
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				movePlatform(curX - 1);
-				sleep(ANIMATION_DELAY);
+				sleep(movementDelay);
 			}
 
 			if (keys.contains(KeyPressed.KeyRight)) {
 				movePlatform(curX + 1);
-				sleep(ANIMATION_DELAY);
+				sleep(movementDelay);
 			}
 
 			if (keys.contains(KeyPressed.KeyRotate)) {
