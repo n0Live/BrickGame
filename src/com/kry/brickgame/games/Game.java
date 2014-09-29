@@ -187,6 +187,7 @@ public abstract class Game extends Thread {
 		setRotation(rotation);
 
 		setScore(0);
+		setStatus(Status.None);
 
 		this.curX = 0;
 		this.curY = 0;

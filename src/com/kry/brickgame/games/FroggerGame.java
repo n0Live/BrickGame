@@ -159,7 +159,6 @@ public class FroggerGame extends GameWithLives {
 	 */
 	public FroggerGame(int speed, int level, int type) {
 		super(speed, level, type);
-		setStatus(Status.None);
 
 		// initialize the frog
 		this.frog = new Shape(1);

@@ -72,7 +72,7 @@ public class SnakeGame extends GameWithLives {
 	 */
 	public SnakeGame(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		setStatus(Status.None);
+
 		// for every even type of game
 		isToroidalField = (getType() % 2 == 0);
 		// for types 1-2

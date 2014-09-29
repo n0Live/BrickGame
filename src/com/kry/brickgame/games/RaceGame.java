@@ -79,7 +79,6 @@ public class RaceGame extends GameWithLives {
 	 */
 	public RaceGame(int speed, int level, int type) {
 		super(speed, level, type);
-		setStatus(Status.None);
 
 		car = new ÑharacterShape(Ñharacters.Car);
 

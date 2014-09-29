@@ -96,7 +96,6 @@ public class GunGame extends GameWithGun {
 	 */
 	public GunGame(int speed, int level, int type) {
 		super(speed, level, type);
-		setStatus(Status.None);
 
 		// ==define the parameters of the types of game==
 		// for types 5-8 and 13-16

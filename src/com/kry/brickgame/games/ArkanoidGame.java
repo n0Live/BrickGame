@@ -242,7 +242,6 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	public ArkanoidGame(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		setStatus(Status.None);
 
 		// platform size depends on the type of game
 		if (getType() % 4 == 1)

@@ -138,7 +138,6 @@ public class TetrisGame extends Game {
 	 */
 	public TetrisGame(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		setStatus(Status.None);
 
 		// for types 17-32
 		hasLiquidFigures = ((getType() >= 17) && (getType() <= 32));
