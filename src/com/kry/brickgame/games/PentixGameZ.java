@@ -52,8 +52,6 @@ public class PentixGameZ extends PentixGame {
 			}
 		}, 0, 1000);
 
-		super.start();
-
 		addLineTimer.cancel();
 	}
 

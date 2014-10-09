@@ -18,8 +18,6 @@ public class SplashScreen extends Game {
 	}
 
 	public void start() {
-		super.start();
-
 		setStatus(Status.DoSomeWork);
 		insertNumbers();
 

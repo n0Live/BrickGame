@@ -11,6 +11,7 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.Splash;
 
 /**
@@ -26,6 +27,13 @@ public abstract class Game extends Thread {
 	 * Number of subtypes
 	 */
 	public static int subtypesNumber;
+
+	// ** Direction constants **
+	protected static final RotationAngle UP = RotationAngle.d0;
+	protected static final RotationAngle DOWN = RotationAngle.d180;
+	protected static final RotationAngle RIGHT = RotationAngle.d90;
+	protected static final RotationAngle LEFT = RotationAngle.d270;
+	// **
 
 	/*---MAGIC NUMBERS---*/
 	/**
@@ -185,6 +193,9 @@ public abstract class Game extends Thread {
 		setBoard(board);
 		setPreview(preview);
 		setRotation(rotation);
+
+		clearBoard();
+		clearPreview();
 
 		setScore(0);
 		setStatus(Status.None);
@@ -734,12 +745,6 @@ public abstract class Game extends Thread {
 		setStatus(Status.None);
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
-	}
-
-	@Override
-	public void start() {
-		clearBoard();
-		clearPreview();
 	}
 
 	@Override

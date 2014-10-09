@@ -187,7 +187,6 @@ public class FroggerGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		super.start();
 		setStatus(Status.Running);
 
 		loadNewLevel();

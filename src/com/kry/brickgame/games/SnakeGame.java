@@ -31,13 +31,6 @@ public class SnakeGame extends GameWithLives {
 	 */
 	public static final int subtypesNumber = 4;
 
-	// ** Direction constants **
-	private static final RotationAngle LEFT = RotationAngle.d270;
-	private static final RotationAngle RIGHT = RotationAngle.d90;
-	private static final RotationAngle UP = RotationAngle.d0;
-	private static final RotationAngle DOWN = RotationAngle.d180;
-	// **
-
 	/**
 	 * The snake
 	 */
@@ -84,7 +77,6 @@ public class SnakeGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		super.start();
 		setStatus(Status.Running);
 
 		loadNewLevel();

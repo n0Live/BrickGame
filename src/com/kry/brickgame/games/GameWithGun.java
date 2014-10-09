@@ -39,14 +39,14 @@ public abstract class GameWithGun extends GameWithLives {
 		bullets = new int[boardHeight - gun.getHeight()][boardWidth];
 		initBullets(bullets);
 	}
-	
+
 	/**
 	 * Filling the bullets array with zeros
 	 * 
 	 * @param bullets
 	 *            the bullets array
 	 */
-	private static void initBullets(int[][] bullets) {
+	protected static void initBullets(int[][] bullets) {
 		for (int i = 0; i < bullets.length; i++)
 			for (int j = 0; j < bullets[i].length; j++)
 				bullets[i][j] = 0;
@@ -64,6 +64,7 @@ public abstract class GameWithGun extends GameWithLives {
 				// bullet is blink
 				if (board.getCell(i, j) == Cell.Blink)
 					board.setCell(Cell.Empty, i, j);
+
 	}
 
 	/**
@@ -101,21 +102,19 @@ public abstract class GameWithGun extends GameWithLives {
 	 * Processing the flight of bullets (destruction mode)
 	 */
 	protected synchronized void flightOfBullets() {
-		clearBullets(getBoard());
+		Board board = getBoard();
+
+		clearBullets(board);
 
 		for (int y = 0; y < bullets.length; y++) {
 			for (int x = 0; x < bullets[y].length; x++) {
 				// if 0, than bullet is not exist
 				if (bullets[y][x] > 0) {
-					Board board = getBoard();
 					// if the bullet does not reach the border of the board
 					if (bullets[y][x] < boardHeight - 1) {
 						// if under the bullet is filled cell
-						if (board.getCell(x, bullets[y][x]) == Cell.Full) {
-							// remove the cell
-							board.setCell(Cell.Empty, x, bullets[y][x]++);
-							// increase scores
-							setScore(getScore() + 1);
+						if (board.getCell(x, bullets[y][x]) != Cell.Empty) {
+							removeCell(board, x, bullets[y][x]);
 							// remove the bullet
 							bullets[y][x] = 0;
 						} else {
@@ -125,8 +124,7 @@ public abstract class GameWithGun extends GameWithLives {
 					} else if (bullets[y][x] == boardHeight - 1) {
 						// if under the bullet is filled cell
 						if (board.getCell(x, bullets[y][x]) == Cell.Full) {
-							// increase scores
-							setScore(getScore() + 1);
+							removeCell(board, x, bullets[y][x]);
 						}
 						// show the bullet
 						board.setCell(Cell.Blink, x, bullets[y][x]);
@@ -143,20 +141,38 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 
 	/**
+	 * Erasing the cell from the board and increasing scores
+	 * 
+	 * @param board
+	 *            the board
+	 * @param x
+	 *            x-coordinate of the cell
+	 * @param y
+	 *            y-coordinate of the cell
+	 */
+	protected void removeCell(Board board, int x, int y) {
+		// remove the cell
+		board.setCell(Cell.Empty, x, y);
+		// increase scores
+		setScore(getScore() + 1);
+	}
+
+	/**
 	 * Processing the flight of mud bullets (creation mode)
 	 */
 	protected synchronized void flightOfMud() {
-		clearBullets(getBoard());
+		Board board = getBoard();
+
+		clearBullets(board);
 
 		for (int y = 0; y < bullets.length; y++) {
 			for (int x = 0; x < bullets[y].length; x++) {
 				// if 0, than bullet is not exist
 				if (bullets[y][x] > 0) {
-					Board board = getBoard();
 					// if the bullet does not reach the border of the board
 					if (bullets[y][x] < boardHeight - 1) {
 						// if in front of the bullet is filled cell
-						if (board.getCell(x, bullets[y][x] + 1) == Cell.Full) {
+						if (board.getCell(x, bullets[y][x] + 1) != Cell.Empty) {
 							// stop the bullet before the cell
 							board.setCell(Cell.Full, x, bullets[y][x]);
 							setScore(getScore() + 1);
@@ -235,7 +251,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            if {@code true},then shot is made with two guns on the sides,
 	 *            otherwise shot is made with one gun on the center
 	 */
-	protected void fire(final int x, final int y, boolean hasTwoSmokingBarrels) {
+	protected void fire(int x, int y, boolean hasTwoSmokingBarrels) {
 		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight))
 			return;
 

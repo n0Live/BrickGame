@@ -114,7 +114,6 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	public void start() {
-		super.start();
 		setStatus(Status.Running);
 
 		loadNewLevel();

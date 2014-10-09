@@ -407,7 +407,9 @@ public class GameSelector extends Game {
 	}
 
 	public void start() {
-		super.start();
+		clearBoard();
+		clearPreview();
+		
 		if (drawAll())
 			setStatus(Status.DoSomeWork);
 		else

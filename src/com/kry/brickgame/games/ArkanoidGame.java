@@ -1,10 +1,9 @@
 package com.kry.brickgame.games;
 
-import static com.kry.brickgame.games.GameUtils.boardHorizontalShift;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 
-import java.util.Random;
+import java.awt.Point;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,13 +29,6 @@ public class ArkanoidGame extends GameWithLives {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 64;
-
-	// ** Direction constants **
-	private static final RotationAngle UP = RotationAngle.d0;
-	private static final RotationAngle DOWN = RotationAngle.d180;
-	private static final RotationAngle RIGHT = RotationAngle.d90;
-	private static final RotationAngle LEFT = RotationAngle.d270;
-	// **
 
 	/**
 	 * The bit, who which kicks the ball
@@ -65,11 +57,7 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * The bricks wall
 	 */
-	private volatile Board bricks;
-	/**
-	 * Number of bricks is not broken at the current level
-	 */
-	private int bricksCount;
+	private volatile BricksWall bricks;
 	/**
 	 * Y-coordinate position on the board for the second platform
 	 */
@@ -254,18 +242,16 @@ public class ArkanoidGame extends GameWithLives {
 			platform = new ÑharacterShape(Ñharacters.Platform1);
 
 		// initialize the ball
-		this.ball = new Shape(1);
-		ball.setCoord(0, new int[] { 0, 0 });
-		ball.setFill(Cell.Full);
+		this.ball = BallUtils.getBall(Cell.Full);
 
 		// for types 1-16 and 33-48
 		usePreloadedBricks = ((getType() <= 16))
 				|| ((getType() >= 33) && (getType() <= 48));
-		// for every 4-8 types
+		// for every 5-8 types
 		isShiftingBricks = ((getType() % 8 >= 5) || (getType() % 8 == 0));
 		// for every 9-16 types
 		useDoubleSidedPlatform = ((getType() % 16 >= 9) || (getType() % 16 == 0));
-		// for types 8-16
+		// for types 32-64
 		drawInvertedBoard = (getType() > 32);
 	}
 
@@ -274,10 +260,9 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		super.start();
 		setStatus(Status.Running);
 
-		loadLevel(true);
+		loadNewLevel();
 
 		// create timer for shift the bricks
 		Timer shiftBricksTimer = new Timer("ShiftBricksTimer", true);
@@ -329,8 +314,7 @@ public class ArkanoidGame extends GameWithLives {
 
 		// create the bricks wall
 		if (setBricks) {
-			bricks = (usePreloadedBricks) ? setPreloadedBricks()
-					: generateBricks();
+			bricks = new BricksWall(getLevel(), usePreloadedBricks);
 
 			bricksX = 0;
 			bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
@@ -357,179 +341,11 @@ public class ArkanoidGame extends GameWithLives {
 	}
 
 	/**
-	 * Creating the randomly generated bricks wall
-	 * 
-	 * @return the bricks wall
-	 */
-	private Board generateBricks() {
-		Random r = new Random();
-
-		// bricks wall's height from 6 on level 1, to 9 on level 10
-		Board genBricks = new Board(boardWidth, getLevel() / 3 + 6);
-		bricksCount = 0;
-
-		// on one chance from 3 - the wall has a vertical symmetry
-		boolean isVerticalSymmetry = (r.nextInt(3) == 0);
-		// calculate center for a vertical symmetry
-		// (for odd and even lines count)
-		int centerPoint = genBricks.getHeight() / 2
-				+ ((genBricks.getHeight() % 2 != 0) ? 1 : 0);
-
-		for (int i = 0; i < genBricks.getHeight(); i++) {
-			if (isVerticalSymmetry && (i >= centerPoint)) {
-
-				genBricks.setRow(
-						genBricks.getRow(genBricks.getHeight() - 1 - i), i);
-
-				for (int j = 0; j < boardWidth / 2; j++) {
-					// calculate count of the bricks
-					if (genBricks.getCell(j, i) == Cell.Full)
-						bricksCount += 2;
-				}
-			} else {
-				for (int j = 0; j < boardWidth / 2; j++) {
-					// the chance for full cell 2 to 3
-					Cell brick = (r.nextInt(3) == 0) ? Cell.Empty : Cell.Full;
-					genBricks.setCell(brick, j, i);
-					genBricks.setCell(brick, boardWidth - 1 - j, i);
-
-					// calculate count of the bricks
-					if (brick == Cell.Full)
-						bricksCount += 2;
-				}
-			}
-		}
-
-		return genBricks;
-	}
-
-	/**
-	 * Setting predefined bricks wall
-	 * 
-	 * @return the bricks wall
-	 */
-	private Board setPreloadedBricks() {
-		final Cell F = Cell.Full;
-		final Cell E = Cell.Empty;
-		final Cell[][][] preloadedBricks = new Cell[][][] {//
-		{ // 1
-						{ E, F, E, F, E, E, F, E, F, E },
-						{ E, E, F, E, E, E, E, F, E, E },//
-						{ E, F, F, F, E, E, F, F, F, E },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, F, F, E, F, F, E, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, E, F, F, F, F, E, E, E }, },//
-				{// 2
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, F, F, F, F, F, F, F, F, F },//
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, E, E, F, F, F, F, E, E, E },
-						{ E, E, E, F, F, F, F, E, E, E }, },//
-
-				{// 3
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },//
-						{ E, F, F, F, E, E, F, F, F, E },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, E, E, F, F, F, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ F, F, F, F, F, F, F, F, F, F }, },//
-				{// 4
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ F, E, F, F, F, F, F, F, E, F },//
-						{ F, F, E, F, F, F, F, E, F, F },
-						{ F, F, F, E, F, F, E, F, F, F },
-						{ F, F, E, F, F, F, F, E, F, F },
-						{ F, E, F, F, F, F, F, F, E, F },
-						{ E, F, F, F, F, F, F, F, F, E }, },//
-
-				{// 5
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },//
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ F, F, F, F, F, F, F, F, F, F }, },//
-				{// 6
-						{ F, F, E, F, F, F, F, E, F, F },
-						{ F, E, F, F, E, E, F, F, E, F },//
-						{ E, E, F, E, F, F, E, F, E, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ F, F, F, F, E, E, F, F, F, F },
-						{ F, F, F, F, E, E, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, E, F, F, F, F, F, F, E, E }, },//
-				{// 7
-						{ F, E, E, F, E, E, F, E, E, F },
-						{ F, E, F, F, F, F, F, F, E, F },//
-						{ F, E, F, F, F, F, F, F, E, F },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, E, F, F, F, F, F, F, E, F },
-						{ F, E, F, F, F, F, F, F, E, F },
-						{ F, E, E, F, E, E, F, E, E, F }, },//
-				{// 8
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, F, F, F, F, F, F, F, F, E },//
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, E, F, E, F, F, E, F, E, E },
-						{ E, F, E, E, F, F, E, E, F, E },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, E, F, F, F, F, F, F, E, E }, },//
-				{ // 9
-						{ F, F, E, E, F, F, E, E, F, F },
-						{ E, F, F, E, F, F, E, F, F, E },//
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, F, F, E, F, F, E, F, F, E },
-						{ F, F, E, E, F, F, E, E, F, F }, },//
-				{// 10
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, F, F, F, F, F, E, F, F, E },//
-						{ F, F, E, E, F, F, F, F, F, F },
-						{ E, F, F, E, F, F, E, E, E, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, E, F, F, F, F, E, E, E },
-						{ E, E, E, E, F, F, E, E, E, E }, },//
-		};
-
-		Board newBricks = new Board(boardWidth,
-				preloadedBricks[getLevel() - 1].length);
-
-		bricksCount = 0;
-		for (int i = 0; i < newBricks.getHeight(); i++) {
-			// the bricks is filled from the bottom up
-			newBricks.setRow(
-					preloadedBricks[getLevel() - 1][newBricks.getHeight() - 1
-							- i], i);
-
-			// calculate count of the bricks
-			for (int j = 0; j < newBricks.getWidth(); j++) {
-				if (newBricks.getCell(j, i) == Cell.Full)
-					bricksCount++;
-			}
-		}
-
-		return newBricks;
-	}
-
-	/**
 	 * Shift the bricks wall horizontally
 	 */
 	private synchronized void shiftBricks() {
 		// shift bricks
-		bricks = boardHorizontalShift(bricks,
-				(getRotation() == Rotation.Clockwise) ? 1 : -1);
+		bricks.shift((getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board
 		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
@@ -586,12 +402,8 @@ public class ArkanoidGame extends GameWithLives {
 	 * @return the board after drawing the ball
 	 */
 	private Board drawBall(Board board, int x, int y) {
-		// Create a temporary board, a copy of the basic board
-		Board newBoard = board.clone();
-
-		// Erase the ball and draw on the new place
-		newBoard = drawShape(newBoard, ballX, ballY, ball, Cell.Empty);
-		newBoard = drawShape(newBoard, x, y, ball, ball.getFill());
+		// draw the ball
+		Board newBoard = BallUtils.drawBall(board, ball, ballX, ballY, x, y);
 
 		// replace current coordinates to the new ones
 		ballX = x;
@@ -606,49 +418,51 @@ public class ArkanoidGame extends GameWithLives {
 	private void moveBall() {
 		Board board = getBoard();
 
-		int newX, newY;
+		Point newCoords;
+
 		// set new coordinates from directions
-		newX = ballX + ((ballHorizontalDirection == RIGHT) ? 1 : -1);
-		newY = ballY + ((ballVerticalDirection == UP) ? 1 : -1);
+		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
+				ballVerticalDirection);
 
 		// if the ball fall off the board then loss live
-		if ((newY < 0) || (useDoubleSidedPlatform && (newY >= boardHeight))) {
+		if ((newCoords.y < 0)
+				|| (useDoubleSidedPlatform && (newCoords.y >= boardHeight))) {
 			loss();
 			return;
 		}
 
 		// check collision with the board's borders
-		if (newY < 0) {
+		if (newCoords.y >= boardHeight) {
 			ballVerticalDirection = DOWN;
-			newY = ballY - 1;
 		}
-		if ((newX < 0) || (newX >= boardWidth)) {
+		if ((newCoords.x < 0) || (newCoords.x >= boardWidth)) {
 			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
-			newX = ballX - (newX - ballX);
 		}
+		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
+				ballVerticalDirection);
 
 		// try to break brick under current position of the ball
 		breakBrick(board, ballX, ballY);
 
 		// check collision with the bricks or the platform
-		if ((board.getCell(newX, ballY) != Cell.Empty)
-				|| (board.getCell(ballX, newY) != Cell.Empty)
-				|| (board.getCell(newX, newY) != Cell.Empty)) {
+		if ((board.getCell(newCoords.x, ballY) != Cell.Empty)
+				|| (board.getCell(ballX, newCoords.y) != Cell.Empty)
+				|| (board.getCell(newCoords.x, newCoords.y) != Cell.Empty)) {
 
 			// at first, checked the cells with whom the ball touches the edges
-			if ((board.getCell(newX, ballY) != Cell.Empty)
-					|| (board.getCell(ballX, newY) != Cell.Empty)) {
-				if (board.getCell(newX, ballY) != Cell.Empty) {
+			if ((board.getCell(newCoords.x, ballY) != Cell.Empty)
+					|| (board.getCell(ballX, newCoords.y) != Cell.Empty)) {
+				if (board.getCell(newCoords.x, ballY) != Cell.Empty) {
 					ballHorizontalDirection = ballHorizontalDirection
 							.getOpposite();
-					if (!isPlatform(newX, ballY)) {
-						breakBrick(board, newX, ballY);
+					if (!isPlatform(newCoords.x, ballY)) {
+						breakBrick(board, newCoords.x, ballY);
 					}
 				}
-				if (board.getCell(ballX, newY) != Cell.Empty) {
+				if (board.getCell(ballX, newCoords.y) != Cell.Empty) {
 					ballVerticalDirection = ballVerticalDirection.getOpposite();
-					if (!isPlatform(ballX, newY)) {
-						breakBrick(board, ballX, newY);
+					if (!isPlatform(ballX, newCoords.y)) {
+						breakBrick(board, ballX, newCoords.y);
 					}
 				}
 				// if there are none,then processed the cell with whom the ball
@@ -656,20 +470,20 @@ public class ArkanoidGame extends GameWithLives {
 			} else {
 				ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 				ballVerticalDirection = ballVerticalDirection.getOpposite();
-				if (!isPlatform(newX, newY)) {
-					breakBrick(board, newX, newY);
+				if (!isPlatform(newCoords.x, newCoords.y)) {
+					breakBrick(board, newCoords.x, newCoords.y);
 				}
 			}
 
-			newX = ballX;
-			newY = ballY;
+			newCoords.x = ballX;
+			newCoords.y = ballY;
 		}
 
-		board = drawBall(board, newX, newY);
+		board = drawBall(board, newCoords.x, newCoords.y);
 		setBoard(board);
 
 		// when destroying all bricks
-		if (bricksCount <= 0)
+		if (bricks.getBricksCount() <= 0)
 			win();
 	}
 
@@ -688,19 +502,11 @@ public class ArkanoidGame extends GameWithLives {
 		int givenX = x - bricksX;
 		int givenY = y - bricksY;
 
-		if ((givenX < 0) || (givenX >= bricks.getWidth()) || (givenY < 0)
-				|| (givenY >= bricks.getHeight()))
-			return;
-
-		if (bricks.getCell(givenX, givenY) != Cell.Empty) {
-			bricks.setCell(Cell.Empty, givenX, givenY);
-
+		if (bricks.breakBrick(givenX, givenY)) {
 			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
 			// increase scores
 			setScore(getScore() + 1);
-			// decrease bricks count
-			bricksCount--;
 		}
 	}
 

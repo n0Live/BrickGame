@@ -154,8 +154,6 @@ public class TetrisGame extends Game {
 	 */
 	@Override
 	public void start() {
-		super.start();
-
 		// getLevel() - 1 - because on the first level doesn't need to add line
 		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
 

@@ -43,8 +43,6 @@ public class TetrisGameJ extends TetrisGame {
 			}
 		}, 0, 1000);
 
-		super.start();
-
 		addLineTimer.cancel();
 	}
 
