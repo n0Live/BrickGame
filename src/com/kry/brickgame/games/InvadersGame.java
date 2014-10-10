@@ -226,7 +226,7 @@ public class InvadersGame extends GameWithGun {
 					processInvasion();
 				}
 			}
-		}, ANIMATION_DELAY * 2, getSpeed(true));
+		}, getSpeed(true) * 2, getSpeed(true));
 
 		setStatus(Status.Running);
 	}
@@ -318,7 +318,7 @@ public class InvadersGame extends GameWithGun {
 				return;
 			}
 		}
-		//draw the ball in the new position
+		// draw the ball in the new position
 		board = drawBall(board, newCoords.x, newCoords.y);
 		setBoard(board);
 	}
@@ -397,7 +397,7 @@ public class InvadersGame extends GameWithGun {
 
 		bricksY = newBricksY;
 
-		//reset the bullets
+		// reset the bullets
 		initBullets(bullets);
 
 		setBoard(board);
