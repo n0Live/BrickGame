@@ -11,7 +11,6 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.games.Game.Status;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.InvadersSplash;
@@ -84,11 +83,13 @@ public class InvadersGame extends GameWithGun {
 	 * Whether to draw the board upside down?
 	 */
 	private boolean drawInvertedBoard;
-	
-	private Timer invasion;
+	/**
+	 * Timer for the invasion
+	 */
+	private Timer invasionTimer;
 
 	// increase speed from the original
-	private final int FIRST_LEVEL_SPEED = 350;
+	private final int FIRST_LEVEL_SPEED = 300;
 	private final int TENTH_LEVEL_SPEED = 50;
 
 	@Override
@@ -111,7 +112,32 @@ public class InvadersGame extends GameWithGun {
 	 * @param type
 	 *            type of the game type of the game:
 	 *            <ol>
-	 *            <li>...;
+	 *            <li>invaders with preloaded bricks vs one gun;
+	 *            <li>invaders with preloaded and shifting bricks vs one gun;
+	 *            <li>invaders with preloaded bricks vs two guns;
+	 *            <li>invaders with preloaded and shifting bricks vs two guns;
+	 *            <li>invaders with randomly generated bricks vs one gun;
+	 *            <li>invaders with randomly generated and shifting bricks vs
+	 *            one gun;
+	 *            <li>invaders with randomly generated bricks vs two guns;
+	 *            <li>invaders with randomly generated and shifting bricks vs
+	 *            two guns;
+	 *            <li>invaders with preloaded bricks vs one gun, the board is
+	 *            upside down;
+	 *            <li>invaders with preloaded and shifting bricks vs one gun,
+	 *            the board is upside down;
+	 *            <li>invaders with preloaded bricks vs two guns, the board is
+	 *            upside down;
+	 *            <li>invaders with preloaded and shifting bricks vs two guns,
+	 *            the board is upside down;
+	 *            <li>invaders with randomly generated bricks vs one gun, the
+	 *            board is upside down;
+	 *            <li>invaders with randomly generated and shifting bricks vs
+	 *            one gun, the board is upside down;
+	 *            <li>invaders with randomly generated bricks vs two guns, the
+	 *            board is upside down;
+	 *            <li>invaders with randomly generated and shifting bricks vs
+	 *            two guns, the board is upside down.
 	 */
 	public InvadersGame(int speed, int level, int type) {
 		super(speed, level, type);
@@ -145,32 +171,20 @@ public class InvadersGame extends GameWithGun {
 			public void run() {
 				flightOfBullets();
 			}
-		}, 0, ANIMATION_DELAY / 2);
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-
+			// check the number of remaining bricks
 			if (bricks.getBricksCount() <= 0) {
 				win();
 			}
-
 			// processing of key presses
 			processKeys();
 		}
 
 		bulletSwarm.cancel();
-		invasion.cancel();
-	}
-
-	private void processInvasion() {
-		if (isFlyingBall) {
-			moveBall();
-		} else {
-			if (!droppingDown()) {
-				loss(curX, curY);
-			} else {
-				createBall();
-			}
-		}
+		invasionTimer.cancel();
 	}
 
 	/**
@@ -180,69 +194,89 @@ public class InvadersGame extends GameWithGun {
 	@Override
 	protected void loadNewLevel() {
 		setStatus(Status.DoSomeWork);
-		
-		if (invasion != null)
-			invasion.cancel();
-		
+
+		// if the invasionTimer was set, then cancel it
+		if (invasionTimer != null)
+			invasionTimer.cancel();
+
 		// clear the bullets
 		initBullets(bullets);
 
 		// return the ball to the start position
 		initBall();
 
-		curX = boardWidth / 2 - 1;
-		curY = 0;
-
 		// create the bricks wall
 		bricks = new BricksWall(getLevel(), usePreloadedBricks);
-
 		bricksX = 0;
 		bricksY = (boardHeight - bricks.getHeight());
-
 		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 
+		// set the starting position of the gun
+		curX = boardWidth / 2 - 1;
+		curY = 0;
 		// draws the gun
 		moveGun(curX, curY);
 
 		createBall();
 
 		// create timer for invasion
-		invasion = new Timer("Invasion", true);
-		invasion.schedule(new TimerTask() {
+		invasionTimer = new Timer("Invasion", true);
+		invasionTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				if (getStatus() == Status.Running) {
 					processInvasion();
 				}
 			}
-		}, ANIMATION_DELAY, getSpeed(true));
+		}, ANIMATION_DELAY * 2, getSpeed(true));
 
 		setStatus(Status.Running);
 	}
 
+	/**
+	 * Processing actions of invaders
+	 */
+	private synchronized void processInvasion() {
+		if (isFlyingBall) { // the ball already created
+			moveBall();
+		} else {
+			// dropping down the bricks wall
+			if (!droppingDown()) {
+				loss(curX, curY);
+			} else {
+				createBall();
+			}
+		}
+	}
+
+	/**
+	 * Erasing the ball from the board
+	 */
 	private void initBall() {
 		isFlyingBall = false;
-
 		setBoard(drawBall(getBoard(), -1, -1));
 	}
 
+	/**
+	 * Creating the ball from one of a bricks in the bricks wall
+	 * <p>
+	 * Setting the coordinates of the ball and ball's movement direction
+	 */
 	private void createBall() {
 		for (int y = 0; y < bricks.getHeight(); y++) {
 			for (int x = bricks.getWidth() - 1; x >= 0; x--) {
 				if (bricks.getCell(x, y) == Cell.Full) {
-
 					ballX = x + bricksX;
 					ballY = y + bricksY;
 					ballVerticalDirection = DOWN;
 					// magic aiming algorithm
-					if (ballX < curX) { // the ball to the left of the gun
+					if (ballX < curX) { // if the ball to the left of the gun
 						ballHorizontalDirection = (Math.abs(ballX - curX) < Math
 								.abs(ballY - curY)) ? LEFT : RIGHT;
 					} else {
 						ballHorizontalDirection = (Math.abs(ballX - curX) < Math
 								.abs(ballY - curY)) ? RIGHT : LEFT;
 					}
-
 					// delete this brick from bricks wall
 					bricks.setCell(Cell.Empty, x, y);
 
@@ -254,16 +288,16 @@ public class InvadersGame extends GameWithGun {
 
 	}
 
+	/**
+	 * Move the ball to a new position in movement direction
+	 */
 	private void moveBall() {
-		Board board = getBoard();
-
 		Point newCoords;
-
 		// set new coordinates from directions
 		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
 				ballVerticalDirection);
 
-		// if the ball fall off the board then loss live
+		// if the ball fall off the board then remove it
 		if (newCoords.y < 0) {
 			initBall();
 			bricks.setBricksCount(bricks.getBricksCount() - 1);
@@ -277,6 +311,8 @@ public class InvadersGame extends GameWithGun {
 		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
 				ballVerticalDirection);
 
+		Board board = getBoard().clone();
+
 		// check collision with the gun
 		if (newCoords.y <= curY + gun.maxY()) {
 			if (checkCollision(board, ball, newCoords.x, newCoords.y)) {
@@ -284,7 +320,7 @@ public class InvadersGame extends GameWithGun {
 				return;
 			}
 		}
-
+		//draw the ball in the new position
 		board = drawBall(board, newCoords.x, newCoords.y);
 		setBoard(board);
 	}
@@ -348,6 +384,7 @@ public class InvadersGame extends GameWithGun {
 		int newBricksY = bricksY - 1;
 		insertCellsToBoard(board, bricks.getBoard(), bricksX, newBricksY);
 
+		// check collision with the gun
 		boolean result = true;
 		for (int i = 0; i < boardWidth; i++) {
 			if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
@@ -362,6 +399,7 @@ public class InvadersGame extends GameWithGun {
 
 		bricksY = newBricksY;
 
+		//reset the bullets
 		initBullets(bullets);
 
 		setBoard(board);
@@ -393,8 +431,6 @@ public class InvadersGame extends GameWithGun {
 		} else {
 			breakBrick(board, x, y);
 		}
-		if (bricks.getBricksCount() <= 0)
-			win();
 	}
 
 	@Override
@@ -424,12 +460,16 @@ public class InvadersGame extends GameWithGun {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				moveGun(curX - 1, curY);
-				sleep(ANIMATION_DELAY * 2);
+				if (!moveGun(curX - 1, curY))
+					loss(curX - 1, curY);
+				else
+					sleep(ANIMATION_DELAY * 2);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				moveGun(curX + 1, curY);
-				sleep(ANIMATION_DELAY * 2);
+				if (!moveGun(curX + 1, curY))
+					loss(curX + 1, curY);
+				else
+					sleep(ANIMATION_DELAY * 2);
 			}
 			if ((keys.contains(KeyPressed.KeyDown))
 					|| (keys.contains(KeyPressed.KeyUp))) {
@@ -442,5 +482,4 @@ public class InvadersGame extends GameWithGun {
 			}
 		}
 	}
-
 }
