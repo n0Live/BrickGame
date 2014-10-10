@@ -12,25 +12,25 @@ public class InvadersSplash extends Splash {
 			{ E, F, F, F, F, F, F, F, F, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, B, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, E, E, E, E } }, {
 			// 1
 			{ F, F, F, F, F, F, F, F, F, F }, //
 			{ E, F, F, F, F, F, F, F, E, E }, //
-			{ E, E, E, E, E, E, E, E, E, B }, //
+			{ E, E, E, E, E, E, E, E, E, F }, //
+			{ E, E, E, E, B, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, E, E, E, E } }, {
 			// 2
 			{ F, F, F, F, F, F, F, F, F, F }, //
 			{ E, F, F, F, F, F, F, F, E, E }, //
-			{ E, E, E, E, F, E, E, E, E, E },//
+			{ E, E, E, E, B, E, E, E, E, E },//
+			{ E, E, E, E, E, E, E, E, F, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, E, E, E, B, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, F, E, E, E, E }, //
 			{ E, E, E, E, F, F, F, E, E, E } }, {
@@ -39,8 +39,8 @@ public class InvadersSplash extends Splash {
 			{ E, F, F, F, E, F, F, F, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E },//
 			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, F, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, E, E, B, E, E, E }, //
 			{ E, E, E, E, E, F, E, E, E, E }, //
 			{ E, E, E, E, F, F, F, E, E, E } } };
 

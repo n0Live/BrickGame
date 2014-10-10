@@ -14,7 +14,7 @@ public class GunSplash extends Splash {
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, F, E, E, E, E, E }, //
+			{ E, E, E, E, B, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, E, E, E, E } }, {
 			// 1
@@ -22,7 +22,7 @@ public class GunSplash extends Splash {
 			{ F, F, F, F, F, E, E, E, F, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
-			{ E, E, E, E, F, E, E, E, E, E }, //
+			{ E, E, E, E, B, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, E, E, E, E } }, {
@@ -30,7 +30,7 @@ public class GunSplash extends Splash {
 			{ F, F, F, E, F, E, F, F, E, F },//
 			{ F, F, E, E, F, F, F, E, F, F }, //
 			{ F, F, F, F, F, E, E, E, F, E },//
-			{ E, E, E, E, F, E, E, E, E, E }, //
+			{ E, E, E, E, B, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
