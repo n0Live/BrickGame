@@ -169,7 +169,9 @@ public class InvadersGame extends GameWithGun {
 		bulletSwarm.schedule(new TimerTask() {
 			@Override
 			public void run() {
+				// if (getStatus() == Status.Running) {
 				flightOfBullets();
+				// }
 			}
 			// twice as slow if hasTwoSmokingBarrels
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
@@ -478,7 +480,7 @@ public class InvadersGame extends GameWithGun {
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-				sleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY / 2);
 			}
 		}
 	}

@@ -121,10 +121,12 @@ public class GunGame extends GameWithGun {
 		bulletSwarm.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (isCreationMode)
-					flightOfMud();
-				else
-					flightOfBullets();
+				if (getStatus() == Status.Running) {
+					if (isCreationMode)
+						flightOfMud();
+					else
+						flightOfBullets();
+				}
 			}
 			// twice as slow if hasTwoSmokingBarrels
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
