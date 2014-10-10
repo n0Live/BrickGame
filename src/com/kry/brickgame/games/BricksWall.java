@@ -118,7 +118,7 @@ public class BricksWall extends Board {
 		// 10
 		super(preloadedBricks[level][0].length,
 				usePreloadedBricks ? preloadedBricks[level].length
-						: level / 3 + 6);
+						: level / 2 + 5);
 
 		if (usePreloadedBricks
 				&& ((level >= 0) && (level < preloadedBricks.length)))
