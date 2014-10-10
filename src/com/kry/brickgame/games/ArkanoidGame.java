@@ -281,9 +281,25 @@ public class ArkanoidGame extends GameWithLives {
 
 		int currentSpeed;
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			// if the size of the platform is 1, decrease the speed
-			currentSpeed = (platform.getType() == Ñharacters.Platform1) ? getSpeed(true)
-					: getSpeed(true) / 2;
+			// change the speed in depending of the platform size
+			switch (platform.getType()) {
+			case Platform1:
+				currentSpeed = getSpeed(true) * 5 / 4;
+				break;
+			case Platform2:
+				currentSpeed = getSpeed(true);
+				break;
+			case Platform3:
+				currentSpeed = getSpeed(true) * 3 / 4;
+				break;
+			default:
+				currentSpeed = getSpeed(true) / 2;
+				break;
+			}
+
+			// decrease game speed if use double sided platform
+			if (useDoubleSidedPlatform)
+				currentSpeed += ANIMATION_DELAY;
 
 			if ((getStatus() != Status.Paused) && (elapsedTime(currentSpeed))) {
 				if (!isStartOfLevel)
@@ -353,9 +369,10 @@ public class ArkanoidGame extends GameWithLives {
 		// shift bricks
 		bricks.shift((getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board
-		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
+		Board board = getBoard().clone();
+		insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
-		setBoard(drawBall(getBoard(), ballX, ballY));
+		setBoard(drawBall(board, ballX, ballY));
 	}
 
 	/**
@@ -570,9 +587,20 @@ public class ArkanoidGame extends GameWithLives {
 
 		super.processKeys();
 
-		// decreasing the platfom's movement speed for the 1-cell platform
-		int movementDelay = (platform.getType() == Ñharacters.Platform1) ? ANIMATION_DELAY * 3
-				: ANIMATION_DELAY;
+		int movementDelay;
+
+		// decreasing the platfom's movement speed for the 1- and 2-cell
+		// platform
+		switch (platform.getType()) {
+		case Platform1:
+			movementDelay = ANIMATION_DELAY * 3;
+			break;
+		case Platform2:
+			movementDelay = ANIMATION_DELAY * 2;
+			break;
+		default:
+			movementDelay = ANIMATION_DELAY;
+		}
 
 		if (getStatus() == Status.Running) {
 
