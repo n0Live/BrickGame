@@ -74,11 +74,11 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            x-coordinate position of the new location
 	 * @param y
 	 *            y-coordinate position of the new location
-	 * @return {@code true} if the movement succeeded, otherwise {@code false}
+	 * @return {@code false} if there was a collision, otherwise {@code true}
 	 */
 	protected boolean moveGun(int x, int y) {
 		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight))
-			return false;
+			return true;
 
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
