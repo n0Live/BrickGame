@@ -86,6 +86,10 @@ public class ArkanoidGame extends GameWithLives {
 	 * Whether to draw the board upside down?
 	 */
 	private boolean drawInvertedBoard;
+	/**
+	 * Is this the beginning of the level?
+	 */
+	private boolean isStartOfLevel;
 
 	/**
 	 * The Arkanoid
@@ -260,8 +264,6 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		setStatus(Status.Running);
-
 		loadNewLevel();
 
 		// create timer for shift the bricks
@@ -284,7 +286,8 @@ public class ArkanoidGame extends GameWithLives {
 					: getSpeed(true) / 2;
 
 			if ((getStatus() != Status.Paused) && (elapsedTime(currentSpeed))) {
-				moveBall();
+				if (!isStartOfLevel)
+					moveBall();
 			}
 			// processing of key presses
 			processKeys();
@@ -324,6 +327,9 @@ public class ArkanoidGame extends GameWithLives {
 		}
 		// init ball
 		drawBall(getBoard(), ballX, ballY);
+
+		isStartOfLevel = true;
+
 		// init platform
 		movePlatform(curX);
 
@@ -537,6 +543,7 @@ public class ArkanoidGame extends GameWithLives {
 
 		// restores saved bricks wall
 		insertCellsToBoard(getBoard(), curBricks.getBoard(), bricksX, bricksY);
+		fireBoardChanged(getBoard());
 	}
 
 	@Override
@@ -580,8 +587,10 @@ public class ArkanoidGame extends GameWithLives {
 			}
 
 			if (keys.contains(KeyPressed.KeyRotate)) {
+				if (isStartOfLevel)
+					isStartOfLevel = false;
 				moveBall();
-				sleep(ANIMATION_DELAY);
+				sleep(ANIMATION_DELAY * 2);
 			}
 		}
 	}
