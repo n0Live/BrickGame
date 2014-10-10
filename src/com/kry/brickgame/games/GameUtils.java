@@ -227,23 +227,28 @@ public class GameUtils {
 	 *            y-coordinate for the insertion
 	 * @return {@code true} if the insertion is success, otherwise {@code false}
 	 */
-	protected static boolean insertCellsToBoard(Board board, Cell[][] cells,
+	protected static void insertCellsToBoard(Board board, Cell[][] cells,
 			int x, int y) {
-		if ((x < 0) || (y < 0)) {
-			return false;
+		if ((x >= board.getWidth()) || (y >= board.getHeight())
+				|| (x + cells.length <= 0) || (y + cells[0].length <= 0)) {
+			return;
 		}
 
-		if ((x + cells.length > board.getWidth())
-				|| (y + cells[0].length > board.getHeight())) {
-			return false;
-		}
+		// calculate the shift when the cells is not completely inserted into
+		// the board
+		int fromX = (x < 0) ? -x : 0;
+		int toX = (x + cells.length >= board.getWidth()) ? board.getWidth() - x
+				: cells.length;
 
-		for (int i = 0; i < cells.length; i++) {
-			for (int j = 0; j < cells[0].length; j++) {
+		int fromY = (y < 0) ? -y : 0;
+		int toY = (y + cells[0].length >= board.getHeight()) ? board
+				.getHeight() - y : cells[0].length;
+
+		for (int i = fromX; i < toX; i++) {
+			for (int j = fromY; j < toY; j++) {
 				board.setCell(cells[i][j], x + i, y + j);
 			}
 		}
-		return true;
 	}
 
 	/**
