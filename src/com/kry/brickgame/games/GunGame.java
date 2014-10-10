@@ -29,7 +29,7 @@ public class GunGame extends GameWithGun {
 
 	// decrease speed from the original
 	private final int FIRST_LEVEL_SPEED = 600;
-	private final int TENTH_LEVEL_SPEED = 240;
+	private final int TENTH_LEVEL_SPEED = 250;
 
 	@Override
 	protected int getFIRST_LEVEL_SPEED() {
@@ -114,8 +114,6 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	public void start() {
-		setStatus(Status.Running);
-
 		loadNewLevel();
 
 		// create timer for bullets
@@ -128,16 +126,17 @@ public class GunGame extends GameWithGun {
 				else
 					flightOfBullets();
 			}
-		}, 0, ANIMATION_DELAY / 2);
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 
 			int currentSpeed = getSpeed(true);
 
-			// increase speed in CreationMode
+			// decrease game speed in CreationMode
 			if (isCreationMode) {
 				currentSpeed *= 5;
-				// decrease speed if has two guns
+				// increase game speed if has two guns
 			} else if (hasTwoSmokingBarrels) {
 				currentSpeed -= ANIMATION_DELAY * 2;
 			}
@@ -171,6 +170,8 @@ public class GunGame extends GameWithGun {
 		setBoard(addLines(getBoard(), getLevel()));
 		// draws the gun
 		moveGun(curX, curY);
+
+		setStatus(Status.Running);
 	}
 
 	/**
@@ -320,7 +321,8 @@ public class GunGame extends GameWithGun {
 				if (isCreationMode)
 					keys.remove(KeyPressed.KeyRotate);
 				else
-					sleep(ANIMATION_DELAY);
+					// twice as slow if hasTwoSmokingBarrels
+					sleep(ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 			}
 		}
 	}
