@@ -87,6 +87,19 @@ public class InvadersGame extends GameWithGun {
 	 * Timer for the invasion
 	 */
 	private Timer invasionTimer;
+	// Easter egg
+	/**
+	 * The X-Dimension, which has its own laws
+	 */
+	private boolean theXDimension;
+	/**
+	 * Are you ready to teleport to the X-Dimension?
+	 */
+	private boolean isReadyToXDimension;
+	/**
+	 * X-coordinate of the starting position of the gun
+	 */
+	private int startX;
 
 	// increase speed from the original
 	private final int FIRST_LEVEL_SPEED = 300;
@@ -153,6 +166,16 @@ public class InvadersGame extends GameWithGun {
 		drawInvertedBoard = (getType() > 8);
 		// for 1-4 and 9-12 type of game
 		usePreloadedBricks = ((getType() % 8 >= 1) && (getType() % 8 < 5));
+
+		/*
+		 * The X-Dimension Easter Egg To get into the X-Dimension you might have
+		 * to shoot through the bricks wall above the gun and nowhere else. When
+		 * the bricks wall down to the level of the gun, you need to stand in
+		 * front of the bullet hole.
+		 */
+		isReadyToXDimension = false;
+		theXDimension = false;
+		startX = boardWidth / 2 - 1;
 	}
 
 	/**
@@ -196,6 +219,10 @@ public class InvadersGame extends GameWithGun {
 	@Override
 	protected void loadNewLevel() {
 		setStatus(Status.DoSomeWork);
+		
+		//set the X-Dimension flags
+		theXDimension = isReadyToXDimension && !isShiftingBricks;
+		isReadyToXDimension = !theXDimension && !isShiftingBricks;
 
 		// if the invasionTimer was set, then cancel it
 		if (invasionTimer != null)
@@ -214,7 +241,7 @@ public class InvadersGame extends GameWithGun {
 		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 
 		// set the starting position of the gun
-		curX = boardWidth / 2 - 1;
+		curX = startX;
 		curY = 0;
 		// draws the gun
 		moveGun(curX, curY);
@@ -270,6 +297,13 @@ public class InvadersGame extends GameWithGun {
 				if (bricks.getCell(x, y) == Cell.Full) {
 					ballX = x + bricksX;
 					ballY = y + bricksY;
+
+					//don't create a ball when it below the gun
+					if (ballY < gun.getHeight()) {
+						initBall();
+						return;
+					}
+
 					ballVerticalDirection = DOWN;
 					// magic aiming algorithm
 					if (ballX < curX) { // if the ball to the left of the gun
@@ -369,6 +403,9 @@ public class InvadersGame extends GameWithGun {
 
 			// increase scores
 			setScore(getScore() + 1);
+
+			if (isReadyToXDimension && (x != startX))
+				isReadyToXDimension = false;
 		}
 	}
 
@@ -386,11 +423,27 @@ public class InvadersGame extends GameWithGun {
 		int newBricksY = bricksY - 1;
 		insertCellsToBoard(board, bricks.getBoard(), bricksX, newBricksY);
 
+		if (newBricksY <= -bricks.getHeight()) {
+			win();
+			return true;
+		}
+
 		// check collision with the gun
 		boolean result = true;
 		for (int i = 0; i < boardWidth; i++) {
 			if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
-				result = false;
+				//checking for compliance with the conditions of teleportation in the X-Dimension
+				if (isReadyToXDimension) {
+					for (int j = 0; j < bricks.getHeight(); j++) {
+						if (bricks.getCell(bricksX + startX, j) == Cell.Full) {
+							isReadyToXDimension = false;
+							break;
+						}
+					}
+					result = isReadyToXDimension && (curX == startX);
+				} else {
+					result = false;
+				}
 				break;
 			}
 		}
@@ -439,6 +492,19 @@ public class InvadersGame extends GameWithGun {
 	protected synchronized void fireBoardChanged(Board board) {
 		Board newBoard = board.clone();
 
+		//the X-Dimension has its own laws
+		if (theXDimension) {
+			int startY = (gun != null) ? gun.getHeight() : 0;
+			for (int i = 0; i < newBoard.getWidth(); i++) {
+				for (int j = startY; j < newBoard.getHeight(); j++) {
+					if ((newBoard.getCell(i, j) == Cell.Full)
+							&& (new Random().nextInt(3) != 0)) {
+						newBoard.setCell(Cell.Empty, i, j);
+					}
+				}
+			}
+		}
+
 		// draws the inverted board
 		if (drawInvertedBoard) {
 			for (int i = 0; i < board.getHeight(); i++) {
@@ -447,6 +513,12 @@ public class InvadersGame extends GameWithGun {
 		}
 
 		super.fireBoardChanged(newBoard);
+	}
+
+	@Override
+	protected void loss(int x, int y) {
+		isReadyToXDimension = false;
+		super.loss(x, y);
 	}
 
 	/**
