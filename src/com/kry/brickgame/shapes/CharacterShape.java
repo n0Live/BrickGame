@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.kry.brickgame.Board.Cell;
 
-public abstract class ÑharacterShape extends Shape {
+public abstract class CharacterShape extends Shape {
 
 	/**
 	 * Type of the character
@@ -23,7 +23,7 @@ public abstract class ÑharacterShape extends Shape {
 	 * @param type
 	 *            type of the character
 	 */
-	public ÑharacterShape(int type) {
+	public CharacterShape(int type) {
 		super(charactersTable[type].length);
 		this.type = type;
 		setType(type, RotationAngle.d0, Cell.Full);
@@ -39,7 +39,7 @@ public abstract class ÑharacterShape extends Shape {
 	 * @param fill
 	 *            type of fill of the character
 	 */
-	protected ÑharacterShape setType(int type,
+	protected CharacterShape setType(int type,
 			RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < charactersTable[type].length; i++) {
 			setX(i, charactersTable[type][i][0]);
@@ -74,14 +74,14 @@ public abstract class ÑharacterShape extends Shape {
 		return type;
 	}
 
-	public ÑharacterShape changeRotationAngle(RotationAngle rotationAngle) {
+	public CharacterShape changeRotationAngle(RotationAngle rotationAngle) {
 		return setType(getType(), rotationAngle, getFill());
 	}
 
 	/**
 	 * Selection of a random rotation angle
 	 */
-	public ÑharacterShape setRandomRotate() {
+	public CharacterShape setRandomRotate() {
 		Random r = new Random();
 		int x = Math.abs(r.nextInt()) % 4;
 		RotationAngle[] values = RotationAngle.values();
@@ -91,7 +91,7 @@ public abstract class ÑharacterShape extends Shape {
 	@Override
 	public String toString() {
 		// the type and rotation angle
-		return "ÑharacterShape [" + this.getType() + ", "
+		return "CharacterShape [" + this.getType() + ", "
 				+ this.getRotationAngle()
 				// width and height
 				+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"

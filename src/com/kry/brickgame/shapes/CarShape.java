@@ -1,6 +1,6 @@
 package com.kry.brickgame.shapes;
 
-public class CarShape extends ÑharacterShape {
+public class CarShape extends CharacterShape {
 
 	static {
 		charactersTable = new int[][][] {//

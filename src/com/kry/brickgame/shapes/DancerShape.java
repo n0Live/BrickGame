@@ -1,6 +1,6 @@
 package com.kry.brickgame.shapes;
 
-public class DancerShape extends ÑharacterShape {
+public class DancerShape extends CharacterShape {
 
 	static {
 		charactersTable = new int[][][] {//

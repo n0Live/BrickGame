@@ -12,7 +12,6 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.ArkanoidPlatformShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
-import com.kry.brickgame.shapes.ÑharacterShape;
 import com.kry.brickgame.splashes.ArkanoidSplash;
 import com.kry.brickgame.splashes.Splash;
 
@@ -33,7 +32,7 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * The bit, who which kicks the ball
 	 */
-	private ÑharacterShape platform;
+	private ArkanoidPlatformShape platform;
 	/**
 	 * The ball breaking bricks
 	 */

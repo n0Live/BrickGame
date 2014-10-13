@@ -8,7 +8,7 @@ import com.kry.brickgame.Board.Cell;
  * @author noLive
  * 
  */
-public class Obstacle extends ÑharacterShape {
+public class Obstacle extends CharacterShape {
 
 	static {
 		charactersTable = new int[][][] {//
