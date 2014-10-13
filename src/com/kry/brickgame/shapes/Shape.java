@@ -314,6 +314,23 @@ public class Shape implements Cloneable {
 		return this;
 	}
 
+	
+	/**
+	 * Turn the figure to the opposite direction
+	 * 
+	 * @return the figure after rotation
+	 */
+	public Shape turnAround() {
+		Shape originalShape = new Shape(this);
+
+		for (int i = 0; i < getLength(); i++) {
+			setX(i, -originalShape.x(i));
+			setY(i, -originalShape.y(i));
+		}
+		rotationAngle = rotationAngle.getOpposite();
+		return this;
+	}
+
 	/**
 	 * Loop through the value of {@code maxY()} to {@code minY()} (downwards)
 	 * and from {@code minX()} to {@code maxX()} (left to right), if the value

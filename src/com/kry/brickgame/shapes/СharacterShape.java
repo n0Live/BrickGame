@@ -68,8 +68,7 @@ public class ÑharacterShape extends Shape {
 			rotateLeft();
 			break;
 		case d180:
-			rotateRight();
-			rotateRight();
+			turnAround();
 			break;
 		default:
 			break;

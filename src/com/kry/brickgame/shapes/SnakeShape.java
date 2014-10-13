@@ -138,7 +138,8 @@ public class SnakeShape extends Shape {
 	/**
 	 * Turn of the snake by 180 degrees
 	 */
-	public SnakeShape turnReversal() {
+	@Override
+	public SnakeShape turnAround() {
 		SnakeShape newSnake = this.clone();
 
 		RotationAngle direction;
@@ -277,7 +278,7 @@ public class SnakeShape extends Shape {
 	 */
 	protected SnakeShape turn(RotationAngle direction, boolean isAppleAhead) {
 		if (direction == getDirection().getOpposite()) {
-			return turnReversal();
+			return turnAround();
 		} else {
 			if (isAppleAhead) {
 				return eatApple(direction);
