@@ -1,11 +1,11 @@
 package com.kry.brickgame.games;
 
-import static com.kry.brickgame.games.GameUtils.*;
+import static com.kry.brickgame.games.GameUtils.checkCollision;
+import static com.kry.brickgame.games.GameUtils.drawShape;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.shapes.ÑharacterShape;
-import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
+import com.kry.brickgame.shapes.GunShape;
 
 /**
  * @author noLive
@@ -15,7 +15,7 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * The Gun
 	 */
-	protected ÑharacterShape gun;
+	protected GunShape gun;
 	/**
 	 * Array that stores the coordinates of the bullets
 	 */
@@ -34,7 +34,7 @@ public abstract class GameWithGun extends GameWithLives {
 	public GameWithGun(int speed, int level, int type) {
 		super(speed, level, type);
 
-		gun = new ÑharacterShape(Ñharacters.Gun);
+		gun = new GunShape();
 
 		bullets = new int[boardHeight - gun.getHeight()][boardWidth];
 		initBullets(bullets);

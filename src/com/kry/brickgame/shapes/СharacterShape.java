@@ -4,32 +4,18 @@ import java.util.Random;
 
 import com.kry.brickgame.Board.Cell;
 
-public class ÑharacterShape extends Shape {
-
-	public static enum Ñharacters {
-		Platform1, Platform2, Platform3, Platform4, Gun, Car, DanceShape
-	};
+public abstract class ÑharacterShape extends Shape {
 
 	/**
 	 * Type of the character
 	 */
-	private Ñharacters type;
+	protected int type;
 
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	private final static int[][][] charactersTable = new int[][][] {
-			{ { 0, 0 } }, // platform1
-			{ { 0, 0 }, { 1, 0 } }, // platform2
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // platform3
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // platform4
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // gun
-			{ { -1, -1 }, { 1, -1 }, { 0, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 },
-					{ 0, 2 } }, // car
-			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 1, 0 }, { -1, 1 },
-					{ 1, 1 } } // dance
-	}; //
+	protected static int[][][] charactersTable;
 
 	/**
 	 * Constructor of the player character
@@ -37,8 +23,8 @@ public class ÑharacterShape extends Shape {
 	 * @param type
 	 *            type of the character
 	 */
-	public ÑharacterShape(Ñharacters type) {
-		super(charactersTable[type.ordinal()].length);
+	public ÑharacterShape(int type) {
+		super(charactersTable[type].length);
 		this.type = type;
 		setType(type, RotationAngle.d0, Cell.Full);
 	}
@@ -53,11 +39,11 @@ public class ÑharacterShape extends Shape {
 	 * @param fill
 	 *            type of fill of the character
 	 */
-	private ÑharacterShape setType(Ñharacters type,
+	protected ÑharacterShape setType(int type,
 			RotationAngle rotationAngle, Cell fill) {
-		for (int i = 0; i < charactersTable[type.ordinal()].length; i++) {
-			setX(i, charactersTable[type.ordinal()][i][0]);
-			setY(i, charactersTable[type.ordinal()][i][1]);
+		for (int i = 0; i < charactersTable[type].length; i++) {
+			setX(i, charactersTable[type][i][0]);
+			setY(i, charactersTable[type][i][1]);
 		}
 
 		switch (rotationAngle) {
@@ -84,7 +70,7 @@ public class ÑharacterShape extends Shape {
 	/**
 	 * @return type of the character
 	 */
-	public Ñharacters getType() {
+	public int getType() {
 		return type;
 	}
 

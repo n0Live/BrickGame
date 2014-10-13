@@ -9,8 +9,7 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.shapes.ÑharacterShape;
-import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
+import com.kry.brickgame.shapes.CarShape;
 import com.kry.brickgame.splashes.RaceSplash;
 import com.kry.brickgame.splashes.Splash;
 
@@ -30,7 +29,7 @@ public class RaceGame extends GameWithLives {
 	/**
 	 * Racing car
 	 */
-	private ÑharacterShape car;
+	private CarShape car;
 	/**
 	 * List of the opponents
 	 */
@@ -80,7 +79,7 @@ public class RaceGame extends GameWithLives {
 	public RaceGame(int speed, int level, int type) {
 		super(speed, level, type);
 
-		car = new ÑharacterShape(Ñharacters.Car);
+		car = new CarShape();
 
 		// create the array of possible x-axis positions of the car
 		int startPoint;

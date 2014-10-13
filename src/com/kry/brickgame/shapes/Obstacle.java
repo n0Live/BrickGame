@@ -8,22 +8,17 @@ import com.kry.brickgame.Board.Cell;
  * @author noLive
  * 
  */
-public class Obstacle extends Shape {
+public class Obstacle extends ÑharacterShape {
 
-	/**
-	 * Type of the obstacle
-	 */
-	private int type;
-
-	/**
-	 * A set of the coordinates of points of the obstacles:
-	 * [type][point][coordinate:0-x,1-y]
-	 */
-	private final static int[][][] obstaclesTable = new int[][][] {
-			{ { 0, 0 } }, // 0 - square
-			{ { 1, 0 }, { 0, 0 }, { 0, 1 } }, // 1 - corner
-			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, // 2 - rectangle
-	}; //
+	static {
+		charactersTable = new int[][][] {//
+		// 0 - square
+				{ { 0, 0 } },
+				// 1 - corner
+				{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
+				// 2 - rectangle
+				{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
+	}
 
 	/**
 	 * Constructor of the Obstacle
@@ -32,8 +27,7 @@ public class Obstacle extends Shape {
 	 *            type of the obstacle
 	 */
 	public Obstacle(int type) {
-		super(obstaclesTable[type].length);
-		setType(type, RotationAngle.d0, Cell.Full);
+		super(type);
 	}
 
 	/**
@@ -46,50 +40,23 @@ public class Obstacle extends Shape {
 	 * @param fill
 	 *            type of fill of the obstacle
 	 */
-	private Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
-		for (int i = 0; i < obstaclesTable[type].length; i++) {
-			setX(i, obstaclesTable[type][i][0]);
-			setY(i, obstaclesTable[type][i][1]);
-		}
-
-		switch (rotationAngle) {
-		case d90:
-			rotateRight();
-			break;
-		case d270:
-			rotateLeft();
-			break;
-		case d180:
-			turnAround();
-			break;
-		default:
-			break;
-		}
+	@Override
+	protected Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
+		super.setType(type, rotationAngle, fill);
 
 		// sets the lower left corner to the coordinates [0, 0]
 		while (minX() < 0) {
-			for (int i = 0; i < obstaclesTable[type].length; i++) {
+			for (int i = 0; i < charactersTable[type].length; i++) {
 				setX(i, x(i) + 1);
 			}
 		}
 		while (minY() < 0) {
-			for (int i = 0; i < obstaclesTable[type].length; i++) {
+			for (int i = 0; i < charactersTable[type].length; i++) {
 				setY(i, y(i) + 1);
 			}
 		}
 
-		this.type = type;
-		this.setRotationAngle(rotationAngle);
-		this.setFill(fill);
-
 		return this;
-	}
-
-	/**
-	 * @return type of the obstacle
-	 */
-	public int getType() {
-		return type;
 	}
 
 	public Obstacle changeRotationAngle(RotationAngle rotationAngle) {
@@ -101,18 +68,8 @@ public class Obstacle extends Shape {
 	 */
 	public static Obstacle getRandomTypeInstance() {
 		Random r = new Random();
-		int x = r.nextInt(obstaclesTable.length - 1) + 1;
+		int x = r.nextInt(charactersTable.length - 1) + 1;
 		return new Obstacle(x);
-	}
-
-	/**
-	 * Set a random rotation angle
-	 */
-	public Obstacle setRandomRotate() {
-		Random r = new Random();
-		int x = Math.abs(r.nextInt()) % 4;
-		RotationAngle[] values = RotationAngle.values();
-		return setType(getType(), values[x], getFill());
 	}
 
 	/**
@@ -123,7 +80,7 @@ public class Obstacle extends Shape {
 	 * @see #setRandomRotate
 	 */
 	public static Obstacle setRandomShapeAndRotate() {
-		return getRandomTypeInstance().setRandomRotate();
+		return (Obstacle) getRandomTypeInstance().setRandomRotate();
 	}
 
 	@Override

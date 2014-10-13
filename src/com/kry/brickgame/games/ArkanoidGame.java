@@ -9,10 +9,10 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.shapes.ArkanoidPlatformShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.ÑharacterShape;
-import com.kry.brickgame.shapes.ÑharacterShape.Ñharacters;
 import com.kry.brickgame.splashes.ArkanoidSplash;
 import com.kry.brickgame.splashes.Splash;
 
@@ -237,13 +237,13 @@ public class ArkanoidGame extends GameWithLives {
 
 		// platform size depends on the type of game
 		if (getType() % 4 == 1)
-			platform = new ÑharacterShape(Ñharacters.Platform4);
+			platform = new ArkanoidPlatformShape(3);// 4
 		else if (getType() % 4 == 2)
-			platform = new ÑharacterShape(Ñharacters.Platform3);
+			platform = new ArkanoidPlatformShape(2);// 3
 		else if (getType() % 4 == 3)
-			platform = new ÑharacterShape(Ñharacters.Platform2);
+			platform = new ArkanoidPlatformShape(1);// 2
 		else
-			platform = new ÑharacterShape(Ñharacters.Platform1);
+			platform = new ArkanoidPlatformShape(0);// 1
 
 		// initialize the ball
 		this.ball = BallUtils.getBall(Cell.Full);
@@ -283,16 +283,16 @@ public class ArkanoidGame extends GameWithLives {
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// change the speed in depending of the platform size
 			switch (platform.getType()) {
-			case Platform1:
+			case 0:// 1
 				currentSpeed = getSpeed(true) * 5 / 4;
 				break;
-			case Platform2:
+			case 1:// 2
 				currentSpeed = getSpeed(true);
 				break;
-			case Platform3:
+			case 2:// 3
 				currentSpeed = getSpeed(true) * 3 / 4;
 				break;
-			default:
+			default:// 4
 				currentSpeed = getSpeed(true) / 2;
 				break;
 			}
@@ -592,13 +592,13 @@ public class ArkanoidGame extends GameWithLives {
 		// decreasing the platfom's movement speed for the 1- and 2-cell
 		// platform
 		switch (platform.getType()) {
-		case Platform1:
+		case 0:// 1
 			movementDelay = ANIMATION_DELAY * 3;
 			break;
-		case Platform2:
+		case 1:// 2
 			movementDelay = ANIMATION_DELAY * 2;
 			break;
-		default:
+		default:// 3-4
 			movementDelay = ANIMATION_DELAY;
 		}
 
