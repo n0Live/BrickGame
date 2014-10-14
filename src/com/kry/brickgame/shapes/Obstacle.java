@@ -83,13 +83,4 @@ public class Obstacle extends CharacterShape {
 		return (Obstacle) getRandomTypeInstance().setRandomRotate();
 	}
 
-	@Override
-	public String toString() {
-		// the type and rotation angle
-		return "Obstacle [" + this.getType() + ", " + this.getRotationAngle()
-				// width and height
-				+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"
-				+ super.toString();
-	}
-
 }

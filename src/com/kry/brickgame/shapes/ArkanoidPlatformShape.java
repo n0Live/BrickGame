@@ -1,5 +1,9 @@
 package com.kry.brickgame.shapes;
 
+/**
+ * @author noLive
+ * 
+ */
 public class ArkanoidPlatformShape extends CharacterShape {
 
 	static {
@@ -10,6 +14,13 @@ public class ArkanoidPlatformShape extends CharacterShape {
 		}; //
 	}
 
+	/**
+	 * Constructor for the Arkanoid Platform
+	 * 
+	 * @param type
+	 *            <b>0</b> - 1-cell platform, <b>1</b> - 2-cell platform,
+	 *            <b>2</b> - 3-cell platform, <b>3</b> - 4-cell platform
+	 */
 	public ArkanoidPlatformShape(int type) {
 		super(type);
 	}

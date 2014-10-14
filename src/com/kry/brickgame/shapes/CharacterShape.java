@@ -4,6 +4,10 @@ import java.util.Random;
 
 import com.kry.brickgame.Board.Cell;
 
+/**
+ * @author noLive
+ * 
+ */
 public abstract class CharacterShape extends Shape {
 
 	/**

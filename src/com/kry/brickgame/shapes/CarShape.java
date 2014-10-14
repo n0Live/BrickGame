@@ -1,5 +1,9 @@
 package com.kry.brickgame.shapes;
 
+/**
+ * @author noLive
+ * 
+ */
 public class CarShape extends CharacterShape {
 
 	static {
@@ -9,6 +13,9 @@ public class CarShape extends CharacterShape {
 		}; //
 	}
 
+	/**
+	 * Constructor for the Car
+	 */
 	public CarShape() {
 		super(0);
 	}

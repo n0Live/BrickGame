@@ -1,5 +1,9 @@
 package com.kry.brickgame.shapes;
 
+/**
+ * @author noLive
+ * 
+ */
 public class DancerShape extends CharacterShape {
 
 	static {
@@ -9,6 +13,9 @@ public class DancerShape extends CharacterShape {
 		}; //
 	}
 
+	/**
+	 * Constructor for the Dancer
+	 */
 	public DancerShape() {
 		super(0);
 	}
