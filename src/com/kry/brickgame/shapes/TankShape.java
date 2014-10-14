@@ -12,9 +12,59 @@ public class TankShape extends CharacterShape {
 	}
 	private int coordX;
 	private int coordY;
-	
+
+	/**
+	 * Constructor for the Tank
+	 * 
+	 * @param type
+	 *            0 - player's tank, enemy tank
+	 */
 	public TankShape(int type) {
 		super(type);
+
+		setX(0 - minX());
+		setY(0 - minY());
+	}
+
+	/**
+	 * Copy constructor of the tank
+	 * 
+	 * @param aTank
+	 *            a tank for copying
+	 */
+	public TankShape(TankShape aTank) {
+		super(aTank);
+
+		setX(aTank.x());
+		setY(aTank.y());
+	}
+
+	public TankShape clone() {
+		TankShape newTank = new TankShape(this);
+		return newTank;
+	}
+
+	/**
+	 * Setting the coordinates of the new position depending of the direction
+	 * 
+	 * @param direction
+	 *            movement direction
+	 */
+	public void move(RotationAngle direction) {
+		switch (direction) {
+		case d0:
+			setY(y() + 1);
+			break;
+		case d90:
+			setX(x() + 1);
+			break;
+		case d180:
+			setY(y() - 1);
+			break;
+		case d270:
+			setX(x() - 1);
+			break;
+		}
 	}
 
 	/**
@@ -24,6 +74,12 @@ public class TankShape extends CharacterShape {
 		return coordX;
 	}
 
+	/**
+	 * Setting the x-coordinate position on the board
+	 * 
+	 * @param coordX
+	 *            - the x-coordinate
+	 */
 	public void setX(int coordX) {
 		this.coordX = coordX;
 	}
@@ -35,6 +91,12 @@ public class TankShape extends CharacterShape {
 		return coordY;
 	}
 
+	/**
+	 * Setting the y-coordinate position on the board
+	 * 
+	 * @param coordY
+	 *            - the y-coordinate
+	 */
 	public void setY(int coordY) {
 		this.coordY = coordY;
 	}
