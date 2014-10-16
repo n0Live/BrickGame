@@ -20,7 +20,7 @@ import com.kry.brickgame.splashes.TetrisSplash;
  * @author noLive
  * 
  */
-public class TetrisGame extends Game {
+public class TetrisGameI extends Game {
 	/**
 	 * Animated splash for game
 	 */
@@ -223,7 +223,7 @@ public class TetrisGame extends Game {
 	 *            <li>tetris with a super point, super gun, super mud gun, super
 	 *            bomb and random super figures, the board is upside down.
 	 */
-	public TetrisGame(int speed, int level, Rotation rotation, int type) {
+	public TetrisGameI(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 
 		// for types 10-18 and 55-63
@@ -343,54 +343,65 @@ public class TetrisGame extends Game {
 	 *            the type of game
 	 * @return the new shape
 	 */
-	protected TetrisShape setPieceFromType(int type) {
+	private TetrisShape setPieceFromType(int type) {
 		TetrisShape newPiece = null;
 		Random r = new Random();
 
 		if ((hasLiquidFigures || hasAcidFigures || hasThroughfallFigures || hasRandomFigures)
 				&& (r.nextInt(7) == 0)) {
 			// for super figures
-			newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
+			newPiece = getRandomShape();
 			newPiece.setFill(Cell.Blink);
 		} else {
 			// for every 1 from 9 level
 			if (getType() % 9 == 1)
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
+				newPiece = getRandomShape();
 			// for every 2 from 9 level
 			else if (getType() % 9 == 2)
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 0 });
+				newPiece = getRandomShapeAndSuper(new int[] { 0 });
 			// for every 3 from 9 level
 			else if (getType() % 9 == 3)
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 1 });
+				newPiece = getRandomShapeAndSuper(new int[] { 1 });
 			// for every 4 from 9 level
 			else if (getType() % 9 == 4)
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1 });
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1 });
 			// for every 5 from 9 level
 			else if (getType() % 9 == 5)
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 2 });
+				newPiece = getRandomShapeAndSuper(new int[] { 2 });
 			// for every 6 from 9 level
 			else if (getType() % 9 == 6)
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						1, 2 });
+				newPiece = getRandomShapeAndSuper(new int[] { 1, 2 });
 			// for every 7 from 9 level
 			else if (getType() % 9 == 7)
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1, 2 });
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1, 2 });
 			// for every 8 from 9 level
 			else if (getType() % 9 == 8)
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 3 });
+				newPiece = getRandomShapeAndSuper(new int[] { 3 });
 			// for every 9 from 9 level
 			else if (getType() % 9 == 0)
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1, 2, 3 });
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1, 2, 3 });
 		}
 
 		return newPiece;
+	}
+
+	/**
+	 * Get a random figure with a random rotation angle
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getRandomShape() {
+		return TetrisShape.getRandomTetraminoes().setRandomRotate();
+	}
+
+	/**
+	 * Get a random figure or specified super figure
+	 * 
+	 * @param superShapes
+	 *            the array of numbered super figures (from 0 to 4)
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+		return TetrisShape.getRandomTetraminoesAndSuper(superShapes);
 	}
 
 	/**

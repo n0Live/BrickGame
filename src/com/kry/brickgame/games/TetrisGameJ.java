@@ -8,7 +8,7 @@ import static com.kry.brickgame.games.GameUtils.*;
  * @author noLive
  * 
  */
-public class TetrisGameJ extends TetrisGame {
+public class TetrisGameJ extends TetrisGameI {
 	final int TIME_BETWEEN_ADDING_LINE = 30;
 	volatile int time;
 	volatile boolean isTimeToAddLine;
@@ -16,7 +16,7 @@ public class TetrisGameJ extends TetrisGame {
 	/**
 	 * The Tetris with the addition of new lines every few seconds
 	 * 
-	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public TetrisGameJ(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);

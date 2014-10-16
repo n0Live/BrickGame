@@ -7,12 +7,12 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
  * @author noLive
  * 
  */
-public class TetrisGameK extends TetrisGame {
+public class TetrisGameK extends TetrisGameI {
 
 	/**
 	 * The Tetris with the changing of the figures instead of rotating
 	 * 
-	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public TetrisGameK(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);

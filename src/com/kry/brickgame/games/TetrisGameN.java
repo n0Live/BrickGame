@@ -14,7 +14,7 @@ public class TetrisGameN extends TetrisGameJ {
 	 * The Tetris with the addition of new lines every few seconds and the
 	 * shifting board content
 	 * 
-	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public TetrisGameN(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
