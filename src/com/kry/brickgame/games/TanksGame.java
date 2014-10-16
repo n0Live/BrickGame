@@ -17,7 +17,7 @@ import com.kry.brickgame.splashes.TanksSplash;
  * @author noLive
  * 
  */
-public class TanksGame extends Game {
+public class TanksGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
@@ -67,14 +67,19 @@ public class TanksGame extends Game {
 	public void start() {
 		loadNewLevel();
 
+		int currentSpeed;
+		int enemyTankNumber = 0;
+
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 
-			int currentSpeed = getSpeed(true) * 2;
+			currentSpeed = getSpeed(true) * 2;
+			if (enemyTankNumber >= enemyTanks.length)
+				enemyTankNumber = 0;
 
 			if (getStatus() != Status.Paused) {
 				// moving
 				if (elapsedTime(currentSpeed)) {
-					respawnEnemyTank();
+					enemyTurn(enemyTankNumber++);
 				}
 			}
 			// processing of key presses
@@ -109,7 +114,36 @@ public class TanksGame extends Game {
 		}
 	}
 
-	private boolean respawnEnemyTank() {
+	private void enemyTurn(int tankNumber) {
+		System.out.println(tankNumber);
+
+		TankShape enemyTank = enemyTanks[tankNumber];
+		if (enemyTank == null) {
+			if (respawnEnemyTank(tankNumber))
+				System.out.println("+");
+			else
+				System.out.println("x");
+		} else {
+			int x = enemyTank.x();
+			int y = enemyTank.y();
+
+			if (isTimeForShoot(enemyTank)) {
+				// TODO
+				enemyTank = rotateTank(enemyTank,
+						getDirectionForShoot(enemyTank));
+				System.out.println("*[" + x + "," + y + "]"
+						+ enemyTank.getRotationAngle());
+			} else {
+				enemyTank = moveTank(enemyTank,
+						getDirectionForMovement(enemyTank));
+				System.out.println("=[" + x + "," + y + "]"
+						+ enemyTank.getRotationAngle());
+			}
+			enemyTanks[tankNumber] = enemyTank;
+		}
+	}
+
+	private boolean respawnEnemyTank(int tankNumber) {
 		final int[][] spawnPoints = new int[][] {
 				//
 				{ 0, 0 }, { boardWidth - 1, 0 }, // bottom
@@ -117,45 +151,106 @@ public class TanksGame extends Game {
 				{ 0, boardHeight - 1 }, { boardWidth - 1, boardHeight - 1 } // top
 		};
 
-		int emptySlot = -1;
-		for (int i = 0; i < enemyTanks.length; i++) {
-			if (enemyTanks[i] == null) {
-				emptySlot = i;
-				break;
-			}
-		}
-
-		if (emptySlot == -1)
-			return false;
-
 		TankShape newTank = new TankShape(1);
-		int spawnPoint = new Random().nextInt(spawnPoints.length);
-		int newX = spawnPoints[spawnPoint][0];
-		int newY = spawnPoints[spawnPoint][1];
 
-		if (newX + newTank.minX() < 0)
-			newX -= newTank.minX();
-		else if (newX + newTank.maxX() >= boardWidth)
-			newX -= newTank.maxX();
-		if (newY + newTank.minY() < 0)
-			newY -= newTank.minY();
-		else if (newY + newTank.maxY() >= boardHeight)
-			newY -= newTank.maxY();
+		int tryCount = 5;
 
-		if (Math.abs(newX - tank.x()) < Math.abs(newY - tank.y()))
-			newTank.changeRotationAngle((newY - tank.y() > 0) ? DOWN : UP);
-		else
-			newTank.changeRotationAngle((newX - tank.x() > 0) ? LEFT : RIGHT);
+		int newX, newY;
+		int spawnPoint;
 
-		if (checkCollision(getBoard(), newTank, newX, newY))
+		do {
+			spawnPoint = new Random().nextInt(spawnPoints.length);
+			newX = spawnPoints[spawnPoint][0];
+			newY = spawnPoints[spawnPoint][1];
+
+			if (newX + newTank.minX() < 0)
+				newX -= newTank.minX();
+			else if (newX + newTank.maxX() >= boardWidth)
+				newX -= newTank.maxX();
+			if (newY + newTank.minY() < 0)
+				newY -= newTank.minY();
+			else if (newY + newTank.maxY() >= boardHeight)
+				newY -= newTank.maxY();
+
+			newTank.setX(newX);
+			newTank.setY(newY);
+			newTank.changeRotationAngle(getDirectionForShoot(newTank));
+			tryCount--;
+		} while ((checkCollision(getBoard(), newTank, newX, newY))
+				&& (tryCount > 0));
+
+		if (tryCount <= 0)
 			return false;
 
-		newTank.setX(newX);
-		newTank.setY(newY);
-		enemyTanks[emptySlot] = newTank;
+		enemyTanks[tankNumber] = newTank;
 		drawTank(getBoard(), newTank);
 
 		return true;
+	}
+
+	private RotationAngle getDirection(int x, int y, boolean forMovement) {
+		RotationAngle result;
+
+		if (Math.abs(x - tank.x()) < Math.abs(y - tank.y())) {
+			if (forMovement)
+				result = ((x - tank.x() > 0) ? LEFT : RIGHT);
+			else
+				result = ((y - tank.y() > 0) ? DOWN : UP);
+		} else {
+			if (forMovement)
+				result = ((y - tank.y() > 0) ? DOWN : UP);
+			else
+				result = ((x - tank.x() > 0) ? LEFT : RIGHT);
+		}
+
+		return result;
+	}
+
+	private RotationAngle getDirectionForShoot(TankShape tank) {
+		return getDirection(tank.x(), tank.y(), false);
+	}
+
+	private RotationAngle getDirectionForMovement(TankShape tank) {
+		return getDirection(tank.x(), tank.y(), true);
+	}
+
+	private boolean isTimeForShoot(TankShape enemyTank) {
+		final int minChance = 4;
+
+		int chance = minChance;
+		int distance = Math.min(Math.abs(enemyTank.x() - tank.x()),
+				Math.abs(enemyTank.y() - tank.y()));
+
+		chance -= distance;
+
+		RotationAngle shotDirection = getDirectionForShoot(enemyTank);
+
+		if ((((shotDirection == UP) || (shotDirection == DOWN))//
+				&& (Math.abs(enemyTank.x() - tank.x()) <= tank.getWidth() / 2))//
+
+				|| (((shotDirection == LEFT) || (shotDirection == RIGHT))//
+				&& (Math.abs(enemyTank.y() - tank.y()) <= tank.getHeight() / 2)))
+			return true;
+
+		RotationAngle moveDirection = getDirectionForMovement(enemyTank);
+
+		if ((moveDirection == enemyTank.getRotationAngle())
+				&& (moveDirection != shotDirection))
+			chance -= distance / 2;
+
+		if ((shotDirection == UP) || (shotDirection == DOWN)) {
+			if (((enemyTank.x() - tank.x() < 0) && (tank.getRotationAngle() == LEFT))
+					|| ((enemyTank.x() - tank.x() >= 0) && (tank
+							.getRotationAngle() == RIGHT)))
+				chance += distance / 2;
+		} else {
+			if (((enemyTank.y() - tank.y() < 0) && (tank.getRotationAngle() == DOWN))
+					|| ((enemyTank.y() - tank.y() >= 0) && (tank
+							.getRotationAngle() == UP)))
+				chance += distance / 2;
+		}
+
+		return chance >= new Random().nextInt(minChance + 1);
 	}
 
 	private TankShape moveTank(TankShape tank, RotationAngle direction) {
@@ -172,6 +267,27 @@ public class TanksGame extends Game {
 		} else {
 			newTank.move(direction);
 		}
+
+		if (checkBoardCollision(board, newTank, newTank.x(), newTank.y())
+				|| (checkCollision(board, newTank, newTank.x(), newTank.y())))
+			return tank;
+
+		// draw the tank on the new place
+		setBoard(drawTank(board, newTank));
+
+		return newTank;
+	}
+
+	private TankShape rotateTank(TankShape tank, RotationAngle direction) {
+		Board board = getBoard().clone();
+		TankShape newTank = tank.clone();
+
+		// Erase the gun to not interfere with the checks
+		board = eraseTank(board, newTank);
+
+		newTank.changeRotationAngle(direction);
+		if (checkCollision(board, newTank, newTank.x(), newTank.y()))
+			newTank.move(direction);
 
 		if (checkBoardCollision(board, newTank, newTank.x(), newTank.y())
 				|| (checkCollision(board, newTank, newTank.x(), newTank.y())))
