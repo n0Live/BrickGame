@@ -280,7 +280,7 @@ public class TetrisShape extends Shape {
 			if ((superShapes != null)) {
 				for (int j = 0; j < superShapes.length; j++) {
 					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_SUPER_SHAPE
-							+ j].ordinal();
+							+ superShapes[j]].ordinal();
 				}
 			}
 		}
