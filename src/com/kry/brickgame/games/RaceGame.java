@@ -53,10 +53,6 @@ public class RaceGame extends GameWithLives {
 	 * {@code true} - three-lane, {@code false} - two-lane
 	 */
 	private boolean isThreelaneTraffic;
-	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
 
 	/**
 	 * The Race
@@ -97,7 +93,7 @@ public class RaceGame extends GameWithLives {
 		// for every even type of game
 		isThreelaneTraffic = (getType() % 2 == 0);
 		// for types 3-4
-		drawInvertedBoard = (getType() >= 3);
+		setDrawInvertedBoard((getType() >= 3));
 	}
 
 	/**
@@ -345,20 +341,6 @@ public class RaceGame extends GameWithLives {
 			if (getLevel() == 1)
 				setSpeed(getSpeed() + 1);
 		}
-	}
-
-	@Override
-	protected synchronized void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
-		}
-
-		super.fireBoardChanged(newBoard);
 	}
 
 	/**

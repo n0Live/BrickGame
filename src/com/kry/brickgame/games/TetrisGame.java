@@ -5,6 +5,7 @@ import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
+import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 
 import java.util.Random;
 
@@ -57,10 +58,6 @@ public class TetrisGame extends Game {
 	 * Has the random figures: liquid, acid or throughfall
 	 */
 	private boolean hasRandomFigures;
-	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
 
 	/**
 	 * The Tetris
@@ -238,7 +235,7 @@ public class TetrisGame extends Game {
 		// for types 37-45 and 82-90
 		hasRandomFigures = (((getType() >= 37) && (getType() <= 45)) || ((getType() >= 82) && (getType() <= 90)));
 		// for types 46-90
-		drawInvertedBoard = (getType() > 45);
+		setDrawInvertedBoard((getType() > 45));
 	}
 
 	/**
@@ -860,39 +857,21 @@ public class TetrisGame extends Game {
 	}
 
 	@Override
-	protected synchronized void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
-		}
-
-		super.fireBoardChanged(newBoard);
-	}
-
-	@Override
 	protected synchronized void firePreviewChanged(Board board) {
-		Board newBoard = board.clone();
 
 		// draws the inverted board
-		if (drawInvertedBoard
+		if (isInvertedBoard()
 				&& !nextPiece.containsIn(new Figures[] { Figures.SuperPoint,
 						Figures.SuperGun, Figures.SuperMudGun,
 						Figures.SuperBomb })) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
+			super.firePreviewChanged(getInvertedBoard(board));
 		}
-
-		super.firePreviewChanged(newBoard);
+		super.firePreviewChanged(board);
 	}
 
 	@Override
 	public void keyPressed(KeyPressed key) {
-		if (drawInvertedBoard) {
+		if (isInvertedBoard()) {
 			// swap the up and down buttons
 			if (key == KeyPressed.KeyDown)
 				keys.add(KeyPressed.KeyUp);
@@ -906,7 +885,7 @@ public class TetrisGame extends Game {
 
 	@Override
 	public void keyReleased(KeyPressed key) {
-		if (drawInvertedBoard) {
+		if (isInvertedBoard()) {
 			// swap the up and down buttons
 			if (key == KeyPressed.KeyDown)
 				keys.remove(KeyPressed.KeyUp);
