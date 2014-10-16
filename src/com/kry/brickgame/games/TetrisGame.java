@@ -878,7 +878,10 @@ public class TetrisGame extends Game {
 		Board newBoard = board.clone();
 
 		// draws the inverted board
-		if (drawInvertedBoard) {
+		if (drawInvertedBoard
+				&& !nextPiece.containsIn(new Figures[] { Figures.SuperPoint,
+						Figures.SuperGun, Figures.SuperMudGun,
+						Figures.SuperBomb })) {
 			for (int i = 0; i < board.getHeight(); i++) {
 				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
 			}
