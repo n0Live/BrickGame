@@ -400,4 +400,16 @@ public class GameUtils {
 		return board;
 	}
 
+	/**
+	 * Returns the inverted copy of the specified board
+	 * @param board specified board
+	 * @return the inverted copy of the board
+	 */
+	protected static Board getInvertedBoard(Board board){
+		Board newBoard = board.clone();
+		for (int i = 0; i < board.getHeight(); i++) {
+			newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
+		}
+		return newBoard;
+	}
 }

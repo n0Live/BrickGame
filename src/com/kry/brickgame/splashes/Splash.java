@@ -58,9 +58,8 @@ public abstract class Splash extends Board {
 				setCell(frameTable[frame][toY - y - 1][x - fromX], x, y);
 			}
 		}
-		
+
 		// scroll the frames in a circle
-		// do not show a zero frame (it's empty)
 		if (frame < (frames - 1)) {
 			frame++;
 		} else {

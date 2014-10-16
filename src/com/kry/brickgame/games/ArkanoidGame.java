@@ -82,10 +82,6 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	private boolean useDoubleSidedPlatform;
 	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
-	/**
 	 * Is this the beginning of the level?
 	 */
 	private boolean isStartOfLevel;
@@ -255,7 +251,7 @@ public class ArkanoidGame extends GameWithLives {
 		// for every 9-16 types
 		useDoubleSidedPlatform = ((getType() % 16 >= 9) || (getType() % 16 == 0));
 		// for types 32-64
-		drawInvertedBoard = (getType() > 32);
+		setDrawInvertedBoard((getType() > 32));
 	}
 
 	/**
@@ -560,20 +556,6 @@ public class ArkanoidGame extends GameWithLives {
 		// restores saved bricks wall
 		insertCellsToBoard(getBoard(), curBricks.getBoard(), bricksX, bricksY);
 		fireBoardChanged(getBoard());
-	}
-
-	@Override
-	protected synchronized void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
-		}
-
-		super.fireBoardChanged(newBoard);
 	}
 
 	/**

@@ -80,10 +80,6 @@ public class InvadersGame extends GameWithGun {
 	 */
 	private boolean usePreloadedBricks;
 	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
-	/**
 	 * Timer for the invasion
 	 */
 	private Timer invasionTimer;
@@ -163,7 +159,7 @@ public class InvadersGame extends GameWithGun {
 		// for every even type of game
 		isShiftingBricks = (getType() % 2 == 0);
 		// for types 9-16
-		drawInvertedBoard = (getType() > 8);
+		setDrawInvertedBoard((getType() > 8));
 		// for 1-4 and 9-12 type of game
 		usePreloadedBricks = ((getType() % 8 >= 1) && (getType() % 8 < 5));
 
@@ -502,13 +498,6 @@ public class InvadersGame extends GameWithGun {
 						newBoard.setCell(Cell.Empty, i, j);
 					}
 				}
-			}
-		}
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
 			}
 		}
 

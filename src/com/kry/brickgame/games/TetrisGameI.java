@@ -1,5 +1,12 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.addLinesToBoard;
+import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
+import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
+import static com.kry.brickgame.games.GameUtils.checkCollision;
+import static com.kry.brickgame.games.GameUtils.drawPoint;
+import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
+
 import java.util.Random;
 
 import com.kry.brickgame.Board;
@@ -8,13 +15,12 @@ import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
 import com.kry.brickgame.splashes.TetrisSplash;
-import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * @author noLive
  * 
  */
-public class TetrisGame extends Game {
+public class TetrisGameI extends Game {
 	/**
 	 * Animated splash for game
 	 */
@@ -22,7 +28,7 @@ public class TetrisGame extends Game {
 	/**
 	 * Number of subtypes
 	 */
-	public static final int subtypesNumber = 50;
+	public static final int subtypesNumber = 90;
 
 	/**
 	 * Flag to check the completion of falling of a figure
@@ -73,17 +79,10 @@ public class TetrisGame extends Game {
 	 *            <li>tetris with super point and super gun;
 	 *            <li>tetris with super mud gun - a figure that can shoot an
 	 *            create filled cells;
-	 *            <li>tetris with super point and super mud gun;
 	 *            <li>tetris with super gun and super mud gun;
 	 *            <li>tetris with super point, super gun and super mud gun;
 	 *            <li>tetris with super bomb - a figure that explode all around
 	 *            after dropping down;
-	 *            <li>tetris with super point and super bomb;
-	 *            <li>tetris with super gun and super bomb;
-	 *            <li>tetris with super point, super gun and super bomb;
-	 *            <li>tetris with super mud gun and super bomb;
-	 *            <li>tetris with super point, super mud gun and super bomb;
-	 *            <li>tetris with super gun, super mud gun and super bomb;
 	 *            <li>tetris with super point, super gun, super mud gun and
 	 *            super bomb;
 	 *            <li>tetris with a liquid (crumbly) figures;
@@ -91,62 +90,152 @@ public class TetrisGame extends Game {
 	 *            <li>tetris with a liquid figures and super gun;
 	 *            <li>tetris with a liquid figures, super point and super gun;
 	 *            <li>tetris with a liquid figures and super mud gun;
-	 *            <li>tetris with a liquid figures, super point and super mud
-	 *            gun;
 	 *            <li>tetris with a liquid figures, super gun and super mud gun;
 	 *            <li>tetris with a liquid figures, super point, super gun and
 	 *            super mud gun;
 	 *            <li>tetris with a liquid figures and super bomb;
-	 *            <li>tetris with a liquid figures, super point and super bomb;
-	 *            <li>tetris with a liquid figures, super gun and super bomb;
-	 *            <li>tetris with a liquid figures, super point, super gun and
-	 *            super bomb;
-	 *            <li>tetris with a liquid figures, super mud gun and super
-	 *            bomb;
-	 *            <li>tetris with a liquid figures, super point, super mud gun
-	 *            and super bomb;
-	 *            <li>tetris with a liquid figures, super gun, super mud gun and
-	 *            super bomb;
 	 *            <li>tetris with a liquid figures, super point, super gun,
 	 *            super mud gun and super bomb;
-	 *            <li>tetris with a acid figures;
-	 *            <li>tetris with a acid figures and super point;
-	 *            <li>tetris with a acid figures and super gun;
-	 *            <li>tetris with a acid figures, super point and super gun;
-	 *            <li>tetris with a acid figures and super mud gun;
-	 *            <li>tetris with a acid figures, super point and super mud gun;
-	 *            <li>tetris with a acid figures, super gun and super mud gun;
-	 *            <li>tetris with a acid figures, super point, super gun and
+	 *            <li>tetris with an acid figures;
+	 *            <li>tetris with an acid figures and super point;
+	 *            <li>tetris with an acid figures and super gun;
+	 *            <li>tetris with an acid figures, super point and super gun;
+	 *            <li>tetris with an acid figures and super mud gun;
+	 *            <li>tetris with an acid figures, super gun and super mud gun;
+	 *            <li>tetris with an acid figures, super point, super gun and
 	 *            super mud gun;
-	 *            <li>tetris with a acid figures and super bomb;
-	 *            <li>tetris with a acid figures, super point and super bomb;
-	 *            <li>tetris with a acid figures, super gun and super bomb;
-	 *            <li>tetris with a acid figures, super point, super gun and
-	 *            super bomb;
-	 *            <li>tetris with a acid figures, super mud gun and super bomb;
-	 *            <li>tetris with a acid figures, super point, super mud gun and
-	 *            super bomb;
-	 *            <li>tetris with a acid figures, super gun, super mud gun and
-	 *            super bomb;
-	 *            <li>tetris with a acid figures, super point, super gun, super
-	 *            mud gun and super bomb.
-	 *            <li>tetris with a figures that can pass through an obstacles,
-	 *            super point, super gun, super mud gun and super bomb.
+	 *            <li>tetris with an acid figures and super bomb;
+	 *            <li>tetris with an acid figures, super point, super gun, super
+	 *            mud gun and super bomb;
+	 *            <li>tetris with a figures that can pass through an obstacles;.
+	 *            <li>tetris with a throughfall figures and super point;
+	 *            <li>tetris with a throughfall figures and super gun;
+	 *            <li>tetris with a throughfall figures, super point and super
+	 *            gun;
+	 *            <li>tetris with a throughfall figures and super mud gun;
+	 *            <li>tetris with a throughfall figures, super gun and super mud
+	 *            gun;
+	 *            <li>tetris with a throughfall figures, super point, super gun
+	 *            and super mud gun;
+	 *            <li>tetris with a throughfall figures and super bomb;
+	 *            <li>tetris with a throughfall figures, super point, super gun,
+	 *            super mud gun and super bomb;
+	 *            <li>tetris with randomly: liquid figures, acid figures or
+	 *            throughfall figures;
+	 *            <li>tetris with super point and random super figures;
+	 *            <li>tetris with super gun and random super figures;
+	 *            <li>tetris with super point, super gun and random super
+	 *            figures;
+	 *            <li>tetris with super mud gun and random super figures;
+	 *            <li>tetris with super gun, super mud gun and random super
+	 *            figures;
+	 *            <li>tetris with super point, super gun, super mud gun and
+	 *            random super figures;
+	 *            <li>tetris with super bomb and random super figures;
 	 *            <li>tetris with a super point, super gun, super mud gun, super
-	 *            bomb and randomly: liquid figures, acid figures or throughfall
-	 *            figures.
+	 *            bomb and random super figures;
+	 *            <li>regular tetris, the board is upside down;
+	 *            <li>tetris with super point - a figure that can pass through
+	 *            an obstacles, the board is upside down;
+	 *            <li>tetris with super gun - a figure that can shoot an
+	 *            obstacles, the board is upside down;
+	 *            <li>tetris with super point and super gun, the board is upside
+	 *            down;
+	 *            <li>tetris with super mud gun - a figure that can shoot an
+	 *            create filled cells, the board is upside down;
+	 *            <li>tetris with super gun and super mud gun, the board is
+	 *            upside down;
+	 *            <li>tetris with super point, super gun and super mud gun, the
+	 *            board is upside down;
+	 *            <li>tetris with super bomb - a figure that explode all around
+	 *            after dropping down, the board is upside down;
+	 *            <li>tetris with super point, super gun, super mud gun and
+	 *            super bomb, the board is upside down;
+	 *            <li>tetris with a liquid (crumbly) figures, the board is
+	 *            upside down;
+	 *            <li>tetris with a liquid figures and super point, the board is
+	 *            upside down;
+	 *            <li>tetris with a liquid figures and super gun, the board is
+	 *            upside down;
+	 *            <li>tetris with a liquid figures, super point and super gun,
+	 *            the board is upside down;
+	 *            <li>tetris with a liquid figures and super mud gun, the board
+	 *            is upside down;
+	 *            <li>tetris with a liquid figures, super gun and super mud gun,
+	 *            the board is upside down;
+	 *            <li>tetris with a liquid figures, super point, super gun and
+	 *            super mud gun, the board is upside down;
+	 *            <li>tetris with a liquid figures and super bomb, the board is
+	 *            upside down;
+	 *            <li>tetris with a liquid figures, super point, super gun,
+	 *            super mud gun and super bomb, the board is upside down;
+	 *            <li>tetris with an acid figures, the board is upside down;
+	 *            <li>tetris with an acid figures and super point, the board is
+	 *            upside down;
+	 *            <li>tetris with an acid figures and super gun, the board is
+	 *            upside down;
+	 *            <li>tetris with an acid figures, super point and super gun,
+	 *            the board is upside down;
+	 *            <li>tetris with an acid figures and super mud gun, the board
+	 *            is upside down;
+	 *            <li>tetris with an acid figures, super gun and super mud gun,
+	 *            the board is upside down;
+	 *            <li>tetris with an acid figures, super point, super gun and
+	 *            super mud gun, the board is upside down;
+	 *            <li>tetris with an acid figures and super bomb, the board is
+	 *            upside down;
+	 *            <li>tetris with an acid figures, super point, super gun, super
+	 *            mud gun and super bomb, the board is upside down;
+	 *            <li>tetris with a figures that can pass through an obstacles;,
+	 *            the board is upside down;
+	 *            <li>tetris with a throughfall figures and super point, the
+	 *            board is upside down;
+	 *            <li>tetris with a throughfall figures and super gun, the board
+	 *            is upside down;
+	 *            <li>tetris with a throughfall figures, super point and super
+	 *            gun, the board is upside down;
+	 *            <li>tetris with a throughfall figures and super mud gun, the
+	 *            board is upside down;
+	 *            <li>tetris with a throughfall figures, super gun and super mud
+	 *            gun, the board is upside down;
+	 *            <li>tetris with a throughfall figures, super point, super gun
+	 *            and super mud gun, the board is upside down;
+	 *            <li>tetris with a throughfall figures and super bomb, the
+	 *            board is upside down;
+	 *            <li>tetris with a throughfall figures, super point, super gun,
+	 *            super mud gun and super bomb, the board is upside down;
+	 *            <li>tetris with randomly: liquid figures, acid figures or
+	 *            throughfall figures, the board is upside down;
+	 *            <li>tetris with super point and random super figures, the
+	 *            board is upside down;
+	 *            <li>tetris with super gun and random super figures, the board
+	 *            is upside down;
+	 *            <li>tetris with super point, super gun and random super
+	 *            figures, the board is upside down;
+	 *            <li>tetris with super mud gun and random super figures, the
+	 *            board is upside down;
+	 *            <li>tetris with super gun, super mud gun and random super
+	 *            figures, the board is upside down;
+	 *            <li>tetris with super point, super gun, super mud gun and
+	 *            random super figures, the board is upside down;
+	 *            <li>tetris with super bomb and random super figures, the board
+	 *            is upside down;
+	 *            <li>tetris with a super point, super gun, super mud gun, super
+	 *            bomb and random super figures, the board is upside down.
 	 */
-	public TetrisGame(int speed, int level, Rotation rotation, int type) {
+	public TetrisGameI(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 
-		// for types 17-32
-		hasLiquidFigures = ((getType() >= 17) && (getType() <= 32));
-		// for types 33-48
-		hasAcidFigures = ((getType() >= 33) && (getType() <= 48));
-		// for type 49
-		hasThroughfallFigures = (getType() == 49);
-		// for type 50
-		hasRandomFigures = (getType() == 50);
+		// for types 10-18 and 55-63
+		hasLiquidFigures = (((getType() >= 10) && (getType() <= 18)) || ((getType() >= 55) && (getType() <= 63)));
+		// for types 19-27 and 64-72
+		hasAcidFigures = (((getType() >= 19) && (getType() <= 27)) || ((getType() >= 64) && (getType() <= 72)));
+		// for types 28-36 and 73-81
+		hasThroughfallFigures = (((getType() >= 28) && (getType() <= 36)) || ((getType() >= 73) && (getType() <= 81)));
+		// for types 37-45 and 82-90
+		hasRandomFigures = (((getType() >= 37) && (getType() <= 45)) || ((getType() >= 82) && (getType() <= 90)));
+		// for types 46-90
+		setDrawInvertedBoard((getType() > 45));
 	}
 
 	/**
@@ -254,228 +343,65 @@ public class TetrisGame extends Game {
 	 *            the type of game
 	 * @return the new shape
 	 */
-	@SuppressWarnings("static-method")
-	protected TetrisShape setPieceFromType(int type) {
+	private TetrisShape setPieceFromType(int type) {
 		TetrisShape newPiece = null;
 		Random r = new Random();
 
-		switch (type) {
-		case 2:
-			newPiece = TetrisShape
-					.getRandomTetraminoesAndSuper(new int[] { 0 });
-			break;
-		case 3:
-			newPiece = TetrisShape
-					.getRandomTetraminoesAndSuper(new int[] { 1 });
-			break;
-		case 4:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					1 });
-			break;
-		case 5:
-			newPiece = TetrisShape
-					.getRandomTetraminoesAndSuper(new int[] { 2 });
-			break;
-		case 6:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					2 });
-			break;
-		case 7:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 1,
-					2 });
-			break;
-		case 8:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					1, 2 });
-			break;
-		case 9:
-			newPiece = TetrisShape
-					.getRandomTetraminoesAndSuper(new int[] { 3 });
-			break;
-		case 10:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					3 });
-			break;
-		case 11:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 1,
-					3 });
-			break;
-		case 12:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					1, 3 });
-			break;
-		case 13:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 2,
-					3 });
-			break;
-		case 14:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					2, 3 });
-			break;
-		case 15:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 1,
-					2, 3 });
-			break;
-		case 16:
-			newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] { 0,
-					1, 2, 3 });
-			break;
-		case 17:
-		case 33:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			}
-			break;
-		case 18:
-		case 34:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 0 });
-			break;
-		case 19:
-		case 35:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 1 });
-			break;
-		case 20:
-		case 36:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1 });
-			break;
-		case 21:
-		case 37:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 2 });
-			break;
-		case 22:
-		case 38:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				;
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 2 });
-			break;
-		case 23:
-		case 39:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						1, 2 });
-			break;
-		case 24:
-		case 40:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1, 2 });
-			break;
-		case 25:
-		case 41:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape
-						.getRandomTetraminoesAndSuper(new int[] { 3 });
-			break;
-		case 26:
-		case 42:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 3 });
-			break;
-		case 27:
-		case 43:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						1, 3 });
-			break;
-		case 28:
-		case 44:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1, 3 });
-			break;
-		case 29:
-		case 45:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						2, 3 });
-			break;
-		case 30:
-		case 46:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 2, 3 });
-			break;
-		case 31:
-		case 47:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						1, 2, 3 });
-			break;
-		case 32:
-		case 48:
-		case 49:
-		case 50:
-			if (r.nextInt(7) == 0) {
-				newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-				newPiece.setFill(Cell.Blink);
-			} else
-				newPiece = TetrisShape.getRandomTetraminoesAndSuper(new int[] {
-						0, 1, 2, 3 });
-			break;
-		default:
-			newPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
-			;
-			break;
+		if ((hasLiquidFigures || hasAcidFigures || hasThroughfallFigures || hasRandomFigures)
+				&& (r.nextInt(7) == 0)) {
+			// for super figures
+			newPiece = getRandomShape();
+			newPiece.setFill(Cell.Blink);
+		} else {
+			// for every 1 from 9 level
+			if (getType() % 9 == 1)
+				newPiece = getRandomShape();
+			// for every 2 from 9 level
+			else if (getType() % 9 == 2)
+				newPiece = getRandomShapeAndSuper(new int[] { 0 });
+			// for every 3 from 9 level
+			else if (getType() % 9 == 3)
+				newPiece = getRandomShapeAndSuper(new int[] { 1 });
+			// for every 4 from 9 level
+			else if (getType() % 9 == 4)
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1 });
+			// for every 5 from 9 level
+			else if (getType() % 9 == 5)
+				newPiece = getRandomShapeAndSuper(new int[] { 2 });
+			// for every 6 from 9 level
+			else if (getType() % 9 == 6)
+				newPiece = getRandomShapeAndSuper(new int[] { 1, 2 });
+			// for every 7 from 9 level
+			else if (getType() % 9 == 7)
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1, 2 });
+			// for every 8 from 9 level
+			else if (getType() % 9 == 8)
+				newPiece = getRandomShapeAndSuper(new int[] { 3 });
+			// for every 9 from 9 level
+			else if (getType() % 9 == 0)
+				newPiece = getRandomShapeAndSuper(new int[] { 0, 1, 2, 3 });
 		}
+
 		return newPiece;
+	}
+
+	/**
+	 * Get a random figure with a random rotation angle
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getRandomShape() {
+		return TetrisShape.getRandomTetraminoes().setRandomRotate();
+	}
+
+	/**
+	 * Get a random figure or specified super figure
+	 * 
+	 * @param superShapes
+	 *            the array of numbered super figures (from 0 to 4)
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+		return TetrisShape.getRandomTetraminoesAndSuper(superShapes);
 	}
 
 	/**
@@ -941,6 +867,47 @@ public class TetrisGame extends Game {
 		}
 	}
 
+	@Override
+	protected synchronized void firePreviewChanged(Board board) {
+
+		// draws the inverted board
+		if (isInvertedBoard()
+				&& !nextPiece.containsIn(new Figures[] { Figures.SuperPoint,
+						Figures.SuperGun, Figures.SuperMudGun,
+						Figures.SuperBomb })) {
+			super.firePreviewChanged(getInvertedBoard(board));
+		}
+		super.firePreviewChanged(board);
+	}
+
+	@Override
+	public void keyPressed(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown)
+				keys.add(KeyPressed.KeyUp);
+			else if (key == KeyPressed.KeyUp)
+				keys.add(KeyPressed.KeyDown);
+			else
+				keys.add(key);
+		} else
+			super.keyPressed(key);
+	}
+
+	@Override
+	public void keyReleased(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown)
+				keys.remove(KeyPressed.KeyUp);
+			else if (key == KeyPressed.KeyUp)
+				keys.remove(KeyPressed.KeyDown);
+			else
+				keys.remove(key);
+		} else
+			super.keyReleased(key);
+	}
+
 	/**
 	 * Processing of key presses
 	 */
@@ -954,11 +921,11 @@ public class TetrisGame extends Game {
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				tryMove(curPiece, curX - 1, curY);
-				sleep(ANIMATION_DELAY * 2);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				tryMove(curPiece, curX + 1, curY);
-				sleep(ANIMATION_DELAY * 2);
+				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				// if we have the super gun

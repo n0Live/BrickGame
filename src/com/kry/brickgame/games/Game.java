@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 
 import java.util.ArrayList;
@@ -169,6 +170,11 @@ public abstract class Game extends Thread {
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
 	/**
+	 * Whether to draw the board upside down?
+	 */
+	private boolean drawInvertedBoard;
+
+	/**
 	 * The Game
 	 * 
 	 * @param speed
@@ -193,6 +199,8 @@ public abstract class Game extends Thread {
 		setBoard(board);
 		setPreview(preview);
 		setRotation(rotation);
+
+		setDrawInvertedBoard(false);
 
 		clearBoard();
 		clearPreview();
@@ -243,7 +251,7 @@ public abstract class Game extends Thread {
 
 	/**
 	 * The Game
-	 */ 
+	 */
 	public Game() {
 		this(1, 1, 1);
 	}
@@ -261,7 +269,8 @@ public abstract class Game extends Thread {
 	}
 
 	protected synchronized void fireBoardChanged(Board board) {
-		GameEvent event = new GameEvent(this, board);
+		GameEvent event = new GameEvent(this,
+				(isInvertedBoard() ? getInvertedBoard(board) : board));
 		for (GameListener listener : listeners) {
 			listener.boardChanged(event);
 		}
@@ -328,7 +337,8 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Set the status of game and fire the {@link #fireStatusChanged(Status)} event
+	 * Set the status of game and fire the {@link #fireStatusChanged(Status)}
+	 * event
 	 * 
 	 * @param status
 	 *            the status of game
@@ -448,7 +458,8 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Set the direction of rotation and fire the {@link #fireRotationChanged(Rotation)} event
+	 * Set the direction of rotation and fire the
+	 * {@link #fireRotationChanged(Rotation)} event
 	 * 
 	 * @param rotation
 	 *            the direction of rotation
@@ -463,6 +474,25 @@ public abstract class Game extends Thread {
 	 */
 	protected void changeRotation() {
 		setRotation(rotation.getNext());
+	}
+
+	/**
+	 * Get the flag for the drawing the board invertedly
+	 * 
+	 * @return {@code true} if needed to draw the inverted board
+	 */
+	public boolean isInvertedBoard() {
+		return drawInvertedBoard;
+	}
+
+	/**
+	 * Set the flag for the drawing the board invertedly
+	 * 
+	 * @param drawInvertedBoard
+	 *            {@code true} if needed to draw the inverted board
+	 */
+	public void setDrawInvertedBoard(boolean drawInvertedBoard) {
+		this.drawInvertedBoard = drawInvertedBoard;
 	}
 
 	/**
@@ -495,7 +525,8 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Set the main preview and fire the {@link #firePreviewChanged(Board)} event
+	 * Set the main preview and fire the {@link #firePreviewChanged(Board)}
+	 * event
 	 * 
 	 * @param preview
 	 *            the preview board

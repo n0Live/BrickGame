@@ -58,10 +58,6 @@ public class GunGame extends GameWithGun {
 	 * Whether to shift the board?
 	 */
 	private boolean isShiftingBoard;
-	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
 
 	/**
 	 * The Gun Game
@@ -106,7 +102,7 @@ public class GunGame extends GameWithGun {
 		// for every even type of game
 		isShiftingBoard = (getType() % 2 == 0);
 		// for types 8-16
-		drawInvertedBoard = (getType() > 8);
+		setDrawInvertedBoard((getType() > 8));
 	}
 
 	/**
@@ -271,20 +267,6 @@ public class GunGame extends GameWithGun {
 				}
 			}
 		}
-	}
-
-	@Override
-	protected synchronized void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
-		}
-
-		super.fireBoardChanged(newBoard);
 	}
 
 	/**

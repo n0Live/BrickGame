@@ -14,7 +14,7 @@ public class TetrisGameO extends TetrisGameK {
 	 * The Tetris with the changing of the figures instead of rotating and the
 	 * shifting board content
 	 * 
-	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public TetrisGameO(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);

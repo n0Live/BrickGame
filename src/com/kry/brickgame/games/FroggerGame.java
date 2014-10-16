@@ -62,10 +62,6 @@ public class FroggerGame extends GameWithLives {
 	 * Use preloaded tracts or generate new ones?
 	 */
 	private boolean usePreloadedTracts;
-	/**
-	 * Whether to draw the board upside down?
-	 */
-	private boolean drawInvertedBoard;
 
 	/**
 	 * The Frogger
@@ -179,7 +175,7 @@ public class FroggerGame extends GameWithLives {
 		// for types 1-8 and 16-24
 		usePreloadedTracts = ((getType() <= 8) || ((getType() >= 16) && (getType() <= 24)));
 		// for types 16-32
-		drawInvertedBoard = (getType() > 16);
+		setDrawInvertedBoard((getType() > 16));
 	}
 
 	/**
@@ -510,20 +506,6 @@ public class FroggerGame extends GameWithLives {
 		}
 	}
 
-	@Override
-	protected synchronized void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
-
-		// draws the inverted board
-		if (drawInvertedBoard) {
-			for (int i = 0; i < board.getHeight(); i++) {
-				newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
-			}
-		}
-
-		super.fireBoardChanged(newBoard);
-	}
-
 	/**
 	 * Processing of key presses
 	 */
@@ -550,7 +532,7 @@ public class FroggerGame extends GameWithLives {
 			int dY;
 
 			if (keys.contains(KeyPressed.KeyDown)) {
-				if (drawInvertedBoard)
+				if (isInvertedBoard())
 					dY = (curY < boardHeight - 2) ? 2 : 1;
 				else
 					dY = -2;
@@ -560,7 +542,7 @@ public class FroggerGame extends GameWithLives {
 				keys.remove(KeyPressed.KeyDown);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
-				if (drawInvertedBoard)
+				if (isInvertedBoard())
 					dY = -2;
 				else
 					dY = (curY < boardHeight - 2) ? 2 : 1;

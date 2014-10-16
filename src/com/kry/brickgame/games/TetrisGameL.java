@@ -13,7 +13,7 @@ public class TetrisGameL extends TetrisGameJ {
 	 * The Tetris with the addition of new lines every few seconds and the
 	 * changing of the figures instead of rotating
 	 * 
-	 * @see TetrisGame#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public TetrisGameL(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
