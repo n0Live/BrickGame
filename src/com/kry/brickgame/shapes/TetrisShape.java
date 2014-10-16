@@ -1,5 +1,7 @@
 package com.kry.brickgame.shapes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -503,6 +505,21 @@ public class TetrisShape extends Shape {
 		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle,
 				aTetrisShape.getFill());
 		return newTetrisShape;
+	}
+
+	/**
+	 * Returns {@code true} if this figure contains in the specified list of
+	 * figures.
+	 * 
+	 * @param listOfFigures
+	 *            specified list of figures for searching
+	 * @return {@code true} if this figure contains in the specified list of
+	 *         figures
+	 */
+	public boolean containsIn(Figures[] listOfFigures) {
+		Figures[] prepList = listOfFigures.clone();
+		Arrays.sort(prepList);
+		return Arrays.binarySearch(prepList, this.getShape()) >= 0;
 	}
 
 	/**
