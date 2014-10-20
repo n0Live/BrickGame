@@ -68,6 +68,15 @@ public class TankShape extends CharacterShape {
 	}
 
 	/**
+	 * Returns the movement direction of the Tank
+	 * 
+	 * @return movement direction
+	 */
+	public RotationAngle getDirection() {
+		return this.getRotationAngle();
+	}
+
+	/**
 	 * X-coordinate position on the board
 	 */
 	public int x() {
@@ -99,6 +108,12 @@ public class TankShape extends CharacterShape {
 	 */
 	public void setY(int coordY) {
 		this.coordY = coordY;
+	}
+
+	@Override
+	public String toString() {
+		// the type and rotation angle
+		return "[" + this.x() + ", " + this.y() + "]\n" + super.toString();
 	}
 
 }
