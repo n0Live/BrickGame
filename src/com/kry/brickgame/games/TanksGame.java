@@ -6,9 +6,13 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 
 import java.awt.Point;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.shapes.Bullet;
+import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
 import com.kry.brickgame.splashes.Splash;
@@ -27,6 +31,13 @@ public class TanksGame extends GameWithLives {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 4;
+
+	final static int[][] spawnPoints = new int[][] {//
+	{ 0, 0 }, { BOARD_WIDTH - 1, 0 }, // bottom
+			{ 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
+			{ 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
+	};
+
 	/**
 	 * Controlled-by-the-player playerTank
 	 */
@@ -35,6 +46,12 @@ public class TanksGame extends GameWithLives {
 	private TankShape enemyTanks[];
 
 	private int enemiesCount;
+
+	private volatile Bullet[] freeBullets;
+
+	final private int killsToNextLevel = 20;
+
+	private int enemiesKilled;
 
 	/**
 	 * The Gun Game
@@ -51,8 +68,6 @@ public class TanksGame extends GameWithLives {
 	public TanksGame(int speed, int level, int type) {
 		super(speed, level, type);
 
-		playerTank = new TankShape(0);
-
 		// ==define the parameters of the types of game==
 		// 3 tanks on type 1, 6 - on type 4
 		if (getType() % 4 == 0)
@@ -60,6 +75,8 @@ public class TanksGame extends GameWithLives {
 		else
 			enemiesCount = getType() % 4 + 2;
 		enemyTanks = new TankShape[enemiesCount];
+
+		freeBullets = new Bullet[enemiesCount * 4];
 	}
 
 	/**
@@ -72,6 +89,17 @@ public class TanksGame extends GameWithLives {
 		int currentSpeed;
 		int enemyTankNumber = 0;
 
+		// create timer for bullets
+		Timer bulletSwarm = new Timer("BulletSwarm", true);
+		bulletSwarm.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (getStatus() == Status.Running) {
+					flightOfBullets();
+				}
+			}
+		}, 0, ANIMATION_DELAY * 3);
+
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 
 			currentSpeed = getSpeed(true) * 2;
@@ -81,13 +109,17 @@ public class TanksGame extends GameWithLives {
 			if (getStatus() != Status.Paused) {
 				// moving
 				if (elapsedTime(currentSpeed)) {
-					enemyTurn(enemyTankNumber++);
+					if (enemiesKilled >= killsToNextLevel)
+						win();
+					else
+						enemyTurn(enemyTankNumber++);
 				}
 			}
 			// processing of key presses
 			processKeys();
 		}
 
+		bulletSwarm.cancel();
 	}
 
 	/**
@@ -100,21 +132,110 @@ public class TanksGame extends GameWithLives {
 		initEnemyTanks();
 
 		// draws the playerTank
-		drawTank(getBoard(), playerTank);
+		setBoard(drawTank(getBoard(), playerTank));
+
+		loadPreparedObstacle();
+
+		enemiesKilled = 0;
 
 		setStatus(Status.Running);
+	}
+
+	/**
+	 * Loading predefined obstacles
+	 */
+	private void loadPreparedObstacle() {
+		Obstacle obstacle;
+
+		switch (getLevel()) {
+		case 2:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 3:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 4:
+			obstacle = new Obstacle(1).changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			break;
+		case 5:
+			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			break;
+		case 6:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 7:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 8:
+			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
+			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
+			break;
+		case 9:
+			obstacle = new Obstacle(1);
+			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
+			break;
+		case 10:
+			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
+			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
+			obstacle.changeRotationAngle(DOWN);
+			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
+			obstacle = new Obstacle(2);
+			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
+			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
 	 * Setting the coordinates of the start point of the Player Tank
 	 */
 	private void initPlayerTank() {
+		playerTank = new TankShape(0);
 		playerTank.setX(boardWidth / 2 - 1);
 		playerTank.setY(boardHeight / 2 - playerTank.getHeight());
 	}
 
 	/**
-	 * Nulling the enemyTanks' array
+	 * Clearing the enemyTanks' array
 	 */
 	private void initEnemyTanks() {
 		for (int i = 0; i < enemiesCount; i++) {
@@ -129,29 +250,31 @@ public class TanksGame extends GameWithLives {
 	 *            tank number for turn
 	 */
 	private void enemyTurn(int tankNumber) {
-		System.out.println(tankNumber);
-
 		TankShape enemyTank = enemyTanks[tankNumber];
-		if (enemyTank == null) {
-			if (respawnEnemyTank(tankNumber))
-				System.out.println("+");
-			else
-				System.out.println("x");
-		} else {
-			int x = enemyTank.x();
-			int y = enemyTank.y();
 
+		if (enemyTank == null) {
+			if (new Random().nextInt(4) != 0)
+				respawn(tankNumber);
+		} else {
+			RotationAngle moveDirection = getDirectionForMovement(enemyTank);
 			if (checkForShot(enemyTank)) {
-				// TODO
-				enemyTank = rotateTank(enemyTank,
-						getDirectionForShoot(enemyTank));
-				System.out.println("*[" + x + "," + y + "]"
-						+ enemyTank.getRotationAngle());
+				RotationAngle shotDirection = getDirectionForShoot(enemyTank);
+
+				if (shotDirection == moveDirection) {
+					enemyTank = moveTank(enemyTank, moveDirection);
+				} else {
+					enemyTank = rotateTank(enemyTank, shotDirection);
+				}
+
+				sleep(ANIMATION_DELAY);
+
+				Bullet bullet = enemyTank.fire();
+				if (bullet != null) {
+					setBoard(drawShape(getBoard(), bullet.x, bullet.y, bullet,
+							bullet.getFill()));
+				}
 			} else {
-				enemyTank = moveTank(enemyTank,
-						getDirectionForMovement(enemyTank));
-				System.out.println("=[" + x + "," + y + "]"
-						+ enemyTank.getRotationAngle());
+				enemyTank = moveTank(enemyTank, moveDirection);
 			}
 			enemyTanks[tankNumber] = enemyTank;
 		}
@@ -164,17 +287,10 @@ public class TanksGame extends GameWithLives {
 	 *            number of tank for creation
 	 * @return {@code true} if creation is success
 	 */
-	private boolean respawnEnemyTank(int tankNumber) {
-		final int[][] spawnPoints = new int[][] {
-				//
-				{ 0, 0 }, { boardWidth - 1, 0 }, // bottom
-				{ 0, boardHeight / 2 }, { boardWidth - 1, boardHeight / 2 },// middle
-				{ 0, boardHeight - 1 }, { boardWidth - 1, boardHeight - 1 } // top
-		};
-
+	private boolean respawn(int tankNumber) {
 		TankShape newTank = new TankShape(1);
 
-		int tryCount = 5;
+		int tryCount = 3;
 
 		int newX, newY;
 		int spawnPoint;
@@ -322,7 +438,6 @@ public class TanksGame extends GameWithLives {
 				return directions[i];
 		}
 
-		System.out.println(directions[0]);
 		return directions[0];
 	}
 
@@ -394,12 +509,12 @@ public class TanksGame extends GameWithLives {
 				: verticalDistance), shotDirection))
 			chance -= rate * 2;
 		else if (minDistance <= playerTank.getWidth() / 2)
-			chance += rate * 2;
+			chance += rate * 6;
 
-		if (chance > 0.99)
-			chance = 0.99;
-		else if (chance < 0.01)
-			chance = 0.01;
+		if (chance > 1 - rate)
+			chance = 1 - rate;
+		else if (chance < rate)
+			chance = rate;
 
 		return new Random().nextDouble() <= chance;
 	}
@@ -462,15 +577,13 @@ public class TanksGame extends GameWithLives {
 	 */
 	private boolean isFrendlyTankAhead(TankShape tank, int distance,
 			RotationAngle viewDirection) {
-
-		for (int i = 0; i < enemiesCount; i++) {
-			if (enemyTanks[i] != null
-					&& enemyTanks[i] != tank
+		for (TankShape enemyTank : enemyTanks) {
+			if (enemyTank != null
+					&& enemyTank != tank
 					&& isTankAhead(new Point(tank.x(), tank.y()), distance,
-							viewDirection, enemyTanks[i]))
+							viewDirection, enemyTank))
 				return true;
 		}
-
 		return false;
 	}
 
@@ -599,6 +712,154 @@ public class TanksGame extends GameWithLives {
 	}
 
 	/**
+	 * Processing the flight of bullets
+	 */
+	private synchronized void flightOfBullets() {
+		for (int i = 0; i < freeBullets.length; i++) {
+			flightOfBullet(freeBullets[i], false);
+		}
+		if (playerTank != null) {
+			for (int i = playerTank.getBullets().length - 1; i >= 0; i--) {
+				flightOfBullet(playerTank.getBullets()[i], true);
+			}
+		}
+		for (TankShape enemyTank : enemyTanks) {
+			if (enemyTank != null) {
+				for (Bullet bullet : enemyTank.getBullets()) {
+					flightOfBullet(bullet, false);
+				}
+			}
+		}
+
+	}
+
+	private synchronized void flightOfBullet(Bullet bullet,
+			boolean isPlayerBullet) {
+		Bullet result = bullet;
+		if (result != null) {
+			Board board = getBoard().clone();
+			board = drawShape(board, result.x, result.y, result, Cell.Empty);
+
+			result = result.flight();
+			if (checkBoardCollision(board, result, result.x, result.y)) {
+				destroyBullet(result);
+			} else {
+				if (board.getCell(result.x, result.y) != Cell.Empty) {
+					Bullet checkBullet = checkCollisionWithAllBullets(result);
+					boolean isNotTank = true;
+					if (checkBullet != null) {
+						destroyBullet(checkBullet);
+					} else {
+						if (!isPlayerBullet
+								&& checkCollisionWithTank(playerTank, result)) {
+							loss(result.x, result.y);
+							return;
+						}
+						for (int i = 0; i < enemyTanks.length; i++) {
+							TankShape enemyTank = enemyTanks[i];
+							if (checkCollisionWithTank(enemyTank, result)) {
+								if (isPlayerBullet) {
+									board = eraseTank(board, enemyTank);
+									destroyEnemyTank(i);
+								}
+								isNotTank = false;
+								break;
+							}
+						}
+					}
+					if (isNotTank) {
+						board.setCell(Cell.Empty, result.x, result.y);
+					}
+					destroyBullet(result);
+				} else {
+					board.setCell(result.getFill(), result.x, result.y);
+				}
+			}
+			setBoard(board);
+		}
+	}
+
+	private void destroyBullet(Bullet bullet) {
+		for (int i = 0; i < freeBullets.length; i++) {
+			if (freeBullets[i] == bullet) {
+				freeBullets[i] = null;
+				return;
+			}
+		}
+		if (playerTank != null) {
+			playerTank.destroyBullet(bullet);
+		}
+		for (TankShape enemyTank : enemyTanks) {
+			if (enemyTank != null) {
+				enemyTank.destroyBullet(bullet);
+			}
+		}
+	}
+
+	private void destroyEnemyTank(int tankNumber) {
+		if (enemyTanks[tankNumber] != null) {
+			for (Bullet bullet : enemyTanks[tankNumber].getBullets()) {
+				if (bullet != null)
+					setBulletToFreeFly(bullet);
+			}
+			enemyTanks[tankNumber] = null;
+		}
+
+		enemiesKilled++;
+		setScore(getScore() + 1);
+	}
+
+	private void setBulletToFreeFly(Bullet bullet) {
+		for (int i = 0; i < freeBullets.length; i++) {
+			if (freeBullets[i] == null) {
+				freeBullets[i] = bullet;
+			}
+		}
+	}
+
+	private static boolean checkCollisionWithTank(TankShape tank, Bullet bullet) {
+		if (tank == null || bullet == null)
+			return false;
+
+		if ((Math.abs(tank.y() - bullet.y) > tank.getHeight() / 2)
+				&& (Math.abs(tank.x() - bullet.x) > tank.getWidth() / 2))
+			return false;
+
+		Board checkBoard = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+		checkBoard = drawShape(checkBoard, tank.x(), tank.y(), tank,
+				tank.getFill());
+		return checkCollision(checkBoard, bullet, bullet.x, bullet.y);
+	}
+
+	private static Bullet checkCollisionWithTankBullets(TankShape tank,
+			Bullet bullet) {
+		if (tank == null || bullet == null)
+			return null;
+		if (tank != null) {
+			for (Bullet checkBullet : tank.getBullets()) {
+				if (checkBullet != null && checkBullet != bullet
+						&& checkBullet.x == bullet.x
+						&& checkBullet.y == bullet.y)
+					return checkBullet;
+			}
+		}
+		return null;
+	}
+
+	private Bullet checkCollisionWithAllBullets(Bullet bullet) {
+		if (bullet == null)
+			return null;
+		Bullet checkBullet;
+		for (TankShape enemyTank : enemyTanks) {
+			checkBullet = checkCollisionWithTankBullets(enemyTank, bullet);
+			if (checkBullet != null)
+				return checkBullet;
+		}
+
+		return checkCollisionWithTankBullets(playerTank, bullet);
+	}
+
+	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -631,8 +892,11 @@ public class TanksGame extends GameWithLives {
 				sleep(ANIMATION_DELAY);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				// fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-				sleep(ANIMATION_DELAY * 3);
+				Bullet bullet = playerTank.fire();
+				if (bullet != null)
+					setBoard(drawShape(getBoard(), bullet.x, bullet.y, bullet,
+							bullet.getFill()));
+				sleep(ANIMATION_DELAY * 6);
 			}
 		}
 	}
