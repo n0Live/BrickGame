@@ -5,13 +5,20 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class ArkanoidPlatformShape extends CharacterShape {
+	/**
+	 * A set of the coordinates of points of the player character:
+	 * [type][point][coordinate:0-x,1-y]
+	 */
+	private static int[][][] charactersTable = new int[][][] { //
+	{ { 0, 0 } }, // 0 - platform1
+			{ { 0, 0 }, { 1, 0 } }, // 1 - platform2
+			{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // 2 - platform3
+			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // 3 - platform4
+	}; //
 
-	static {
-		charactersTable = new int[][][] { { { 0, 0 } }, // 0 - platform1
-				{ { 0, 0 }, { 1, 0 } }, // 1 - platform2
-				{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // 2 - platform3
-				{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // 3 - platform4
-		}; //
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
 	}
 
 	/**
@@ -22,7 +29,7 @@ public class ArkanoidPlatformShape extends CharacterShape {
 	 *            <b>2</b> - 3-cell platform, <b>3</b> - 4-cell platform
 	 */
 	public ArkanoidPlatformShape(int type) {
-		super(type);
+		super(type, charactersTable[type].length);
 	}
 
 }

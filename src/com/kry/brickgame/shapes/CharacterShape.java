@@ -19,16 +19,22 @@ public abstract class CharacterShape extends Shape {
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	protected static int[][][] charactersTable;
+	private int[][][] charactersTable;
+	
+	protected int[][][] getCharactersTable(){
+		return charactersTable;
+	}
 
 	/**
 	 * Constructor of the player character
 	 * 
 	 * @param type
 	 *            type of the character
+	 * @param length
+	 *            maximal number of the points of the figure
 	 */
-	public CharacterShape(int type) {
-		super(charactersTable[type].length);
+	public CharacterShape(int type, int length) {
+		super(length);
 		this.type = type;
 		setType(type, RotationAngle.d0, Cell.Full);
 	}
@@ -56,9 +62,9 @@ public abstract class CharacterShape extends Shape {
 	 */
 	protected CharacterShape setType(int type, RotationAngle rotationAngle,
 			Cell fill) {
-		for (int i = 0; i < charactersTable[type].length; i++) {
-			setX(i, charactersTable[type][i][0]);
-			setY(i, charactersTable[type][i][1]);
+		for (int i = 0; i < getCharactersTable()[type].length; i++) {
+			setX(i, getCharactersTable()[type][i][0]);
+			setY(i, getCharactersTable()[type][i][1]);
 		}
 
 		switch (rotationAngle) {

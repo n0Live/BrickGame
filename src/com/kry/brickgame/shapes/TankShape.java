@@ -2,16 +2,26 @@ package com.kry.brickgame.shapes;
 
 public class TankShape extends CharacterShape {
 
-	static {
-		charactersTable = new int[][][] {//
-				{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 },
-						{ 1, 0 }, { 0, 1 } }, // 0 - tank
-				{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
-						{ 0, 1 } }, // 1 - enemy tank
-		}; //
+	/**
+	 * A set of the coordinates of points of the player character:
+	 * [type][point][coordinate:0-x,1-y]
+	 */
+	private static int[][][] charactersTable = new int[][][] {//
+	// 0 - tank
+			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
+					{ 0, 1 } },
+			// 1 - enemy tank
+			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, }; //
+
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
 	}
-	private int coordX;
-	private int coordY;
+
+	private int x;
+	private int y;
+
+	private Bullet[] bullets;
 
 	/**
 	 * Constructor for the Tank
@@ -20,10 +30,15 @@ public class TankShape extends CharacterShape {
 	 *            0 - player's tank, enemy tank
 	 */
 	public TankShape(int type) {
-		super(type);
+		super(type, charactersTable[type].length);
 
 		setX(0 - minX());
 		setY(0 - minY());
+
+		this.bullets = new Bullet[(type == 0) ? 4 : 1];
+		for (int i = 0; i < this.bullets.length; i++) {
+			this.bullets[i] = null;
+		}
 	}
 
 	/**
@@ -37,6 +52,8 @@ public class TankShape extends CharacterShape {
 
 		setX(aTank.x());
 		setY(aTank.y());
+
+		this.bullets = aTank.getBullets();
 	}
 
 	public TankShape clone() {
@@ -80,34 +97,81 @@ public class TankShape extends CharacterShape {
 	 * X-coordinate position on the board
 	 */
 	public int x() {
-		return coordX;
+		return x;
 	}
 
 	/**
 	 * Setting the x-coordinate position on the board
 	 * 
-	 * @param coordX
+	 * @param x
 	 *            - the x-coordinate
 	 */
 	public void setX(int coordX) {
-		this.coordX = coordX;
+		this.x = coordX;
 	}
 
 	/**
 	 * Y-coordinate position on the board
 	 */
 	public int y() {
-		return coordY;
+		return y;
 	}
 
 	/**
 	 * Setting the y-coordinate position on the board
 	 * 
-	 * @param coordY
+	 * @param y
 	 *            - the y-coordinate
 	 */
 	public void setY(int coordY) {
-		this.coordY = coordY;
+		this.y = coordY;
+	}
+
+	public Bullet[] getBullets() {
+		return bullets;
+	}
+
+	/**
+	 * Create a new bullet in front of the tank
+	 * 
+	 * @return new bullet if it created, otherwise - {@code null}
+	 */
+	public Bullet fire() {
+		for (int i = 0; i < bullets.length; i++) {
+			if (bullets[i] == null) {
+				int bulletX = x;
+				int bulletY = y;
+
+				if (getDirection() == RotationAngle.d0)
+					bulletY += 2;
+				else if (getDirection() == RotationAngle.d90)
+					bulletX += 2;
+				else if (getDirection() == RotationAngle.d180)
+					bulletY -= 2;
+				else if (getDirection() == RotationAngle.d270)
+					bulletX -= 2;
+
+				bullets[i] = new Bullet(bulletX, bulletY, getDirection());
+				return bullets[i];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Destroy the bullet (change to {@code null})
+	 * 
+	 * @param bullet
+	 *            bullet for the destroying
+	 */
+	public void destroyBullet(Bullet bullet) {
+		for (int i = 0; i < bullets.length; i++) {
+			Bullet checkBullet = bullets[i];
+			if (bullet == checkBullet) {
+				bullets[i] = null;
+				return;
+			}
+		}
 	}
 
 	@Override

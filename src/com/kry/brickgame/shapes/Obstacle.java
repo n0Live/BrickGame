@@ -10,16 +10,23 @@ import com.kry.brickgame.Board.Cell;
  */
 public class Obstacle extends CharacterShape {
 
-	static {
-		charactersTable = new int[][][] {//
+	/**
+	 * A set of the coordinates of points of the player character:
+	 * [type][point][coordinate:0-x,1-y]
+	 */
+	private static int[][][] charactersTable = new int[][][] {//
 		// 0 - square
-				{ { 0, 0 } },
-				// 1 - corner
-				{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
-				// 2 - rectangle
-				{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
+		{ { 0, 0 } },
+		// 1 - corner
+		{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
+		// 2 - rectangle
+		{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
+	
+	@Override
+	protected int[][][] getCharactersTable(){
+		return charactersTable;
 	}
-
+	
 	/**
 	 * Constructor of the Obstacle
 	 * 
@@ -27,7 +34,7 @@ public class Obstacle extends CharacterShape {
 	 *            type of the obstacle
 	 */
 	public Obstacle(int type) {
-		super(type);
+		super(type, charactersTable[type].length);
 	}
 
 	/**
@@ -46,12 +53,12 @@ public class Obstacle extends CharacterShape {
 
 		// sets the lower left corner to the coordinates [0, 0]
 		while (minX() < 0) {
-			for (int i = 0; i < charactersTable[type].length; i++) {
+			for (int i = 0; i < getCharactersTable()[type].length; i++) {
 				setX(i, x(i) + 1);
 			}
 		}
 		while (minY() < 0) {
-			for (int i = 0; i < charactersTable[type].length; i++) {
+			for (int i = 0; i < getCharactersTable()[type].length; i++) {
 				setY(i, y(i) + 1);
 			}
 		}
