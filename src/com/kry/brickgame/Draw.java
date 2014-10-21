@@ -255,11 +255,12 @@ public class Draw extends JPanel implements GameListener {
 		// TODO draw background above canvas
 		appendCanvas(background, canvas, 50, 52);
 
-		Graphics2D g2d = (Graphics2D) g;
+		Graphics2D g2d = (Graphics2D) g.create();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		g2d.drawRenderedImage(background, null);
+		g2d.dispose();
 	}
 
 	/**

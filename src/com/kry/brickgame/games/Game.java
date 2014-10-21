@@ -40,11 +40,11 @@ public abstract class Game extends Thread {
 	/**
 	 * Width of the default board ({@value} )
 	 */
-	private static final int BOARD_WIDTH = 10;
+	protected static final int BOARD_WIDTH = 10;
 	/**
 	 * Height of the default board ({@value} )
 	 */
-	private static final int BOARD_HEIGHT = 20;
+	protected static final int BOARD_HEIGHT = 20;
 	/**
 	 * Width of the default preview board ({@value} )
 	 */
