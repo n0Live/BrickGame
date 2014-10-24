@@ -3,14 +3,15 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
-import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
+import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
+import static com.kry.brickgame.games.ObstacleUtils.snakeObstacles;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.SnakeShape;
@@ -102,11 +103,8 @@ public class SnakeGame extends GameWithLives {
 	 */
 	private void prepareBoard() {
 		if (getLevel() > 1) {
-			// plus one random obstacle each level
-			for (int i = 0; i < getLevel() - 1; i++) {
-				while (!generateObstacle(new Random().nextInt(3)))
-					;
-			}
+			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0,
+					(isToroidalField ? 2 : 1), 0));
 		}
 	}
 
@@ -190,117 +188,12 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Creates the obstacle and places it on the board randomly
-	 * 
-	 * @param type
-	 *            type of the obstacle
-	 * @return {@code true} if successfully added the obstacle
-	 */
-	private boolean generateObstacle(int type) {
-		Random r = new Random();
-		int x, y;
-
-		Obstacle obstacle = new Obstacle(type);
-
-		// finds empty cells
-		int k = 10; // maximum of attempts
-		do {
-			obstacle.setRandomRotate();
-
-			x = r.nextInt(boardWidth - obstacle.getWidth());
-			y = r.nextInt(boardHeight - obstacle.getHeight());
-
-			k--;
-		} while ((checkCollision(getBoard(), obstacle, x, y, true)) && (k > 0));
-
-		if (k > 0) {
-			setBoard(drawShape(getBoard(), x, y, obstacle, Cell.Full));
-			return true;
-		} else
-			return false;
-	}
-
-	/**
 	 * Loading predefined obstacles
 	 */
 	private void loadPreparedObstacle() {
-		Obstacle obstacle;
-
-		switch (getLevel()) {
-		case 2:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 3:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 4:
-			obstacle = new Obstacle(1).changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			break;
-		case 5:
-			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			break;
-		case 6:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 7:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 8:
-			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 9:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 10:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			break;
-		default:
-			break;
+		if (getLevel() > 1) {
+			setBoard(getPreparedObstacles(getBoard(),
+					snakeObstacles[getLevel()]));
 		}
 	}
 
