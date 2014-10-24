@@ -99,9 +99,9 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Preparation of the boards for the new level
+	 * Generating random obstacles
 	 */
-	private void prepareBoard() {
+	private void loadRandomObstacles() {
 		if (getLevel() > 1) {
 			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0,
 					(isToroidalField ? 2 : 1), 0));
@@ -217,7 +217,7 @@ public class SnakeGame extends GameWithLives {
 		if (usePreloadedLevels)
 			loadPreparedObstacle();
 		else
-			prepareBoard();
+			loadRandomObstacles();
 		addApple();
 
 		setStatus(Status.Running);
