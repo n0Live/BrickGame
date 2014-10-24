@@ -81,6 +81,80 @@ public class ObstacleUtils extends Game {
 					new PlacedObstacle(new Obstacle(2), 3, 6),
 					new PlacedObstacle(new Obstacle(2), 3, 11) }, };
 
+	public static PlacedObstacle[][] tanksObstacles = new PlacedObstacle[][] {
+			{ null },// 0
+			{ null },// 1
+			{// 2
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },
+			{// 3
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 0, 9) },
+			{// 4
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(2), 3, 11) }, //
+			{// 5
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15) },
+			{// 6
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 8, 9) },
+			{// 7
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 8
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 9
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 8, 9),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 10
+					new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(
+							new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(
+							new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
+					new PlacedObstacle(new Obstacle(2), 3, 11) }, };
+
 	/**
 	 * Creates an obstacles and places it on the board randomly
 	 * 
@@ -117,7 +191,7 @@ public class ObstacleUtils extends Game {
 						new Random().nextInt(3), leftBorderSpace,
 						rightBorderSpace, bottomBorderSpace, topBorderSpace);
 				k--;
-			} while (result.equals(boardWithObstacle)  && k > 0);
+			} while (result.equals(boardWithObstacle) && k > 0);
 			result = boardWithObstacle;
 		}
 		return result;
@@ -178,10 +252,10 @@ public class ObstacleUtils extends Game {
 			obstacle.setRandomRotate();
 
 			x = r.nextInt(board.getWidth() - obstacle.getWidth()
-					- (leftBorderSpace + rightBorderSpace))
+					- (leftBorderSpace + rightBorderSpace) + 1)
 					+ leftBorderSpace;
 			y = r.nextInt(board.getHeight() - obstacle.getHeight()
-					- (bottomBorderSpace + topBorderSpace))
+					- (bottomBorderSpace + topBorderSpace) + 1)
 					+ bottomBorderSpace;
 
 			k--;

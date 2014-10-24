@@ -3,6 +3,9 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
+import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
+import static com.kry.brickgame.games.ObstacleUtils.tanksObstacles;
 
 import java.awt.Point;
 import java.util.Random;
@@ -12,7 +15,6 @@ import java.util.TimerTask;
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.shapes.Bullet;
-import com.kry.brickgame.shapes.Obstacle;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
 import com.kry.brickgame.splashes.Splash;
@@ -30,7 +32,7 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Number of subtypes
 	 */
-	public static final int subtypesNumber = 4;
+	public static final int subtypesNumber = 8;
 
 	final static int[][] spawnPoints = new int[][] {//
 	{ 0, 0 }, { BOARD_WIDTH - 1, 0 }, // bottom
@@ -46,6 +48,10 @@ public class TanksGame extends GameWithLives {
 	private TankShape enemyTanks[];
 
 	private int enemiesCount;
+	/**
+	 * Use preloaded levels or generate new ones?
+	 */
+	private boolean usePreloadedLevels;
 
 	private volatile Bullet[] freeBullets;
 
@@ -69,6 +75,8 @@ public class TanksGame extends GameWithLives {
 		super(speed, level, type);
 
 		// ==define the parameters of the types of game==
+		// for types 1-4
+		usePreloadedLevels = (getType() <= 4);
 		// 3 tanks on type 1, 6 - on type 4
 		if (getType() % 4 == 0)
 			enemiesCount = 6;
@@ -134,7 +142,10 @@ public class TanksGame extends GameWithLives {
 		// draws the playerTank
 		setBoard(drawTank(getBoard(), playerTank));
 
-		loadPreparedObstacle();
+		if (usePreloadedLevels)
+			loadPreparedObstacles();
+		else
+			loadRandomObstacles();
 
 		enemiesKilled = 0;
 
@@ -144,84 +155,19 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Loading predefined obstacles
 	 */
-	private void loadPreparedObstacle() {
-		Obstacle obstacle;
+	private void loadPreparedObstacles() {
+		if (getLevel() > 1) {
+			setBoard(getPreparedObstacles(getBoard(),
+					tanksObstacles[getLevel()]));
+		}
+	}
 
-		switch (getLevel()) {
-		case 2:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 3:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 4:
-			obstacle = new Obstacle(1).changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			break;
-		case 5:
-			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			break;
-		case 6:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 7:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 8:
-			obstacle = new Obstacle(1).changeRotationAngle(RIGHT);
-			setBoard(drawShape(getBoard(), 1, 15, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			setBoard(drawShape(getBoard(), 8, 8, obstacle, Cell.Full));
-			break;
-		case 9:
-			obstacle = new Obstacle(1);
-			setBoard(drawShape(getBoard(), 1, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 0, 8, obstacle, Cell.Full));
-			break;
-		case 10:
-			obstacle = new Obstacle(1).changeRotationAngle(LEFT);
-			setBoard(drawShape(getBoard(), 6, 3, obstacle, Cell.Full));
-			obstacle.changeRotationAngle(DOWN);
-			setBoard(drawShape(getBoard(), 6, 15, obstacle, Cell.Full));
-			obstacle = new Obstacle(2);
-			setBoard(drawShape(getBoard(), 3, 6, obstacle, Cell.Full));
-			setBoard(drawShape(getBoard(), 3, 11, obstacle, Cell.Full));
-			break;
-		default:
-			break;
+	/**
+	 * Generating random obstacles
+	 */
+	private void loadRandomObstacles() {
+		if (getLevel() > 1) {
+			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0, 3, 3));
 		}
 	}
 
