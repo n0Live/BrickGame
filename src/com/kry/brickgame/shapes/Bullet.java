@@ -1,34 +1,20 @@
 package com.kry.brickgame.shapes;
 
-import com.kry.brickgame.Board.Cell;
-
-public class Bullet extends Shape {
+public class Bullet extends CoordinatedShape {
 	/**
-	 * X-coordinate position
+	 * A set of the coordinates of points of the player character:
+	 * [type][point][coordinate:0-x,1-y]
 	 */
-	public int x;
-	/**
-	 * Y-coordinate position
-	 */
-	public int y;
+	private static int[][][] charactersTable = new int[][][] { { { 0, 0 } } };
 
-	public Bullet(int x, int y, RotationAngle direction) {
-		super(1, direction, Cell.Full);
-		this.setCoord(0, new int[] { 0, 0 });
-
-		this.x = x;
-		this.y = y;
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
 	}
 
-	/**
-	 * Setting the coordinates of the new position
-	 * 
-	 * @param x
-	 *            x-coordinate of the new position
-	 * @param y
-	 *            y-coordinate of the new position
-	 */
-	public void setCoords(int x, int y) {
+	public Bullet(int x, int y, RotationAngle direction) {
+		super(0, charactersTable[0].length, x, y, direction);
+
 		this.x = x;
 		this.y = y;
 	}
@@ -40,30 +26,8 @@ public class Bullet extends Shape {
 	 *            movement direction
 	 */
 	public Bullet flight() {
-		switch (getRotationAngle()) {
-		case d0:
-			y++;
-			break;
-		case d90:
-			x++;
-			break;
-		case d180:
-			y--;
-			break;
-		case d270:
-			x--;
-			break;
-		}
+		move(getDirection());
 		return this;
-	}
-
-	/**
-	 * Returns the movement direction of the Bullet
-	 * 
-	 * @return movement direction
-	 */
-	public RotationAngle getDirection() {
-		return this.getRotationAngle();
 	}
 
 }
