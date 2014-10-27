@@ -150,7 +150,7 @@ public abstract class Game extends Thread {
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
-	private long timePoint = System.currentTimeMillis();
+	private long timePoint;
 	/**
 	 * The main (base) board
 	 */
@@ -215,6 +215,8 @@ public abstract class Game extends Thread {
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
+		
+		timePoint = System.currentTimeMillis();
 	}
 
 	/**
