@@ -121,4 +121,10 @@ public abstract class CoordinatedShape extends CharacterShape {
 		return new Point(x, y);
 	}
 
+	@Override
+	public String toString() {
+		return "[" + this.x() + ", " + this.y() + "]\n"
+				+ super.toString();
+	}
+
 }

@@ -1,6 +1,5 @@
 package com.kry.brickgame.shapes;
 
-
 public class TankShape extends CoordinatedShape {
 
 	/**
@@ -12,7 +11,10 @@ public class TankShape extends CoordinatedShape {
 			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
 					{ 0, 1 } },
 			// 1 - enemy tank
-			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, }; //
+			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
+			// 2 - tank in box (for check)
+			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
+					{ -1, 1 }, { 0, 1 }, { 1, 1 } } }; //
 
 	@Override
 	protected int[][][] getCharactersTable() {
@@ -23,7 +25,8 @@ public class TankShape extends CoordinatedShape {
 	 * Constructor for the Tank
 	 * 
 	 * @param type
-	 *            0 - player's tank, enemy tank
+	 *            0 - player's tank, 1 - enemy tank, 2 - tank in the box (for
+	 *            check)
 	 */
 	public TankShape(int type) {
 		super(type, charactersTable[type].length);
@@ -42,12 +45,6 @@ public class TankShape extends CoordinatedShape {
 	public TankShape clone() {
 		TankShape newTank = new TankShape(this);
 		return newTank;
-	}
-
-	@Override
-	public String toString() {
-		// the type and rotation angle
-		return "TankShape [" + this.x() + ", " + this.y() + "]\n" + super.toString();
 	}
 
 }
