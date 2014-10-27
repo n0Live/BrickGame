@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.shapes.CoordinatedShape;
 import com.kry.brickgame.shapes.Shape;
 
 /**
@@ -15,7 +16,6 @@ public class GameUtils {
 	/**
 	 * Collision check of the new figure with a filled cells on the board
 	 * 
-	 * @return true if there is a collision
 	 * @param board
 	 *            the board for collision check
 	 * @param piece
@@ -72,7 +72,6 @@ public class GameUtils {
 	/**
 	 * Collision check of the new figure with a filled cells on the board
 	 * 
-	 * @return true if there is a collision
 	 * @param board
 	 *            the board for collision check
 	 * @param piece
@@ -90,6 +89,43 @@ public class GameUtils {
 	protected static boolean checkCollision(Board board, Shape piece, int x,
 			int y) {
 		return checkCollision(board, piece, x, y, false);
+	}
+
+	/**
+	 * Collision check of two figures with coordinates
+	 * 
+	 * @param first
+	 *            the first figure
+	 * @param second
+	 *            the second figure
+	 * @return {@code true} if there is a collision
+	 */
+	protected static boolean checkTwoShapeCollision(CoordinatedShape first,
+			CoordinatedShape second) {
+		if (first == null || second == null)
+			return false;
+
+		//when the figures are placed too far apart, returns false
+		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math
+				.max(first.getHeight(), second.getHeight())
+				&& Math.abs(first.x() + first.minX() - second.x()
+						+ second.minX()) > Math.max(first.getWidth(),
+						second.getWidth()))
+			return false;
+
+		for (int i = 0; i < first.getLength(); i++) {
+			int givenFirstX = first.x() + first.x(i);
+			int givenFirstY = first.y() + first.y(i);
+
+			for (int j = 0; j < second.getLength(); j++) {
+				int givenSecondX = second.x() + second.x(j);
+				int givenSecondY = second.y() + second.y(j);
+
+				if (givenFirstX == givenSecondX && givenFirstY == givenSecondY)
+					return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -285,6 +321,24 @@ public class GameUtils {
 	}
 
 	/**
+	 * Drawing the figure with coordinates on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param shape
+	 *            the figure
+	 * @param fill
+	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
+	 *            figure, {@code Cells.Empty} - to erase the figure
+	 * 
+	 * @return the board with the figure
+	 */
+	protected static Board drawShape(Board board, CoordinatedShape shape,
+			Cell fill) {
+		return drawShape(board, shape.x(), shape.y(), shape, fill);
+	}
+
+	/**
 	 * Drawing the point of the figure on the board.
 	 * <p>
 	 * If the point is outside the borders of the board, then drawing it on the
@@ -402,10 +456,12 @@ public class GameUtils {
 
 	/**
 	 * Returns the inverted copy of the specified board
-	 * @param board specified board
+	 * 
+	 * @param board
+	 *            specified board
 	 * @return the inverted copy of the board
 	 */
-	protected static Board getInvertedBoard(Board board){
+	protected static Board getInvertedBoard(Board board) {
 		Board newBoard = board.clone();
 		for (int i = 0; i < board.getHeight(); i++) {
 			newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
