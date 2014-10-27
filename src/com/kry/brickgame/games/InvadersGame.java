@@ -188,9 +188,9 @@ public class InvadersGame extends GameWithGun {
 		bulletSwarm.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				// if (getStatus() == Status.Running) {
-				flightOfBullets();
-				// }
+				if (getStatus() == Status.Running) {
+					flightOfBullets();
+				}
 			}
 			// twice as slow if hasTwoSmokingBarrels
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
@@ -215,8 +215,8 @@ public class InvadersGame extends GameWithGun {
 	@Override
 	protected void loadNewLevel() {
 		setStatus(Status.DoSomeWork);
-		
-		//set the X-Dimension flags
+
+		// set the X-Dimension flags
 		theXDimension = isReadyToXDimension && !isShiftingBricks;
 		isReadyToXDimension = !theXDimension && !isShiftingBricks;
 
@@ -294,7 +294,7 @@ public class InvadersGame extends GameWithGun {
 					ballX = x + bricksX;
 					ballY = y + bricksY;
 
-					//don't create a ball when it below the gun
+					// don't create a ball when it below the gun
 					if (ballY < gun.getHeight()) {
 						initBall();
 						return;
@@ -428,7 +428,8 @@ public class InvadersGame extends GameWithGun {
 		boolean result = true;
 		for (int i = 0; i < boardWidth; i++) {
 			if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
-				//checking for compliance with the conditions of teleportation in the X-Dimension
+				// checking for compliance with the conditions of teleportation
+				// in the X-Dimension
 				if (isReadyToXDimension) {
 					for (int j = 0; j < bricks.getHeight(); j++) {
 						if (bricks.getCell(bricksX + startX, j) == Cell.Full) {
@@ -488,7 +489,7 @@ public class InvadersGame extends GameWithGun {
 	protected synchronized void fireBoardChanged(Board board) {
 		Board newBoard = board.clone();
 
-		//the X-Dimension has its own laws
+		// the X-Dimension has its own laws
 		if (theXDimension) {
 			int startY = (gun != null) ? gun.getHeight() : 0;
 			for (int i = 0; i < newBoard.getWidth(); i++) {
