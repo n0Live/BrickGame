@@ -1,6 +1,7 @@
 package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundPlayer.Snd;
 
 /**
  * @author noLive
@@ -121,6 +122,8 @@ public abstract class GameWithLives extends Game {
 	protected void win() {
 		setStatus(Status.DoSomeWork);
 
+		play(Snd.win);
+		
 		animatedClearBoard(true);
 
 		setLevel(getLevel() + 1);

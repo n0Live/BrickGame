@@ -12,6 +12,8 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.SoundPlayer;
+import com.kry.brickgame.SoundPlayer.Snd;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.Splash;
 
@@ -57,6 +59,10 @@ public abstract class Game extends Thread {
 	 * Animation delay in milliseconds
 	 */
 	protected static final int ANIMATION_DELAY = 30;
+	/**
+	 * Is the sound turned off?
+	 */
+	private static boolean muted = false;
 
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
@@ -163,12 +169,10 @@ public abstract class Game extends Thread {
 	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
-
 	/**
 	 * Set of the pressed keys
 	 */
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
-
 	/**
 	 * Whether to draw the board upside down?
 	 */
@@ -215,7 +219,7 @@ public abstract class Game extends Thread {
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
-		
+
 		timePoint = System.currentTimeMillis();
 	}
 
@@ -487,6 +491,14 @@ public abstract class Game extends Thread {
 		return drawInvertedBoard;
 	}
 
+	protected static boolean isMuted() {
+		return muted;
+	}
+
+	protected static void setMuted(boolean muted) {
+		Game.muted = muted;
+	}
+
 	/**
 	 * Set the flag for the drawing the board invertedly
 	 * 
@@ -603,7 +615,7 @@ public abstract class Game extends Thread {
 	 *            if {@code true} then animation speed is increased twice
 	 */
 	protected void animatedClearBoard(boolean isFast) {
-		int k = (isFast ? 2 : 1);
+		int delay = (isFast) ? ANIMATION_DELAY / 2 : ANIMATION_DELAY * 5;
 
 		// the board is filled upwards
 		for (int y = 0; y < boardHeight; y++) {
@@ -611,7 +623,7 @@ public abstract class Game extends Thread {
 				board.setCell(Cell.Full, x, y);
 			}
 			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY / k);
+			sleep(delay);
 		}
 		// and is cleaned downwards
 		for (int y = boardHeight - 1; y >= 0; y--) {
@@ -619,7 +631,7 @@ public abstract class Game extends Thread {
 				board.setCell(Cell.Empty, x, y);
 			}
 			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY / k);
+			sleep(delay);
 		}
 	}
 
@@ -739,7 +751,9 @@ public abstract class Game extends Thread {
 		while ((newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardHeight) {
 			newY--;
 		}
-
+		
+		play(Snd.kaboom);
+		
 		Kaboom kaboom = new Kaboom();
 
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
@@ -766,6 +780,7 @@ public abstract class Game extends Thread {
 	 */
 	protected void gameOver() {
 		setStatus(Status.GameOver);
+		play(Snd.game_over);
 		animatedClearBoard();
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
@@ -819,6 +834,13 @@ public abstract class Game extends Thread {
 		keys.remove(key);
 	}
 
+	protected static SoundPlayer play(Snd sound) {
+		if (isMuted())
+			return null;
+		else
+			return SoundPlayer.playSound(sound);
+	}
+
 	/**
 	 * Processing of key presses
 	 */
@@ -835,6 +857,12 @@ public abstract class Game extends Thread {
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
 			pause();
+			return;
+		}
+
+		if (keys.contains(KeyPressed.KeyMute)) {
+			keys.remove(KeyPressed.KeyMute);
+			setMuted(!isMuted());
 			return;
 		}
 

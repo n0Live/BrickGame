@@ -2,8 +2,10 @@ package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundPlayer.Snd;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.SoundPlayer;
 
 import static com.kry.brickgame.games.GameUtils.*;
 
@@ -33,12 +35,17 @@ public class SplashScreen extends Game {
 		}, "SplashScreen");
 
 		splashScreenThread.start();
+		
+		SoundPlayer welcome = play(Snd.welcome);
 
 		// by pressing any key status sets to Status.None
 		while (getStatus() != Status.None) {
 			processKeys();
 		}
-
+		
+		if (welcome.isPlaying())
+			welcome.stop();
+		
 		splashScreenThread.interrupt();
 		Main.gameSelector = new GameSelector();
 		Main.setGame(Main.gameSelector);
@@ -88,7 +95,7 @@ public class SplashScreen extends Game {
 		if (isRightDirection) {
 			for (int i = fromX; i <= toX; i++) {
 
-				if (interrupted())
+				if (isInterrupted())
 					return false;
 
 				// invert cells
@@ -101,7 +108,7 @@ public class SplashScreen extends Game {
 		} else {
 			for (int i = fromX; i >= toX; i--) {
 
-				if (interrupted())
+				if (isInterrupted())
 					return false;
 
 				// invert cells
@@ -135,7 +142,7 @@ public class SplashScreen extends Game {
 		if (isUpDirection) {
 			for (int i = fromY; i <= toY; i++) {
 
-				if (interrupted())
+				if (isInterrupted())
 					return false;
 
 				// invert cells
@@ -148,7 +155,7 @@ public class SplashScreen extends Game {
 		} else {
 			for (int i = fromY; i >= toY; i--) {
 
-				if (interrupted())
+				if (isInterrupted())
 					return false;
 
 				// invert cells
@@ -180,7 +187,6 @@ public class SplashScreen extends Game {
 					|| !verticalMove(fromY, toY, toX--)
 					|| !horizontalMove(toX, fromX, toY++)
 					|| !verticalMove(toY, fromY, fromX++)) {
-				Thread.currentThread().interrupt();
 				return;
 			}
 		}
@@ -199,10 +205,7 @@ public class SplashScreen extends Game {
 
 		for (int i = 0; i < repeatCount; i++) {
 
-			if (interrupted()) {
-				// when checking the "interrupted" flag is reset, so sets it
-				// again
-				Thread.currentThread().interrupt();
+			if (isInterrupted()) {
 				return;
 			}
 

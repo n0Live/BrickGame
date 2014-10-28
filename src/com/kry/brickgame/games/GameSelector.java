@@ -12,6 +12,7 @@ import com.kry.brickgame.Board;
 import com.kry.brickgame.BoardLetters;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.SoundPlayer.Snd;
 import com.kry.brickgame.splashes.Splash;
 
 import static com.kry.brickgame.games.GameUtils.*;
@@ -461,6 +462,8 @@ public class GameSelector extends Game {
 
 	@Override
 	public void keyPressed(KeyPressed key) {
+		play(Snd.select);
+		
 		switch (key) {
 		case KeyLeft:
 			setSpeed(getSpeed() + 1);
@@ -482,6 +485,9 @@ public class GameSelector extends Game {
 			break;
 		case KeyStart:
 			changeGame();
+			break;
+		case KeyMute:
+			setMuted(!isMuted());
 			break;
 		case KeyReset:
 			// stop the splash animation timer

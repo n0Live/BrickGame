@@ -47,10 +47,10 @@ public class GameKeyAdapter extends KeyAdapter {
 			Main.getGame().keyPressed(KeyPressed.KeyReset);
 			break;
 		case 'm':
-			Main.getGame().keyPressed(KeyPressed.KeyReset);
+			Main.getGame().keyPressed(KeyPressed.KeyMute);
 			break;
 		case 'M':
-			Main.getGame().keyPressed(KeyPressed.KeyReset);
+			Main.getGame().keyPressed(KeyPressed.KeyMute);
 			break;
 		}
 	}

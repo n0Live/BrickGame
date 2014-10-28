@@ -442,7 +442,7 @@ public class ArkanoidGame extends GameWithLives {
 		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
 				ballVerticalDirection);
 
-		// if the ball fall off the board then loss live
+		// if the ball fall off the board then game_over live
 		if ((newCoords.y < 0)
 				|| (useDoubleSidedPlatform && (newCoords.y >= boardHeight))) {
 			loss();
