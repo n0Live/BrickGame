@@ -9,6 +9,7 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.ArkanoidPlatformShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
@@ -349,6 +350,8 @@ public class ArkanoidGame extends GameWithLives {
 
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
+
 		loadLevel(true);
 	}
 
@@ -521,6 +524,8 @@ public class ArkanoidGame extends GameWithLives {
 		int givenY = y - bricksY;
 
 		if (bricks.breakBrick(givenX, givenY)) {
+			play(Sounds.hit_cell);
+
 			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
 			// increase scores
@@ -586,13 +591,17 @@ public class ArkanoidGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				movePlatform(curX - 1);
-				sleep(movementDelay);
+				if (movePlatform(curX - 1)) {
+					play(Sounds.move);
+					sleep(movementDelay);
+				}
 			}
 
 			if (keys.contains(KeyPressed.KeyRight)) {
-				movePlatform(curX + 1);
-				sleep(movementDelay);
+				if (movePlatform(curX + 1)) {
+					play(Sounds.move);
+					sleep(movementDelay);
+				}
 			}
 
 			if (keys.contains(KeyPressed.KeyRotate)) {

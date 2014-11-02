@@ -10,7 +10,10 @@ import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import java.util.Random;
 
 import com.kry.brickgame.Board;
+import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Backgrounds;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
@@ -252,6 +255,8 @@ public class TetrisGameI extends Game {
 		// Create the "next" figure
 		nextPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
 		newPiece();
+
+		SoundManager.playSound(backgrounds, Backgrounds.tetris, false, false);
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			doRepetitiveWork();
@@ -639,20 +644,25 @@ public class TetrisGameI extends Game {
 	 */
 	protected void pieceDropped() {
 		if (curPiece.getShape() == Figures.SuperPoint) {// super point
+			play(Sounds.fall_super);
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		} else if ((curPiece.getShape() == Figures.SuperGun)
 				|| (curPiece.getShape() == Figures.SuperMudGun)) { // guns
+			play(Sounds.fall_super);
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
 			curPiece = new TetrisShape(Figures.NoShape);
 		} else if (curPiece.getShape() == Figures.SuperBomb) {// bomb
 			kaboom(curX + 1, curY); // shift the epicenter to the bottom edge
 		} else if (hasLiquidFigures // liquid figure
 				&& (curPiece.getFill() == Cell.Blink)) {
+			play(Sounds.fall_super);
 			flowDown(getBoard(), curX, curY, curPiece, false);
 		} else if (hasAcidFigures // acid figure
 				&& (curPiece.getFill() == Cell.Blink)) {
+			play(Sounds.fall_super);
 			flowDown(getBoard(), curX, curY, curPiece, true);
 		} else { // ordinal figure
+			play(Sounds.fall);
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
 
@@ -684,6 +694,8 @@ public class TetrisGameI extends Game {
 				}
 			}
 			if (lineIsFull) {
+				play(Sounds.remove_line);
+
 				numFullLines++;
 
 				// animated clearing of a full line
@@ -880,6 +892,15 @@ public class TetrisGameI extends Game {
 		super.firePreviewChanged(board);
 	}
 
+	// TODO
+	protected void play(Sounds sound) {
+		if (!backgrounds
+				.getClip(
+						SoundManager.getResourceFromName(Backgrounds.tetris
+								.toString())).isPlaying())
+			super.play(sound);
+	}
+
 	@Override
 	public void keyPressed(KeyPressed key) {
 		if (isInvertedBoard()) {
@@ -920,19 +941,25 @@ public class TetrisGameI extends Game {
 
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				tryMove(curPiece, curX - 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				if (tryMove(curPiece, curX - 1, curY)) {
+					play(Sounds.move);
+					sleep(ANIMATION_DELAY * 3);
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				tryMove(curPiece, curX + 1, curY);
-				sleep(ANIMATION_DELAY * 3);
+				if (tryMove(curPiece, curX + 1, curY)) {
+					play(Sounds.move);
+					sleep(ANIMATION_DELAY * 3);
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				// if we have the super gun
 				if (curPiece.getShape() == Figures.SuperGun) {
+					play(Sounds.hit_cell);
 					// than shoot of it
 					shoot(curX, curY + curPiece.minY());
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
+					play(Sounds.add_cell);
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
 				} else if (curPiece.getShape() != Figures.SuperPoint) {
@@ -941,7 +968,9 @@ public class TetrisGameI extends Game {
 						rotatedPiece = curPiece.clone().rotateLeft();
 					else
 						rotatedPiece = curPiece.clone().rotateRight();
-					tryMove(rotatedPiece, curX, curY);
+
+					if (tryMove(rotatedPiece, curX, curY))
+						play(Sounds.turn);
 				}
 				keys.remove(KeyPressed.KeyRotate);
 			}

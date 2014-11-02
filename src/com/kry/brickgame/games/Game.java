@@ -12,8 +12,9 @@ import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundPlayer;
-import com.kry.brickgame.SoundPlayer.Snd;
+import com.kry.brickgame.SoundBank;
+import com.kry.brickgame.SoundManager;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.Splash;
 
@@ -22,6 +23,10 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public abstract class Game extends Thread {
+	public static final SoundBank sounds = new SoundBank(
+			SoundManager.enumToResourceArray(Sounds.class));
+	public static final SoundBank backgrounds = new SoundBank();
+
 	/**
 	 * Animated splash for game
 	 */
@@ -169,6 +174,7 @@ public abstract class Game extends Thread {
 	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
+
 	/**
 	 * Set of the pressed keys
 	 */
@@ -196,6 +202,8 @@ public abstract class Game extends Thread {
 	 */
 	protected Game(int speed, int level, Board board, Board preview,
 			Rotation rotation, int type) {
+		sounds.stopAll();
+
 		this.type = type;
 
 		setSpeed(speed);
@@ -604,7 +612,7 @@ public abstract class Game extends Thread {
 				board.setCell(Cell.Empty, x2++, y);
 
 			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY);
+			sleep(ANIMATION_DELAY * 2);
 		}
 	}
 
@@ -751,9 +759,9 @@ public abstract class Game extends Thread {
 		while ((newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardHeight) {
 			newY--;
 		}
-		
-		play(Snd.kaboom);
-		
+
+		play(Sounds.kaboom);
+
 		Kaboom kaboom = new Kaboom();
 
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
@@ -780,7 +788,7 @@ public abstract class Game extends Thread {
 	 */
 	protected void gameOver() {
 		setStatus(Status.GameOver);
-		play(Snd.game_over);
+		play(Sounds.game_over);
 		animatedClearBoard();
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
@@ -834,11 +842,15 @@ public abstract class Game extends Thread {
 		keys.remove(key);
 	}
 
-	protected static SoundPlayer play(Snd sound) {
-		if (isMuted())
-			return null;
-		else
-			return SoundPlayer.playSound(sound);
+	protected <E extends Enum<E>> void play(Sounds sound) {
+		if (!isMuted())
+			// SoundManager.stopAll(sounds, true);
+			SoundManager.playSound(sounds, sound, true, false);
+	}
+
+	protected void loopSound(Sounds sound) {
+		if (!isMuted())
+			SoundManager.loopSound(sounds, sound);
 	}
 
 	/**

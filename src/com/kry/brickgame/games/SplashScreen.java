@@ -1,13 +1,12 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundPlayer.Snd;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundPlayer;
-
-import static com.kry.brickgame.games.GameUtils.*;
+import com.kry.brickgame.SoundManager.Sounds;
 
 /**
  * @author noLive
@@ -21,6 +20,9 @@ public class SplashScreen extends Game {
 
 	public void start() {
 		setStatus(Status.DoSomeWork);
+		
+		play(Sounds.welcome);
+		
 		insertNumbers();
 
 		// Splash screen will be run in a separate thread
@@ -35,17 +37,12 @@ public class SplashScreen extends Game {
 		}, "SplashScreen");
 
 		splashScreenThread.start();
-		
-		SoundPlayer welcome = play(Snd.welcome);
 
 		// by pressing any key status sets to Status.None
 		while (getStatus() != Status.None) {
 			processKeys();
 		}
-		
-		if (welcome.isPlaying())
-			welcome.stop();
-		
+
 		splashScreenThread.interrupt();
 		Main.gameSelector = new GameSelector();
 		Main.setGame(Main.gameSelector);
@@ -71,7 +68,8 @@ public class SplashScreen extends Game {
 		insertCellsToBoard(board, boardNumber.getBoard(),// lower right
 				board.getWidth() - boardNumber.getWidth() - 1, 1);
 
-		setBoard(board);
+		if (!isInterrupted())
+			setBoard(board);
 	}
 
 	/**

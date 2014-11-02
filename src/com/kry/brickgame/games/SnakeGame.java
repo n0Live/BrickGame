@@ -201,6 +201,8 @@ public class SnakeGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	protected void loadNewLevel() {
+		super.loadNewLevel();
+		
 		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
 				: LEFT);
 		// starting position - the middle of the bottom border of the board

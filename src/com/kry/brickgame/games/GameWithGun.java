@@ -5,6 +5,7 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.GunShape;
 
 /**
@@ -151,6 +152,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            y-coordinate of the cell
 	 */
 	protected void removeCell(Board board, int x, int y) {
+		play(Sounds.hit_cell);
 		// remove the cell
 		board.setCell(Cell.Empty, x, y);
 		// increase scores
@@ -174,8 +176,7 @@ public abstract class GameWithGun extends GameWithLives {
 						// if in front of the bullet is filled cell
 						if (board.getCell(x, bullets[y][x] + 1) != Cell.Empty) {
 							// stop the bullet before the cell
-							board.setCell(Cell.Full, x, bullets[y][x]);
-							setScore(getScore() + 1);
+							addCell(board, x, bullets[y][x]);
 							// check for a filled lines
 							removeFullLines(bullets[y][x]);
 							// remove the bullet
@@ -186,8 +187,7 @@ public abstract class GameWithGun extends GameWithLives {
 						}
 					} else if (bullets[y][x] == boardHeight - 1) {
 						// stop the bullet on the border of the board
-						board.setCell(Cell.Full, x, bullets[y][x]);
-						setScore(getScore() + 1);
+						addCell(board, x, bullets[y][x]);
 						// check for a filled lines
 						removeFullLines(bullets[y][x]);
 						// remove the bullet
@@ -199,6 +199,25 @@ public abstract class GameWithGun extends GameWithLives {
 		}
 	}
 
+	/**
+	 * Adding the cell to the board and increasing scores
+	 * 
+	 * @param board
+	 *            the board
+	 * @param x
+	 *            x-coordinate of the cell
+	 * @param y
+	 *            y-coordinate of the cell
+	 */
+	protected void addCell(Board board, int x, int y) {
+		play(Sounds.add_cell);
+		// remove the cell
+		board.setCell(Cell.Full, x, y);
+		// increase scores
+		setScore(getScore() + 1);
+	}
+
+	
 	/**
 	 * Removal of a filled lines
 	 */
@@ -215,6 +234,8 @@ public abstract class GameWithGun extends GameWithLives {
 			}
 		}
 		if (lineIsFull) {
+			play(Sounds.remove_line);
+			
 			animatedClearLine(getBoard(), curX, y);
 
 			// erase the gun from the board before dropping ups lines
@@ -268,6 +289,8 @@ public abstract class GameWithGun extends GameWithLives {
 				}
 			}
 		}
+		//TODO
+		//play(Sounds.turn);
 	}
 
 }

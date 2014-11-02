@@ -1,5 +1,7 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +14,8 @@ import com.kry.brickgame.Board;
 import com.kry.brickgame.BoardLetters;
 import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundPlayer.Snd;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.splashes.Splash;
-
-import static com.kry.brickgame.games.GameUtils.*;
 
 /**
  * The selection screen of a game
@@ -461,32 +461,37 @@ public class GameSelector extends Game {
 	}
 
 	@Override
-	public void keyPressed(KeyPressed key) {
-		play(Snd.select);
-		
+	public void keyPressed(KeyPressed key) {		
 		switch (key) {
 		case KeyLeft:
+			play(Sounds.select);
 			setSpeed(getSpeed() + 1);
 			break;
 		case KeyRight:
+			play(Sounds.select);
 			setLevel(getLevel() + 1);
 			break;
 		case KeyRotate:
+			play(Sounds.select);
 			if (getRotation() == Rotation.Counterclockwise)
 				prevLetter();
 			else
 				nextLetter();
 			break;
 		case KeyUp:
+			play(Sounds.select);
 			nextNumber();
 			break;
 		case KeyDown:
+			play(Sounds.select);
 			prevNumber();
 			break;
 		case KeyStart:
+			play(Sounds.select);
 			changeGame();
 			break;
 		case KeyMute:
+			play(Sounds.select);
 			setMuted(!isMuted());
 			break;
 		case KeyReset:

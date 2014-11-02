@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.Bullet;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
@@ -162,6 +163,8 @@ public class TanksGame extends GameWithLives {
 	 */
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
+
 		resetBullets();
 		resetPlayerTank();
 		resetEnemyTanks();
@@ -260,16 +263,19 @@ public class TanksGame extends GameWithLives {
 			// if the movement and shooting direction is the same, the tank
 			// fired on the move
 			if (shotDirection == moveDirection && !isBornWithGun) {
-				enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber], moveDirection, false);
+				enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber],
+						moveDirection, false);
 			} else {
-				enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber], shotDirection, true);
+				enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber],
+						shotDirection, true);
 			}
 
 			sleep(ANIMATION_DELAY * 2);
-			
+
 			fire(enemyTanks[tankNumber]);
 		} else {
-			enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber], moveDirection, false);
+			enemyTanks[tankNumber] = moveTank(enemyTanks[tankNumber],
+					moveDirection, false);
 		}
 
 		return true;
@@ -623,7 +629,7 @@ public class TanksGame extends GameWithLives {
 			boolean rotationOnly) {
 		if (tank == null)
 			return null;
-		
+
 		Board board = getBoard().clone();
 		TankShape newTank = tank.clone();
 
@@ -719,10 +725,12 @@ public class TanksGame extends GameWithLives {
 	 */
 	private void flightOfBullets() {
 		for (int i = 0; i < enemyBullets.length; i++) {
-			flightOfBullet(enemyBullets[i], false);
+			if (!flightOfBullet(enemyBullets[i], false))
+				return;
 		}
 		for (int i = 0; i < playerBullets.length; i++) {
-			flightOfBullet(playerBullets[i], true);
+			if (!flightOfBullet(playerBullets[i], true))
+				return;
 		}
 	}
 
@@ -734,10 +742,11 @@ public class TanksGame extends GameWithLives {
 	 * @param isPlayerBullet
 	 *            {@code true} when bullet fired by the player tank
 	 */
-	private synchronized void flightOfBullet(Bullet bullet,
+	private synchronized boolean flightOfBullet(Bullet bullet,
 			boolean isPlayerBullet) {
-
-		if (bullet != null) {
+		if (bullet == null) {
+			return false;
+		} else {
 			Board board = getBoard();
 			// erase bullet from the board only if it has flew out of the tank
 			if (!checkCollisionWithTank(bullet, isPlayerBullet))
@@ -769,7 +778,7 @@ public class TanksGame extends GameWithLives {
 								&& checkTwoShapeCollision(playerTank, result)) {
 							// when the enemy bullet hit the player tank
 							loss(result.x(), result.y());
-							return;
+							return false;
 						}
 						for (int i = 0; i < enemyTanks.length; i++) {
 							TankShape enemyTank = enemyTanks[i];
@@ -793,6 +802,7 @@ public class TanksGame extends GameWithLives {
 				}
 			}
 			setBoard(board);
+			return true;
 		}
 	}
 
@@ -824,6 +834,8 @@ public class TanksGame extends GameWithLives {
 	 *            number of the removed tank
 	 */
 	private void destroyEnemyTank(int tankNumber) {
+		play(Sounds.hit_cell);
+
 		if (enemyTanks[tankNumber] != null)
 			enemyTanks[tankNumber] = null;
 
@@ -901,7 +913,7 @@ public class TanksGame extends GameWithLives {
 	private boolean fire(TankShape tank) {
 		if (tank == null)
 			return false;
-		
+
 		boolean isPlayerBullet = (tank == playerTank);
 		Bullet[] bullets = isPlayerBullet ? playerBullets : enemyBullets;
 
@@ -968,6 +980,7 @@ public class TanksGame extends GameWithLives {
 				sleep(ANIMATION_DELAY);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
+				play(Sounds.move);
 				fire(playerTank);
 				keys.remove(KeyPressed.KeyRotate);
 				sleep(ANIMATION_DELAY * 3);

@@ -1,7 +1,7 @@
 package com.kry.brickgame.games;
 
 import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundPlayer.Snd;
+import com.kry.brickgame.SoundManager.Sounds;
 
 /**
  * @author noLive
@@ -85,7 +85,9 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Loading the specified level
 	 */
-	protected abstract void loadNewLevel();
+	protected void loadNewLevel(){
+		play(Sounds.start);
+	}
 
 	/**
 	 * Reloading the specified level
@@ -122,7 +124,7 @@ public abstract class GameWithLives extends Game {
 	protected void win() {
 		setStatus(Status.DoSomeWork);
 
-		play(Snd.win);
+		play(Sounds.win);
 		
 		animatedClearBoard(true);
 

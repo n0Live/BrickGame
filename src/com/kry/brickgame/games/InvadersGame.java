@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.InvadersSplash;
@@ -214,6 +215,8 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
+
 		setStatus(Status.DoSomeWork);
 
 		// set the X-Dimension flags
@@ -395,6 +398,8 @@ public class InvadersGame extends GameWithGun {
 		int givenY = y - bricksY;
 
 		if (bricks.breakBrick(givenX, givenY)) {
+			play(Sounds.hit_cell);
+
 			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
 			// increase scores
@@ -524,16 +529,20 @@ public class InvadersGame extends GameWithGun {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (!moveGun(curX - 1, curY))
-					loss(curX - 1, curY);
-				else
+				if (moveGun(curX - 1, curY)) {
+					play(Sounds.move);
 					sleep(ANIMATION_DELAY * 2);
+				} else {
+					loss(curX - 1, curY);
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (!moveGun(curX + 1, curY))
-					loss(curX + 1, curY);
-				else
+				if (moveGun(curX + 1, curY)){
+					play(Sounds.move);
 					sleep(ANIMATION_DELAY * 2);
+				} else {
+					loss(curX + 1, curY);
+				}
 			}
 			if ((keys.contains(KeyPressed.KeyDown))
 					|| (keys.contains(KeyPressed.KeyUp))) {

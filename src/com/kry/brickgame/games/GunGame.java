@@ -10,6 +10,7 @@ import java.util.TimerTask;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.splashes.GunSplash;
 import com.kry.brickgame.splashes.Splash;
 
@@ -160,6 +161,7 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
@@ -282,23 +284,30 @@ public class GunGame extends GameWithGun {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				moveGun(curX - 1, curY);
-				if (isCreationMode)
-					keys.remove(KeyPressed.KeyLeft);
-				else
-					sleep(ANIMATION_DELAY * 2);
+				if (moveGun(curX - 1, curY)) {
+					play(Sounds.move);
+					if (isCreationMode)
+						keys.remove(KeyPressed.KeyLeft);
+					else
+						sleep(ANIMATION_DELAY * 2);
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				moveGun(curX + 1, curY);
-				if (isCreationMode)
-					keys.remove(KeyPressed.KeyRight);
-				else
-					sleep(ANIMATION_DELAY * 2);
+				if (moveGun(curX + 1, curY)) {
+					play(Sounds.move);
+					if (isCreationMode)
+						keys.remove(KeyPressed.KeyRight);
+					else
+						sleep(ANIMATION_DELAY * 2);
+				}
 			}
 			if ((keys.contains(KeyPressed.KeyDown))
 					|| (keys.contains(KeyPressed.KeyUp))) {
-				droppingDown();
-				sleep(ANIMATION_DELAY * 2);
+				if (droppingDown()) {
+					play(Sounds.move);
+					sleep(ANIMATION_DELAY * 2);
+
+				}
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;
 import com.kry.brickgame.splashes.Splash;
@@ -200,6 +201,7 @@ public class FroggerGame extends GameWithLives {
 	 */
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
@@ -458,6 +460,9 @@ public class FroggerGame extends GameWithLives {
 		// draw the frog on the new place
 		if (y == boardHeight - 1) {
 			setBoard(drawShape(board, x, y, frog, Cell.Full));
+			
+			play(Sounds.add_cell);
+			
 			checkForWin();
 		} else {
 			setBoard(drawShape(board, x, y, frog, frog.getFill()));
@@ -519,12 +524,16 @@ public class FroggerGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (!jumpFrog(curX - 1, curY))
+				if (jumpFrog(curX - 1, curY))
+					play(Sounds.move);
+				else
 					loss();
 				keys.remove(KeyPressed.KeyLeft);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (!jumpFrog(curX + 1, curY))
+				if (jumpFrog(curX + 1, curY))
+					play(Sounds.move);
+				else
 					loss();
 				keys.remove(KeyPressed.KeyRight);
 			}
@@ -537,7 +546,9 @@ public class FroggerGame extends GameWithLives {
 				else
 					dY = -2;
 
-				if (!jumpFrog(curX, curY + dY))
+				if (jumpFrog(curX, curY + dY))
+					play(Sounds.move);
+				else
 					loss();
 				keys.remove(KeyPressed.KeyDown);
 			}
@@ -547,13 +558,17 @@ public class FroggerGame extends GameWithLives {
 				else
 					dY = (curY < boardHeight - 2) ? 2 : 1;
 
-				if (!jumpFrog(curX, curY + dY))
+				if (jumpFrog(curX, curY + dY))
+					play(Sounds.move);
+				else
 					loss();
 				keys.remove(KeyPressed.KeyUp);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				dY = (curY < boardHeight - 2) ? 2 : 1;
-				if (!jumpFrog(curX, curY + dY))
+				if (jumpFrog(curX, curY + dY))
+					play(Sounds.move);
+				else
 					loss();
 				keys.remove(KeyPressed.KeyRotate);
 			}

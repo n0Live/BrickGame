@@ -3,12 +3,16 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 
+import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import javafx.scene.media.AudioClip;
+
 import com.kry.brickgame.Board;
 import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundManager.Sounds;
 import com.kry.brickgame.shapes.CarShape;
 import com.kry.brickgame.splashes.RaceSplash;
 import com.kry.brickgame.splashes.Splash;
@@ -101,6 +105,11 @@ public class RaceGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
+		URL resource = getClass().getResource("/sounds/race.wav");
+		AudioClip clip = backgrounds.getClip(resource.toExternalForm());
+		clip.setCycleCount(AudioClip.INDEFINITE);
+		clip.play();
+		
 		setStatus(Status.Running);
 
 		loadNewLevel();
@@ -126,6 +135,7 @@ public class RaceGame extends GameWithLives {
 	 */
 	@Override
 	protected void loadNewLevel() {
+		super.loadNewLevel();
 		// set position
 		curPosition = 1;
 		curX = positions[curPosition];
@@ -303,9 +313,9 @@ public class RaceGame extends GameWithLives {
 	 * @param position
 	 *            the new position of the car
 	 */
-	private void moveCar(int position) {
+	private boolean moveCar(int position) {
 		if ((position < 0) || (position >= positions.length))
-			return;
+			return false;
 
 		int newX = positions[position];
 
@@ -326,6 +336,8 @@ public class RaceGame extends GameWithLives {
 
 		if (isAccident)
 			loss(curX, curY);
+		
+		return !isAccident;
 	}
 
 	@Override
@@ -356,11 +368,13 @@ public class RaceGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				moveCar(curPosition - 1);
+				if (moveCar(curPosition - 1))
+					play(Sounds.move);
 				keys.remove(KeyPressed.KeyLeft);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				moveCar(curPosition + 1);
+				if (moveCar(curPosition + 1))
+					play(Sounds.move);
 				keys.remove(KeyPressed.KeyRight);
 			}
 			if ((keys.contains(KeyPressed.KeyDown))
