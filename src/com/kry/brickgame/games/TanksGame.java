@@ -4,6 +4,7 @@ import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.checkTwoShapeCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.tanksObstacles;
@@ -13,9 +14,9 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Bullet;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
@@ -118,8 +119,6 @@ public class TanksGame extends GameWithLives {
 	public void start() {
 		loadNewLevel();
 
-		int currentSpeed;
-
 		// Number of the enemy tanks whose turn
 		int enemyTankNumber = 0;
 
@@ -133,6 +132,8 @@ public class TanksGame extends GameWithLives {
 				}
 			}
 		}, 0, ANIMATION_DELAY * 4);
+
+		int currentSpeed;
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			currentSpeed = getSpeed(true) * 3;
@@ -163,8 +164,6 @@ public class TanksGame extends GameWithLives {
 	 */
 	@Override
 	protected void loadNewLevel() {
-		super.loadNewLevel();
-
 		resetBullets();
 		resetPlayerTank();
 		resetEnemyTanks();
@@ -178,6 +177,8 @@ public class TanksGame extends GameWithLives {
 			loadRandomObstacles();
 
 		enemiesKilled = 0;
+
+		super.loadNewLevel();
 
 		setStatus(Status.Running);
 	}
@@ -335,6 +336,9 @@ public class TanksGame extends GameWithLives {
 	 * @return shooting direction
 	 */
 	private RotationAngle getDirectionForShoot(TankShape tank) {
+		if (tank == null)
+			return null;
+
 		int x = tank.x();
 		int y = tank.y();
 
@@ -357,6 +361,9 @@ public class TanksGame extends GameWithLives {
 	 * @return movement direction
 	 */
 	private RotationAngle getDirectionForMovement(TankShape tank) {
+		if (tank == null)
+			return null;
+
 		int x = tank.x();
 		int y = tank.y();
 
@@ -499,6 +506,9 @@ public class TanksGame extends GameWithLives {
 	 * @return {@code true} when can be make a shot
 	 */
 	private boolean checkForShot(TankShape tank) {
+		if (tank == null)
+			return false;
+
 		// maximum value of distance at which can be make a shot
 		final int minDistanceLimit = 4;
 		final int maxDistanceLimit = 9;
@@ -744,13 +754,13 @@ public class TanksGame extends GameWithLives {
 	 */
 	private synchronized boolean flightOfBullet(Bullet bullet,
 			boolean isPlayerBullet) {
-		if (bullet == null) {
-			return false;
-		} else {
-			Board board = getBoard();
+		if (bullet != null) {
 			// erase bullet from the board only if it has flew out of the tank
 			if (!checkCollisionWithTank(bullet, isPlayerBullet))
-				board = drawShape(board, bullet, Cell.Empty);
+				setBoard(drawShape(getBoard(), bullet, Cell.Empty));
+
+			Board board = getBoard().clone();
+			
 			// move bullet to the new position
 			Bullet result = bullet.flight();
 
@@ -760,6 +770,9 @@ public class TanksGame extends GameWithLives {
 			} else {
 				// if the bullet hit something
 				if (board.getCell(result.x(), result.y()) != Cell.Empty) {
+					
+					playEffect(Effects.hit_cell);
+					
 					// bullet hit a simple obstacle?
 					boolean isObstacle = true;
 
@@ -802,8 +815,8 @@ public class TanksGame extends GameWithLives {
 				}
 			}
 			setBoard(board);
-			return true;
 		}
+		return true;
 	}
 
 	/**
@@ -834,7 +847,7 @@ public class TanksGame extends GameWithLives {
 	 *            number of the removed tank
 	 */
 	private void destroyEnemyTank(int tankNumber) {
-		play(Sounds.hit_cell);
+		playEffect(Effects.hit_cell);
 
 		if (enemyTanks[tankNumber] != null)
 			enemyTanks[tankNumber] = null;
@@ -980,7 +993,7 @@ public class TanksGame extends GameWithLives {
 				sleep(ANIMATION_DELAY);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				play(Sounds.move);
+				playEffect(Effects.move);
 				fire(playerTank);
 				keys.remove(KeyPressed.KeyRotate);
 				sleep(ANIMATION_DELAY * 3);

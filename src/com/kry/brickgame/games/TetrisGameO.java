@@ -1,6 +1,6 @@
 package com.kry.brickgame.games;
 
-import com.kry.brickgame.Board;
+import com.kry.brickgame.boards.Board;
 
 import static com.kry.brickgame.games.GameUtils.*;
 

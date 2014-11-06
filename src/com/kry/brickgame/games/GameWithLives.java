@@ -1,7 +1,9 @@
 package com.kry.brickgame.games;
 
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import static com.kry.brickgame.games.GameUtils.playMusic;
+
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Music;
 
 /**
  * @author noLive
@@ -85,8 +87,9 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Loading the specified level
 	 */
-	protected void loadNewLevel(){
-		play(Sounds.start);
+	@SuppressWarnings("static-method")
+	protected void loadNewLevel() {
+		playMusic(Music.start);
 	}
 
 	/**
@@ -111,7 +114,7 @@ public abstract class GameWithLives extends Game {
 		kaboom(x, y);
 		setLives(getLives() - 1);
 		if (getLives() > 0) {
-			animatedClearBoard(true);// fast
+			animatedClearBoard(CB_LOSE);
 			reloadLevel();
 		} else {
 			gameOver();
@@ -124,9 +127,8 @@ public abstract class GameWithLives extends Game {
 	protected void win() {
 		setStatus(Status.DoSomeWork);
 
-		play(Sounds.win);
-		
-		animatedClearBoard(true);
+		playMusic(Music.win);
+		animatedClearBoard(CB_WIN);
 
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1)

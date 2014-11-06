@@ -2,7 +2,7 @@ package com.kry.brickgame.shapes;
 
 import java.util.Random;
 
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive

@@ -2,8 +2,10 @@ package com.kry.brickgame.games;
 
 import java.util.Random;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.SoundBank;
+import com.kry.brickgame.SoundManager;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.shapes.CoordinatedShape;
 import com.kry.brickgame.shapes.Shape;
 
@@ -12,6 +14,30 @@ import com.kry.brickgame.shapes.Shape;
  * 
  */
 public class GameUtils {
+	/**
+	 * Sound effects
+	 */
+	public enum Effects {
+		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, race;
+	}
+
+	/**
+	 * Music
+	 */
+	public enum Music {
+		welcome, start, win, game_over, tetris, kaboom;
+	}
+
+	/**
+	 * Melodies for Dance game
+	 */
+	public enum Melodies {
+		melody1, melody2, melody3, melody4, melody5, melody6, melody7, melody8, melody9;
+	}
+
+	public static final SoundBank effects = new SoundBank();
+	public static final SoundBank music = new SoundBank();
+	public static final SoundBank backgrounds = new SoundBank();
 
 	/**
 	 * Collision check of the new figure with a filled cells on the board
@@ -105,7 +131,7 @@ public class GameUtils {
 		if (first == null || second == null)
 			return false;
 
-		//when the figures are placed too far apart, returns false
+		// when the figures are placed too far apart, returns false
 		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math
 				.max(first.getHeight(), second.getHeight())
 				&& Math.abs(first.x() + first.minX() - second.x()
@@ -214,7 +240,7 @@ public class GameUtils {
 	 *            shift to the left
 	 * @return the board after horizontal shift
 	 */
-	protected static Board boardHorizontalShift(Board board, int dX) {
+	public static Board boardHorizontalShift(Board board, int dX) {
 		// If dX is greater than the width of the board, it is reduced
 		int reducedDX = dX % board.getWidth();
 
@@ -468,4 +494,67 @@ public class GameUtils {
 		}
 		return newBoard;
 	}
+
+	/**
+	 * Play the {@code sound}, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param sound
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	protected static <E extends Enum<E>> void play(SoundBank soundBank,
+			Enum<E> sound) {
+		if (!Game.isMuted())
+			SoundManager.play(soundBank, sound);
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Effects}.
+	 * 
+	 * @param sound
+	 *            {@code Effects} value, containing the name of the sound
+	 */
+	protected static void playEffect(Effects sound) {
+		if (!Game.isMuted() && !SoundManager.isPlaying(music))
+			SoundManager.play(effects, sound);
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Music}.
+	 * 
+	 * @param sound
+	 *            {@code Music} value, containing the name of the sound
+	 */
+	protected static void playMusic(Music sound) {
+		if (!Game.isMuted()) {
+			stopAllSounds();
+			if (Music.start.equals(sound))
+				SoundManager.playAndWait(music, sound);
+			else
+				SoundManager.play(music, sound);
+		}
+	}
+
+	/**
+	 * Play the {@code sound} in a circle, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param sound
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	protected static <E extends Enum<E>> void loop(SoundBank soundBank,
+			Enum<E> sound) {
+		if (!Game.isMuted())
+			SoundManager.loop(soundBank, sound);
+	}
+
+	/**
+	 * Stops playing for all sounds
+	 */
+	protected static void stopAllSounds() {
+		SoundManager.stopAll();
+	}
+
 }

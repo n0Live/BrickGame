@@ -1,5 +1,8 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.playEffect;
+
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 
@@ -26,9 +29,11 @@ public class TetrisGameL extends TetrisGameJ {
 				&& (!isFallingFinished)) {
 			// if we have the super gun
 			if (curPiece.getShape() == Figures.SuperGun) {
+				playEffect(Effects.hit_cell);
 				// than shoot of it
 				shoot(curX, curY + curPiece.minY());
 			} else if (curPiece.getShape() == Figures.SuperMudGun) {
+				playEffect(Effects.add_cell);
 				mudShoot(curX, curY + curPiece.minY());
 				// if the super point, than do nothing
 			} else if (curPiece.getShape() != Figures.SuperPoint) {
@@ -37,7 +42,9 @@ public class TetrisGameL extends TetrisGameJ {
 					rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
 				else
 					rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
-				tryMove(rotatedPiece, curX, curY);
+				
+				if (tryMove(rotatedPiece, curX, curY))
+					 playEffect(Effects.turn);
 			}
 		} else
 			super.keyPressed(key);

@@ -2,14 +2,16 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.awt.Point;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.boards.BricksWall;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.ArkanoidPlatformShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
@@ -280,7 +282,7 @@ public class ArkanoidGame extends GameWithLives {
 			// change the speed in depending of the platform size
 			switch (platform.getType()) {
 			case 0:// 1
-				currentSpeed = getSpeed(true) * 5 / 4;
+				currentSpeed = getSpeed(true) * 5 / 4;// slower
 				break;
 			case 1:// 2
 				currentSpeed = getSpeed(true);
@@ -289,7 +291,7 @@ public class ArkanoidGame extends GameWithLives {
 				currentSpeed = getSpeed(true) * 3 / 4;
 				break;
 			default:// 4
-				currentSpeed = getSpeed(true) / 2;
+				currentSpeed = getSpeed(true) / 2;// faster
 				break;
 			}
 
@@ -350,9 +352,8 @@ public class ArkanoidGame extends GameWithLives {
 
 	@Override
 	protected void loadNewLevel() {
-		super.loadNewLevel();
-
 		loadLevel(true);
+		super.loadNewLevel();
 	}
 
 	@Override
@@ -452,12 +453,17 @@ public class ArkanoidGame extends GameWithLives {
 			return;
 		}
 
+		// whether the ball bounced off the surface?
+		boolean bounce = false;
+
 		// check collision with the board's borders
 		if (newCoords.y >= boardHeight) {
 			ballVerticalDirection = DOWN;
+			bounce = true;
 		}
 		if ((newCoords.x < 0) || (newCoords.x >= boardWidth)) {
 			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
+			bounce = true;
 		}
 		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
 				ballVerticalDirection);
@@ -478,12 +484,16 @@ public class ArkanoidGame extends GameWithLives {
 							.getOpposite();
 					if (!isPlatform(newCoords.x, ballY)) {
 						breakBrick(board, newCoords.x, ballY);
+					} else {
+						bounce = true;
 					}
 				}
 				if (board.getCell(ballX, newCoords.y) != Cell.Empty) {
 					ballVerticalDirection = ballVerticalDirection.getOpposite();
 					if (!isPlatform(ballX, newCoords.y)) {
 						breakBrick(board, ballX, newCoords.y);
+					} else {
+						bounce = true;
 					}
 				}
 				// if there are none,then processed the cell with whom the ball
@@ -493,11 +503,17 @@ public class ArkanoidGame extends GameWithLives {
 				ballVerticalDirection = ballVerticalDirection.getOpposite();
 				if (!isPlatform(newCoords.x, newCoords.y)) {
 					breakBrick(board, newCoords.x, newCoords.y);
+				} else {
+					bounce = true;
 				}
 			}
 
 			newCoords.x = ballX;
 			newCoords.y = ballY;
+		}
+
+		if (bounce) {
+			playEffect(Effects.turn);
 		}
 
 		board = drawBall(board, newCoords.x, newCoords.y);
@@ -524,7 +540,7 @@ public class ArkanoidGame extends GameWithLives {
 		int givenY = y - bricksY;
 
 		if (bricks.breakBrick(givenX, givenY)) {
-			play(Sounds.hit_cell);
+			playEffect(Effects.hit_cell);
 
 			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
@@ -592,21 +608,23 @@ public class ArkanoidGame extends GameWithLives {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (movePlatform(curX - 1)) {
-					play(Sounds.move);
+					playEffect(Effects.move);
 					sleep(movementDelay);
 				}
 			}
 
 			if (keys.contains(KeyPressed.KeyRight)) {
 				if (movePlatform(curX + 1)) {
-					play(Sounds.move);
+					playEffect(Effects.move);
 					sleep(movementDelay);
 				}
 			}
 
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				if (isStartOfLevel)
+				if (isStartOfLevel) {
 					isStartOfLevel = false;
+					playEffect(Effects.turn);
+				}
 				moveBall();
 				sleep(ANIMATION_DELAY * 2);
 			}

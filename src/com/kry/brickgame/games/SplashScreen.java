@@ -1,28 +1,33 @@
 package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.music;
+import static com.kry.brickgame.games.GameUtils.playMusic;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.SoundManager;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.boards.BoardNumbers;
+import com.kry.brickgame.games.GameUtils.Music;
 
 /**
  * @author noLive
  * 
  */
 public class SplashScreen extends Game {
+	private final Music welcome = Music.welcome;
 
 	public SplashScreen() {
 		super();
+		SoundManager.prepare(music, welcome);
 	}
 
 	public void start() {
 		setStatus(Status.DoSomeWork);
-		
-		play(Sounds.welcome);
-		
+
+		playMusic(welcome);
+
 		insertNumbers();
 
 		// Splash screen will be run in a separate thread
@@ -44,6 +49,9 @@ public class SplashScreen extends Game {
 		}
 
 		splashScreenThread.interrupt();
+		// Waits for end of interrupting splashScreenThread
+		while (splashScreenThread.isAlive())
+			;
 		Main.gameSelector = new GameSelector();
 		Main.setGame(Main.gameSelector);
 	}
@@ -52,24 +60,28 @@ public class SplashScreen extends Game {
 	 * Draws a "9999" on the main board
 	 */
 	private void insertNumbers() {
-		Board board = getBoard();
+		Board board = getBoard().clone();
 		BoardNumbers boardNumber = new BoardNumbers();
 
 		boardNumber.setNumber(BoardNumbers.intToNumbers(9));
 
-		insertCellsToBoard(board, boardNumber.getBoard(),// upper left
-				1, board.getHeight() - boardNumber.getHeight() - 1);
-		insertCellsToBoard(board, boardNumber.getBoard(),// lower left
-				1, boardNumber.getHeight());
-		insertCellsToBoard(board,
-				boardNumber.getBoard(),// upper right
-				board.getWidth() - boardNumber.getWidth() - 1,
+		// upper left
+		insertCellsToBoard(board, boardNumber.getBoard(), 1, board.getHeight()
+				- boardNumber.getHeight() - 1);
+		// lower left
+		insertCellsToBoard(board, boardNumber.getBoard(), 1,
+				boardNumber.getHeight());
+		// upper right
+		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth()
+				- boardNumber.getWidth() - 1,
 				board.getHeight() - boardNumber.getHeight() * 2);
-		insertCellsToBoard(board, boardNumber.getBoard(),// lower right
-				board.getWidth() - boardNumber.getWidth() - 1, 1);
+		// lower right
+		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth()
+				- boardNumber.getWidth() - 1, 1);
 
-		if (!isInterrupted())
+		if (!isInterrupted()) {
 			setBoard(board);
+		}
 	}
 
 	/**

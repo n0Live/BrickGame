@@ -3,15 +3,17 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.awt.Point;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.boards.BricksWall;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.InvadersSplash;
@@ -180,8 +182,6 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	public void start() {
-		setStatus(Status.Running);
-
 		loadNewLevel();
 
 		// create timer for bullets
@@ -215,10 +215,6 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	protected void loadNewLevel() {
-		super.loadNewLevel();
-
-		setStatus(Status.DoSomeWork);
-
 		// set the X-Dimension flags
 		theXDimension = isReadyToXDimension && !isShiftingBricks;
 		isReadyToXDimension = !theXDimension && !isShiftingBricks;
@@ -257,6 +253,8 @@ public class InvadersGame extends GameWithGun {
 				}
 			}
 		}, getSpeed(true) * 2, getSpeed(true));
+
+		super.loadNewLevel();
 
 		setStatus(Status.Running);
 	}
@@ -316,6 +314,9 @@ public class InvadersGame extends GameWithGun {
 					bricks.setCell(Cell.Empty, x, y);
 
 					isFlyingBall = true;
+
+					playEffect(Effects.turn);
+
 					return;
 				}
 			}
@@ -339,9 +340,13 @@ public class InvadersGame extends GameWithGun {
 			return;
 		}
 
+		// whether the ball bounced off the surface?
+		boolean bounce = false;
+
 		// check collision with the board's borders
 		if ((newCoords.x < 0) || (newCoords.x >= boardWidth)) {
 			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
+			bounce = true;
 		}
 		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
 				ballVerticalDirection);
@@ -355,6 +360,11 @@ public class InvadersGame extends GameWithGun {
 				return;
 			}
 		}
+
+		if (bounce) {
+			playEffect(Effects.turn);
+		}
+
 		// draw the ball in the new position
 		board = drawBall(board, newCoords.x, newCoords.y);
 		setBoard(board);
@@ -398,7 +408,7 @@ public class InvadersGame extends GameWithGun {
 		int givenY = y - bricksY;
 
 		if (bricks.breakBrick(givenX, givenY)) {
-			play(Sounds.hit_cell);
+			playEffect(Effects.hit_cell);
 
 			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
@@ -527,23 +537,28 @@ public class InvadersGame extends GameWithGun {
 		super.processKeys();
 
 		if (getStatus() == Status.Running) {
+			int newX = curX;
+			int newY = curY;
+			boolean move = false;
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (moveGun(curX - 1, curY)) {
-					play(Sounds.move);
-					sleep(ANIMATION_DELAY * 2);
-				} else {
-					loss(curX - 1, curY);
-				}
+				newX = newX - 1;
+				move = true;
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (moveGun(curX + 1, curY)){
-					play(Sounds.move);
+				newX = newX + 1;
+				move = true;
+			}
+
+			if (move) {
+				if (moveGun(newX, newY)) {
+					playEffect(Effects.move);
 					sleep(ANIMATION_DELAY * 2);
 				} else {
-					loss(curX + 1, curY);
+					loss(newX, newY);
 				}
 			}
+
 			if ((keys.contains(KeyPressed.KeyDown))
 					|| (keys.contains(KeyPressed.KeyUp))) {
 				processInvasion();

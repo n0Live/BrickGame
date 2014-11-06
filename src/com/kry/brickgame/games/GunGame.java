@@ -3,14 +3,17 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.addLinesToBoard;
 import static com.kry.brickgame.games.GameUtils.boardHorizontalShift;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.playEffect;
+import static com.kry.brickgame.games.GameUtils.playMusic;
 
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameUtils.Music;
 import com.kry.brickgame.splashes.GunSplash;
 import com.kry.brickgame.splashes.Splash;
 
@@ -161,7 +164,6 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	protected void loadNewLevel() {
-		super.loadNewLevel();
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
@@ -170,6 +172,8 @@ public class GunGame extends GameWithGun {
 		setBoard(addLines(getBoard(), getLevel()));
 		// draws the gun
 		moveGun(curX, curY);
+
+		super.loadNewLevel();
 
 		setStatus(Status.Running);
 	}
@@ -253,7 +257,8 @@ public class GunGame extends GameWithGun {
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
 
-				animatedClearBoard(true);
+				playMusic(Music.win);
+				animatedClearBoard(CB_WIN);
 
 				Board board = getBoard();
 				for (int i = 0; i < getLevel(); i++) {
@@ -285,7 +290,7 @@ public class GunGame extends GameWithGun {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (moveGun(curX - 1, curY)) {
-					play(Sounds.move);
+					playEffect(Effects.move);
 					if (isCreationMode)
 						keys.remove(KeyPressed.KeyLeft);
 					else
@@ -294,7 +299,7 @@ public class GunGame extends GameWithGun {
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
 				if (moveGun(curX + 1, curY)) {
-					play(Sounds.move);
+					playEffect(Effects.move);
 					if (isCreationMode)
 						keys.remove(KeyPressed.KeyRight);
 					else
@@ -304,9 +309,8 @@ public class GunGame extends GameWithGun {
 			if ((keys.contains(KeyPressed.KeyDown))
 					|| (keys.contains(KeyPressed.KeyUp))) {
 				if (droppingDown()) {
-					play(Sounds.move);
+					playEffect(Effects.move);
 					sleep(ANIMATION_DELAY * 2);
-
 				}
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {

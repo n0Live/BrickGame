@@ -4,8 +4,8 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 
 import java.awt.Point;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 

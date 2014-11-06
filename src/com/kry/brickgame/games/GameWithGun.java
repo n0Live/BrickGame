@@ -2,10 +2,11 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.GunShape;
 
 /**
@@ -152,7 +153,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            y-coordinate of the cell
 	 */
 	protected void removeCell(Board board, int x, int y) {
-		play(Sounds.hit_cell);
+		playEffect(Effects.hit_cell);
 		// remove the cell
 		board.setCell(Cell.Empty, x, y);
 		// increase scores
@@ -210,7 +211,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            y-coordinate of the cell
 	 */
 	protected void addCell(Board board, int x, int y) {
-		play(Sounds.add_cell);
+		playEffect(Effects.add_cell);
 		// remove the cell
 		board.setCell(Cell.Full, x, y);
 		// increase scores
@@ -234,7 +235,7 @@ public abstract class GameWithGun extends GameWithLives {
 			}
 		}
 		if (lineIsFull) {
-			play(Sounds.remove_line);
+			playEffect(Effects.remove_line);
 			
 			animatedClearLine(getBoard(), curX, y);
 
@@ -289,8 +290,7 @@ public abstract class GameWithGun extends GameWithLives {
 				}
 			}
 		}
-		//TODO
-		//play(Sounds.turn);
+		playEffect(Effects.turn);
 	}
 
 }

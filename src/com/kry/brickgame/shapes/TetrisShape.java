@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive

@@ -1,6 +1,7 @@
 package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -10,11 +11,11 @@ import java.util.TimerTask;
 
 import javax.swing.SwingUtilities;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.BoardLetters;
-import com.kry.brickgame.BoardNumbers;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.BoardLetters;
+import com.kry.brickgame.boards.BoardNumbers;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.splashes.Splash;
 
 /**
@@ -464,34 +465,34 @@ public class GameSelector extends Game {
 	public void keyPressed(KeyPressed key) {		
 		switch (key) {
 		case KeyLeft:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			setSpeed(getSpeed() + 1);
 			break;
 		case KeyRight:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			setLevel(getLevel() + 1);
 			break;
 		case KeyRotate:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			if (getRotation() == Rotation.Counterclockwise)
 				prevLetter();
 			else
 				nextLetter();
 			break;
 		case KeyUp:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			nextNumber();
 			break;
 		case KeyDown:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			prevNumber();
 			break;
 		case KeyStart:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			changeGame();
 			break;
 		case KeyMute:
-			play(Sounds.select);
+			playEffect(Effects.select);
 			setMuted(!isMuted());
 			break;
 		case KeyReset:

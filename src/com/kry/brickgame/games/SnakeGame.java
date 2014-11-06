@@ -3,6 +3,7 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.snakeObstacles;
@@ -10,8 +11,9 @@ import static com.kry.brickgame.games.ObstacleUtils.snakeObstacles;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.SnakeShape;
@@ -78,8 +80,6 @@ public class SnakeGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		setStatus(Status.Running);
-
 		loadNewLevel();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
@@ -201,8 +201,6 @@ public class SnakeGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	protected void loadNewLevel() {
-		super.loadNewLevel();
-		
 		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
 				: LEFT);
 		// starting position - the middle of the bottom border of the board
@@ -221,6 +219,8 @@ public class SnakeGame extends GameWithLives {
 		else
 			loadRandomObstacles();
 		addApple();
+
+		super.loadNewLevel();
 
 		setStatus(Status.Running);
 	}
@@ -321,6 +321,7 @@ public class SnakeGame extends GameWithLives {
 		setBoard(drawSnake(board, newSnake, newX, newY));
 
 		if (isAppleAhead) {
+			playEffect(Effects.bonus);
 			// increases score
 			setScore(getScore() + 1);
 			// add a new apple
@@ -405,29 +406,39 @@ public class SnakeGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (!tryMove(LEFT))
+				if (tryMove(LEFT)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else
 					loss(curX, curY);
-				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (!tryMove(RIGHT))
+				if (tryMove(RIGHT)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else
 					loss(curX, curY);
-				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyDown)) {
-				if (!tryMove(DOWN))
+				if (tryMove(DOWN)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else
 					loss(curX, curY);
-				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
-				if (!tryMove(UP))
+				if (tryMove(UP)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else
 					loss(curX, curY);
-				sleep(ANIMATION_DELAY * 3);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				if (!tryMove(snake.getDirection()))
+				if (tryMove(snake.getDirection())) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 2);
+				} else
 					loss(curX, curY);
-				sleep(ANIMATION_DELAY * 2);
 			}
 		}
 	}

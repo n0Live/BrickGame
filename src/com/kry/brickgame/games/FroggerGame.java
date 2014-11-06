@@ -4,14 +4,15 @@ import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;
 import com.kry.brickgame.splashes.Splash;
@@ -201,13 +202,14 @@ public class FroggerGame extends GameWithLives {
 	 */
 	@Override
 	protected void loadNewLevel() {
-		super.loadNewLevel();
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
 		// initialize the frog
 		setFrog();
 
+		super.loadNewLevel();
+		
 		setStatus(Status.Running);
 	}
 
@@ -460,9 +462,9 @@ public class FroggerGame extends GameWithLives {
 		// draw the frog on the new place
 		if (y == boardHeight - 1) {
 			setBoard(drawShape(board, x, y, frog, Cell.Full));
-			
-			play(Sounds.add_cell);
-			
+
+			playEffect(Effects.add_cell);
+
 			checkForWin();
 		} else {
 			setBoard(drawShape(board, x, y, frog, frog.getFill()));
@@ -522,19 +524,17 @@ public class FroggerGame extends GameWithLives {
 		super.processKeys();
 
 		if (getStatus() == Status.Running) {
+			int newX = curX, newY = curY;
+			boolean move = false;
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (jumpFrog(curX - 1, curY))
-					play(Sounds.move);
-				else
-					loss();
+				newX = newX - 1;
+				move = true;
 				keys.remove(KeyPressed.KeyLeft);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (jumpFrog(curX + 1, curY))
-					play(Sounds.move);
-				else
-					loss();
+				newX = newX + 1;
+				move = true;
 				keys.remove(KeyPressed.KeyRight);
 			}
 
@@ -546,10 +546,8 @@ public class FroggerGame extends GameWithLives {
 				else
 					dY = -2;
 
-				if (jumpFrog(curX, curY + dY))
-					play(Sounds.move);
-				else
-					loss();
+				newY = newY + dY;
+				move = true;
 				keys.remove(KeyPressed.KeyDown);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
@@ -558,20 +556,24 @@ public class FroggerGame extends GameWithLives {
 				else
 					dY = (curY < boardHeight - 2) ? 2 : 1;
 
-				if (jumpFrog(curX, curY + dY))
-					play(Sounds.move);
-				else
-					loss();
+				newY = newY + dY;
+				move = true;
 				keys.remove(KeyPressed.KeyUp);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				dY = (curY < boardHeight - 2) ? 2 : 1;
-				if (jumpFrog(curX, curY + dY))
-					play(Sounds.move);
-				else
-					loss();
+				newY = newY + dY;
+				move = true;
 				keys.remove(KeyPressed.KeyRotate);
 			}
+			
+			if (move) {
+				if (jumpFrog(newX, newY))
+					playEffect(Effects.move);
+				else
+					loss();
+			}
+
 		}
 	}
 

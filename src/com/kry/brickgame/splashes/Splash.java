@@ -1,6 +1,6 @@
 package com.kry.brickgame.splashes;
 
-import com.kry.brickgame.Board;
+import com.kry.brickgame.boards.Board;
 
 public abstract class Splash extends Board {
 
