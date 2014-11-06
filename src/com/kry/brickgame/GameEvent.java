@@ -2,6 +2,7 @@ package com.kry.brickgame;
 
 import java.util.EventObject;
 
+import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.games.Game.Rotation;
 import com.kry.brickgame.games.Game.Status;
 
@@ -10,14 +11,15 @@ import com.kry.brickgame.games.Game.Status;
  * 
  */
 public class GameEvent extends EventObject {
-
 	private static final long serialVersionUID = 3341669389633046775L;
+
 	private Board board;
 	private Status status;
 	private String info;
 	private int speed;
 	private int level;
 	private Rotation rotation;
+	private boolean	mute;
 
 	/**
 	 * Events of the game
@@ -36,7 +38,7 @@ public class GameEvent extends EventObject {
 	 *            game level
 	 */
 	public GameEvent(Object source, Board board, Status status, String info,
-			int speed, int level, Rotation rotation) {
+			int speed, int level, Rotation rotation, boolean mute) {
 		super(source);
 		this.board = board;
 		this.status = status;
@@ -44,6 +46,7 @@ public class GameEvent extends EventObject {
 		this.speed = speed;
 		this.level = level;
 		this.rotation = rotation;
+		this.mute = mute;
 	}
 
 	public GameEvent(Object source) {
@@ -79,6 +82,11 @@ public class GameEvent extends EventObject {
 		super(source);
 		this.rotation = rotation;
 	}
+	
+	public GameEvent(Object source, boolean mute) {
+		super(source);
+		this.mute = mute;
+	}
 
 	protected Status getStatus() {
 		return status;
@@ -102,6 +110,10 @@ public class GameEvent extends EventObject {
 
 	protected Rotation getRotation() {
 		return rotation;
+	}
+
+	protected boolean isMute() {
+		return mute;
 	}
 
 }

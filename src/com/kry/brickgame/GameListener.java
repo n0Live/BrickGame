@@ -22,4 +22,6 @@ public interface GameListener extends EventListener {
 
 	public void rotationChanged(GameEvent event);
 
+	public void muteChanged(GameEvent event);
+
 }

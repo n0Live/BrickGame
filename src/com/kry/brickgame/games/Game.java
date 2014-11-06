@@ -2,19 +2,21 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.playEffect;
+import static com.kry.brickgame.games.GameUtils.playMusic;
+import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kry.brickgame.Board;
-import com.kry.brickgame.Board.Cell;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundBank;
-import com.kry.brickgame.SoundManager;
-import com.kry.brickgame.SoundManager.Sounds;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameUtils.Music;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.Splash;
 
@@ -23,9 +25,6 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public abstract class Game extends Thread {
-	public static final SoundBank sounds = new SoundBank(
-			SoundManager.enumToResourceArray(Sounds.class));
-	public static final SoundBank backgrounds = new SoundBank();
 
 	/**
 	 * Animated splash for game
@@ -36,6 +35,7 @@ public abstract class Game extends Thread {
 	 */
 	public static int subtypesNumber;
 
+	/*---MAGIC NUMBERS---*/
 	// ** Direction constants **
 	protected static final RotationAngle UP = RotationAngle.d0;
 	protected static final RotationAngle DOWN = RotationAngle.d180;
@@ -43,7 +43,6 @@ public abstract class Game extends Thread {
 	protected static final RotationAngle LEFT = RotationAngle.d270;
 	// **
 
-	/*---MAGIC NUMBERS---*/
 	/**
 	 * Width of the default board ({@value} )
 	 */
@@ -64,10 +63,17 @@ public abstract class Game extends Thread {
 	 * Animation delay in milliseconds
 	 */
 	protected static final int ANIMATION_DELAY = 30;
+
+	// ** anumatedClearBoard constants **
+	protected static final int CB_GAME_OVER = 6000;
+	protected static final int CB_WIN = 5240;
+	protected static final int CB_LOSE = 1200;
+	// **
+
 	/**
 	 * Is the sound turned off?
 	 */
-	private static boolean muted = false;
+	private static boolean mute = false;
 
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
@@ -202,7 +208,7 @@ public abstract class Game extends Thread {
 	 */
 	protected Game(int speed, int level, Board board, Board preview,
 			Rotation rotation, int type) {
-		sounds.stopAll();
+		stopAllSounds();
 
 		this.type = type;
 
@@ -329,6 +335,13 @@ public abstract class Game extends Thread {
 		GameEvent event = new GameEvent(this, rotation);
 		for (GameListener listener : listeners) {
 			listener.rotationChanged(event);
+		}
+	}
+
+	protected void fireMuteChanged(boolean mute) {
+		GameEvent event = new GameEvent(this, mute);
+		for (GameListener listener : listeners) {
+			listener.muteChanged(event);
 		}
 	}
 
@@ -500,11 +513,15 @@ public abstract class Game extends Thread {
 	}
 
 	protected static boolean isMuted() {
-		return muted;
+		return mute;
 	}
 
-	protected static void setMuted(boolean muted) {
-		Game.muted = muted;
+	protected void setMuted(boolean mute) {
+		Game.mute = mute;
+		if (mute) {
+			stopAllSounds();
+		}
+		fireMuteChanged(mute);
 	}
 
 	/**
@@ -605,6 +622,8 @@ public abstract class Game extends Thread {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
 
+		playEffect(Effects.remove_line);
+
 		while ((x1 >= 0) || (x2 < board.getWidth())) {
 			if (x1 >= 0)
 				board.setCell(Cell.Empty, x1--, y);
@@ -619,11 +638,12 @@ public abstract class Game extends Thread {
 	/**
 	 * Animated clearing of the board (upwards then downwards)
 	 * 
-	 * @param isFast
-	 *            if {@code true} then animation speed is increased twice
+	 * @param millis
+	 *            duration of the animation in milliseconds
 	 */
-	protected void animatedClearBoard(boolean isFast) {
-		int delay = (isFast) ? ANIMATION_DELAY / 2 : ANIMATION_DELAY * 5;
+	protected void animatedClearBoard(int millis) {
+		// delay between animation frames
+		int delay = millis / (boardHeight * 2);
 
 		// the board is filled upwards
 		for (int y = 0; y < boardHeight; y++) {
@@ -644,11 +664,11 @@ public abstract class Game extends Thread {
 	}
 
 	/**
-	 * Animated clearing of the board on the normal speed
+	 * Animated clearing of the board on Game Over
 	 * 
 	 */
 	protected void animatedClearBoard() {
-		animatedClearBoard(false);
+		animatedClearBoard(CB_GAME_OVER);
 	}
 
 	/**
@@ -760,7 +780,7 @@ public abstract class Game extends Thread {
 			newY--;
 		}
 
-		play(Sounds.kaboom);
+		playMusic(Music.kaboom);
 
 		Kaboom kaboom = new Kaboom();
 
@@ -778,6 +798,7 @@ public abstract class Game extends Thread {
 	protected void pause() {
 		if (getStatus() == Status.Running) {
 			setStatus(Status.Paused);
+			stopAllSounds();
 		} else if (getStatus() == Status.Paused) {
 			setStatus(Status.Running);
 		}
@@ -788,8 +809,11 @@ public abstract class Game extends Thread {
 	 */
 	protected void gameOver() {
 		setStatus(Status.GameOver);
-		play(Sounds.game_over);
+
+		playMusic(Music.game_over);
+
 		animatedClearBoard();
+
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
@@ -840,17 +864,6 @@ public abstract class Game extends Thread {
 	 */
 	public void keyReleased(KeyPressed key) {
 		keys.remove(key);
-	}
-
-	protected <E extends Enum<E>> void play(Sounds sound) {
-		if (!isMuted())
-			// SoundManager.stopAll(sounds, true);
-			SoundManager.playSound(sounds, sound, true, false);
-	}
-
-	protected void loopSound(Sounds sound) {
-		if (!isMuted())
-			SoundManager.loopSound(sounds, sound);
 	}
 
 	/**

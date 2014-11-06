@@ -15,7 +15,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import com.kry.brickgame.Board.Cell;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.Game.Rotation;
 import com.kry.brickgame.games.Game.Status;
 
@@ -56,6 +57,8 @@ public class Draw extends JPanel implements GameListener {
 	private Board preview = null;
 
 	private Rotation rotation;
+
+	private boolean mute;
 
 	/**
 	 * Color of inactive elements
@@ -532,8 +535,8 @@ public class Draw extends JPanel implements GameListener {
 		space = fm.stringWidth(HI + SCORE) + indent * 4;
 
 		if (iconFont != null)
-			drawTextOnCanvas(canvas, ICON_MUSIC, ICON_MUSIC, iconFont, x
-					+ space, y);
+			drawTextOnCanvas(canvas, ICON_MUSIC, ((!mute) ? ICON_MUSIC : ""),
+					iconFont, x + space, y);
 		/* --- */
 
 		/* Next/Lines labels */
@@ -693,6 +696,11 @@ public class Draw extends JPanel implements GameListener {
 	@Override
 	public void rotationChanged(GameEvent event) {
 		rotation = event.getRotation();
+	}
+
+	@Override
+	public void muteChanged(GameEvent event) {
+		mute = event.isMute();
 	}
 
 }
