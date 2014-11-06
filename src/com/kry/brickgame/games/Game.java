@@ -823,6 +823,9 @@ public abstract class Game extends Thread {
 	 */
 	protected void ExitToMainMenu() {
 		setStatus(Status.None);
+		
+		stopAllSounds();
+		
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}

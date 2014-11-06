@@ -27,6 +27,7 @@ public class SplashScreen extends Game {
 		setStatus(Status.DoSomeWork);
 
 		playMusic(welcome);
+		sleep(ANIMATION_DELAY);
 
 		insertNumbers();
 

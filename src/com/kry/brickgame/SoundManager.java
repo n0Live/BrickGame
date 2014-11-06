@@ -5,8 +5,6 @@ import java.util.EnumSet;
 
 import javafx.scene.media.AudioClip;
 
-import com.sun.media.jfxmediaimpl.AudioClipProvider;
-
 public class SoundManager {
 	private final static String soundFolder = "/sounds/";
 	private final static String soundExtension = ".mp3";
@@ -42,6 +40,7 @@ public class SoundManager {
 	 */
 	private static String getResourceFromName(String soundName) {
 		URL resource = SoundManager.class.getResource(soundFolder + soundName
+		// + ("engine".equals(soundName) ? ".wav" : soundExtension));
 				+ soundExtension);
 		return resource.toExternalForm();
 	}
@@ -96,6 +95,26 @@ public class SoundManager {
 	public static <E extends Enum<E>> void play(SoundBank soundBank,
 			Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(1);
+		clip.play();
+	}
+
+	/**
+	 * Play the {@code AudioClip} at once in normal rate, depending of the
+	 * specified {@code enum} value, from the specified {@code soundBank}. If
+	 * the {@code AudioClip} is already playing, then stopped it at first.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank,
+			Enum<E> value) {
+		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(1);
+		if (clip.isPlaying())
+			clip.stop();
 		clip.play();
 	}
 
@@ -116,9 +135,10 @@ public class SoundManager {
 	public static <E extends Enum<E>> void play(SoundBank soundBank,
 			Enum<E> value, double rate) {
 		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(1);
 		// Use default parameters except rate
 		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(),
-				clip.getPriority());
+				Thread.MAX_PRIORITY); // clip.getPriority());
 	}
 
 	/**
@@ -133,6 +153,7 @@ public class SoundManager {
 	public static <E extends Enum<E>> void playAndWait(SoundBank soundBank,
 			Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(1);
 		clip.play();
 		while (clip.isPlaying()) {
 			try {
@@ -154,10 +175,11 @@ public class SoundManager {
 	 */
 	public static <E extends Enum<E>> void loop(SoundBank soundBank,
 			Enum<E> value) {
-
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(AudioClip.INDEFINITE);
-		clip.play();
+		// Use default parameters except priority
+		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(),
+				clip.getPan(), Thread.MAX_PRIORITY);
 	}
 
 	/**
@@ -175,13 +197,6 @@ public class SoundManager {
 		if (clip.isPlaying()) {
 			clip.stop();
 		}
-	}
-
-	/**
-	 * Stop playing for all {@code AudioClips}
-	 */
-	public static void stopAll() {
-		AudioClipProvider.getProvider().stopAllClips();
 	}
 
 	/**

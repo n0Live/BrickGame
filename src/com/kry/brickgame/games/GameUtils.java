@@ -18,7 +18,7 @@ public class GameUtils {
 	 * Sound effects
 	 */
 	public enum Effects {
-		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, race;
+		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, start_engine, engine;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class GameUtils {
 
 	public static final SoundBank effects = new SoundBank();
 	public static final SoundBank music = new SoundBank();
-	public static final SoundBank backgrounds = new SoundBank();
+	public static final SoundBank melodies = new SoundBank();
 
 	/**
 	 * Collision check of the new figure with a filled cells on the board
@@ -543,18 +543,29 @@ public class GameUtils {
 	 *            specified SoundBank
 	 * @param sound
 	 *            {@code enum} value, containing the name of the sound
+	 * @param echoDelay
+	 *            delay before starting the second audio stream. 0 -without
+	 *            echo.
 	 */
 	protected static <E extends Enum<E>> void loop(SoundBank soundBank,
-			Enum<E> sound) {
-		if (!Game.isMuted())
+			Enum<E> sound, int echoDelay) {
+		if (!Game.isMuted()) {
 			SoundManager.loop(soundBank, sound);
+			// double loop - workaround for ending gap
+			if (echoDelay > 0) {
+				Game.sleep(echoDelay);
+				SoundManager.loop(soundBank, sound);
+			}
+		}
 	}
 
 	/**
 	 * Stops playing for all sounds
 	 */
 	protected static void stopAllSounds() {
-		SoundManager.stopAll();
+		effects.stopAll();
+		music.stopAll();
+		melodies.stopAll();
 	}
 
 }

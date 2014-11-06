@@ -2,12 +2,15 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.effects;
+import static com.kry.brickgame.games.GameUtils.loop;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameUtils.Effects;
@@ -66,16 +69,19 @@ public class RaceGame extends GameWithLives {
 	 * @param type
 	 *            type of the game type of the game:
 	 *            <ol>
-	 *            <li>race with two possible positions of the car
-	 *            <li>race with three possible positions of the car and a wide
-	 *            variety of positions of the opponents
-	 *            <li>race with two possible positions of the car, the board is
-	 *            upside down;
-	 *            <li>race with three possible positions of the car, the board
-	 *            is upside down;
+	 *            <li>start_engine with two possible positions of the car
+	 *            <li>start_engine with three possible positions of the car and
+	 *            a wide variety of positions of the opponents
+	 *            <li>start_engine with two possible positions of the car, the
+	 *            board is upside down;
+	 *            <li>start_engine with three possible positions of the car, the
+	 *            board is upside down;
 	 */
 	public RaceGame(int speed, int level, int type) {
 		super(speed, level, type);
+
+		SoundManager.prepare(effects, Effects.start_engine);
+		SoundManager.prepare(effects, Effects.engine);
 
 		car = new CarShape();
 
@@ -145,14 +151,16 @@ public class RaceGame extends GameWithLives {
 		super.loadNewLevel();
 
 		setStatus(Status.Running);
+
+		playEffect(Effects.start_engine);
+		sleep(ANIMATION_DELAY * 4);
+		loop(effects, Effects.engine, ANIMATION_DELAY * 12);
 	}
 
 	/**
 	 * Shifting the borders and opponents on a one cell down and drawing it
 	 */
 	private void moveOn() {
-		playEffect(Effects.race);
-
 		Board board = getBoard();
 		// draw borders
 		setBoard(drawBorder(board, !isThreelaneTraffic));
