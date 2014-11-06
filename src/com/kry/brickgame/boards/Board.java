@@ -1,4 +1,4 @@
-package com.kry.brickgame;
+package com.kry.brickgame.boards;
 
 import java.util.Arrays;
 

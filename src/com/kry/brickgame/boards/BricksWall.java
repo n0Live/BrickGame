@@ -1,10 +1,8 @@
-package com.kry.brickgame.games;
-
-import static com.kry.brickgame.games.GameUtils.boardHorizontalShift;
+package com.kry.brickgame.boards;
 
 import java.util.Random;
 
-import com.kry.brickgame.Board;
+import com.kry.brickgame.games.GameUtils;
 
 public class BricksWall extends Board {
 	static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
@@ -204,7 +202,7 @@ public class BricksWall extends Board {
 	 *            shift to the left
 	 */
 	public void shift(int dX) {
-		setBoard(boardHorizontalShift(this, dX).getBoard());
+		setBoard(GameUtils.boardHorizontalShift(this, dX).getBoard());
 	}
 
 	/**
@@ -216,17 +214,16 @@ public class BricksWall extends Board {
 	 *            y-coordinate of the brick for breaking
 	 */
 	public boolean breakBrick(int x, int y) {
-		if ((x < 0) || (x >= getWidth()) || (y < 0)
-				|| (y >= getHeight()))
+		if ((x < 0) || (x >= getWidth()) || (y < 0) || (y >= getHeight()))
 			return false;
 
 		if (getCell(x, y) != Cell.Empty) {
 			setCell(Cell.Empty, x, y);
 			// decrease bricks count
 			setBricksCount(getBricksCount() - 1);
-			
+
 			return true;
-		}else
+		} else
 			return false;
 	}
 
