@@ -219,7 +219,7 @@ public class Shape implements Cloneable {
 	 */
 	public int minX() {
 		int result = x(0);
-		for (int i = 0; i < getLength(); i++) {
+		for (int i = 1; i < getLength(); i++) {
 			result = Math.min(result, x(i));
 		}
 		return result;
@@ -231,7 +231,7 @@ public class Shape implements Cloneable {
 	 */
 	public int minY() {
 		int result = y(0);
-		for (int i = 0; i < getLength(); i++) {
+		for (int i = 1; i < getLength(); i++) {
 			result = Math.min(result, y(i));
 		}
 		return result;
@@ -243,7 +243,7 @@ public class Shape implements Cloneable {
 	 */
 	public int maxX() {
 		int result = x(0);
-		for (int i = 0; i < getLength(); i++) {
+		for (int i = 1; i < getLength(); i++) {
 			result = Math.max(result, x(i));
 		}
 		return result;
@@ -255,7 +255,7 @@ public class Shape implements Cloneable {
 	 */
 	public int maxY() {
 		int result = y(0);
-		for (int i = 0; i < getLength(); i++) {
+		for (int i = 1; i < getLength(); i++) {
 			result = Math.max(result, y(i));
 		}
 		return result;
