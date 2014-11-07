@@ -459,7 +459,9 @@ public abstract class Game extends Thread {
 	 *            score 0 - 19999
 	 */
 	protected synchronized void setScore(int score) {
-		if ((score > 19999) || (score < 0))
+		if (score > 19999)
+			this.score = 19999;
+		else if (score < 0)
 			this.score = 0;
 		else
 			this.score = score;
@@ -823,9 +825,9 @@ public abstract class Game extends Thread {
 	 */
 	protected void ExitToMainMenu() {
 		setStatus(Status.None);
-		
+
 		stopAllSounds();
-		
+
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
