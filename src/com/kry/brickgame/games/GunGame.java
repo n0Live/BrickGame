@@ -306,8 +306,7 @@ public class GunGame extends GameWithGun {
 						sleep(ANIMATION_DELAY * 2);
 				}
 			}
-			if ((keys.contains(KeyPressed.KeyDown))
-					|| (keys.contains(KeyPressed.KeyUp))) {
+			if (keys.contains(KeyPressed.KeyDown)) {
 				if (droppingDown()) {
 					playEffect(Effects.move);
 					sleep(ANIMATION_DELAY * 2);

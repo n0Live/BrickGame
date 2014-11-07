@@ -73,7 +73,7 @@ public abstract class Game extends Thread {
 	/**
 	 * Is the sound turned off?
 	 */
-	private static boolean mute = false;
+	private static boolean mute = true;
 
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
@@ -858,7 +858,16 @@ public abstract class Game extends Thread {
 	 *            keyCode associated with the pressed key
 	 */
 	public void keyPressed(KeyPressed key) {
-		keys.add(key);
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown)
+				keys.add(KeyPressed.KeyUp);
+			else if (key == KeyPressed.KeyUp)
+				keys.add(KeyPressed.KeyDown);
+			else
+				keys.add(key);
+		} else
+			keys.add(key);
 	}
 
 	/**
@@ -868,7 +877,16 @@ public abstract class Game extends Thread {
 	 *            keyCode associated with the released key
 	 */
 	public void keyReleased(KeyPressed key) {
-		keys.remove(key);
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown)
+				keys.remove(KeyPressed.KeyUp);
+			else if (key == KeyPressed.KeyUp)
+				keys.remove(KeyPressed.KeyDown);
+			else
+				keys.remove(key);
+		} else
+			keys.remove(key);
 	}
 
 	/**

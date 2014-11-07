@@ -538,31 +538,18 @@ public class FroggerGame extends GameWithLives {
 				keys.remove(KeyPressed.KeyRight);
 			}
 
-			int dY;
-
 			if (keys.contains(KeyPressed.KeyDown)) {
-				if (isInvertedBoard())
-					dY = (curY < boardHeight - 2) ? 2 : 1;
-				else
-					dY = -2;
-
-				newY = newY + dY;
+				newY = newY -2;
 				move = true;
 				keys.remove(KeyPressed.KeyDown);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
-				if (isInvertedBoard())
-					dY = -2;
-				else
-					dY = (curY < boardHeight - 2) ? 2 : 1;
-
-				newY = newY + dY;
+				newY = newY + ((curY < boardHeight - 2) ? 2 : 1);
 				move = true;
 				keys.remove(KeyPressed.KeyUp);
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
-				dY = (curY < boardHeight - 2) ? 2 : 1;
-				newY = newY + dY;
+				newY = newY + ((curY < boardHeight - 2) ? 2 : 1);
 				move = true;
 				keys.remove(KeyPressed.KeyRotate);
 			}

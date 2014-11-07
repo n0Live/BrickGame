@@ -379,8 +379,7 @@ public class RaceGame extends GameWithLives {
 					playEffect(Effects.move);
 				keys.remove(KeyPressed.KeyRight);
 			}
-			if ((keys.contains(KeyPressed.KeyDown))
-					|| (keys.contains(KeyPressed.KeyUp))) {
+			if (keys.contains(KeyPressed.KeyUp)) {
 				moveOn();
 				sleep(ANIMATION_DELAY);
 			}

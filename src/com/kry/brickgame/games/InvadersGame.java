@@ -559,8 +559,7 @@ public class InvadersGame extends GameWithGun {
 				}
 			}
 
-			if ((keys.contains(KeyPressed.KeyDown))
-					|| (keys.contains(KeyPressed.KeyUp))) {
+			if (keys.contains(KeyPressed.KeyDown)) {
 				processInvasion();
 				sleep(ANIMATION_DELAY * 2);
 			}

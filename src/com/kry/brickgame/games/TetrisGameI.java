@@ -891,34 +891,6 @@ public class TetrisGameI extends Game {
 		super.firePreviewChanged(board);
 	}
 
-	@Override
-	public void keyPressed(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown)
-				keys.add(KeyPressed.KeyUp);
-			else if (key == KeyPressed.KeyUp)
-				keys.add(KeyPressed.KeyDown);
-			else
-				keys.add(key);
-		} else
-			super.keyPressed(key);
-	}
-
-	@Override
-	public void keyReleased(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown)
-				keys.remove(KeyPressed.KeyUp);
-			else if (key == KeyPressed.KeyUp)
-				keys.remove(KeyPressed.KeyDown);
-			else
-				keys.remove(key);
-		} else
-			super.keyReleased(key);
-	}
-
 	/**
 	 * Processing of key presses
 	 */
