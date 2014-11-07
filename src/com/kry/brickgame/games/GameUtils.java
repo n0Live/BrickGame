@@ -241,6 +241,9 @@ public class GameUtils {
 	 * @return the board after horizontal shift
 	 */
 	public static Board boardHorizontalShift(Board board, int dX) {
+		if (board == null)
+			return board;
+		
 		// If dX is greater than the width of the board, it is reduced
 		int reducedDX = dX % board.getWidth();
 
@@ -291,6 +294,9 @@ public class GameUtils {
 	 */
 	protected static void insertCellsToBoard(Board board, Cell[][] cells,
 			int x, int y) {
+		if (board == null)
+			return;
+
 		if ((x >= board.getWidth()) || (y >= board.getHeight())
 				|| (x + cells.length <= 0) || (y + cells[0].length <= 0)) {
 			return;
@@ -332,6 +338,9 @@ public class GameUtils {
 	 */
 	protected static Board drawShape(Board board, int x, int y, Shape shape,
 			Cell fill) {
+		if (shape == null || board == null)
+			return board;
+
 		for (int i = 0; i < shape.getLength(); i++) {
 			int board_x = x + shape.x(i);
 			int board_y = y + shape.y(i);
@@ -381,6 +390,9 @@ public class GameUtils {
 	 * @return the board with the point
 	 */
 	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
+		if (board == null)
+			return board;
+
 		int board_x = x;
 		int board_y = y;
 
@@ -414,6 +426,8 @@ public class GameUtils {
 	 */
 	protected static Board addLinesToBoard(Board board, int fromLine,
 			int linesCount, boolean isUpwardDirection) {
+		if (board == null)
+			return board;
 
 		if ((linesCount < 1)//
 				|| ((isUpwardDirection) && //
@@ -488,6 +502,9 @@ public class GameUtils {
 	 * @return the inverted copy of the board
 	 */
 	protected static Board getInvertedBoard(Board board) {
+		if (board == null)
+			return board;
+		
 		Board newBoard = board.clone();
 		for (int i = 0; i < board.getHeight(); i++) {
 			newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
