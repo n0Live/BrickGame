@@ -209,7 +209,7 @@ public class DanceGame extends Game {
 	 */
 	@Override
 	public void start() {
-
+		move();
 		playMusic(Music.start);
 
 		setStatus(Status.Running);
@@ -272,8 +272,10 @@ public class DanceGame extends Game {
 	 * @return a new dance position
 	 */
 	protected DancePosition createPosition() {
-		// interval between positions from 4 to 1
-		int interval = (4 - getSpeed() / 3);
+		// interval between positions from 3 to 1
+		int interval = (3 - getSpeed() / 3);
+		if (interval <= 0)
+			interval = 1;
 		interval += 1 + DancerShape.maxY - DancerShape.minY;
 
 		int upperBorder = boardHeight - getLevel();
@@ -305,7 +307,7 @@ public class DanceGame extends Game {
 		}
 
 		// calculate y-coordinates of the previous position
-		int prevY = upperBorder - interval;
+		int prevY = upperBorder - interval - DancerShape.height;
 		for (int i = 0; i < positions.length; i++) {
 			if (positions[i] != null) {
 				prevY = Math.max(prevY, positions[i].y);
@@ -422,7 +424,7 @@ public class DanceGame extends Game {
 	 * @return playback rate
 	 */
 	protected double calculateRate() {
-		return (1 + (double) getSpeed() / 20);
+		return (1 + (double) getSpeed() / 10);
 	}
 
 	@Override
