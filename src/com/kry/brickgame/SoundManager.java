@@ -7,7 +7,7 @@ import javafx.scene.media.AudioClip;
 
 public class SoundManager {
 	private final static String soundFolder = "/sounds/";
-	private final static String soundExtension = ".mp3";
+	private final static String soundExtension = ".m4a";
 
 	/**
 	 * Gets the string array of resources from the {@code enum} values.
@@ -38,9 +38,8 @@ public class SoundManager {
 	 *            name of sound
 	 * @return name of resource
 	 */
-	private static String getResourceFromName(String soundName) {
+	public static String getResourceFromName(String soundName) {
 		URL resource = SoundManager.class.getResource(soundFolder + soundName
-		// + ("engine".equals(soundName) ? ".wav" : soundExtension));
 				+ soundExtension);
 		return resource.toExternalForm();
 	}
@@ -163,7 +162,7 @@ public class SoundManager {
 			}
 		}
 	}
-
+	
 	/**
 	 * Play the {@code AudioClip} in a circle, depending of the specified
 	 * {@code enum} value, from the specified {@code soundBank}.
