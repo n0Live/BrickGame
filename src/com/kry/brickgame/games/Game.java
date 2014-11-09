@@ -73,7 +73,7 @@ public abstract class Game extends Thread {
 	/**
 	 * Is the sound turned off?
 	 */
-	private static boolean mute = true;
+	private static boolean mute = false;
 
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;

@@ -83,7 +83,7 @@ public class SoundBank implements Iterable<AudioClip> {
 	 *            file name of sound file
 	 * @return {@code AudioClip}
 	 */
-	public AudioClip getClip(String file) {
+	public synchronized AudioClip getClip(String file) {
 		if (!clips.containsKey(file)) {
 			loadSound(file);
 		}

@@ -243,7 +243,7 @@ public class GameUtils {
 	public static Board boardHorizontalShift(Board board, int dX) {
 		if (board == null)
 			return board;
-		
+
 		// If dX is greater than the width of the board, it is reduced
 		int reducedDX = dX % board.getWidth();
 
@@ -504,7 +504,7 @@ public class GameUtils {
 	protected static Board getInvertedBoard(Board board) {
 		if (board == null)
 			return board;
-		
+
 		Board newBoard = board.clone();
 		for (int i = 0; i < board.getHeight(); i++) {
 			newBoard.setRow(board.getRow(i), board.getHeight() - i - 1);
@@ -550,6 +550,21 @@ public class GameUtils {
 				SoundManager.playAndWait(music, sound);
 			else
 				SoundManager.play(music, sound);
+		}
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Melodies} with specified
+	 * {@code rate}.
+	 * 
+	 * @param sound
+	 *            {@code Melodies} value, containing the name of the sound
+	 * @param rate
+	 *            playback rate multiplier
+	 */
+	protected static void playMelody(Melodies sound, double rate) {
+		if (!Game.isMuted()) {
+			SoundManager.play(melodies, sound, rate);
 		}
 	}
 
