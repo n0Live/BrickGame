@@ -310,6 +310,8 @@ public class GunGame extends GameWithGun {
 				if (droppingDown()) {
 					playEffect(Effects.move);
 					sleep(ANIMATION_DELAY * 2);
+				}else{
+					loss(curX, curY);
 				}
 			}
 			if (keys.contains(KeyPressed.KeyRotate)) {
