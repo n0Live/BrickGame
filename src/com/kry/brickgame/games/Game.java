@@ -13,6 +13,7 @@ import java.util.Set;
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.ScoresManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameUtils.Effects;
@@ -25,7 +26,6 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public abstract class Game extends Thread {
-
 	/**
 	 * Animated splash for game
 	 */
@@ -35,6 +35,41 @@ public abstract class Game extends Thread {
 	 */
 	public static int subtypesNumber;
 
+	public static enum Status {
+		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
+	};
+
+	public static enum Rotation {
+		None, Clockwise, Counterclockwise;
+
+		/**
+		 * Get the next rotation
+		 * <p>
+		 * If current rotation is {@code None}, then return {@code None}
+		 * 
+		 * @return the next rotation
+		 */
+		public Rotation getNext() {
+			// if None then getNext() return None
+			if (this == Rotation.None)
+				return this;
+			else
+				return this.ordinal() < Rotation.values().length - 1 ? Rotation
+						.values()[this.ordinal() + 1] : Rotation.values()[1];
+		}
+	};
+
+	public static enum KeyPressed {
+		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
+	};
+
+	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
+
+	/**
+	 * Set of the pressed keys
+	 */
+	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
+
 	/*---MAGIC NUMBERS---*/
 	// ** Direction constants **
 	protected static final RotationAngle UP = RotationAngle.d0;
@@ -42,7 +77,6 @@ public abstract class Game extends Thread {
 	protected static final RotationAngle RIGHT = RotationAngle.d90;
 	protected static final RotationAngle LEFT = RotationAngle.d270;
 	// **
-
 	/**
 	 * Width of the default board ({@value} )
 	 */
@@ -70,11 +104,6 @@ public abstract class Game extends Thread {
 	protected static final int CB_LOSE = 1200;
 	// **
 
-	/**
-	 * Is the sound turned off?
-	 */
-	private static boolean mute = false;
-
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
 
@@ -87,14 +116,19 @@ public abstract class Game extends Thread {
 	}
 
 	/*------*/
+
+	/**
+	 * Is the sound turned off?
+	 */
+	private static boolean mute = false;
 	/**
 	 * Speed
 	 */
-	private volatile int speed;
+	private static int speed;
 	/**
 	 * Level
 	 */
-	private volatile int level;
+	private static int level;
 	/**
 	 * Score
 	 */
@@ -103,6 +137,10 @@ public abstract class Game extends Thread {
 	 * Type of game
 	 */
 	private int type;
+	/**
+	 * Direction of rotation
+	 */
+	private Rotation rotation;
 	/**
 	 * Width of the board
 	 */
@@ -127,43 +165,10 @@ public abstract class Game extends Thread {
 	 * Y-coordinate position on the board
 	 */
 	protected int curY;
-
-	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
-
-	public static enum Status {
-		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
-	};
-
 	/**
 	 * Game status
 	 */
 	private volatile Status status;
-
-	public static enum Rotation {
-		None, Clockwise, Counterclockwise;
-
-		/**
-		 * Get the next rotation
-		 * <p>
-		 * If current rotation is {@code None}, then return {@code None}
-		 * 
-		 * @return the next rotation
-		 */
-		public Rotation getNext() {
-			// if None then getNext() return None
-			if (this == Rotation.None)
-				return this;
-			else
-				return this.ordinal() < Rotation.values().length - 1 ? Rotation
-						.values()[this.ordinal() + 1] : Rotation.values()[1];
-		}
-
-	};
-
-	/**
-	 * Direction of rotation
-	 */
-	private Rotation rotation;
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
@@ -176,15 +181,6 @@ public abstract class Game extends Thread {
 	 * The preview board
 	 */
 	private volatile Board preview;
-
-	public static enum KeyPressed {
-		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
-	};
-
-	/**
-	 * Set of the pressed keys
-	 */
-	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 	/**
 	 * Whether to draw the board upside down?
 	 */
@@ -398,7 +394,7 @@ public abstract class Game extends Thread {
 	 * 
 	 * @return speed level 1-10
 	 */
-	protected synchronized int getSpeed() {
+	protected int getSpeed() {
 		return getSpeed(false);
 	}
 
@@ -408,14 +404,14 @@ public abstract class Game extends Thread {
 	 * @param speed
 	 *            speed level 1-10
 	 */
-	protected synchronized void setSpeed(int speed) {
+	protected void setSpeed(int speed) {
 		if (speed < 1) {
-			this.speed = 10;
+			Game.speed = 10;
 		} else if (speed > 10) {
-			this.speed = 1;
+			Game.speed = 1;
 		} else
-			this.speed = speed;
-		fireSpeedChanged(this.speed);
+			Game.speed = speed;
+		fireSpeedChanged(Game.speed);
 	}
 
 	/**
@@ -423,7 +419,7 @@ public abstract class Game extends Thread {
 	 * 
 	 * @return level 1-10
 	 */
-	protected synchronized int getLevel() {
+	protected static int getLevel() {
 		return level;
 	}
 
@@ -433,14 +429,14 @@ public abstract class Game extends Thread {
 	 * @param level
 	 *            level 1-10
 	 */
-	protected synchronized void setLevel(int level) {
+	protected void setLevel(int level) {
 		if (level < 1) {
-			this.level = 10;
+			Game.level = 10;
 		} else if (level > 10) {
-			this.level = 1;
+			Game.level = 1;
 		} else
-			this.level = level;
-		fireLevelChanged(this.level);
+			Game.level = level;
+		fireLevelChanged(Game.level);
 	}
 
 	/**
@@ -799,6 +795,9 @@ public abstract class Game extends Thread {
 	 */
 	protected void pause() {
 		if (getStatus() == Status.Running) {
+
+			fireInfoChanged(String.valueOf("HI" + setHiScore()));
+			
 			setStatus(Status.Paused);
 			stopAllSounds();
 		} else if (getStatus() == Status.Paused) {
@@ -815,11 +814,22 @@ public abstract class Game extends Thread {
 		playMusic(Music.game_over);
 
 		animatedClearBoard();
-
-		Thread.currentThread().interrupt();
-		Main.setGame(Main.gameSelector);
+		
+		ExitToMainMenu();
 	}
 
+	@SuppressWarnings("unchecked")
+	protected int setHiScore(){
+		return ScoresManager.getInstance()
+				.setHiScore((Class<Game>) this.getClass(), getScore());
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected int getHiScore(){
+		return ScoresManager.getInstance()
+				.getHiScore((Class<Game>) this.getClass());
+	}
+	
 	/**
 	 * Exit to Main menu
 	 */
@@ -827,6 +837,8 @@ public abstract class Game extends Thread {
 		setStatus(Status.None);
 
 		stopAllSounds();
+
+		setHiScore();
 
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);

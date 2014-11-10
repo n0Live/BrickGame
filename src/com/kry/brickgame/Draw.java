@@ -19,6 +19,7 @@ import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.Game.Rotation;
 import com.kry.brickgame.games.Game.Status;
+import com.kry.brickgame.games.GameSelector;
 
 /**
  * @author noLive
@@ -79,9 +80,11 @@ public class Draw extends JPanel implements GameListener {
 
 	/* Numerical values */
 	private String scores;
+	private String hiScores;
 	private String speed;
 	private String level;
 
+	private boolean showHiScore;
 	/**
 	 * Game status
 	 */
@@ -175,6 +178,8 @@ public class Draw extends JPanel implements GameListener {
 		speed = "1";
 		level = "1";
 		rotation = Rotation.None;
+
+		showHiScore = false;
 	}
 
 	protected Board getBoard() {
@@ -517,7 +522,8 @@ public class Draw extends JPanel implements GameListener {
 		x = indent + boardCanvas.getWidth();
 		y = indent + digitalFontSize;
 
-		drawTextOnCanvas(canvas, "18888", scores, digitalFont, x, y);
+		drawTextOnCanvas(canvas, "18888", (showHiScore ? hiScores : scores),
+				digitalFont, x, y);
 		/* --- */
 
 		/* Scores label */
@@ -526,7 +532,8 @@ public class Draw extends JPanel implements GameListener {
 		fm = getGraphics().getFontMetrics(textFont);
 		space = fm.stringWidth(HI) + 1;
 
-		drawTextOnCanvas(canvas, HI, "", textFont.deriveFont(Font.PLAIN), x, y);
+		drawTextOnCanvas(canvas, HI, (showHiScore ? HI : ""),
+				textFont.deriveFont(Font.PLAIN), x, y);
 		drawTextOnCanvas(canvas, SCORE, SCORE, textFont.deriveFont(Font.PLAIN),
 				x + space, y);
 		/* --- */
@@ -652,9 +659,10 @@ public class Draw extends JPanel implements GameListener {
 	 * and vice versa, for blinking "Pause" icon
 	 */
 	public void blinkingPauseIcon() {
-		if (status == Status.Paused)
+		if (status == Status.Paused) {
 			showPauseIcon = !showPauseIcon;
-		else
+			showHiScore = showPauseIcon;
+		} else
 			showPauseIcon = false;
 
 		repaint();
@@ -676,11 +684,21 @@ public class Draw extends JPanel implements GameListener {
 	@Override
 	public void statusChanged(GameEvent event) {
 		status = event.getStatus();
+		
+		if (status == Status.DoSomeWork
+				&& event.getSource() instanceof GameSelector)
+			showHiScore = true;
+		else
+			showHiScore = false;
 	}
 
 	@Override
 	public void infoChanged(GameEvent event) {
-		scores = event.getInfo();
+		if (event.getInfo().startsWith("HI")) {
+			hiScores = event.getInfo().substring(2);
+		} else {
+			scores = event.getInfo();
+		}
 	}
 
 	@Override
