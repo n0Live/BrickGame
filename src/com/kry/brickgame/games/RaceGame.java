@@ -101,6 +101,8 @@ public class RaceGame extends GameWithLives {
 		isThreelaneTraffic = (getType() % 2 == 0);
 		// for types 3-4
 		setDrawInvertedBoard((getType() >= 3));
+
+		loadNewLevel();
 	}
 
 	/**
@@ -108,14 +110,12 @@ public class RaceGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-
-			int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
-					: getSpeed(true) / 3;
-
 			if (getStatus() != Status.Paused) {
+
+				int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
+						: getSpeed(true) / 3;
+
 				// moving
 				if (elapsedTime(currentSpeed)) {
 					moveOn();
@@ -352,6 +352,14 @@ public class RaceGame extends GameWithLives {
 			if (getLevel() == 1)
 				setSpeed(getSpeed() + 1);
 		}
+	}
+
+	@Override
+	protected void pause() {
+		if (getStatus() == Status.Paused) {
+			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+		}
+		super.pause();
 	}
 
 	/**
