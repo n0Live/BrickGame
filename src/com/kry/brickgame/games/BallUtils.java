@@ -13,7 +13,7 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
  * @author noLive
  * 
  */
-public class BallUtils {
+public final class BallUtils {
 
 	/**
 	 * Return the new ball object - one cell shape

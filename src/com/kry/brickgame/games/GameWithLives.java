@@ -1,8 +1,12 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.CB_LOSE;
+import static com.kry.brickgame.games.GameConsts.CB_WIN;
 import static com.kry.brickgame.games.GameUtils.playMusic;
 
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Music;
 
 /**

@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.playEffect;

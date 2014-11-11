@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.addLinesToBoard;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
@@ -13,6 +14,9 @@ import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.games.GameUtils.Music;
 import com.kry.brickgame.shapes.TetrisShape;

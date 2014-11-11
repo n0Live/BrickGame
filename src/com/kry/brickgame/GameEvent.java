@@ -3,8 +3,8 @@ package com.kry.brickgame;
 import java.util.EventObject;
 
 import com.kry.brickgame.boards.Board;
-import com.kry.brickgame.games.Game.Rotation;
-import com.kry.brickgame.games.Game.Status;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * @author noLive

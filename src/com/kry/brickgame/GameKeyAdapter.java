@@ -3,7 +3,7 @@ package com.kry.brickgame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import com.kry.brickgame.games.Game.KeyPressed;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
 
 /**
  * @author noLive

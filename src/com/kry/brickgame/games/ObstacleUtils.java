@@ -1,5 +1,8 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.DOWN;
+import static com.kry.brickgame.games.GameConsts.LEFT;
+import static com.kry.brickgame.games.GameConsts.RIGHT;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 
@@ -9,9 +12,9 @@ import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.shapes.Obstacle;
 
-public class ObstacleUtils extends Game {
+public final class ObstacleUtils {
 
-	private static class PlacedObstacle {
+	private static final class PlacedObstacle {
 		public final Obstacle obstacle;
 		public final int x;
 		public final int y;

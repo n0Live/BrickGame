@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.splashes.PentixSplash;
 import com.kry.brickgame.splashes.Splash;

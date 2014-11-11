@@ -1,5 +1,11 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
+import static com.kry.brickgame.games.GameConsts.BOARD_HEIGHT;
+import static com.kry.brickgame.games.GameConsts.BOARD_WIDTH;
+import static com.kry.brickgame.games.GameConsts.CB_GAME_OVER;
+import static com.kry.brickgame.games.GameConsts.PREVIEW_HEIGHT;
+import static com.kry.brickgame.games.GameConsts.PREVIEW_WIDTH;
 import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.playEffect;
@@ -16,9 +22,11 @@ import com.kry.brickgame.Main;
 import com.kry.brickgame.ScoresManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.games.GameUtils.Music;
-import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.Splash;
 
 /**
@@ -35,34 +43,6 @@ public abstract class Game extends Thread {
 	 */
 	public static int subtypesNumber;
 
-	public static enum Status {
-		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
-	};
-
-	public static enum Rotation {
-		None, Clockwise, Counterclockwise;
-
-		/**
-		 * Get the next rotation
-		 * <p>
-		 * If current rotation is {@code None}, then return {@code None}
-		 * 
-		 * @return the next rotation
-		 */
-		public Rotation getNext() {
-			// if None then getNext() return None
-			if (this == Rotation.None)
-				return this;
-			else
-				return this.ordinal() < Rotation.values().length - 1 ? Rotation
-						.values()[this.ordinal() + 1] : Rotation.values()[1];
-		}
-	};
-
-	public static enum KeyPressed {
-		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
-	};
-
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
 	/**
@@ -70,43 +50,10 @@ public abstract class Game extends Thread {
 	 */
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
-	/*---MAGIC NUMBERS---*/
-	// ** Direction constants **
-	protected static final RotationAngle UP = RotationAngle.d0;
-	protected static final RotationAngle DOWN = RotationAngle.d180;
-	protected static final RotationAngle RIGHT = RotationAngle.d90;
-	protected static final RotationAngle LEFT = RotationAngle.d270;
-	// **
-	/**
-	 * Width of the default board ({@value} )
-	 */
-	protected static final int BOARD_WIDTH = 10;
-	/**
-	 * Height of the default board ({@value} )
-	 */
-	protected static final int BOARD_HEIGHT = 20;
-	/**
-	 * Width of the default preview board ({@value} )
-	 */
-	private static final int PREVIEW_WIDTH = 4;
-	/**
-	 * Height of the default preview board ({@value} )
-	 */
-	private static final int PREVIEW_HEIGHT = 4;
-	/**
-	 * Animation delay in milliseconds
-	 */
-	protected static final int ANIMATION_DELAY = 30;
-
-	// ** anumatedClearBoard constants **
-	protected static final int CB_GAME_OVER = 6000;
-	protected static final int CB_WIN = 5240;
-	protected static final int CB_LOSE = 1200;
-	// **
-
 	private final int FIRST_LEVEL_SPEED = 500;
 	private final int TENTH_LEVEL_SPEED = 80;
 
+	/*---MAGIC NUMBERS---*/
 	protected int getFIRST_LEVEL_SPEED() {
 		return FIRST_LEVEL_SPEED;
 	}
@@ -619,8 +566,8 @@ public abstract class Game extends Thread {
 	protected void animatedClearLine(Board board, int x, int y) {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
-		
-		//change status form stopping other work 
+
+		// change status form stopping other work
 		Status prevStatus = getStatus();
 		setStatus(Status.DoSomeWork);
 
@@ -635,8 +582,8 @@ public abstract class Game extends Thread {
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
 		}
-		
-		//restore previous status
+
+		// restore previous status
 		setStatus(prevStatus);
 	}
 
@@ -802,11 +749,11 @@ public abstract class Game extends Thread {
 	 */
 	protected void pause() {
 		if (getStatus() == Status.Running) {
-			//send score
+			// send score
 			fireInfoChanged(String.valueOf(score));
-			//send high score
+			// send high score
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
-			
+
 			setStatus(Status.Paused);
 			stopAllSounds();
 		} else if (getStatus() == Status.Paused) {
@@ -823,22 +770,22 @@ public abstract class Game extends Thread {
 		playMusic(Music.game_over);
 
 		animatedClearBoard();
-		
+
 		ExitToMainMenu();
 	}
 
 	@SuppressWarnings("unchecked")
-	protected int setHiScore(){
-		return ScoresManager.getInstance()
-				.setHiScore((Class<Game>) this.getClass(), getScore());
+	protected int setHiScore() {
+		return ScoresManager.getInstance().setHiScore(
+				(Class<Game>) this.getClass(), getScore());
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	protected int getHiScore(){
-		return ScoresManager.getInstance()
-				.getHiScore((Class<Game>) this.getClass());
+	protected int getHiScore() {
+		return ScoresManager.getInstance().getHiScore(
+				(Class<Game>) this.getClass());
 	}
-	
+
 	/**
 	 * Exit to Main menu
 	 */

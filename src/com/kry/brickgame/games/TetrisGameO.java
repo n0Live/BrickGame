@@ -1,8 +1,10 @@
 package com.kry.brickgame.games;
 
-import com.kry.brickgame.boards.Board;
+import static com.kry.brickgame.games.GameUtils.boardHorizontalShift;
 
-import static com.kry.brickgame.games.GameUtils.*;
+import com.kry.brickgame.boards.Board;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * @author noLive

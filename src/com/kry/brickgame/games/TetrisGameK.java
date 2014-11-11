@@ -2,6 +2,9 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.playEffect;
 
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;

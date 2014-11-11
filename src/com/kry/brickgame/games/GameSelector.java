@@ -16,6 +16,9 @@ import com.kry.brickgame.ScoresManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.BoardLetters;
 import com.kry.brickgame.boards.BoardNumbers;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.splashes.Splash;
 

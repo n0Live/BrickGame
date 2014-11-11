@@ -1,8 +1,12 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
+
 import java.util.Timer;
 import java.util.TimerTask;
-import static com.kry.brickgame.games.GameUtils.*;
+
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * @author noLive

@@ -1,5 +1,10 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
+import static com.kry.brickgame.games.GameConsts.DOWN;
+import static com.kry.brickgame.games.GameConsts.LEFT;
+import static com.kry.brickgame.games.GameConsts.RIGHT;
+import static com.kry.brickgame.games.GameConsts.UP;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
@@ -13,6 +18,9 @@ import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Rotation;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;

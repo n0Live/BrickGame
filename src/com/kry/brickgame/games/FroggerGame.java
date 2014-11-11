@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
@@ -12,6 +13,8 @@ import java.util.Set;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;

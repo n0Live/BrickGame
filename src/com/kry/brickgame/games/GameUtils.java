@@ -13,7 +13,7 @@ import com.kry.brickgame.shapes.Shape;
  * @author noLive
  * 
  */
-public class GameUtils {
+public final class GameUtils {
 	/**
 	 * Sound effects
 	 */
