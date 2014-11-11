@@ -42,7 +42,9 @@ public class TetrisGameJ extends TetrisGameI {
 				}
 			}
 		}, 0, 1000);
-
+		
+		super.start();
+		
 		addLineTimer.cancel();
 	}
 
