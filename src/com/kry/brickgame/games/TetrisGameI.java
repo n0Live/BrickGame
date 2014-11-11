@@ -256,7 +256,7 @@ public class TetrisGameI extends Game {
 		isFallingFinished = false;
 
 		// Create the "next" figure
-		nextPiece = TetrisShape.getRandomTetraminoes().setRandomRotate();
+		nextPiece = getRandomShape();
 		newPiece();
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
@@ -697,6 +697,22 @@ public class TetrisGameI extends Game {
 			if (lineIsFull) {
 				numFullLines++;
 
+				// increasing score
+				switch (numFullLines) {
+				default: // 1
+					setScore(getScore() + 1);
+					break;
+				case 2:
+					setScore(getScore() + 2);
+					break;
+				case 3:
+					setScore(getScore() + 4);
+					break;
+				case 4:
+					setScore(getScore() + 8);
+					break;
+				}
+
 				// animated clearing of a full line
 				animatedClearLine(getBoard(), curX, y);
 
@@ -719,25 +735,6 @@ public class TetrisGameI extends Game {
 			}
 		}
 
-		if (numFullLines > 0) {
-			// increasing score
-			switch (numFullLines) {
-			case 1:
-				setScore(getScore() + 1);
-				break;
-			case 2:
-				setScore(getScore() + 3);
-				break;
-			case 3:
-				setScore(getScore() + 7);
-				break;
-			case 4:
-				setScore(getScore() + 15);
-				break;
-			default:
-				break;
-			}
-		}
 		return numFullLines;
 	}
 
