@@ -29,6 +29,7 @@ import com.kry.brickgame.splashes.TetrisSplash;
  * 
  */
 public class TetrisGameI extends Game {
+	private static final long serialVersionUID = 8508883731172323862L;
 	/**
 	 * Animated splash for game
 	 */
@@ -244,6 +245,19 @@ public class TetrisGameI extends Game {
 		hasRandomFigures = (((getType() >= 37) && (getType() <= 45)) || ((getType() >= 82) && (getType() <= 90)));
 		// for types 46-90
 		setDrawInvertedBoard((getType() > 45));
+
+		isFallingFinished = false;
+
+		// getLevel() - 1 - because on the first level doesn't need to add line
+		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
+
+		// Create the "next" figure
+		nextPiece = getRandomShape();
+		newPiece();
+
+		playMusic(Music.tetris);
+
+		setStatus(Status.Running);
 	}
 
 	/**
@@ -251,18 +265,7 @@ public class TetrisGameI extends Game {
 	 */
 	@Override
 	public void start() {
-		playMusic(Music.tetris);
-
-		// getLevel() - 1 - because on the first level doesn't need to add line
-		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
-
-		setStatus(Status.Running);
-		isFallingFinished = false;
-
-		// Create the "next" figure
-		nextPiece = getRandomShape();
-		newPiece();
-
+		super.start();
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			doRepetitiveWork();
 		}

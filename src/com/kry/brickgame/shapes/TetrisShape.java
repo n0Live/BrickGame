@@ -12,6 +12,7 @@ import com.kry.brickgame.boards.Board.Cell;
  * 
  */
 public class TetrisShape extends Shape {
+	private static final long serialVersionUID = -4165024906477016657L;
 
 	public static enum Figures {
 		NoShape, //

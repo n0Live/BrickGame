@@ -5,6 +5,7 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class SnakeShape extends Shape {
+	private static final long serialVersionUID = -394507760656713746L;
 	/**
 	 * Initial size of the snake
 	 */

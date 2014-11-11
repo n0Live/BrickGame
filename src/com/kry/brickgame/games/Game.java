@@ -12,12 +12,14 @@ import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
+import com.kry.brickgame.GameLoader;
 import com.kry.brickgame.Main;
 import com.kry.brickgame.ScoresManager;
 import com.kry.brickgame.boards.Board;
@@ -33,7 +35,9 @@ import com.kry.brickgame.splashes.Splash;
  * @author noLive
  * 
  */
-public abstract class Game extends Thread {
+public abstract class Game extends Thread implements Serializable {
+	private static final long serialVersionUID = -8891762583782516818L;
+	
 	/**
 	 * Animated splash for game
 	 */
@@ -50,20 +54,6 @@ public abstract class Game extends Thread {
 	 */
 	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 
-	private final int FIRST_LEVEL_SPEED = 500;
-	private final int TENTH_LEVEL_SPEED = 80;
-
-	/*---MAGIC NUMBERS---*/
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
-	}
-
-	/*------*/
-
 	/**
 	 * Is the sound turned off?
 	 */
@@ -71,11 +61,11 @@ public abstract class Game extends Thread {
 	/**
 	 * Speed
 	 */
-	private static int speed;
+	private int speed;
 	/**
 	 * Level
 	 */
-	private static int level;
+	private int level;
 	/**
 	 * Score
 	 */
@@ -133,6 +123,89 @@ public abstract class Game extends Thread {
 	 */
 	private boolean drawInvertedBoard;
 
+	// TODO
+	// Game speed constants. May be overrided by means of
+	// getFIRST_LEVEL_SPEED(), getTENTH_LEVEL_SPEED()
+	private final int FIRST_LEVEL_SPEED = 500;
+	private final int TENTH_LEVEL_SPEED = 80;
+
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
+
+	/**
+	 * The Game
+	 */
+	public Game() {
+		setStatus(Status.None);
+		
+		stopAllSounds();
+		
+		setSpeed(1);
+		setLevel(1);
+		setRotation(Rotation.None);
+
+		setBoard(new Board(BOARD_WIDTH, BOARD_HEIGHT));
+		setPreview(new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));
+
+		setDrawInvertedBoard(false);
+
+		setScore(0);
+
+		this.curX = 0;
+		this.curY = 0;
+
+		timePoint = System.currentTimeMillis();
+
+		boardWidth = board.getWidth();
+		boardHeight = board.getHeight();
+		previewWidth = preview.getWidth();
+		previewHeight = preview.getHeight();
+
+		clearBoard();
+		clearPreview();
+	}
+
+	/**
+	 * The Game
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param rotation
+	 *            direction of rotation
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, Rotation rotation, int type) {
+		this();
+
+		setSpeed(speed);
+		setLevel(level);
+		setRotation(rotation);
+
+		this.type = type;
+	}
+
+	/**
+	 * The Game without rotation
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, int type) {
+		this(speed, level, Rotation.None, type);
+	}
+
 	/**
 	 * The Game
 	 * 
@@ -151,73 +224,33 @@ public abstract class Game extends Thread {
 	 */
 	protected Game(int speed, int level, Board board, Board preview,
 			Rotation rotation, int type) {
-		stopAllSounds();
-
-		this.type = type;
-
-		setSpeed(speed);
-		setLevel(level);
+		this(speed, level, rotation, type);
+		
 		setBoard(board);
 		setPreview(preview);
-		setRotation(rotation);
-
-		setDrawInvertedBoard(false);
-
-		clearBoard();
-		clearPreview();
-
-		setScore(0);
-		setStatus(Status.None);
-
-		this.curX = 0;
-		this.curY = 0;
-
+	
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
 
-		timePoint = System.currentTimeMillis();
+		clearBoard();
+		clearPreview();
 	}
-
-	/**
-	 * The Game
-	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param rotation
-	 *            direction of rotation
-	 * @param type
-	 *            type of the game
-	 */
-	public Game(int speed, int level, Rotation rotation, int type) {
-		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
-				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), rotation, type);// preview
+	
+	@Override
+	public void start() {
+		fireBoardChanged(board);
+		firePreviewChanged(preview);
+		fireSpeedChanged(speed);
+		fireLevelChanged(level);
+		fireRotationChanged(rotation);
+		fireMuteChanged(mute);
+		fireStatusChanged(status);
+		fireInfoChanged(String.valueOf(score));
+		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
-
-	/**
-	 * The Game without rotation
-	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param type
-	 *            type of the game
-	 */
-	public Game(int speed, int level, int type) {
-		this(speed, level, new Board(BOARD_WIDTH, BOARD_HEIGHT), // board
-				new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT), Rotation.None, type);// preview
-	}
-
-	/**
-	 * The Game
-	 */
-	public Game() {
-		this(1, 1, 1);
-	}
+	
 
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
@@ -288,6 +321,13 @@ public abstract class Game extends Thread {
 		}
 	}
 
+	protected void fireExit() {
+		GameEvent event = new GameEvent(this);
+		for (GameListener listener : listeners) {
+			listener.exit(event);
+		}
+	}
+
 	/**
 	 * Get the splash screen for game
 	 * 
@@ -353,12 +393,12 @@ public abstract class Game extends Thread {
 	 */
 	protected void setSpeed(int speed) {
 		if (speed < 1) {
-			Game.speed = 10;
+			this.speed = 10;
 		} else if (speed > 10) {
-			Game.speed = 1;
+			this.speed = 1;
 		} else
-			Game.speed = speed;
-		fireSpeedChanged(Game.speed);
+			this.speed = speed;
+		fireSpeedChanged(this.speed);
 	}
 
 	/**
@@ -366,7 +406,7 @@ public abstract class Game extends Thread {
 	 * 
 	 * @return level 1-10
 	 */
-	protected static int getLevel() {
+	protected int getLevel() {
 		return level;
 	}
 
@@ -378,12 +418,12 @@ public abstract class Game extends Thread {
 	 */
 	protected void setLevel(int level) {
 		if (level < 1) {
-			Game.level = 10;
+			this.level = 10;
 		} else if (level > 10) {
-			Game.level = 1;
+			this.level = 1;
 		} else
-			Game.level = level;
-		fireLevelChanged(Game.level);
+			this.level = level;
+		fireLevelChanged(this.level);
 	}
 
 	/**
@@ -771,7 +811,7 @@ public abstract class Game extends Thread {
 
 		animatedClearBoard();
 
-		ExitToMainMenu();
+		exitToMainMenu();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -789,15 +829,28 @@ public abstract class Game extends Thread {
 	/**
 	 * Exit to Main menu
 	 */
-	protected void ExitToMainMenu() {
+	protected void exitToMainMenu() {
 		setStatus(Status.None);
 
 		stopAllSounds();
 
 		setHiScore();
 
+		Main.gameSelector.setSpeed(speed);
+		Main.gameSelector.setLevel(level);
+		
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
+	}
+
+	protected void quit() {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
+			setStatus(Status.Paused);
+			GameLoader.saveGame(this);
+		}else{
+			GameLoader.deleteSavedGame();
+		}
+		fireExit();
 	}
 
 	@Override
@@ -864,9 +917,15 @@ public abstract class Game extends Thread {
 		if (getStatus() == Status.None)
 			return;
 
+		if (keys.contains(KeyPressed.KeyOnOff)) {
+			keys.remove(KeyPressed.KeyOnOff);
+			quit();
+			return;
+		}
+
 		if (keys.contains(KeyPressed.KeyReset)) {
 			keys.remove(KeyPressed.KeyReset);
-			ExitToMainMenu();
+			exitToMainMenu();
 			return;
 		}
 

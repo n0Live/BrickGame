@@ -1,7 +1,7 @@
 package com.kry.brickgame.shapes;
 
 public class TankShape extends CoordinatedShape {
-
+	private static final long serialVersionUID = 3770507302625800510L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

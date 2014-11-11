@@ -30,6 +30,7 @@ import com.kry.brickgame.splashes.Splash;
  */
 @SuppressWarnings("rawtypes")
 public class GameSelector extends Game {
+	private static final long serialVersionUID = -2388591192036308490L;
 	/**
 	 * List of games with the letters associated with them
 	 */
@@ -380,7 +381,7 @@ public class GameSelector extends Game {
 				drawGameSplash(null);
 			}
 			
-			fireInfoChanged(String.valueOf("HI" + ScoresManager.getInstance().getHiScore(c))); //TODO
+			fireInfoChanged(String.valueOf("HI" + ScoresManager.getInstance().getHiScore(c)));
 		} else {
 			maxNumber = 1;
 			drawGameSplash(null);
@@ -506,6 +507,11 @@ public class GameSelector extends Game {
 			if (splashTimer != null)
 				splashTimer.cancel();
 			Main.setGame(new SplashScreen());
+			break;
+		case KeyOnOff:
+			if (splashTimer != null)
+				splashTimer.cancel();
+			quit();
 			break;
 		default:
 			break;

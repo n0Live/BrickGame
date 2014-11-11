@@ -37,6 +37,7 @@ import com.kry.brickgame.splashes.TanksSplash;
  * 
  */
 public class TanksGame extends GameWithLives {
+	private static final long serialVersionUID = 538052340777294912L;
 	/**
 	 * Animated splash for game
 	 */
@@ -69,6 +70,10 @@ public class TanksGame extends GameWithLives {
 	 * Count of enemy tanks
 	 */
 	private int enemiesCount;
+	/**
+	 * Number of the enemy tanks whose turn
+	 */
+	private int enemyTankNumber;
 	/**
 	 * Bullets fired by the enemy tanks
 	 */
@@ -119,6 +124,10 @@ public class TanksGame extends GameWithLives {
 		enemyBullets = new Bullet[enemiesCount];
 		// four bullets for player
 		playerBullets = new Bullet[4];
+
+		enemyTankNumber = 0;
+
+		loadNewLevel();
 	}
 
 	/**
@@ -126,11 +135,7 @@ public class TanksGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
-		// Number of the enemy tanks whose turn
-		int enemyTankNumber = 0;
-
+		super.start();
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
 		bulletSwarm.schedule(new TimerTask() {
@@ -142,12 +147,11 @@ public class TanksGame extends GameWithLives {
 			}
 		}, 0, ANIMATION_DELAY * 4);
 
-		int currentSpeed;
-
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			currentSpeed = getSpeed(true) * 3;
-
 			if (getStatus() != Status.Paused) {
+				int currentSpeed;
+				currentSpeed = getSpeed(true) * 3;
+
 				if (elapsedTime(currentSpeed)) {
 					if (enemiesKilled >= killsToNextLevel)
 						win();
@@ -188,8 +192,6 @@ public class TanksGame extends GameWithLives {
 		enemiesKilled = 0;
 
 		super.loadNewLevel();
-
-		setStatus(Status.Running);
 	}
 
 	/**
@@ -769,7 +771,7 @@ public class TanksGame extends GameWithLives {
 				setBoard(drawShape(getBoard(), bullet, Cell.Empty));
 
 			Board board = getBoard().clone();
-			
+
 			// move bullet to the new position
 			Bullet result = bullet.flight();
 
@@ -779,9 +781,9 @@ public class TanksGame extends GameWithLives {
 			} else {
 				// if the bullet hit something
 				if (board.getCell(result.x(), result.y()) != Cell.Empty) {
-					
+
 					playEffect(Effects.hit_cell);
-					
+
 					// bullet hit a simple obstacle?
 					boolean isObstacle = true;
 

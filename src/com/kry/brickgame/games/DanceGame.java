@@ -9,7 +9,6 @@ import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.melodies;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.playMelody;
-import static com.kry.brickgame.games.GameUtils.playMusic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +21,6 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.games.GameUtils.Melodies;
-import com.kry.brickgame.games.GameUtils.Music;
 import com.kry.brickgame.shapes.DancerShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.DanceSplash;
@@ -33,6 +31,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class DanceGame extends Game {
+	private static final long serialVersionUID = 1329642134274377275L;
 	/**
 	 * Animated splash for game
 	 */
@@ -208,6 +207,11 @@ public class DanceGame extends Game {
 
 		// for type 1 - draw inverted board
 		setDrawInvertedBoard(type == 1);
+
+		move();
+		setStatus(Status.Running);
+		// play the first melody
+		playMelody(getMelody(), rate);
 	}
 
 	/**
@@ -215,16 +219,10 @@ public class DanceGame extends Game {
 	 */
 	@Override
 	public void start() {
-		move();
-		playMusic(Music.start);
-
-		setStatus(Status.Running);
-
-		// play the first melody
-		playMelody(getMelody(), rate);
-
+		super.start();
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
+
 				// change speed and melody after finished playing the melody
 				if (!isMuted() && !SoundManager.isPlaying(melodies)) {
 					setSpeed(getSpeed() + 1);
@@ -243,6 +241,7 @@ public class DanceGame extends Game {
 						melodyNumber++;
 					}
 				}
+
 				// move positions
 				move();
 			}

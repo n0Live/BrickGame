@@ -5,6 +5,7 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class ArkanoidPlatformShape extends CharacterShape {
+	private static final long serialVersionUID = -4308280159216035580L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

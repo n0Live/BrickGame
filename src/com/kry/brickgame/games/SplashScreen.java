@@ -18,6 +18,8 @@ import com.kry.brickgame.games.GameUtils.Music;
  * 
  */
 public class SplashScreen extends Game {
+	private static final long serialVersionUID = 6213953274430176604L;
+	
 	private final Music welcome = Music.welcome;
 
 	public SplashScreen() {
@@ -54,9 +56,9 @@ public class SplashScreen extends Game {
 		splashScreenThread.interrupt();
 		// Waits for end of interrupting splashScreenThread
 		while (splashScreenThread.isAlive())
-			;
-		Main.gameSelector = new GameSelector();
-		Main.setGame(Main.gameSelector);
+			;//wait
+		
+		Main.setGame(Main.gameSelector = new GameSelector());
 	}
 
 	/**

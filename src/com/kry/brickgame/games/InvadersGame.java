@@ -30,6 +30,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class InvadersGame extends GameWithGun {
+	private static final long serialVersionUID = 7821002285005926463L;
 	/**
 	 * Animated splash for game
 	 */
@@ -91,7 +92,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * Timer for the invasion
 	 */
-	private Timer invasionTimer;
+	private transient Timer invasionTimer;
 	// Easter egg
 	/**
 	 * The X-Dimension, which has its own laws
@@ -181,6 +182,8 @@ public class InvadersGame extends GameWithGun {
 		isReadyToXDimension = false;
 		theXDimension = false;
 		startX = boardWidth / 2 - 1;
+
+		loadNewLevel();
 	}
 
 	/**
@@ -188,7 +191,10 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
+		super.start();
+		// create timer for invasion,
+		// for the deserialization
+		createInvasionTimer();
 
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
@@ -249,7 +255,18 @@ public class InvadersGame extends GameWithGun {
 
 		createBall();
 
+		super.loadNewLevel();
+
 		// create timer for invasion
+		if (!start)// workaround for serialization
+			createInvasionTimer();
+	}
+
+	private void createInvasionTimer() {
+		// if the invasionTimer was set, then cancel it
+		if (invasionTimer != null)
+			invasionTimer.cancel();
+
 		invasionTimer = new Timer("Invasion", true);
 		invasionTimer.schedule(new TimerTask() {
 			@Override
@@ -259,10 +276,6 @@ public class InvadersGame extends GameWithGun {
 				}
 			}
 		}, getSpeed(true) * 2, getSpeed(true));
-
-		super.loadNewLevel();
-
-		setStatus(Status.Running);
 	}
 
 	/**
@@ -512,15 +525,15 @@ public class InvadersGame extends GameWithGun {
 
 		// the X-Dimension has its own laws
 		if (theXDimension) {
-			int startY = (gun != null) ? gun.getHeight() : 0;
 			for (int i = 0; i < newBoard.getWidth(); i++) {
-				for (int j = startY; j < newBoard.getHeight(); j++) {
+				for (int j = 0; j < newBoard.getHeight(); j++) {
 					if ((newBoard.getCell(i, j) == Cell.Full)
 							&& (new Random().nextInt(3) != 0)) {
 						newBoard.setCell(Cell.Empty, i, j);
 					}
 				}
 			}
+			drawShape(newBoard, curX, curY, gun, gun.getFill());
 		}
 
 		super.fireBoardChanged(newBoard);

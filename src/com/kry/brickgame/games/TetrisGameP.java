@@ -11,6 +11,7 @@ import com.kry.brickgame.games.GameConsts.Status;
  * 
  */
 public class TetrisGameP extends TetrisGameL {
+	private static final long serialVersionUID = 3734423526420480573L;
 
 	/**
 	 * The Tetris with the addition of new lines every few seconds, and the

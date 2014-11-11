@@ -26,6 +26,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class GunGame extends GameWithGun {
+	private static final long serialVersionUID = -8031498937942999783L;
 	/**
 	 * Animated splash for game
 	 */
@@ -111,6 +112,8 @@ public class GunGame extends GameWithGun {
 		isShiftingBoard = (getType() % 2 == 0);
 		// for types 8-16
 		setDrawInvertedBoard((getType() > 8));
+
+		loadNewLevel();
 	}
 
 	/**
@@ -118,8 +121,7 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
+		super.start();
 		// create timer for bullets
 		Timer bulletSwarm = new Timer("BulletSwarm", true);
 		bulletSwarm.schedule(new TimerTask() {
@@ -136,18 +138,18 @@ public class GunGame extends GameWithGun {
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-
-			int currentSpeed = getSpeed(true);
-
-			// decrease game speed in CreationMode
-			if (isCreationMode) {
-				currentSpeed *= 5;
-				// increase game speed if has two guns
-			} else if (hasTwoSmokingBarrels) {
-				currentSpeed -= ANIMATION_DELAY * 2;
-			}
-
 			if (getStatus() != Status.Paused) {
+
+				int currentSpeed = getSpeed(true);
+
+				// decrease game speed in CreationMode
+				if (isCreationMode) {
+					currentSpeed *= 5;
+					// increase game speed if has two guns
+				} else if (hasTwoSmokingBarrels) {
+					currentSpeed -= ANIMATION_DELAY * 2;
+				}
+
 				// moving
 				if (elapsedTime(currentSpeed)) {
 					// try drop down lines
@@ -172,14 +174,15 @@ public class GunGame extends GameWithGun {
 		curX = boardWidth / 2 - 1;
 		curY = 0;
 
+		// clear the bullets
+		initBullets(bullets);
+		
 		// draws a rows on the top of the border
 		setBoard(addLines(getBoard(), getLevel()));
 		// draws the gun
 		moveGun(curX, curY);
 
 		super.loadNewLevel();
-
-		setStatus(Status.Running);
 	}
 
 	/**
@@ -314,7 +317,7 @@ public class GunGame extends GameWithGun {
 				if (droppingDown()) {
 					playEffect(Effects.move);
 					sleep(ANIMATION_DELAY * 2);
-				}else{
+				} else {
 					loss(curX, curY);
 				}
 			}

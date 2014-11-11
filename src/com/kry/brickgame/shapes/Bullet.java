@@ -1,6 +1,7 @@
 package com.kry.brickgame.shapes;
 
 public class Bullet extends CoordinatedShape {
+	private static final long serialVersionUID = 8131536153963633602L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

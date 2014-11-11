@@ -1,12 +1,14 @@
 package com.kry.brickgame.boards;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * @author noLive
  * 
  */
-public class Board implements Cloneable {
+public class Board implements Cloneable, Serializable {
+	private static final long serialVersionUID = -2792579857001935997L;
 
 	/**
 	 * Cell type

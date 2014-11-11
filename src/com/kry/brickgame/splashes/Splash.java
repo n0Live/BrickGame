@@ -2,8 +2,9 @@ package com.kry.brickgame.splashes;
 
 import com.kry.brickgame.boards.Board;
 
-public abstract class Splash extends Board {
-
+public abstract class Splash extends Board{
+	private static final long serialVersionUID = 681833325724653718L;
+	
 	public final static int width = 10;
 	public final static int height = 8;
 

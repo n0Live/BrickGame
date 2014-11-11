@@ -33,6 +33,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class SnakeGame extends GameWithLives {
+	private static final long serialVersionUID = -4904453559355597994L;
 	/**
 	 * Animated splash for game
 	 */
@@ -81,6 +82,8 @@ public class SnakeGame extends GameWithLives {
 		isToroidalField = (getType() % 2 == 0);
 		// for types 1-2
 		usePreloadedLevels = (getType() <= 2);
+
+		loadNewLevel();
 	}
 
 	/**
@@ -88,8 +91,7 @@ public class SnakeGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
+		super.start();
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
@@ -229,8 +231,6 @@ public class SnakeGame extends GameWithLives {
 		addApple();
 
 		super.loadNewLevel();
-
-		setStatus(Status.Running);
 	}
 
 	/**

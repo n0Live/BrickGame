@@ -14,12 +14,15 @@ import com.kry.brickgame.games.GameUtils.Music;
  * 
  */
 public abstract class GameWithLives extends Game {
+	private static final long serialVersionUID = -3573267355159195541L;
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
+
+	protected boolean start;
 
 	/**
 	 * The Game with lives
@@ -39,6 +42,7 @@ public abstract class GameWithLives extends Game {
 		super(speed, level, rotation, type);
 
 		setLives(4);
+		start = true;
 	}
 
 	/**
@@ -53,6 +57,16 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
+	}
+
+	@Override
+	public void start() {
+		super.start();
+		// play music only in first start, not after deserialization
+		if (start) {
+			start = false;
+			playMusic(Music.start);
+		}
 	}
 
 	/**
@@ -91,9 +105,12 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Loading the specified level
 	 */
-	@SuppressWarnings("static-method")
 	protected void loadNewLevel() {
-		playMusic(Music.start);
+		// play music always except the first start
+		if (!start) {
+			playMusic(Music.start);
+		}
+		setStatus(Status.Running);
 	}
 
 	/**

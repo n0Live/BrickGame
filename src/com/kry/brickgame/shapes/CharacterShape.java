@@ -9,6 +9,7 @@ import com.kry.brickgame.boards.Board.Cell;
  * 
  */
 public abstract class CharacterShape extends Shape {
+	private static final long serialVersionUID = -3023350297252336349L;
 
 	/**
 	 * Type of the character

@@ -11,6 +11,7 @@ import com.kry.brickgame.games.GameConsts.Status;
  * 
  */
 public class TetrisGameO extends TetrisGameK {
+	private static final long serialVersionUID = 826647707906573426L;
 
 	/**
 	 * The Tetris with the changing of the figures instead of rotating and the

@@ -14,6 +14,7 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
  * 
  */
 public class TetrisGameL extends TetrisGameJ {
+	private static final long serialVersionUID = 751057972065508388L;
 
 	/**
 	 * The Tetris with the addition of new lines every few seconds and the

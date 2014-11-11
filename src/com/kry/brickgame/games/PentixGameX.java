@@ -10,6 +10,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class PentixGameX extends TetrisGameP {
+	private static final long serialVersionUID = -6598238012412470344L;
 	/**
 	 * Animated splash for game
 	 */

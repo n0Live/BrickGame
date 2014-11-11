@@ -9,7 +9,7 @@ import com.kry.brickgame.boards.Board.Cell;
  * 
  */
 public class Obstacle extends CharacterShape {
-
+	private static final long serialVersionUID = 3456812497392122162L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

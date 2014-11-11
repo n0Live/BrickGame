@@ -5,6 +5,8 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class DancerShape extends CharacterShape {
+	private static final long serialVersionUID = 8546393398653335390L;
+
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

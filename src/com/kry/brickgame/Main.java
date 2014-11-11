@@ -25,7 +25,7 @@ public final class Main {
 	/**
 	 * The selection screen of a game
 	 */
-	public static GameSelector gameSelector;
+	public static GameSelector gameSelector = new GameSelector();
 	/**
 	 * Observer to {@code KeyEvent}
 	 */

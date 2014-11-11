@@ -5,7 +5,8 @@ package com.kry.brickgame.splashes;
  * 
  */
 public class ArkanoidSplash extends Splash {
-
+	private static final long serialVersionUID = 5591689903182020140L;
+	
 	private static Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ F, F, F, F, F, F, F, F, F, F }, //

@@ -25,6 +25,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class FroggerGame extends GameWithLives {
+	private static final long serialVersionUID = -6630171064937505387L;
 	/**
 	 * Animated splash for game
 	 */
@@ -181,6 +182,8 @@ public class FroggerGame extends GameWithLives {
 		usePreloadedTracts = ((getType() <= 8) || ((getType() >= 16) && (getType() <= 24)));
 		// for types 16-32
 		setDrawInvertedBoard((getType() > 16));
+
+		loadNewLevel();
 	}
 
 	/**
@@ -188,8 +191,7 @@ public class FroggerGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
+		super.start();
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused)
 					&& (elapsedTime(getSpeed(true) * 3))) {
@@ -203,16 +205,23 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	@Override
-	protected void loadNewLevel() {
+	private void loadLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
 		// initialize the frog
 		setFrog();
+	}
 
+	@Override
+	protected void loadNewLevel() {
+		loadLevel();
 		super.loadNewLevel();
-		
+	}
+
+	@Override
+	protected void reloadLevel() {
+		loadLevel();
 		setStatus(Status.Running);
 	}
 
@@ -542,7 +551,7 @@ public class FroggerGame extends GameWithLives {
 			}
 
 			if (keys.contains(KeyPressed.KeyDown)) {
-				newY = newY -2;
+				newY = newY - 2;
 				move = true;
 				keys.remove(KeyPressed.KeyDown);
 			}
@@ -556,7 +565,7 @@ public class FroggerGame extends GameWithLives {
 				move = true;
 				keys.remove(KeyPressed.KeyRotate);
 			}
-			
+
 			if (move) {
 				if (jumpFrog(newX, newY))
 					playEffect(Effects.move);

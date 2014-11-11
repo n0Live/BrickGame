@@ -5,6 +5,7 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class CarShape extends CharacterShape {
+	private static final long serialVersionUID = -2252007263544922105L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

@@ -721,4 +721,9 @@ public class Draw extends JPanel implements GameListener {
 		mute = event.isMute();
 	}
 
+	@Override
+	public void exit(GameEvent event) {
+		System.exit(0);
+	}
+
 }

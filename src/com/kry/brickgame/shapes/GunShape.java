@@ -5,6 +5,7 @@ package com.kry.brickgame.shapes;
  * 
  */
 public class GunShape extends CharacterShape {
+	private static final long serialVersionUID = -3399573299437538347L;
 	/**
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]

@@ -3,6 +3,7 @@ package com.kry.brickgame.shapes;
 import java.awt.Point;
 
 public abstract class CoordinatedShape extends CharacterShape {
+	private static final long serialVersionUID = -1378907881713510647L;
 	/**
 	 * X-coordinate position
 	 */

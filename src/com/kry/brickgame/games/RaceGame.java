@@ -25,6 +25,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class RaceGame extends GameWithLives {
+	private static final long serialVersionUID = 4304043854809432310L;
 	/**
 	 * Animated splash for game
 	 */
@@ -110,9 +111,14 @@ public class RaceGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
+		super.start();
+
+		// don't start playing sound after deserialization
+		if (getStatus() != Status.Paused)
+			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if (getStatus() != Status.Paused) {
-
 				int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
 						: getSpeed(true) / 3;
 
@@ -149,9 +155,8 @@ public class RaceGame extends GameWithLives {
 
 		super.loadNewLevel();
 
-		setStatus(Status.Running);
-
-		loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+		if (!start)// workaround for serialization
+			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
 	}
 
 	/**

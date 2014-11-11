@@ -1,5 +1,6 @@
 package com.kry.brickgame.shapes;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import com.kry.brickgame.boards.Board.Cell;
@@ -8,7 +9,8 @@ import com.kry.brickgame.boards.Board.Cell;
  * @author noLive
  * 
  */
-public class Shape implements Cloneable {
+public class Shape implements Cloneable, Serializable {
+	private static final long serialVersionUID = 842374378117995961L;
 
 	/**
 	 * Rotation angle of a figure (in degrees)
@@ -46,7 +48,7 @@ public class Shape implements Cloneable {
 			return this.ordinal() < RotationAngle.values().length - 1 ? RotationAngle
 					.values()[this.ordinal() + 1] : RotationAngle.values()[0];
 		}
-		
+
 		/**
 		 * The direction opposite to the current direction
 		 */
@@ -80,8 +82,7 @@ public class Shape implements Cloneable {
 	 * @param fill
 	 *            type of fill of the figure
 	 */
-	public Shape(int length, RotationAngle rotationAngle,
-			Cell fill) {
+	public Shape(int length, RotationAngle rotationAngle, Cell fill) {
 		this.coords = new int[length][2];
 		this.rotationAngle = rotationAngle;
 		this.fill = fill;
@@ -262,7 +263,7 @@ public class Shape implements Cloneable {
 	}
 
 	/**
-	 * Getting points number of the current figure 
+	 * Getting points number of the current figure
 	 */
 	public int getLength() {
 		return coords.length;
@@ -314,7 +315,6 @@ public class Shape implements Cloneable {
 		return this;
 	}
 
-	
 	/**
 	 * Turn the figure to the opposite direction
 	 * 

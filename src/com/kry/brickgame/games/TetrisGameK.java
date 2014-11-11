@@ -14,6 +14,7 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
  *  
  */
 public class TetrisGameK extends TetrisGameI {
+	private static final long serialVersionUID = -2765291209922783752L;
 
 	/**
 	 * The Tetris with the changing of the figures instead of rotating

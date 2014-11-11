@@ -15,6 +15,7 @@ import com.kry.brickgame.shapes.GunShape;
  * 
  */
 public abstract class GameWithGun extends GameWithLives {
+	private static final long serialVersionUID = -1845599776247419199L;
 	/**
 	 * The Gun
 	 */

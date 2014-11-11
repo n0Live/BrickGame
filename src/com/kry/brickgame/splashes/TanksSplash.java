@@ -6,7 +6,8 @@ package com.kry.brickgame.splashes;
  * 
  */
 public class TanksSplash extends Splash {
-
+	private static final long serialVersionUID = -5081031885912858164L;
+	
 	private static Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ F, F, E, E, E, E, E, E }, //

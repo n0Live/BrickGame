@@ -5,7 +5,8 @@ package com.kry.brickgame.splashes;
  * 
  */
 public class SnakeSplash extends Splash {
-
+	private static final long serialVersionUID = -3561093655966432475L;
+	
 	private static Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ E, E, F, F, E, E, E, E, E, E }, //

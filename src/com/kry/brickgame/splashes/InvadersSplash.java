@@ -5,7 +5,8 @@ package com.kry.brickgame.splashes;
  * 
  */
 public class InvadersSplash extends Splash {
-
+	private static final long serialVersionUID = 8121034490271030749L;
+	
 	private static Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ F, F, F, F, F, F, F, F, F, F }, //

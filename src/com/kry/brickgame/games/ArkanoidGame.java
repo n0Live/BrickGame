@@ -31,6 +31,7 @@ import com.kry.brickgame.splashes.Splash;
  * 
  */
 public class ArkanoidGame extends GameWithLives {
+	private static final long serialVersionUID = 8505150526466946063L;
 	/**
 	 * Animated splash for game
 	 */
@@ -263,6 +264,8 @@ public class ArkanoidGame extends GameWithLives {
 		useDoubleSidedPlatform = ((getType() % 16 >= 9) || (getType() % 16 == 0));
 		// for types 32-64
 		setDrawInvertedBoard((getType() > 32));
+
+		loadNewLevel();
 	}
 
 	/**
@@ -270,8 +273,7 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	@Override
 	public void start() {
-		loadNewLevel();
-
+		super.start();
 		// create timer for shift the bricks
 		Timer shiftBricksTimer = new Timer("ShiftBricksTimer", true);
 		if (isShiftingBricks) {
@@ -285,31 +287,31 @@ public class ArkanoidGame extends GameWithLives {
 			}, 0, getFIRST_LEVEL_SPEED());
 		}
 
-		int currentSpeed;
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			// change the speed in depending of the platform size
-			switch (platform.getType()) {
-			case 0:// 1
-				currentSpeed = getSpeed(true) * 5 / 4;// slower
-				break;
-			case 1:// 2
-				currentSpeed = getSpeed(true);
-				break;
-			case 2:// 3
-				currentSpeed = getSpeed(true) * 3 / 4;
-				break;
-			default:// 4
-				currentSpeed = getSpeed(true) / 2;// faster
-				break;
-			}
+			if (getStatus() != Status.Paused) {
+				// change the speed in depending of the platform size
+				int currentSpeed;
+				switch (platform.getType()) {
+				case 0:// 1
+					currentSpeed = getSpeed(true) * 5 / 4;// slower
+					break;
+				case 1:// 2
+					currentSpeed = getSpeed(true);
+					break;
+				case 2:// 3
+					currentSpeed = getSpeed(true) * 3 / 4;
+					break;
+				default:// 4
+					currentSpeed = getSpeed(true) / 2;// faster
+					break;
+				}
+				// decrease game speed if use double sided platform
+				if (useDoubleSidedPlatform)
+					currentSpeed += ANIMATION_DELAY;
 
-			// decrease game speed if use double sided platform
-			if (useDoubleSidedPlatform)
-				currentSpeed += ANIMATION_DELAY;
-
-			if ((getStatus() != Status.Paused) && (elapsedTime(currentSpeed))) {
-				if (!isStartOfLevel)
+				if (elapsedTime(currentSpeed) && !isStartOfLevel) {
 					moveBall();
+				}
 			}
 			// processing of key presses
 			processKeys();
@@ -354,8 +356,6 @@ public class ArkanoidGame extends GameWithLives {
 
 		// init platform
 		movePlatform(curX);
-
-		setStatus(Status.Running);
 	}
 
 	@Override

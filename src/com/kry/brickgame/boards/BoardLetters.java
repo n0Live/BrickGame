@@ -5,6 +5,7 @@ package com.kry.brickgame.boards;
  * 
  */
 public class BoardLetters extends Board {
+	private static final long serialVersionUID = -2320950183789497365L;
 
 	enum Letters {
 		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z

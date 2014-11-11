@@ -13,6 +13,8 @@ import com.kry.brickgame.games.GameConsts.Status;
  * 
  */
 public class TetrisGameJ extends TetrisGameI {
+	private static final long serialVersionUID = 4703415063910078444L;
+	
 	final int TIME_BETWEEN_ADDING_LINE = 30;
 	volatile int time;
 	volatile boolean isTimeToAddLine;
@@ -30,7 +32,6 @@ public class TetrisGameJ extends TetrisGameI {
 
 	@Override
 	public void start() {
-
 		// create timer for addition of lines
 		Timer addLineTimer = new Timer("AddLineTicTac", true);
 		addLineTimer.scheduleAtFixedRate(new TimerTask() {

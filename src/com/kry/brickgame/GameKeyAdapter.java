@@ -52,6 +52,9 @@ public class GameKeyAdapter extends KeyAdapter {
 		case 'M':
 			Main.getGame().keyPressed(KeyPressed.KeyMute);
 			break;
+		case KeyEvent.VK_ESCAPE:
+			Main.getGame().keyPressed(KeyPressed.KeyOnOff);
+			break;
 		}
 	}
 
@@ -88,7 +91,7 @@ public class GameKeyAdapter extends KeyAdapter {
 			Main.getGame().keyReleased(KeyPressed.KeyReset);
 			break;
 		case KeyEvent.VK_ESCAPE:
-			System.exit(0);
+			Main.getGame().keyReleased(KeyPressed.KeyOnOff);
 			break;
 
 		}

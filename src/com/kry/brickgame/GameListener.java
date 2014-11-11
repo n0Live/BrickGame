@@ -24,4 +24,6 @@ public interface GameListener extends EventListener {
 
 	public void muteChanged(GameEvent event);
 
+	public void exit(GameEvent event);
+
 }

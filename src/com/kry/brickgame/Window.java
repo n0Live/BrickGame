@@ -83,7 +83,10 @@ public class Window extends JFrame implements MouseInputListener {
 		}, 0, 500);
 
 		setTitle("Brick Game");
-		Main.setGame(new SplashScreen());
+		Game game = GameLoader.loadGame();
+		if (game == null)
+			game =new SplashScreen();
+		Main.setGame(game);
 	}
 
 	@Override

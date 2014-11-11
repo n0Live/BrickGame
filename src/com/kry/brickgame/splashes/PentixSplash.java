@@ -5,7 +5,8 @@ package com.kry.brickgame.splashes;
  * 
  */
 public class PentixSplash extends Splash {
-
+	private static final long serialVersionUID = -3040854159282989785L;
+	
 	private static Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ E, E, E, F, F, E, E, E, E, E }, //
