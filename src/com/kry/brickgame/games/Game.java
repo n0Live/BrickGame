@@ -619,6 +619,10 @@ public abstract class Game extends Thread {
 	protected void animatedClearLine(Board board, int x, int y) {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
+		
+		//change status form stopping other work 
+		Status prevStatus = getStatus();
+		setStatus(Status.DoSomeWork);
 
 		playEffect(Effects.remove_line);
 
@@ -631,6 +635,9 @@ public abstract class Game extends Thread {
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
 		}
+		
+		//restore previous status
+		setStatus(prevStatus);
 	}
 
 	/**
@@ -795,7 +802,9 @@ public abstract class Game extends Thread {
 	 */
 	protected void pause() {
 		if (getStatus() == Status.Running) {
-
+			//send score
+			fireInfoChanged(String.valueOf(score));
+			//send high score
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
 			
 			setStatus(Status.Paused);
