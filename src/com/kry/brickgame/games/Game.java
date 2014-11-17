@@ -57,7 +57,7 @@ public abstract class Game extends Thread implements Serializable {
 	/**
 	 * Is the sound turned off?
 	 */
-	private static boolean mute = false;
+	private static boolean mute = true;
 	/**
 	 * Speed
 	 */
@@ -830,8 +830,6 @@ public abstract class Game extends Thread implements Serializable {
 	 * Exit to Main menu
 	 */
 	protected void exitToMainMenu() {
-		setStatus(Status.None);
-
 		stopAllSounds();
 
 		setHiScore();
@@ -843,6 +841,9 @@ public abstract class Game extends Thread implements Serializable {
 		Main.setGame(Main.gameSelector);
 	}
 
+	/**
+	 * Quit from the game
+	 */
 	protected void quit() {
 		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
 			setStatus(Status.Paused);
