@@ -5,7 +5,7 @@ import java.util.Random;
 import com.kry.brickgame.games.GameUtils;
 
 public class BricksWall extends Board {
-	private static final long serialVersionUID = -1932483370911692504L;
+	private static final long serialVersionUID = -5524132721347429556L;
 
 	static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
 			{ // 1
