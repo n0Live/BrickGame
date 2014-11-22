@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.kry.brickgame.GameEvent;
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.GameLoader;
 import com.kry.brickgame.Main;
 import com.kry.brickgame.ScoresManager;
+import com.kry.brickgame.UI.GameEvent;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
@@ -66,6 +66,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * Level
 	 */
 	private int level;
+	//TODO serialize
 	/**
 	 * Score
 	 */

@@ -2,6 +2,8 @@ package com.kry.brickgame;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 
@@ -10,90 +12,30 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * 
  */
 public class GameKeyAdapter extends KeyAdapter {
+	private final static Map<Integer, KeyPressed> keycodeMap;
+	static {
+		keycodeMap = new HashMap<>();
+		keycodeMap.put(KeyEvent.VK_LEFT, KeyPressed.KeyLeft);
+		keycodeMap.put(KeyEvent.VK_RIGHT, KeyPressed.KeyRight);
+		keycodeMap.put(KeyEvent.VK_DOWN, KeyPressed.KeyDown);
+		keycodeMap.put(KeyEvent.VK_UP, KeyPressed.KeyUp);
+		keycodeMap.put(KeyEvent.VK_SPACE, KeyPressed.KeyRotate);
+		keycodeMap.put(KeyEvent.VK_ENTER, KeyPressed.KeyStart);
+		keycodeMap.put(KeyEvent.VK_P, KeyPressed.KeyStart);
+		keycodeMap.put(KeyEvent.VK_R, KeyPressed.KeyReset);
+		keycodeMap.put(KeyEvent.VK_M, KeyPressed.KeyMute);
+		keycodeMap.put(KeyEvent.VK_ESCAPE, KeyPressed.KeyOnOff);
+	}
 
 	public void keyPressed(KeyEvent e) {
-
 		int keycode = e.getKeyCode();
-
-		switch (keycode) {
-		case KeyEvent.VK_LEFT:
-			Main.getGame().keyPressed(KeyPressed.KeyLeft);
-			break;
-		case KeyEvent.VK_RIGHT:
-			Main.getGame().keyPressed(KeyPressed.KeyRight);
-			break;
-		case KeyEvent.VK_DOWN:
-			Main.getGame().keyPressed(KeyPressed.KeyDown);
-			break;
-		case KeyEvent.VK_UP:
-			Main.getGame().keyPressed(KeyPressed.KeyUp);
-			break;
-		case KeyEvent.VK_SPACE:
-			Main.getGame().keyPressed(KeyPressed.KeyRotate);
-			break;
-		case KeyEvent.VK_ENTER:
-			Main.getGame().keyPressed(KeyPressed.KeyStart);
-			break;
-		case 'p':
-			Main.getGame().keyPressed(KeyPressed.KeyStart);
-			break;
-		case 'P':
-			Main.getGame().keyPressed(KeyPressed.KeyStart);
-			break;
-		case 'r':
-			Main.getGame().keyPressed(KeyPressed.KeyReset);
-			break;
-		case 'R':
-			Main.getGame().keyPressed(KeyPressed.KeyReset);
-			break;
-		case 'm':
-			Main.getGame().keyPressed(KeyPressed.KeyMute);
-			break;
-		case 'M':
-			Main.getGame().keyPressed(KeyPressed.KeyMute);
-			break;
-		case KeyEvent.VK_ESCAPE:
-			Main.getGame().keyPressed(KeyPressed.KeyOnOff);
-			break;
-		}
+		if (keycodeMap.containsKey(keycode))
+			CommandAdapter.keyPressed(keycodeMap.get(keycode));
 	}
 
 	public void keyReleased(KeyEvent e) {
-
 		int keycode = e.getKeyCode();
-
-		switch (keycode) {
-		case KeyEvent.VK_LEFT:
-			Main.getGame().keyReleased(KeyPressed.KeyLeft);
-			break;
-		case KeyEvent.VK_RIGHT:
-			Main.getGame().keyReleased(KeyPressed.KeyRight);
-			break;
-		case KeyEvent.VK_DOWN:
-			Main.getGame().keyReleased(KeyPressed.KeyDown);
-			break;
-		case KeyEvent.VK_UP:
-			Main.getGame().keyReleased(KeyPressed.KeyUp);
-			break;
-		case KeyEvent.VK_SPACE:
-			Main.getGame().keyReleased(KeyPressed.KeyRotate);
-			break;
-		case 'p':
-			Main.getGame().keyReleased(KeyPressed.KeyStart);
-			break;
-		case 'P':
-			Main.getGame().keyReleased(KeyPressed.KeyStart);
-			break;
-		case 'm':
-			Main.getGame().keyReleased(KeyPressed.KeyReset);
-			break;
-		case 'M':
-			Main.getGame().keyReleased(KeyPressed.KeyReset);
-			break;
-		case KeyEvent.VK_ESCAPE:
-			Main.getGame().keyReleased(KeyPressed.KeyOnOff);
-			break;
-
-		}
+		if (keycodeMap.containsKey(keycode))
+			CommandAdapter.keyReleased(keycodeMap.get(keycode));
 	}
 }

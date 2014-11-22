@@ -45,30 +45,28 @@ public final class GameConsts {
 	/**
 	 * Width of the default board ({@value} )
 	 */
-	protected static final int BOARD_WIDTH = 10;
+	public static final int BOARD_WIDTH = 10;
 	/**
 	 * Height of the default board ({@value} )
 	 */
-	protected static final int BOARD_HEIGHT = 20;
+	public static final int BOARD_HEIGHT = 20;
 	/**
 	 * Width of the default preview board ({@value} )
 	 */
-	protected static final int PREVIEW_WIDTH = 4;
+	public static final int PREVIEW_WIDTH = 4;
 	/**
 	 * Height of the default preview board ({@value} )
 	 */
-	protected static final int PREVIEW_HEIGHT = 4;
+	public static final int PREVIEW_HEIGHT = 4;
 	/**
 	 * Animation delay in milliseconds
 	 */
-	protected static final int ANIMATION_DELAY = 30;
+	public static final int ANIMATION_DELAY = 30;
 
 	// ** anumatedClearBoard constants **
 	protected static final int CB_GAME_OVER = 6000;
 	protected static final int CB_WIN = 5240;
 	protected static final int CB_LOSE = 1200;
 	// **
-
-
 
 }

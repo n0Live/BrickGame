@@ -2,6 +2,7 @@ package com.kry.brickgame;
 
 import java.awt.EventQueue;
 
+import com.kry.brickgame.UI.Window;
 import com.kry.brickgame.games.Game;
 import com.kry.brickgame.games.GameSelector;
 

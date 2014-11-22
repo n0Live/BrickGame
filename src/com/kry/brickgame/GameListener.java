@@ -2,6 +2,8 @@ package com.kry.brickgame;
 
 import java.util.EventListener;
 
+import com.kry.brickgame.UI.GameEvent;
+
 /**
  * @author noLive
  * 
