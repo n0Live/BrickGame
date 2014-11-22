@@ -10,6 +10,7 @@ import static com.kry.brickgame.games.GameUtils.melodies;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.playMelody;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -60,7 +61,8 @@ public class DanceGame extends Game {
 	/**
 	 * Class describes a dance position
 	 */
-	private class DancePosition {
+	private class DancePosition implements Serializable{
+		private static final long serialVersionUID = 8936725072827465123L;
 		/**
 		 * Positions of the {@code DancerShape} on y-axis
 		 */
