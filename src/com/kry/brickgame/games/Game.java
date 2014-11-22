@@ -66,7 +66,6 @@ public abstract class Game extends Thread implements Serializable {
 	 * Level
 	 */
 	private int level;
-	//TODO serialize
 	/**
 	 * Score
 	 */

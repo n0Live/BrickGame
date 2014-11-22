@@ -23,8 +23,8 @@ public class GameProperties {
 		board = null;
 		preview = null;
 		status = null;
-		info = "0"; //scores
-		hiScores = "0";
+		info = null; //scores
+		hiScores = null;
 		speed = 1;
 		level = 1;
 		rotation = null;
