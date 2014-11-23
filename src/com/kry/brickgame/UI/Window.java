@@ -10,8 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,6 +32,8 @@ public class Window extends JFrame {
 	private static final long serialVersionUID = 3466619047314091863L;
 
 	public JFrame frame;
+	
+	private Map <Integer, JButton> buttons;
 
 	private int x;
 	private int y;
@@ -47,6 +49,8 @@ public class Window extends JFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		buttons = new HashMap<>();
+		
 		// Color bgColor = new Color(109, 119, 92);
 		Color bgColor = new Color(136, 153, 107);
 
@@ -127,7 +131,7 @@ public class Window extends JFrame {
 		JButton btnU = new JButton("U");
 		btnU.setActionCommand("KeyUp");
 		btnU.setFocusable(false);
-		btnU.addActionListener(btnListener);
+		//btnU.addActionListener(btnListener);
 		btnU.addMouseListener(btnMouseListener);
 
 		JButton btnL = new JButton("L");
@@ -154,6 +158,17 @@ public class Window extends JFrame {
 		// btnRotate.addActionListener(btnListener);
 		btnRotate.addMouseListener(btnMouseListener);
 
+		buttons.put(KeyEvent.VK_LEFT, btnL);
+		buttons.put(KeyEvent.VK_RIGHT, btnR);
+		buttons.put(KeyEvent.VK_DOWN, btnD);
+		buttons.put(KeyEvent.VK_UP, btnU);
+		buttons.put(KeyEvent.VK_SPACE, btnRotate);
+		//buttons.put(KeyEvent.VK_ENTER, );
+		//buttons.put(KeyEvent.VK_P, );
+		//buttons.put(KeyEvent.VK_R, );
+		//buttons.put(KeyEvent.VK_M, );
+		buttons.put(KeyEvent.VK_ESCAPE, btnClose);
+	
 		drawPanel.add(btnU, "cell 1 2");
 		drawPanel.add(btnL, "cell 0 3");
 		drawPanel.add(btnR, "cell 2 3");
@@ -192,16 +207,19 @@ public class Window extends JFrame {
 				.addKeyEventDispatcher(new KeyEventDispatcher() {
 					@Override
 					public boolean dispatchKeyEvent(KeyEvent e) {
+						JButton btn;
 						ButtonModel btnMdl;
 						if (e.getID() == Event.KEY_PRESS) {
-							if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-								btnMdl = btnD.getModel();
+							if (buttons.containsKey(e.getKeyCode())) {
+								btn = buttons.get(e.getKeyCode());
+								btnMdl = btn.getModel();
 								btnMdl.setArmed(true);
 								btnMdl.setPressed(true);
 							}
 						} else if (e.getID() == Event.KEY_RELEASE) {
-							if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-								btnMdl = btnD.getModel();
+							if (buttons.containsKey(e.getKeyCode())) {
+								btn = buttons.get(e.getKeyCode());
+								btnMdl = btn.getModel();
 								btnMdl.setPressed(false);
 								btnMdl.setArmed(false);
 							}
@@ -229,44 +247,6 @@ public class Window extends JFrame {
 			frame.setLocation(e.getX() + frame.getX() - x,
 					e.getY() + frame.getY() - y);
 			frame.repaint();
-		}
-	}
-
-	private class ButtonMouseListener extends MouseAdapter {
-		private Set<KeyPressed> keyPressed;
-
-		public ButtonMouseListener() {
-			keyPressed = new HashSet<>();
-
-			new Timer("KeyPressed", true).schedule(new TimerTask() {
-				@Override
-				public void run() {
-					SwingUtilities.invokeLater(new Runnable() {
-						public void run() {
-							for (KeyPressed key : keyPressed) {
-								Main.getGame().keyPressed(key);
-							}
-							;
-						}
-					});
-				}
-			}, 0, 70);
-
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-			final JButton btn = (JButton) e.getSource();
-			keyPressed.add(KeyPressed.valueOf(btn.getActionCommand()));
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			JButton btn = (JButton) e.getSource();
-			KeyPressed key =KeyPressed.valueOf(btn.getActionCommand());
-			keyPressed.remove(key);
-			Main.getGame().keyReleased(key);
-			
 		}
 	}
 
