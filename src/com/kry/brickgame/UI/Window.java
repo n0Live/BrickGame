@@ -58,10 +58,6 @@ public class Window extends JFrame {
 		//frame.setResizable(false);
 		//frame.setUndecorated(true);
 
-		/*
-		 * frame.setBounds(0, 0, Drawer.SQUARE_SIZE * (10 + 6) + Drawer.SQUARE_SIZE,
-		 * Drawer.SQUARE_SIZE * 20 + Drawer.SQUARE_SIZE);
-		 */
 		frame.setBounds(0, 0, 360, 640);
 
 		// place window in the center of the screen
@@ -92,41 +88,6 @@ public class Window extends JFrame {
 		
 		
 		drawPanel.add(btnClose, "cell 5 0,alignx right");
-
-		ActionListener btnListener = new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JButton btn = (JButton) e.getSource();
-				ButtonModel btnMdl = btn.getModel();
-				switch (btn.getText()) {
-				case "U":
-					if (btnMdl.isArmed())
-						Main.getGame().keyPressed(KeyPressed.KeyUp);
-					else
-						Main.getGame().keyReleased(KeyPressed.KeyUp);
-					break;
-				case "L":
-					Main.getGame().keyPressed(KeyPressed.KeyLeft);
-					break;
-				case "R":
-					Main.getGame().keyPressed(KeyPressed.KeyRight);
-					break;
-				case "D":
-					if (btnMdl.isArmed())
-						Main.getGame().keyPressed(KeyPressed.KeyDown);
-					else
-						Main.getGame().keyReleased(KeyPressed.KeyDown);
-					break;
-				case "Rotate":
-					Main.getGame().keyPressed(KeyPressed.KeyRotate);
-					break;
-				default:
-					break;
-				}
-
-			}
-		};
-
 
 		JButton btnU = new JButton("U");
 		btnU.setActionCommand("KeyUp");
