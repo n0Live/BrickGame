@@ -261,9 +261,9 @@ public final class Drawer {
 		// set thickness of the line
 		g2d.setStroke(new BasicStroke(borderLineWidth));
 		// shift for the proper drawing the thick border line
-		int shift = (int) (borderLineWidth / 2);
-		g2d.drawRect(shift, shift, canvas.getWidth() - shift * 2,
-				canvas.getHeight() - shift * 2);
+		int shift = Math.round(borderLineWidth);
+		g2d.drawRect(shift / 2, shift / 2, canvas.getWidth() - shift,
+				canvas.getHeight() - shift);
 
 		g2d.dispose();
 	}
