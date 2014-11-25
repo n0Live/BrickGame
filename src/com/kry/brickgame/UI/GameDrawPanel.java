@@ -10,9 +10,12 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.games.GameConsts.Status;
@@ -41,6 +44,28 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			backgroundImage = null;
 		}
 
+		new Timer("BlinkingSquares", true).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						blinkingSquares();
+					}
+				});
+			}
+		}, 0, 10);
+
+		new Timer("BlinkingPause", true).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						blinkingPauseIcon();
+					}
+				});
+			}
+		}, 0, 500);
+
 	}
 
 	@Override
@@ -67,7 +92,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		}
 
 		int gameFieldWidth = size.width * 3 / 4;
-		int gameFieldHeight =  gameFieldWidth * 4 /3; //size.height * 3 / 5;
+		int gameFieldHeight = gameFieldWidth * 4 / 3; // size.height * 3 / 5;
 		if (gameFieldWidth >= 50 && gameFieldHeight >= 100) {
 			BufferedImage gameField = Drawer.getDrawnGameField(gameFieldWidth,
 					gameFieldHeight, properties);

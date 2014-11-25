@@ -9,13 +9,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -97,28 +93,6 @@ public class Window extends JFrame {
 
 		frame.addMouseListener(mouseListener);
 		frame.addMouseMotionListener(mouseListener);
-
-		new Timer("BlinkingSquares", true).schedule(new TimerTask() {
-			@Override
-			public void run() {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						drawPanel.blinkingSquares();
-					}
-				});
-			}
-		}, 0, 10);
-		
-		new Timer("BlinkingPause", true).schedule(new TimerTask() {
-			@Override
-			public void run() {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						drawPanel.blinkingPauseIcon();
-					}
-				});
-			}
-		}, 0, 500);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 				.addKeyEventDispatcher(new ButtonsFactory.ButtonsKeyEventDispatcher());
