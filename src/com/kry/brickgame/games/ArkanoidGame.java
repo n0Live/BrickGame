@@ -287,24 +287,17 @@ public class ArkanoidGame extends GameWithLives {
 			}, 0, getFIRST_LEVEL_SPEED());
 		}
 
+		final float slowestSpeed = 1.25f;
+		final float speedStep = 0.25f;
+
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
 			if (getStatus() != Status.Paused) {
 				// change the speed in depending of the platform size
-				int currentSpeed;
-				switch (platform.getType()) {
-				case 0:// 1
-					currentSpeed = getSpeed(true) * 5 / 4;// slower
-					break;
-				case 1:// 2
-					currentSpeed = getSpeed(true);
-					break;
-				case 2:// 3
-					currentSpeed = getSpeed(true) * 3 / 4;
-					break;
-				default:// 4
-					currentSpeed = getSpeed(true) / 2;// faster
-					break;
-				}
+				// (slower when used small platform)
+				int speedFactor = (int) (slowestSpeed - platform.getType()
+						* speedStep);
+				int currentSpeed = getSpeed(true) * speedFactor;
+
 				// decrease game speed if use double sided platform
 				if (useDoubleSidedPlatform)
 					currentSpeed += ANIMATION_DELAY;
