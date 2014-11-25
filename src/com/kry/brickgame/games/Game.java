@@ -37,7 +37,7 @@ import com.kry.brickgame.splashes.Splash;
  */
 public abstract class Game extends Thread implements Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
-	
+
 	/**
 	 * Animated splash for game
 	 */
@@ -142,9 +142,9 @@ public abstract class Game extends Thread implements Serializable {
 	 */
 	public Game() {
 		setStatus(Status.None);
-		
+
 		stopAllSounds();
-		
+
 		setSpeed(1);
 		setLevel(1);
 		setRotation(Rotation.None);
@@ -225,10 +225,10 @@ public abstract class Game extends Thread implements Serializable {
 	protected Game(int speed, int level, Board board, Board preview,
 			Rotation rotation, int type) {
 		this(speed, level, rotation, type);
-		
+
 		setBoard(board);
 		setPreview(preview);
-	
+
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
@@ -237,7 +237,7 @@ public abstract class Game extends Thread implements Serializable {
 		clearBoard();
 		clearPreview();
 	}
-	
+
 	@Override
 	public void start() {
 		fireBoardChanged(board);
@@ -250,7 +250,6 @@ public abstract class Game extends Thread implements Serializable {
 		fireInfoChanged(String.valueOf(score));
 		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
-	
 
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
@@ -836,7 +835,7 @@ public abstract class Game extends Thread implements Serializable {
 
 		Main.gameSelector.setSpeed(speed);
 		Main.gameSelector.setLevel(level);
-		
+
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
@@ -845,13 +844,24 @@ public abstract class Game extends Thread implements Serializable {
 	 * Quit from the game
 	 */
 	protected void quit() {
-		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
-			setStatus(Status.Paused);
-			GameLoader.saveGame(this);
-		}else{
+		if (!saveState()) {
 			GameLoader.deleteSavedGame();
 		}
 		fireExit();
+	}
+
+	/**
+	 * Save state of the current game
+	 * 
+	 * @return {@code true} - when success, {@code false} - otherwise
+	 */
+	public boolean saveState() {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
+			setStatus(Status.Paused);
+			return GameLoader.saveGame(this);
+		} else {
+			return false;
+		}
 	}
 
 	@Override

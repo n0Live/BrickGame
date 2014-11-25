@@ -2,20 +2,17 @@ package com.kry.brickgame.UI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Event;
-import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.ButtonModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -32,8 +29,6 @@ public class Window extends JFrame {
 	private static final long serialVersionUID = 3466619047314091863L;
 
 	public JFrame frame;
-	
-	private Map <Integer, JButton> buttons;
 
 	private int x;
 	private int y;
@@ -49,8 +44,6 @@ public class Window extends JFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		buttons = new HashMap<>();
-		
 		// Color bgColor = new Color(109, 119, 92);
 		Color bgColor = new Color(136, 153, 107);
 
@@ -65,6 +58,8 @@ public class Window extends JFrame {
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		frame.addWindowListener(new WindowListener());
 
 		final GameDrawPanel drawPanel = new GameDrawPanel();
 		drawPanel.setBackground(bgColor);
@@ -77,64 +72,24 @@ public class Window extends JFrame {
 
 		JButton btnMinimize = new JButton("_");
 		btnMinimize.setFocusable(false);
+		btnMinimize.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.setState(ICONIFIED);
+			}
+		});
 		drawPanel.add(btnMinimize, "cell 4 0,alignx right");
-
-		ButtonMouseListener btnMouseListener = new ButtonMouseListener();
 		
-		JButton btnClose = new JButton("X");
-		btnClose.setActionCommand("KeyOnOff");
-		btnClose.setFocusable(false);
-		btnClose.addMouseListener(btnMouseListener);
-		
+		JButton btnClose = ButtonsFactory.getButton(KeyPressed.KeyOnOff);
+		btnClose.setText("X");
 		
 		drawPanel.add(btnClose, "cell 5 0,alignx right");
 
-		JButton btnU = new JButton("U");
-		btnU.setActionCommand("KeyUp");
-		btnU.setFocusable(false);
-		//btnU.addActionListener(btnListener);
-		btnU.addMouseListener(btnMouseListener);
-
-		JButton btnL = new JButton("L");
-		btnL.setActionCommand("KeyLeft");
-		btnL.setFocusable(false);
-		// btnL.addActionListener(btnListener);
-		btnL.addMouseListener(btnMouseListener);
-
-		JButton btnR = new JButton("R");
-		btnR.setActionCommand("KeyRight");
-		btnR.setFocusable(false);
-		// btnR.addActionListener(btnListener);
-		btnR.addMouseListener(btnMouseListener);
-
-		final JButton btnD = new JButton("D");
-		btnD.setActionCommand("KeyDown");
-		btnD.setFocusable(false);
-		// btnD.addActionListener(btnListener);
-		btnD.addMouseListener(btnMouseListener);
-
-		JButton btnRotate = new JButton("Rotate");
-		btnRotate.setActionCommand("KeyRotate");
-		btnRotate.setFocusable(false);
-		// btnRotate.addActionListener(btnListener);
-		btnRotate.addMouseListener(btnMouseListener);
-
-		buttons.put(KeyEvent.VK_LEFT, btnL);
-		buttons.put(KeyEvent.VK_RIGHT, btnR);
-		buttons.put(KeyEvent.VK_DOWN, btnD);
-		buttons.put(KeyEvent.VK_UP, btnU);
-		buttons.put(KeyEvent.VK_SPACE, btnRotate);
-		//buttons.put(KeyEvent.VK_ENTER, );
-		//buttons.put(KeyEvent.VK_P, );
-		//buttons.put(KeyEvent.VK_R, );
-		//buttons.put(KeyEvent.VK_M, );
-		buttons.put(KeyEvent.VK_ESCAPE, btnClose);
-	
-		drawPanel.add(btnU, "cell 1 2");
-		drawPanel.add(btnL, "cell 0 3");
-		drawPanel.add(btnR, "cell 2 3");
-		drawPanel.add(btnD, "cell 1 4");
-		drawPanel.add(btnRotate, "cell 4 3");
+		drawPanel.add(ButtonsFactory.getButton(KeyPressed.KeyUp), "cell 1 2");
+		drawPanel.add(ButtonsFactory.getButton(KeyPressed.KeyLeft), "cell 0 3");
+		drawPanel.add(ButtonsFactory.getButton(KeyPressed.KeyRight), "cell 2 3");
+		drawPanel.add(ButtonsFactory.getButton(KeyPressed.KeyDown), "cell 1 4");
+		drawPanel.add(ButtonsFactory.getButton(KeyPressed.KeyRotate), "cell 4 3");
 
 		frame.addKeyListener(Main.gameKeyAdapter);
 
@@ -153,6 +108,7 @@ public class Window extends JFrame {
 				});
 			}
 		}, 0, 10);
+		
 		new Timer("BlinkingPause", true).schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -165,29 +121,7 @@ public class Window extends JFrame {
 		}, 0, 500);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-				.addKeyEventDispatcher(new KeyEventDispatcher() {
-					@Override
-					public boolean dispatchKeyEvent(KeyEvent e) {
-						JButton btn;
-						ButtonModel btnMdl;
-						if (e.getID() == Event.KEY_PRESS) {
-							if (buttons.containsKey(e.getKeyCode())) {
-								btn = buttons.get(e.getKeyCode());
-								btnMdl = btn.getModel();
-								btnMdl.setArmed(true);
-								btnMdl.setPressed(true);
-							}
-						} else if (e.getID() == Event.KEY_RELEASE) {
-							if (buttons.containsKey(e.getKeyCode())) {
-								btn = buttons.get(e.getKeyCode());
-								btnMdl = btn.getModel();
-								btnMdl.setPressed(false);
-								btnMdl.setArmed(false);
-							}
-						}
-						return false;
-					}
-				});
+				.addKeyEventDispatcher(new ButtonsFactory.ButtonsKeyEventDispatcher());
 
 		setTitle("Brick Game");
 		Game game = GameLoader.loadGame();
@@ -209,6 +143,14 @@ public class Window extends JFrame {
 					e.getY() + frame.getY() - y);
 			frame.repaint();
 		}
+	}
+	
+	private class WindowListener extends WindowAdapter{
+		@Override
+	    public void windowIconified(WindowEvent e) {
+			Main.getGame().saveState();
+		}
+
 	}
 
 }

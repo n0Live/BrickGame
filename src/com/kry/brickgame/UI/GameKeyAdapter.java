@@ -1,10 +1,11 @@
-package com.kry.brickgame;
+package com.kry.brickgame.UI;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.kry.brickgame.Main;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 
 /**
@@ -12,7 +13,7 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * 
  */
 public class GameKeyAdapter extends KeyAdapter {
-	private final static Map<Integer, KeyPressed> keycodeMap;
+	public final static Map<Integer, KeyPressed> keycodeMap;
 	static {
 		keycodeMap = new HashMap<>();
 		keycodeMap.put(KeyEvent.VK_LEFT, KeyPressed.KeyLeft);
@@ -30,12 +31,12 @@ public class GameKeyAdapter extends KeyAdapter {
 	public void keyPressed(KeyEvent e) {
 		int keycode = e.getKeyCode();
 		if (keycodeMap.containsKey(keycode))
-			CommandAdapter.keyPressed(keycodeMap.get(keycode));
+			Main.getGame().keyPressed(keycodeMap.get(keycode));
 	}
 
 	public void keyReleased(KeyEvent e) {
 		int keycode = e.getKeyCode();
 		if (keycodeMap.containsKey(keycode))
-			CommandAdapter.keyReleased(keycodeMap.get(keycode));
+			Main.getGame().keyReleased(keycodeMap.get(keycode));
 	}
 }
