@@ -3,6 +3,10 @@ package com.kry.brickgame.UI;
 import java.awt.Color;
 import java.awt.Dimension;
 
+/**
+ * @author noLive
+ * 
+ */
 public class UIConsts {
 	/* LABELS */
 	protected static final String HI = "HI";

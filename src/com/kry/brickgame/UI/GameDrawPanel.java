@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputListener;
 
 import com.kry.brickgame.GameListener;
 import com.kry.brickgame.games.GameConsts.Status;
@@ -35,6 +36,10 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		properties = new GameProperties();
 		canvas = null;
 		size = null;
+
+		setBorder(new ResizableBorder());
+		addMouseListener(resizeListener);
+		addMouseMotionListener(resizeListener);
 
 		try {
 			backgroundImage = ImageIO.read(getClass().getResourceAsStream(
@@ -198,4 +203,5 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		System.exit(0);
 	}
 
+	MouseInputListener resizeListener = new GameMouseListener();
 }
