@@ -1,6 +1,6 @@
 package com.kry.brickgame.UI;
 
-import static com.kry.brickgame.UI.UIConsts.ASPECT_RATIO;
+import static com.kry.brickgame.UI.UIConsts.GAME_FIELD_ASPECT_RATIO;
 import static com.kry.brickgame.UI.UIConsts.COMING;
 import static com.kry.brickgame.UI.UIConsts.GAME_OVER;
 import static com.kry.brickgame.UI.UIConsts.HI;
@@ -24,6 +24,7 @@ import static com.kry.brickgame.UI.UIConsts.fullColor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.FontMetrics;
@@ -107,17 +108,13 @@ public final class Drawer {
 			GameProperties properties) {
 		fontManager = FontManager.getManager();
 
-		// set the size of the canvas based on ASPECT_RATIO
-		float aspectRatio = (float) height / width;
-		int realWidth = (int) ((aspectRatio >= ASPECT_RATIO) ? width : height
-				/ ASPECT_RATIO);
-		int realHeight = (int) ((aspectRatio <= ASPECT_RATIO) ? height : width
-				* ASPECT_RATIO);
+		// set the size of the canvas based on GAME_FIELD_ASPECT_RATIO
+		Dimension d = UIConsts.getDimensionWithAspectRatio(new Dimension(width, height), GAME_FIELD_ASPECT_RATIO);
 
 		// calculate size of a one square
-		squareSideLenght = realHeight / (GameConsts.BOARD_HEIGHT + 1);
+		squareSideLenght = d.height / (GameConsts.BOARD_HEIGHT + 1);
 
-		canvas = initCanvas(realWidth, realHeight);
+		canvas = initCanvas(d.width, d.height);
 
 		float borderLineWidth = calcBorderLineWidth();
 		boardCanvas = initCanvas(properties.board, borderLineWidth);
@@ -132,7 +129,7 @@ public final class Drawer {
 			drawComingSoonStatus(boardCanvas, properties.status);
 
 			int space = squareSideLenght / 2;
-			labelsCanvas = initCanvas(realWidth
+			labelsCanvas = initCanvas(d.width
 					- (boardCanvas.getWidth() + space), boardCanvas.getHeight());
 			// append labels and icons
 			drawLabelsAndIcons(labelsCanvas, properties);

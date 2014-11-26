@@ -6,6 +6,7 @@ import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * The Game main properties
+ * 
  * @author noLive
  */
 public class GameProperties {
@@ -14,7 +15,7 @@ public class GameProperties {
 	protected Status status;
 	protected String info;
 	protected String hiScores;
-	protected int speed; 
+	protected int speed;
 	protected int level;
 	protected Rotation rotation;
 	protected boolean mute;
@@ -23,7 +24,7 @@ public class GameProperties {
 		board = null;
 		preview = null;
 		status = null;
-		info = null; //scores
+		info = null; // scores
 		hiScores = null;
 		speed = 1;
 		level = 1;
