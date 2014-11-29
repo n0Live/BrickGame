@@ -1,9 +1,9 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -38,6 +38,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		size = null;
 
 		setBorder(new ResizableBorder());
+		
 		addMouseListener(resizeListener);
 		addMouseMotionListener(resizeListener);
 
@@ -88,9 +89,9 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			Graphics2D g2d = (Graphics2D) canvas.getGraphics();
 			if (backgroundImage != null) {
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height,
-						Color.DARK_GRAY, null);
+						deviceBgColor, null);
 			} else {
-				g2d.setBackground(Color.DARK_GRAY);
+				g2d.setBackground(deviceBgColor);
 				g2d.clearRect(0, 0, size.width, size.height);
 			}
 			g2d.dispose();

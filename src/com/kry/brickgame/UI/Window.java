@@ -56,21 +56,13 @@ public class Window extends JFrame {
 		setContentPane(drawPanel);
 
 		Game.addGameListener(drawPanel);
-		drawPanel.setLayout(new MigLayout("", "[][][][360px][][]",
-				"[][grow][][][][]"));
+		drawPanel.setLayout(new MigLayout("", "[][][][grow][][]", "[][grow][][][][]"));
 
-		JButton btnMinimize = new JButton("_");
-		btnMinimize.setFocusable(false);
-		btnMinimize.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				setState(ICONIFIED);
-			}
-		});
+		JButton btnMinimize = ButtonsFactory.getMinimizeButton();
 		drawPanel.add(btnMinimize, "cell 4 0,alignx right");
 
-		JButton btnClose = ButtonsFactory.getButton(KeyPressed.KeyOnOff);
-		btnClose.setText("X");
+		JButton btnClose = ButtonsFactory.getCloseButton();//ButtonsFactory.getButton(KeyPressed.KeyOnOff);
+		//btnClose.setText("X");
 
 		drawPanel.add(btnClose, "cell 5 0,alignx right");
 
