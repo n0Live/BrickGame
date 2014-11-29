@@ -1,7 +1,10 @@
 package com.kry.brickgame.UI;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
+import static com.kry.brickgame.UI.UIConsts.lineNormaStroke;
+import static com.kry.brickgame.UI.UIConsts.lineNormalColor;
+import static com.kry.brickgame.UI.UIConsts.lineOverColor;
+import static com.kry.brickgame.UI.UIConsts.lineOverStroke;
+
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -21,10 +24,6 @@ import javax.swing.border.Border;
  * @author noLive
  */
 public class ResizableBorder implements Border {
-	private final Color out = Color.GRAY; // new Color(162, 162, 162);
-	private final Color over = Color.LIGHT_GRAY; // new Color(192, 192, 192);
-	private final Stroke outStroke = new BasicStroke(2f);
-	private final Stroke overStroke = new BasicStroke(3f);
 	private final int triangleSize = 20;
 
 	private boolean mouseOver = false;
@@ -43,8 +42,8 @@ public class ResizableBorder implements Border {
 			Stroke oldStroke = g2d.getStroke();
 			Paint oldPaint = g2d.getPaint();
 
-			g2d.setStroke(mouseOver ? overStroke : outStroke);
-			g2d.setPaint(mouseOver ? over : out);
+			g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
+			g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
 
 			// drawing three lines (or two lines and dot?)
 			g2d.drawLine(width - triangleSize - 1, height, width, height
