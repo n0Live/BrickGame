@@ -38,7 +38,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		size = null;
 
 		setBorder(new ResizableBorder());
-		
+
 		addMouseListener(resizeListener);
 		addMouseMotionListener(resizeListener);
 
@@ -97,21 +97,21 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			g2d.dispose();
 		}
 
-		int gameFieldWidth = size.width * 3 / 4;
-		int gameFieldHeight = gameFieldWidth * 4 / 3; // size.height * 3 / 5;
-		if (gameFieldWidth >= 50 && gameFieldHeight >= 100) {
+		int outBorderSpace = Math.round(size.width / 12);
+		int inBorderHorSpace = Math.round(size.width / 24);
+		int inBorderVertSpace = Math.round(size.width / 18);
+
+		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace) * 2;
+		int gameFieldHeight = Math.round(gameFieldWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
+		if (gameFieldWidth >= 90 && gameFieldHeight >= 120) {
 			BufferedImage gameField = Drawer.getDrawnGameField(gameFieldWidth,
 					gameFieldHeight, properties);
 
-			int spacer = size.width * 1 / 8;
-
 			Graphics2D g2d = (Graphics2D) canvas.getGraphics();
 
-			// g2d.drawImage(gameField, spacer, spacer, gameFieldWidth,
-			// gameFieldHeight, null);
-
-			g2d.drawImage(gameField, spacer, spacer, gameField.getWidth(),
-					gameField.getHeight(), null);
+			g2d.drawImage(gameField, outBorderSpace + inBorderHorSpace, outBorderSpace
+					+ inBorderVertSpace, gameField.getWidth(), gameField.getHeight(),
+					null);
 
 			g2d.dispose();
 		}
