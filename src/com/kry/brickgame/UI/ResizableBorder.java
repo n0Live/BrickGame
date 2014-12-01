@@ -24,7 +24,7 @@ import javax.swing.border.Border;
  * @author noLive
  */
 public class ResizableBorder implements Border {
-	private final int triangleSize = 20;
+	private final int triangleSize = 15;
 
 	private boolean mouseOver = false;
 
@@ -46,11 +46,12 @@ public class ResizableBorder implements Border {
 			g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
 
 			// drawing three lines (or two lines and dot?)
-			g2d.drawLine(width - triangleSize - 1, height, width, height
-					- triangleSize - 1);
-			g2d.drawLine(width - triangleSize / 2 - 1, height, width, height
-					- triangleSize / 2 - 1);
-			g2d.drawLine(width - 3, height, width, height - 3);
+			g2d.drawLine(width - triangleSize, height, width, height
+					- triangleSize);
+			g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height
+					- (triangleSize * 2 / 3));
+			g2d.drawLine(width - (triangleSize / 3), height, width, height
+					- (triangleSize / 3));
 
 			// restore properties from the backup
 			g2d.setStroke(oldStroke);
