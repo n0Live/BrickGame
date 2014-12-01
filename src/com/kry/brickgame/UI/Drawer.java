@@ -112,7 +112,7 @@ public final class Drawer {
 		Dimension d = UIConsts.getDimensionWithAspectRatio(new Dimension(width, height), GAME_FIELD_ASPECT_RATIO);
 
 		// calculate size of a one square
-		squareSideLenght = d.height / (GameConsts.BOARD_HEIGHT + 1);
+		squareSideLenght = Math.round(d.height / (GameConsts.BOARD_HEIGHT + 1));
 
 		canvas = initCanvas(d.width, d.height);
 
