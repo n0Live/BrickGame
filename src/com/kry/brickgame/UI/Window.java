@@ -1,10 +1,7 @@
 package com.kry.brickgame.UI;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -33,11 +30,7 @@ public class Window extends JFrame {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		// Color bgColor = new Color(109, 119, 92);
-		Color bgColor = new Color(136, 153, 107);
-
-		// frame.setResizable(false);
-		 setUndecorated(true);
+		setUndecorated(true);
 
 		setBounds(0, 0, 360, 640);
 
@@ -50,19 +43,19 @@ public class Window extends JFrame {
 		addWindowListener(new WindowListener());
 
 		final GameDrawPanel drawPanel = new GameDrawPanel();
-		drawPanel.setBackground(bgColor);
-		// drawPanel.setOpaque(true);
-		//frame.getContentPane().add(drawPanel);
+
+		// frame.getContentPane().add(drawPanel);
 		setContentPane(drawPanel);
 
 		Game.addGameListener(drawPanel);
-		drawPanel.setLayout(new MigLayout("", "[][][][grow][][]", "[][grow][][][][]"));
+		drawPanel.setLayout(new MigLayout("", "[][][][grow][][]",
+				"[][grow][][][][]"));
 
 		JButton btnMinimize = ButtonsFactory.getMinimizeButton();
 		drawPanel.add(btnMinimize, "cell 4 0,alignx right");
 
-		JButton btnClose = ButtonsFactory.getCloseButton();//ButtonsFactory.getButton(KeyPressed.KeyOnOff);
-		//btnClose.setText("X");
+		JButton btnClose = ButtonsFactory.getCloseButton();// ButtonsFactory.getButton(KeyPressed.KeyOnOff);
+		// btnClose.setText("X");
 
 		drawPanel.add(btnClose, "cell 5 0,alignx right");
 
@@ -75,11 +68,6 @@ public class Window extends JFrame {
 				"cell 4 3");
 
 		addKeyListener(Main.gameKeyAdapter);
-
-		//MouseListener mouseListener = new MouseListener();
-
-		//frame.addMouseListener(mouseListener);
-		//frame.addMouseMotionListener(mouseListener);
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 				.addKeyEventDispatcher(

@@ -4,9 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Stroke;
-import java.awt.event.MouseAdapter;
-
-import javax.swing.JComponent;
 
 /**
  * @author noLive
@@ -59,10 +56,10 @@ public class UIConsts {
 	/**
 	 * Device background color
 	 */
-	protected static final Color deviceBgColor = new Color(60, 60, 60);
+	protected static final Color deviceBgColor = Color.darkGray;//new Color(60, 60, 60);
 
 	protected static final Color lineNormalColor = getBWInverted(deviceBgColor);
-	protected static final Color lineOverColor = getEnhanced(lineNormalColor);
+	protected static final Color lineOverColor = getReduced(lineNormalColor);
 
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
@@ -80,10 +77,11 @@ public class UIConsts {
 	protected static Dimension getDimensionWithAspectRatio(Dimension d,
 			float aspectRatio) {
 		float originalAspectRatio = (float) d.height / d.width;
-
-		int calcWidth = (int) ((originalAspectRatio >= aspectRatio) ? d.width
+		
+		//rounding to the nearest highest integer
+		int calcWidth = (int) Math.ceil((originalAspectRatio >= aspectRatio) ? d.width
 				: d.height / aspectRatio);
-		int calcHeight = (int) ((originalAspectRatio <= aspectRatio) ? d.height
+		int calcHeight = (int) Math.ceil((originalAspectRatio <= aspectRatio) ? d.height
 				: d.width * aspectRatio);
 
 		return new Dimension(calcWidth, calcHeight);

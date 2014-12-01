@@ -116,7 +116,7 @@ public class ButtonsFactory {
 
 			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
 			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
-			
+
 			g2d.drawLine(gap, gap, size.width, size.height);
 			g2d.drawLine(gap, size.height, size.width, gap);
 
@@ -135,7 +135,7 @@ public class ButtonsFactory {
 		}
 
 	}
-	
+
 	private static class ButtonMinimize extends AbstractMenuButton {
 		private static final long serialVersionUID = -7518553794423312339L;
 
@@ -151,7 +151,7 @@ public class ButtonsFactory {
 			// save previous graphical properties for the further restore
 			Stroke oldStroke = g2d.getStroke();
 			Paint oldPaint = g2d.getPaint();
-			
+
 			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
 			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
 
@@ -169,11 +169,11 @@ public class ButtonsFactory {
 					JFrame.class, e.getComponent());
 			frame.setState(Frame.ICONIFIED);
 		}
-
 	}
 
-	public static abstract class AbstractMenuButton extends
-	JButton {
+	public static abstract class AbstractMenuButton extends JButton {
+		private static final long serialVersionUID = 7175204924783660101L;
+
 		protected boolean isMouseOver;
 
 		protected final Dimension size = new Dimension(10, 10);
@@ -184,9 +184,10 @@ public class ButtonsFactory {
 			setFocusable(false);
 			setContentAreaFilled(false);
 			setBorderPainted(false);
-			
-			Dimension sizeWithGap = new Dimension(size.width + gap*2, size.height + gap*2);
-			
+
+			Dimension sizeWithGap = new Dimension(size.width + gap * 2,
+					size.height + gap * 2);
+
 			setMinimumSize(sizeWithGap);
 			setPreferredSize(sizeWithGap);
 			setMaximumSize(sizeWithGap);
@@ -252,6 +253,6 @@ public class ButtonsFactory {
 				btnMdl.setPressed(b);
 			}
 		}
-
 	}
+	
 }
