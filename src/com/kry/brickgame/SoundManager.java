@@ -19,8 +19,7 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(1);
 		if (clip.isPlaying()) {
@@ -36,8 +35,7 @@ public class SoundManager {
 	 *            class of the {@code enum}
 	 * @return string array of resources
 	 */
-	public static <E extends Enum<E>> String[] enumToResourceArray(
-			Class<E> enumClass) {
+	public static <E extends Enum<E>> String[] enumToResourceArray(Class<E> enumClass) {
 		EnumSet<E> values = EnumSet.allOf(enumClass);
 		int i = 0;
 		String[] result = new String[values.size()];
@@ -58,8 +56,7 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 * @return {@code AudioClip}
 	 */
-	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank,
-			Enum<E> value) {
+	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank, Enum<E> value) {
 		return soundBank.getClip(getResourceFromName(value.toString()));
 	}
 	
@@ -74,8 +71,7 @@ public class SoundManager {
 	 * @return name of resource
 	 */
 	public static String getResourceFromName(String soundName) {
-		URL resource = SoundManager.class.getResource(soundFolder + soundName
-				+ soundExtension);
+		URL resource = SoundManager.class.getResource(soundFolder + soundName + soundExtension);
 		return resource.toExternalForm();
 	}
 	
@@ -105,8 +101,7 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 * @return {@code true} if the {@code AudioClip} is playing
 	 */
-	public static <E extends Enum<E>> boolean isPlaying(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> boolean isPlaying(SoundBank soundBank, Enum<E> value) {
 		return getClip(soundBank, value).isPlaying();
 	}
 	
@@ -118,8 +113,7 @@ public class SoundManager {
 	 * @param enumClass
 	 *            class of the {@code enum}
 	 */
-	public static <E extends Enum<E>> void loadSounds(SoundBank soundBank,
-			Class<E> enumClass) {
+	public static <E extends Enum<E>> void loadSounds(SoundBank soundBank, Class<E> enumClass) {
 		soundBank.loadSounds(enumToResourceArray(enumClass));
 	}
 	
@@ -132,13 +126,12 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void loop(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void loop(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(AudioClip.INDEFINITE);
 		// Use default parameters except priority
-		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(),
-				clip.getPan(), Thread.MAX_PRIORITY);
+		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(), clip.getPan(),
+				Thread.MAX_PRIORITY);
 	}
 	
 	/**
@@ -150,8 +143,7 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void play(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(1);
 		clip.play();
@@ -171,13 +163,11 @@ public class SoundManager {
 	 *            while 2.0 will double the rate. Valid range is 0.125 (1/8
 	 *            speed) to 8.0 (8x speed).
 	 */
-	public static <E extends Enum<E>> void play(SoundBank soundBank,
-			Enum<E> value, double rate) {
+	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, double rate) {
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(1);
 		// Use default parameters except rate
-		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(),
-				Thread.MAX_PRIORITY); // clip.getPriority());
+		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(), Thread.MAX_PRIORITY); // clip.getPriority());
 	}
 	
 	/**
@@ -189,8 +179,7 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void playAndWait(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void playAndWait(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(1);
 		clip.play();
@@ -214,8 +203,7 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void prepare(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void prepare(SoundBank soundBank, Enum<E> value) {
 		
 		final AudioClip clip = getClip(soundBank, value);
 		clip.play(0); // silent play
@@ -230,8 +218,7 @@ public class SoundManager {
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void stop(SoundBank soundBank,
-			Enum<E> value) {
+	public static <E extends Enum<E>> void stop(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
 		if (clip.isPlaying()) {
 			clip.stop();

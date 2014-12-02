@@ -75,8 +75,7 @@ public class ScoresManager {
 		File hiScoreFile = new File(HI_SCORE_FILE);
 		if (hiScoreFile.exists()) {
 			
-			try (ObjectInputStream in = new ObjectInputStream(
-					new FileInputStream(hiScoreFile))) {
+			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(hiScoreFile))) {
 				try {
 					hiScores = (HashMap<Class<Game>, Integer>) in.readObject();
 				} catch (ClassNotFoundException e) {
@@ -95,8 +94,7 @@ public class ScoresManager {
 	 */
 	private void saveScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new FileOutputStream(hiScoreFile))) {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(hiScoreFile))) {
 			out.writeObject(hiScores);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

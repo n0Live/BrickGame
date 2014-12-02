@@ -10,7 +10,6 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 
 /**
  * @author noLive
- * 
  */
 public class GameKeyAdapter extends KeyAdapter {
 	public final static Map<Integer, KeyPressed> keycodeMap;
@@ -27,16 +26,20 @@ public class GameKeyAdapter extends KeyAdapter {
 		keycodeMap.put(KeyEvent.VK_M, KeyPressed.KeyMute);
 		keycodeMap.put(KeyEvent.VK_ESCAPE, KeyPressed.KeyOnOff);
 	}
-
+	
+	@Override
 	public void keyPressed(KeyEvent e) {
 		int keycode = e.getKeyCode();
-		if (keycodeMap.containsKey(keycode))
+		if (keycodeMap.containsKey(keycode)) {
 			Main.getGame().keyPressed(keycodeMap.get(keycode));
+		}
 	}
-
+	
+	@Override
 	public void keyReleased(KeyEvent e) {
 		int keycode = e.getKeyCode();
-		if (keycodeMap.containsKey(keycode))
+		if (keycodeMap.containsKey(keycode)) {
 			Main.getGame().keyReleased(keycodeMap.get(keycode));
+		}
 	}
 }

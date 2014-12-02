@@ -25,51 +25,14 @@ import javax.swing.border.Border;
  */
 public class ResizableBorder implements Border {
 	private final int triangleSize = 15;
-
+	
 	private boolean mouseOver = false;
-
-	@Override
-	public void paintBorder(Component c, Graphics g, int x, int y, int width,
-			int height) {
-
-		// don't draw triangle if size of the component less than triangle size
-		if (width > triangleSize && height > triangleSize) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
-
-			g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
-			g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
-
-			// drawing three lines (or two lines and dot?)
-			g2d.drawLine(width - triangleSize, height, width, height
-					- triangleSize);
-			g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height
-					- (triangleSize * 2 / 3));
-			g2d.drawLine(width - (triangleSize / 3), height, width, height
-					- (triangleSize / 3));
-
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-		}
-
-	}
-
+	
 	@Override
 	public Insets getBorderInsets(Component c) {
 		return new Insets(0, 0, 0, 0);
 	}
-
-	@Override
-	public boolean isBorderOpaque() {
-		return false;
-	}
-
+	
 	/**
 	 * Returns resize cursor when mouse move over resize triangle
 	 * 
@@ -81,18 +44,50 @@ public class ResizableBorder implements Border {
 	public int getCursor(MouseEvent e) {
 		Component c = e.getComponent();
 		Point p = c.getMousePosition();
-
+		
 		int cur = Cursor.DEFAULT_CURSOR;
-
-		if (p != null && p.x >= c.getWidth() - triangleSize
-				&& p.y >= c.getHeight() - triangleSize) {
+		
+		if (p != null && p.x >= c.getWidth() - triangleSize && p.y >= c.getHeight() - triangleSize) {
 			cur = Cursor.SE_RESIZE_CURSOR;
 			mouseOver = true;
 		} else {
 			mouseOver = false;
 		}
-
+		
 		return cur;
 	}
-
+	
+	@Override
+	public boolean isBorderOpaque() {
+		return false;
+	}
+	
+	@Override
+	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+		
+		// don't draw triangle if size of the component less than triangle size
+		if (width > triangleSize && height > triangleSize) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			// save previous graphical properties for the further restore
+			Stroke oldStroke = g2d.getStroke();
+			Paint oldPaint = g2d.getPaint();
+			
+			g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
+			g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
+			
+			// drawing three lines (or two lines and dot?)
+			g2d.drawLine(width - triangleSize, height, width, height - triangleSize);
+			g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height
+					- (triangleSize * 2 / 3));
+			g2d.drawLine(width - (triangleSize / 3), height, width, height - (triangleSize / 3));
+			
+			// restore properties from the backup
+			g2d.setStroke(oldStroke);
+			g2d.setPaint(oldPaint);
+		}
+		
+	}
+	
 }

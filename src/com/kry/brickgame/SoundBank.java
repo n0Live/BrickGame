@@ -62,8 +62,7 @@ public class SoundBank implements Iterable<AudioClip> {
 			AudioClip clip;
 			try {
 				clip = new AudioClip(file);
-			} catch (NullPointerException | IllegalArgumentException
-					| MediaException e) {
+			} catch (NullPointerException | IllegalArgumentException | MediaException e) {
 				e.printStackTrace();
 				clip = null;
 			}

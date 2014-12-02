@@ -38,8 +38,7 @@ public class GameLoader {
 	public static Game loadGame() {
 		File savedGameFile = new File(SAVED_GAME_FILE);
 		if (savedGameFile.exists()) {
-			try (ObjectInputStream in = new ObjectInputStream(
-					new FileInputStream(savedGameFile))) {
+			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(savedGameFile))) {
 				return (Game) in.readObject();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -57,12 +56,10 @@ public class GameLoader {
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public static <T extends Game> boolean saveGame(T game) {
-		if (game instanceof GameSelector || game instanceof SplashScreen)
-			return false;
+		if (game instanceof GameSelector || game instanceof SplashScreen) return false;
 		
 		File savedGameFile = new File(SAVED_GAME_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new FileOutputStream(savedGameFile))) {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(savedGameFile))) {
 			out.writeObject(game);
 		} catch (IOException e) {
 			e.printStackTrace();

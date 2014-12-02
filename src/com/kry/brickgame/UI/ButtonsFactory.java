@@ -34,192 +34,145 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * @author noLive
  */
 public class ButtonsFactory {
-	/**
-	 * Mouse listener for the buttons
-	 */
-	private static ButtonMouseListener btnMouseListener = null;
-	/**
-	 * Map of the added buttons, assigned to the keys
-	 */
-	private static Map<KeyPressed, GameButton> buttons = null;
-
-	/**
-	 * Returns button, assigned to the specified key
-	 * 
-	 * @param key
-	 *            action key
-	 * @return button, assigned to the specified key
-	 */
-	public static GameButton getButton(KeyPressed key) {
-		// creating only in first call
-		if (null == btnMouseListener)
-			btnMouseListener = new ButtonMouseListener();
-		if (null == buttons)
-			buttons = new HashMap<>();
-
-		GameButton button = buttons.get(key);
-		// if button not created yet
-		if (null == button) {
-			button = new GameButton(key);
-			buttons.put(key, button);
-		}
-
-		return button;
-	}
-
-	public static JButton getCloseButton() {
-		return new ButtonClose();
-	}
-
-	public static JButton getMinimizeButton() {
-		return new ButtonMinimize();
-	}
-
-	public static class GameButton extends JButton {
-		private static final long serialVersionUID = 575073369779220772L;
-		/**
-		 * Action key, with which the button is associated (read only)
-		 */
-		public final KeyPressed mappedKey;
-
-		/**
-		 * Create button, assigned to the specified key
-		 * 
-		 * @param key
-		 *            action key
-		 */
-		public GameButton(KeyPressed key) {
-			super();
-			this.mappedKey = key;
-			setFocusable(false);
-			setContentAreaFilled(false);
-			setActionCommand(key.toString());
-			addMouseListener(btnMouseListener);
-		}
-	}
-
-	private static class ButtonClose extends AbstractMenuButton {
-		private static final long serialVersionUID = -7518553794423312339L;
-
-		public ButtonClose() {
-			super();
-		}
-
-		protected void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
-
-			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
-			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
-
-			g2d.drawLine(gap, gap, size.width, size.height);
-			g2d.drawLine(gap, size.height, size.width, gap);
-
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-			super.paintComponent(g2d);
-		}
-
-		@Override
-		void doWhenMouseReleased(MouseEvent e) {
-			JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(
-					JFrame.class, e.getComponent());
-			frame.dispatchEvent(new WindowEvent(frame,
-					WindowEvent.WINDOW_CLOSING));
-		}
-
-	}
-
-	private static class ButtonMinimize extends AbstractMenuButton {
-		private static final long serialVersionUID = -7518553794423312339L;
-
-		public ButtonMinimize() {
-			super();
-		}
-
-		protected void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
-
-			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
-			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
-
-			g2d.drawLine(gap, size.height, size.width, size.height);
-
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-			super.paintComponent(g2d);
-		}
-
-		@Override
-		void doWhenMouseReleased(MouseEvent e) {
-			JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(
-					JFrame.class, e.getComponent());
-			frame.setState(Frame.ICONIFIED);
-		}
-	}
-
 	public static abstract class AbstractMenuButton extends JButton {
 		private static final long serialVersionUID = 7175204924783660101L;
-
+		
 		protected boolean isMouseOver;
-
+		
 		protected final Dimension size = new Dimension(10, 10);
 		protected final int gap = 2;
-
+		
+		private final MouseAdapter menuMouseAdapter = new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				isMouseOver = true;
+				repaint();
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				isMouseOver = false;
+				repaint();
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				doWhenMouseReleased(e);
+			}
+		};
+		
 		public AbstractMenuButton() {
 			super();
 			setFocusable(false);
 			setContentAreaFilled(false);
 			setBorderPainted(false);
-
-			Dimension sizeWithGap = new Dimension(size.width + gap * 2,
-					size.height + gap * 2);
-
+			
+			Dimension sizeWithGap = new Dimension(size.width + gap * 2, size.height + gap * 2);
+			
 			setMinimumSize(sizeWithGap);
 			setPreferredSize(sizeWithGap);
 			setMaximumSize(sizeWithGap);
-
+			
 			isMouseOver = false;
 			addMouseListener(menuMouseAdapter);
 		}
-
-		private MouseAdapter menuMouseAdapter = new MouseAdapter() {
-			public void mouseEntered(MouseEvent e) {
-				isMouseOver = true;
-				repaint();
-			}
-
-			public void mouseExited(MouseEvent e) {
-				isMouseOver = false;
-				repaint();
-			}
-
-			public void mouseReleased(MouseEvent e) {
-				doWhenMouseReleased(e);
-			}
-		};
-
+		
 		abstract void doWhenMouseReleased(MouseEvent e);
 	}
-
+	
+	private static class ButtonClose extends AbstractMenuButton {
+		private static final long serialVersionUID = -7518553794423312339L;
+		
+		public ButtonClose() {
+			super();
+		}
+		
+		@Override
+		void doWhenMouseReleased(MouseEvent e) {
+			JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
+					e.getComponent());
+			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			// save previous graphical properties for the further restore
+			Stroke oldStroke = g2d.getStroke();
+			Paint oldPaint = g2d.getPaint();
+			
+			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
+			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
+			
+			g2d.drawLine(gap, gap, size.width, size.height);
+			g2d.drawLine(gap, size.height, size.width, gap);
+			
+			// restore properties from the backup
+			g2d.setStroke(oldStroke);
+			g2d.setPaint(oldPaint);
+			super.paintComponent(g2d);
+		}
+		
+	}
+	
+	private static class ButtonMinimize extends AbstractMenuButton {
+		private static final long serialVersionUID = -7518553794423312339L;
+		
+		public ButtonMinimize() {
+			super();
+		}
+		
+		@Override
+		void doWhenMouseReleased(MouseEvent e) {
+			JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
+					e.getComponent());
+			frame.setState(Frame.ICONIFIED);
+		}
+		
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2d = (Graphics2D) g;
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			
+			// save previous graphical properties for the further restore
+			Stroke oldStroke = g2d.getStroke();
+			Paint oldPaint = g2d.getPaint();
+			
+			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
+			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
+			
+			g2d.drawLine(gap, size.height, size.width, size.height);
+			
+			// restore properties from the backup
+			g2d.setStroke(oldStroke);
+			g2d.setPaint(oldPaint);
+			super.paintComponent(g2d);
+		}
+	}
+	
 	/**
 	 * Provides the effect of pressing the button when pressing the
 	 * corresponding keyboard key
 	 */
 	public static class ButtonsKeyEventDispatcher implements KeyEventDispatcher {
+		/**
+		 * Sets the button to pressed or unpressed.
+		 * 
+		 * @param btn
+		 *            button
+		 * @param b
+		 *            whether or not the button should be pressed
+		 */
+		private static void setPressed(JButton btn, boolean b) {
+			if (btn != null) {
+				ButtonModel btnMdl = btn.getModel();
+				btnMdl.setArmed(b);
+				btnMdl.setPressed(b);
+			}
+		}
+		
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent e) {
 			if (e.getID() == Event.KEY_PRESS) {
@@ -237,22 +190,73 @@ public class ButtonsFactory {
 			}
 			return false;
 		}
-
+	}
+	
+	public static class GameButton extends JButton {
+		private static final long serialVersionUID = 575073369779220772L;
 		/**
-		 * Sets the button to pressed or unpressed.
-		 * 
-		 * @param btn
-		 *            button
-		 * @param b
-		 *            whether or not the button should be pressed
+		 * Action key, with which the button is associated (read only)
 		 */
-		private static void setPressed(JButton btn, boolean b) {
-			if (btn != null) {
-				ButtonModel btnMdl = btn.getModel();
-				btnMdl.setArmed(b);
-				btnMdl.setPressed(b);
-			}
+		public final KeyPressed mappedKey;
+		
+		/**
+		 * Create button, assigned to the specified key
+		 * 
+		 * @param key
+		 *            action key
+		 */
+		public GameButton(KeyPressed key) {
+			super();
+			mappedKey = key;
+			setFocusable(false);
+			setContentAreaFilled(false);
+			setActionCommand(key.toString());
+			addMouseListener(btnMouseListener);
 		}
+	}
+	
+	/**
+	 * Mouse listener for the buttons
+	 */
+	private static ButtonMouseListener btnMouseListener = null;
+	
+	/**
+	 * Map of the added buttons, assigned to the keys
+	 */
+	private static Map<KeyPressed, GameButton> buttons = null;
+	
+	/**
+	 * Returns button, assigned to the specified key
+	 * 
+	 * @param key
+	 *            action key
+	 * @return button, assigned to the specified key
+	 */
+	public static GameButton getButton(KeyPressed key) {
+		// creating only in first call
+		if (null == btnMouseListener) {
+			btnMouseListener = new ButtonMouseListener();
+		}
+		if (null == buttons) {
+			buttons = new HashMap<>();
+		}
+		
+		GameButton button = buttons.get(key);
+		// if button not created yet
+		if (null == button) {
+			button = new GameButton(key);
+			buttons.put(key, button);
+		}
+		
+		return button;
+	}
+	
+	public static JButton getCloseButton() {
+		return new ButtonClose();
+	}
+	
+	public static JButton getMinimizeButton() {
+		return new ButtonMinimize();
 	}
 	
 }

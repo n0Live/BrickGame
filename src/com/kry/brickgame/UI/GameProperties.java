@@ -19,7 +19,7 @@ public class GameProperties {
 	protected int level;
 	protected Rotation rotation;
 	protected boolean mute;
-
+	
 	protected GameProperties() {
 		board = null;
 		preview = null;
@@ -31,5 +31,5 @@ public class GameProperties {
 		rotation = null;
 		mute = false;
 	}
-
+	
 }
