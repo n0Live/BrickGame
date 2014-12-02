@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class DanceSplash extends Splash {
 	private static final long serialVersionUID = 4698308435944509589L;
@@ -26,9 +25,9 @@ public class DanceSplash extends Splash {
 			{ E, E, F, E, E }, //
 			{ E, F, E, F, E }, //
 			{ E, F, E, E, F } } };
-
+	
 	public DanceSplash() {
 		super(frameTable);
 	}
-
+	
 }

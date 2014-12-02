@@ -2,6 +2,9 @@ package com.kry.brickgame.shapes;
 
 import java.awt.Point;
 
+/**
+ * @author noLive
+ */
 public abstract class CoordinatedShape extends CharacterShape {
 	private static final long serialVersionUID = -1378907881713510647L;
 	/**
@@ -12,30 +15,48 @@ public abstract class CoordinatedShape extends CharacterShape {
 	 * Y-coordinate position
 	 */
 	protected int y;
-
+	
+	public CoordinatedShape(CoordinatedShape aShape) {
+		super(aShape);
+		
+		setX(aShape.x());
+		setY(aShape.y());
+	}
+	
+	public CoordinatedShape(int type, int length) {
+		super(type, length);
+		
+		setX(0 - minX());
+		setY(0 - minY());
+	}
+	
 	public CoordinatedShape(int type, int length, int x, int y,
 			RotationAngle direction) {
 		super(type, length);
-
+		
 		this.x = x;
 		this.y = y;
 		changeRotationAngle(direction);
 	}
-
-	public CoordinatedShape(int type, int length) {
-		super(type, length);
-
-		setX(0 - minX());
-		setY(0 - minY());
+	
+	/**
+	 * Gets the coordinates of the current position
+	 * 
+	 * @return coordinates of the current position
+	 */
+	public Point getCoordinates() {
+		return new Point(x, y);
 	}
-
-	public CoordinatedShape(CoordinatedShape aShape) {
-		super(aShape);
-
-		setX(aShape.x());
-		setY(aShape.y());
+	
+	/**
+	 * Returns the movement direction
+	 * 
+	 * @return movement direction
+	 */
+	public RotationAngle getDirection() {
+		return getRotationAngle();
 	}
-
+	
 	/**
 	 * Setting the coordinates of the new position depending of the direction
 	 * 
@@ -58,50 +79,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 			break;
 		}
 	}
-
-	/**
-	 * Returns the movement direction
-	 * 
-	 * @return movement direction
-	 */
-	public RotationAngle getDirection() {
-		return this.getRotationAngle();
-	}
-
-	/**
-	 * X-coordinate position on the board
-	 */
-	public int x() {
-		return x;
-	}
-
-	/**
-	 * Setting the x-coordinate position on the board
-	 * 
-	 * @param x
-	 *            - the x-coordinate
-	 */
-	public void setX(int coordX) {
-		this.x = coordX;
-	}
-
-	/**
-	 * Y-coordinate position on the board
-	 */
-	public int y() {
-		return y;
-	}
-
-	/**
-	 * Setting the y-coordinate position on the board
-	 * 
-	 * @param y
-	 *            - the y-coordinate
-	 */
-	public void setY(int coordY) {
-		this.y = coordY;
-	}
-
+	
 	/**
 	 * Setting the coordinates of the new position
 	 * 
@@ -109,23 +87,47 @@ public abstract class CoordinatedShape extends CharacterShape {
 	 *            coordinates of the new position
 	 */
 	public void setCoordinates(Point position) {
-		this.x = position.x;
-		this.y = position.y;
+		x = position.x;
+		y = position.y;
 	}
-
+	
 	/**
-	 * Gets the coordinates of the current position
+	 * Setting the x-coordinate position on the board
 	 * 
-	 * @return coordinates of the current position
+	 * @param x
+	 *            - the x-coordinate
 	 */
-	public Point getCoordinates() {
-		return new Point(x, y);
+	public void setX(int coordX) {
+		x = coordX;
 	}
-
+	
+	/**
+	 * Setting the y-coordinate position on the board
+	 * 
+	 * @param y
+	 *            - the y-coordinate
+	 */
+	public void setY(int coordY) {
+		y = coordY;
+	}
+	
 	@Override
 	public String toString() {
-		return "[" + this.x() + ", " + this.y() + "]\n"
-				+ super.toString();
+		return "[" + this.x() + ", " + this.y() + "]\n" + super.toString();
 	}
-
+	
+	/**
+	 * X-coordinate position on the board
+	 */
+	public int x() {
+		return x;
+	}
+	
+	/**
+	 * Y-coordinate position on the board
+	 */
+	public int y() {
+		return y;
+	}
+	
 }

@@ -1,9 +1,7 @@
 package com.kry.brickgame.splashes;
 
-
 /**
  * @author noLive
- * 
  */
 public class GunSplash extends Splash {
 	private static final long serialVersionUID = -8553198050273372439L;
@@ -45,9 +43,9 @@ public class GunSplash extends Splash {
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, F, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, E, E, E, E } } };
-
+	
 	public GunSplash() {
 		super(frameTable);
 	}
-
+	
 }

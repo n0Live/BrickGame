@@ -49,16 +49,10 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Spawn point of enemy tanks
 	 */
-	final private static int[][] spawnPoints = new int[][] {
-			{
-					0, 0 }, {
-					BOARD_WIDTH - 1, 0 }, // bottom
-			{
-					0, BOARD_HEIGHT / 2 }, {
-					BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
-			{
-					0, BOARD_HEIGHT - 1 }, {
-					BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
+	final private static int[][] spawnPoints = new int[][] { { 0, 0 },
+			{ BOARD_WIDTH - 1, 0 }, // bottom
+			{ 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
+			{ 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
 	};
 	/**
 	 * Quantity of destroyed tanks to enter to the next level
@@ -599,8 +593,7 @@ public class TanksGame extends GameWithLives {
 		
 		// weight for each direction,
 		// to calculate the chance of movement in this direction
-		float[] weightOfDirection = new float[] {
-				0.25f, 0.25f, 0.25f, 0.25f };
+		float[] weightOfDirection = new float[] { 0.25f, 0.25f, 0.25f, 0.25f };
 		
 		int horizontalDistance = x - playerTank.x();
 		int verticalDistance = y - playerTank.y();

@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class SnakeSplash extends Splash {
 	private static final long serialVersionUID = -3561093655966432475L;
@@ -35,9 +34,9 @@ public class SnakeSplash extends Splash {
 			{ E, E, F, F, E, E, E, F, E, E }, //
 			{ E, E, E, E, E, E, E, F, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E } } }; //
-
+	
 	public SnakeSplash() {
 		super(frameTable);
 	}
-
+	
 }

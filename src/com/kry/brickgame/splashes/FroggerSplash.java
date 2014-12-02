@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class FroggerSplash extends Splash {
 	private static final long serialVersionUID = -5173782844759282L;
@@ -40,9 +39,9 @@ public class FroggerSplash extends Splash {
 			{ F, F, F, F, F, F, F, F, F, F }, //
 			{ F, E, E, E, F, F, E, E, E, E }, //
 			{ F, F, F, F, F, F, F, F, F, F }, } };
-
+	
 	public FroggerSplash() {
 		super(frameTable);
 	}
-
+	
 }

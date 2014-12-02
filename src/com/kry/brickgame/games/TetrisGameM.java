@@ -8,11 +8,10 @@ import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * @author noLive
- * 
  */
 public class TetrisGameM extends TetrisGameI {
 	private static final long serialVersionUID = 21601260655217157L;
-
+	
 	/**
 	 * The Tetris with the shifting board content
 	 * 
@@ -21,7 +20,7 @@ public class TetrisGameM extends TetrisGameI {
 	public TetrisGameM(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-
+	
 	@Override
 	protected void pieceDropped() {
 		super.pieceDropped();
@@ -31,5 +30,5 @@ public class TetrisGameM extends TetrisGameI {
 			setBoard(board);
 		}
 	}
-
+	
 }

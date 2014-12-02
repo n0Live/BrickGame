@@ -6,16 +6,15 @@ import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
- * 
  */
 public abstract class CharacterShape extends Shape {
 	private static final long serialVersionUID = -3023350297252336349L;
-
+	
 	/**
 	 * Type of the character
 	 */
 	protected int type;
-
+	
 	/**
 	 * Copy constructor of the player character
 	 * 
@@ -26,7 +25,7 @@ public abstract class CharacterShape extends Shape {
 		super(aShape);
 		type = aShape.getType();
 	}
-
+	
 	/**
 	 * Constructor of the player character
 	 * 
@@ -40,20 +39,20 @@ public abstract class CharacterShape extends Shape {
 		this.type = type;
 		setType(type, RotationAngle.d0, Cell.Full);
 	}
-
+	
 	public CharacterShape changeRotationAngle(RotationAngle rotationAngle) {
 		return setType(getType(), rotationAngle, getFill());
 	}
-
+	
 	abstract protected int[][][] getCharactersTable();
-
+	
 	/**
 	 * @return type of the character
 	 */
 	public int getType() {
 		return type;
 	}
-
+	
 	/**
 	 * Selection of a random rotation angle
 	 */
@@ -63,7 +62,7 @@ public abstract class CharacterShape extends Shape {
 		RotationAngle[] values = RotationAngle.values();
 		return setType(getType(), values[x], getFill());
 	}
-
+	
 	/**
 	 * Selection of the player character
 	 * 
@@ -80,7 +79,7 @@ public abstract class CharacterShape extends Shape {
 			setX(i, getCharactersTable()[type][i][0]);
 			setY(i, getCharactersTable()[type][i][1]);
 		}
-
+		
 		switch (rotationAngle) {
 		case d90:
 			rotateRight();
@@ -94,22 +93,21 @@ public abstract class CharacterShape extends Shape {
 		default:
 			break;
 		}
-
+		
 		this.type = type;
 		setRotationAngle(rotationAngle);
 		setFill(fill);
-
+		
 		return this;
 	}
-
+	
 	@Override
 	public String toString() {
 		// the type and rotation angle
-		return "CharacterShape [" + getType() + ", "
-		+ getRotationAngle()
-		// width and height
-		+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"
-		+ super.toString();
+		return "CharacterShape [" + getType() + ", " + getRotationAngle()
+				// width and height
+				+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"
+				+ super.toString();
 	}
-
+	
 }

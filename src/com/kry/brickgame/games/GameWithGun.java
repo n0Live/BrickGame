@@ -87,7 +87,6 @@ public abstract class GameWithGun extends GameWithLives {
 					board.setCell(Cell.Empty, i, j);
 				}
 		}
-		
 	}
 	
 	/**

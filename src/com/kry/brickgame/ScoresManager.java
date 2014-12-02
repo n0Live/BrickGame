@@ -13,9 +13,7 @@ import java.util.Map;
 import com.kry.brickgame.games.Game;
 
 /**
- * 
  * @author noLive
- * 
  */
 public class ScoresManager {
 	/**
@@ -26,11 +24,24 @@ public class ScoresManager {
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static ScoresManager singleton;
+	
+	/**
+	 * Get instance of the {@code ScoresManager}
+	 * 
+	 * @return instance of the {@code ScoresManager}
+	 */
+	public static ScoresManager getInstance() {
+		if (null == singleton) {
+			singleton = new ScoresManager();
+		}
+		return singleton;
+	}
+	
 	/**
 	 * Comparison of the game class and high scores
 	 */
 	private Map<Class<Game>, Integer> hiScores;
-
+	
 	/**
 	 * Singleton class, which manages the high scores
 	 */
@@ -39,7 +50,21 @@ public class ScoresManager {
 			hiScores = new HashMap<>();
 		}
 	}
-
+	
+	/**
+	 * Get stored high score of the specified game
+	 * 
+	 * @param gameClass
+	 *            class of the game
+	 * @return high score
+	 */
+	public int getHiScore(Class<Game> gameClass) {
+		if (!hiScores.containsKey(gameClass)) {
+			hiScores.put(gameClass, 0);
+		}
+		return hiScores.get(gameClass);
+	}
+	
 	/**
 	 * Read the high scores from the file (deserialization)
 	 * 
@@ -49,7 +74,7 @@ public class ScoresManager {
 	private boolean loadScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
 		if (hiScoreFile.exists()) {
-
+			
 			try (ObjectInputStream in = new ObjectInputStream(
 					new FileInputStream(hiScoreFile))) {
 				try {
@@ -61,11 +86,10 @@ public class ScoresManager {
 				return false;
 			}
 			return true;
-		} else {
+		} else
 			return false;
-		}
 	}
-
+	
 	/**
 	 * Write the high scores to the file (serialization)
 	 */
@@ -80,32 +104,7 @@ public class ScoresManager {
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * Get instance of the {@code ScoresManager}
-	 * 
-	 * @return instance of the {@code ScoresManager}
-	 */
-	public static ScoresManager getInstance() {
-		if (null == singleton) {
-			singleton = new ScoresManager();
-		}
-		return singleton;
-	}
-
-	/**
-	 * Get stored high score of the specified game
-	 * 
-	 * @param gameClass
-	 *            class of the game
-	 * @return high score
-	 */
-	public int getHiScore(Class<Game> gameClass) {
-		if (!hiScores.containsKey(gameClass))
-			hiScores.put(gameClass, 0);
-		return hiScores.get(gameClass);
-	}
-
+	
 	/**
 	 * Set the high score of the specified game when it more then previously
 	 * stored value.
@@ -129,5 +128,5 @@ public class ScoresManager {
 		} else
 			return prevScore;
 	}
-
+	
 }

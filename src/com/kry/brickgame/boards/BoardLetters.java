@@ -2,20 +2,55 @@ package com.kry.brickgame.boards;
 
 /**
  * @author noLive
- * 
  */
 public class BoardLetters extends Board {
-	private static final long serialVersionUID = -2320950183789497365L;
-
 	enum Letters {
 		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
-	};
-
+	}
+	
+	private static final long serialVersionUID = -2320950183789497365L;;
+	
 	public final static int width = 5;
 	public final static int height = 5;
-
+	
+	/**
+	 * Convert a character to a Letters object
+	 * 
+	 * @param ch
+	 *            - character like 'A', 'B', 'C', ...
+	 */
+	public static Letters charToLetters(char ch) {
+		Letters result = Letters.None;
+		
+		try {
+			result = Letters.valueOf(String.valueOf(ch).toUpperCase());
+		} catch (IllegalArgumentException e) {
+			result = Letters.None;
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Convert a string to a Letters object
+	 * 
+	 * @param str
+	 *            - string like "A", "B", "C", ...
+	 */
+	protected static Letters stringToLetters(String str) {
+		Letters result = Letters.None;
+		
+		try {
+			result = Letters.valueOf(str.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			result = Letters.None;
+		}
+		
+		return result;
+	}
+	
 	private Letters letter;
-
+	
 	/**
 	 * Table letters to draw them on the board 5x5: [index][y][x]
 	 */
@@ -182,14 +217,18 @@ public class BoardLetters extends Board {
 			{ E, E, F, E, E },//
 			{ E, F, E, E, E },//
 			{ F, F, F, F, F } }
-
+	
 	};
-
+	
 	public BoardLetters() {
 		super(width, height);
 		setLetter(Letters.None);
 	}
-
+	
+	protected Letters getLetter() {
+		return letter;
+	}
+	
 	public void setLetter(Letters letter) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -199,45 +238,5 @@ public class BoardLetters extends Board {
 		}
 		this.letter = letter;
 	}
-
-	protected Letters getLetter() {
-		return letter;
-	}
-
-	/**
-	 * Convert a string to a Letters object
-	 * 
-	 * @param str
-	 *            - string like "A", "B", "C", ...
-	 */
-	protected static Letters stringToLetters(String str) {
-		Letters result = Letters.None;
-
-		try {
-			result = Letters.valueOf(str.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			result = Letters.None;
-		}
-
-		return result;
-	}
-
-	/**
-	 * Convert a character to a Letters object
-	 * 
-	 * @param ch
-	 *            - character like 'A', 'B', 'C', ...
-	 */
-	public static Letters charToLetters(char ch) {
-		Letters result = Letters.None;
-
-		try {
-			result = Letters.valueOf(String.valueOf(ch).toUpperCase());
-		} catch (IllegalArgumentException e) {
-			result = Letters.None;
-		}
-
-		return result;
-	}
-
+	
 }

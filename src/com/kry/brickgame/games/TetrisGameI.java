@@ -26,7 +26,6 @@ import com.kry.brickgame.splashes.TetrisSplash;
 
 /**
  * @author noLive
- * 
  */
 public class TetrisGameI extends Game {
 	private static final long serialVersionUID = 8508883731172323862L;
@@ -38,7 +37,7 @@ public class TetrisGameI extends Game {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 90;
-
+	
 	/**
 	 * Drawing the figure on the board
 	 * 
@@ -53,17 +52,16 @@ public class TetrisGameI extends Game {
 	 * @param fill
 	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
 	 *            figure, {@code Cells.Empty} - to erase the figure
-	 * 
 	 * @return the board with the figure
 	 */
 	protected static Board drawShape(Board board, int x, int y,
 			TetrisShape piece, Cell fill) {
 		Cell[] boardFill = new Cell[piece.getLength()];
-
+		
 		for (int i = 0; i < piece.getLength(); i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y + piece.y(i);
-
+			
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
@@ -78,9 +76,10 @@ public class TetrisGameI extends Game {
 			}
 		}
 		piece.setBoardFill(boardFill);
-
+		
 		return board;
 	}
+	
 	/**
 	 * Erasing the figure from the board. The board's cells returned to its
 	 * original state.
@@ -93,18 +92,16 @@ public class TetrisGameI extends Game {
 	 *            y-coordinate position on the board of the figure
 	 * @param piece
 	 *            the figure
-	 * 
 	 * @return the board without the figure
 	 */
 	protected static Board eraseShape(Board board, int x, int y,
 			TetrisShape piece) {
-		if (piece.getShape() == Figures.NoShape)
-			return board;
-
+		if (piece.getShape() == Figures.NoShape) return board;
+		
 		for (int i = 0; i < piece.getLength(); i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y + piece.y(i);
-
+			
 			// if the figure does not leave off the board
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
@@ -114,6 +111,7 @@ public class TetrisGameI extends Game {
 		}
 		return board;
 	}
+	
 	/**
 	 * Collision check for the super figure. Allows the figure to pass through
 	 * the filled area if there is emptiness below.
@@ -134,7 +132,7 @@ public class TetrisGameI extends Game {
 		try {
 			boolean isNotCollision = false;
 			int board_x;
-
+			
 			for (int i = 0; i < piece.getLength(); i++) {
 				isNotCollision = false;
 				board_x = x + piece.x(i);
@@ -155,6 +153,7 @@ public class TetrisGameI extends Game {
 			return false;
 		}
 	}
+	
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
@@ -171,22 +170,22 @@ public class TetrisGameI extends Game {
 	 * Has the liquid (crumbly) figures
 	 */
 	private boolean hasLiquidFigures;
-
+	
 	/**
 	 * Has the acid figures
 	 */
 	private boolean hasAcidFigures;
-
+	
 	/**
 	 * Has the figures that can pass through an obstacles
 	 */
 	private boolean hasThroughfallFigures;
-
+	
 	/**
 	 * Has the random figures: liquid, acid or throughfall
 	 */
 	private final boolean hasRandomFigures;
-
+	
 	/**
 	 * The Tetris
 	 * 
@@ -353,7 +352,7 @@ public class TetrisGameI extends Game {
 	 */
 	public TetrisGameI(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-
+		
 		// for types 10-18 and 55-63
 		hasLiquidFigures = (((getType() >= 10) && (getType() <= 18)) || ((getType() >= 55) && (getType() <= 63)));
 		// for types 19-27 and 64-72
@@ -364,36 +363,36 @@ public class TetrisGameI extends Game {
 		hasRandomFigures = (((getType() >= 37) && (getType() <= 45)) || ((getType() >= 82) && (getType() <= 90)));
 		// for types 46-90
 		setDrawInvertedBoard((getType() > 45));
-
+		
 		isFallingFinished = false;
-
+		
 		// getLevel() - 1 - because on the first level doesn't need to add line
 		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
-
+		
 		// Create the "next" figure
 		nextPiece = getRandomShape();
 		newPiece();
-
+		
 		playMusic(Music.tetris);
-
+		
 		setStatus(Status.Running);
 	}
-
+	
 	/**
 	 * Adds one randomly generated line at the bottom of the board
 	 */
 	protected boolean addLines() {
 		Board board = getBoard().clone();
-
+		
 		board = addLinesToBoard(board, 0, 1, true);
-
+		
 		if (!board.equals(getBoard())) {
 			setBoard(board);
 			return true;
 		} else
 			return false;
 	}
-
+	
 	/**
 	 * Checking whether filled line at the figure
 	 * 
@@ -409,25 +408,24 @@ public class TetrisGameI extends Game {
 	 */
 	private boolean checkForFullLines(Board board, TetrisShape piece, int x,
 			int y) {
-
+		
 		for (int j = y + piece.minY(); j <= y + piece.maxY(); j++) {
 			// check leaving from the board
 			if (j >= boardHeight) {
 				break;
 			}
-
+			
 			boolean hasFullLine = true;
 			for (int i = 0; i < boardWidth; i++) {
 				// true - only if all cells is full
 				hasFullLine &= (board.getCell(i, j) != Cell.Empty);
 			}
 			// exits if at least one line is full
-			if (hasFullLine)
-				return true;
+			if (hasFullLine) return true;
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Do the work that needs to be repeated until the end of the game
 	 */
@@ -443,7 +441,7 @@ public class TetrisGameI extends Game {
 		// processing of key presses
 		processKeys();
 	}
-
+	
 	/**
 	 * Rapidly drops of the figure to the bottom of the board
 	 */
@@ -457,10 +455,10 @@ public class TetrisGameI extends Game {
 		}
 		pieceDropped();
 	}
-
+	
 	@Override
 	protected synchronized void firePreviewChanged(Board board) {
-
+		
 		// draws the inverted board
 		if (isInvertedBoard()
 				&& !nextPiece.containsIn(new Figures[] { Figures.SuperPoint,
@@ -470,10 +468,10 @@ public class TetrisGameI extends Game {
 		}
 		super.firePreviewChanged(board);
 	}
-
+	
 	private void flowDown(Board board, int x, int y, TetrisShape piece,
 			boolean isAcid) {
-
+		
 		int[][] sortedPoints = new int[piece.getLength()][2];
 		int n = 0;
 		for (int j = piece.minY(); j <= piece.maxY(); j++) {
@@ -481,7 +479,7 @@ public class TetrisGameI extends Game {
 			if (j >= boardHeight) {
 				break;
 			}
-
+			
 			for (int i = piece.minX(); i <= piece.maxX(); i++) {
 				for (int k = 0; k < piece.getLength(); k++) {
 					if ((piece.x(k) == i) && (piece.y(k) == j)) {
@@ -491,11 +489,11 @@ public class TetrisGameI extends Game {
 				}
 			}
 		}
-
+		
 		for (int[] sortedPoint : sortedPoints) {
 			int board_x = x + sortedPoint[0];
 			int board_y = y + sortedPoint[1];
-
+			
 			while ((board_y > 0)
 					&& (board.getCell(board_x, board_y - 1) == Cell.Empty)) {
 				drawPoint(board, board_x, board_y - 1, piece.getFill());
@@ -515,7 +513,7 @@ public class TetrisGameI extends Game {
 			setBoard(board);
 		}
 	}
-
+	
 	/**
 	 * Get a random figure with a random rotation angle
 	 */
@@ -523,7 +521,7 @@ public class TetrisGameI extends Game {
 	protected TetrisShape getRandomShape() {
 		return TetrisShape.getRandomTetraminoes().setRandomRotate();
 	}
-
+	
 	/**
 	 * Get a random figure or specified super figure
 	 * 
@@ -534,7 +532,7 @@ public class TetrisGameI extends Game {
 	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
 		return TetrisShape.getRandomTetraminoesAndSuper(superShapes);
 	}
-
+	
 	/**
 	 * Filling (setting {@code Cell.Full}) a single cell, located under the cell
 	 * with the specified coordinates {@code [x, y]}
@@ -545,11 +543,10 @@ public class TetrisGameI extends Game {
 	 *            y-coordinate of the cell from where shot will be made
 	 */
 	protected void mudShoot(int x, int y) {
-		if ((y <= 0) || (y > boardHeight))
-			return;
-
+		if ((y <= 0) || (y > boardHeight)) return;
+		
 		Board board = getBoard();
-
+		
 		for (int i = y - 1; i >= 0; i--) {
 			if (board.getCell(x, i) != Cell.Empty) {
 				if (board.getCell(x, i + 1) == Cell.Empty) {
@@ -563,30 +560,30 @@ public class TetrisGameI extends Game {
 				board.setCell(Cell.Full, x, 0);
 			}
 		}
-
+		
 		setBoard(board);
-
+		
 		// check for full lines
 		removeFullLines();
 	}
-
+	
 	/**
 	 * Creation of a new figure
 	 */
 	private void newPiece() {
 		curPiece = new TetrisShape(Figures.NoShape);
-
+		
 		// X-coordinate - middle of the board
 		curX = boardWidth / 2 - 1;
 		// Y-coordinate - top edge, and so that the bottom edge of the figure
 		// was at the top of the border
 		curY = boardHeight - 1 - nextPiece.minY();
-
+		
 		// select random type of figures
 		if (hasRandomFigures) {
 			if (nextPiece.getFill() == Cell.Blink) {
 				int typeOfSuperShape = new Random().nextInt(3);
-
+				
 				hasLiquidFigures = (typeOfSuperShape == 0) ? true : false;
 				hasAcidFigures = (typeOfSuperShape == 1) ? true : false;
 				hasThroughfallFigures = (typeOfSuperShape == 2) ? true : false;
@@ -596,14 +593,14 @@ public class TetrisGameI extends Game {
 				hasThroughfallFigures = false;
 			}
 		}
-
+		
 		if (!tryMove(nextPiece, curX, curY)) {
 			gameOver();
 		} else {
 			nextPiece = setPieceFromType(getType());
-
+			
 			clearPreview();
-
+			
 			int previewX, previewY;
 			// not for super figures
 			if (nextPiece.getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE) {
@@ -626,12 +623,12 @@ public class TetrisGameI extends Game {
 				previewX = 0;
 				previewY = 0;
 			}
-
+			
 			setPreview(drawShape(getPreview(), previewX, previewY, nextPiece,
 					nextPiece.getFill()));
 		}
 	}
-
+	
 	/**
 	 * Dropping on one line down
 	 */
@@ -640,7 +637,7 @@ public class TetrisGameI extends Game {
 			pieceDropped();
 		}
 	}
-
+	
 	/**
 	 * Ending of falling of the figure
 	 */
@@ -667,27 +664,26 @@ public class TetrisGameI extends Game {
 			playEffect(Effects.fall);
 			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		}
-
+		
 		isFallingFinished = true;
-
+		
 		removeFullLines();
-
+		
 		// check for game over
 		if ((curY + curPiece.maxY()) >= boardHeight) {
 			gameOver();
 		}
 	}
-
+	
 	/**
 	 * Processing of key presses
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None)
-			return;
-
+		if (getStatus() == Status.None) return;
+		
 		super.processKeys();
-
+		
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				if (tryMove(curPiece, curX - 1, curY)) {
@@ -718,7 +714,7 @@ public class TetrisGameI extends Game {
 					} else {
 						rotatedPiece = curPiece.clone().rotateRight();
 					}
-
+					
 					if (tryMove(rotatedPiece, curX, curY)) {
 						playEffect(Effects.turn);
 					}
@@ -735,15 +731,15 @@ public class TetrisGameI extends Game {
 			}
 		}
 	}
-
+	
 	/**
 	 * Removal of a filled lines
 	 */
 	private int removeFullLines() {
 		Board board = getBoard();
-
+		
 		int numFullLines = 0;
-
+		
 		// going through on all lines
 		for (int y = 0; y < boardHeight - 1; y++) {
 			boolean lineIsFull = true;
@@ -756,7 +752,7 @@ public class TetrisGameI extends Game {
 			}
 			if (lineIsFull) {
 				numFullLines++;
-
+				
 				// increasing score
 				switch (numFullLines) {
 				default: // 1
@@ -772,35 +768,35 @@ public class TetrisGameI extends Game {
 					setScore(getScore() + 8);
 					break;
 				}
-
+				
 				// animated clearing of a full line
 				animatedClearLine(getBoard(), curX, y);
-
+				
 				// if mud gun, than erase it before dropping downs lines
 				if (curPiece.getShape() == Figures.SuperMudGun) {
 					eraseShape(board, curX, curY, curPiece);
 				}
-
+				
 				// drop the lines down on the filled line
 				for (int k = y; k < boardHeight - 1; k++) {
 					for (int x = 0; x < boardWidth; x++) {
 						board.setCell(board.getCell(x, k + 1), x, k);
 					}
 				}
-
+				
 				// restore it after dropping downs lines
 				if (curPiece.getShape() == Figures.SuperMudGun) {
 					drawShape(board, curX, curY, curPiece, curPiece.getFill());
 				}
-
+				
 				// return to one line back (because we removed the filled line)
 				y--;
 			}
 		}
-
+		
 		return numFullLines;
 	}
-
+	
 	/**
 	 * Sets a new shape, depending on the type of game
 	 * 
@@ -810,7 +806,7 @@ public class TetrisGameI extends Game {
 	 */
 	private TetrisShape setPieceFromType(int type) {
 		TetrisShape newPiece = null;
-
+		
 		if ((hasLiquidFigures || hasAcidFigures || hasThroughfallFigures || hasRandomFigures)
 				&& (r.nextInt(7) == 0)) {
 			// for super figures
@@ -838,16 +834,16 @@ public class TetrisGameI extends Game {
 				newPiece = getRandomShapeAndSuper(new int[] { 0, 1, 2, 3 });
 			}
 		}
-
+		
 		return newPiece;
 	}
-
+	
 	@Override
 	protected void setScore(int score) {
 		int oldHundreds = getScore() / 100;
-
+		
 		super.setScore(score);
-
+		
 		// when a sufficient number of points changes the speed and the level
 		if (getScore() / 100 > oldHundreds) {
 			setSpeed(getSpeed() + 1);
@@ -860,7 +856,7 @@ public class TetrisGameI extends Game {
 			}
 		}
 	}
-
+	
 	/**
 	 * Destroying (setting {@code Cell.Empty}) a single cell, located under the
 	 * cell with the specified coordinates {@code [x, y]}
@@ -871,21 +867,20 @@ public class TetrisGameI extends Game {
 	 *            y-coordinate of the cell from where shot will be made
 	 */
 	protected void shoot(int x, int y) {
-		if ((y <= 0) || (y > boardHeight))
-			return;
-
+		if ((y <= 0) || (y > boardHeight)) return;
+		
 		Board board = getBoard();
-
+		
 		for (int i = y - 1; i >= 0; i--) {
 			if (board.getCell(x, i) != Cell.Empty) {
 				board.setCell(Cell.Empty, x, i);
 				break;
 			}
 		}
-
+		
 		setBoard(board);
 	}
-
+	
 	/**
 	 * Launching the game
 	 */
@@ -896,7 +891,7 @@ public class TetrisGameI extends Game {
 			doRepetitiveWork();
 		}
 	}
-
+	
 	/**
 	 * Tries to move the figure
 	 * 
@@ -911,11 +906,11 @@ public class TetrisGameI extends Game {
 	protected boolean tryMove(TetrisShape newPiece, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
-
+		
 		// Erase the current figure from the temporary board to not interfere
 		// with the checks
 		board = eraseShape(board, curX, curY, curPiece);
-
+		
 		// If a collision from the new figure with the side boundary of the
 		// board then trying to move aside
 		int prepX = newX;
@@ -925,7 +920,7 @@ public class TetrisGameI extends Game {
 		// Checks
 		if (checkBoardCollisionVertical(board, newPiece, newY, false))
 			return false;
-
+		
 		if (// for super point
 		(newPiece.getShape() == Figures.SuperPoint)//
 				|| ((newPiece.getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE) && //
@@ -940,19 +935,18 @@ public class TetrisGameI extends Game {
 					return false;
 			}
 		} else { // for ordinal figures
-			if (checkCollision(board, newPiece, prepX, newY))
-				return false;
+			if (checkCollision(board, newPiece, prepX, newY)) return false;
 		}
-
+		
 		// Erase the current figure from the basic board and draw the new figure
 		setBoard(drawShape(board, prepX, newY, newPiece, newPiece.getFill()));
-
+		
 		// The current figure is replaced by the new
 		curPiece = newPiece.clone();
 		curX = prepX;
 		curY = newY;
-
+		
 		return true;
 	}
-
+	
 }

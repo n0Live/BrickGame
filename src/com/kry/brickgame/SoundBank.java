@@ -8,21 +8,19 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.media.MediaException;
 
 /**
- * 
  * @author noLive
- * 
  */
 public class SoundBank implements Iterable<AudioClip> {
-
-	private Map<String, AudioClip> clips;
-
+	
+	private final Map<String, AudioClip> clips;
+	
 	/**
 	 * Create an empty SoundBank.
 	 */
 	public SoundBank() {
 		clips = new HashMap<>();
 	}
-
+	
 	/**
 	 * Creates an SoundBank and loads {@code files} to it.
 	 * 
@@ -33,19 +31,26 @@ public class SoundBank implements Iterable<AudioClip> {
 		this();
 		loadSounds(files);
 	}
-
+	
 	/**
-	 * Loads {@code files} to the {@code SoundBank}.
+	 * Gets the {@code AudioClip}, depending of the specified file name.
 	 * 
-	 * @param files
-	 *            array of file names to load
+	 * @param file
+	 *            file name of sound file
+	 * @return {@code AudioClip}
 	 */
-	public void loadSounds(String[] files) {
-		for (int i = 0; i < files.length; i++) {
-			loadSound(files[i]);
+	public synchronized AudioClip getClip(String file) {
+		if (!clips.containsKey(file)) {
+			loadSound(file);
 		}
+		return clips.get(file);
 	}
-
+	
+	@Override
+	public Iterator<AudioClip> iterator() {
+		return clips.values().iterator();
+	}
+	
 	/**
 	 * Loads {@code file} to the {@code SoundBank}.
 	 * 
@@ -65,34 +70,28 @@ public class SoundBank implements Iterable<AudioClip> {
 			clips.put(file, clip);
 		}
 	}
-
+	
+	/**
+	 * Loads {@code files} to the {@code SoundBank}.
+	 * 
+	 * @param files
+	 *            array of file names to load
+	 */
+	public void loadSounds(String[] files) {
+		for (String file : files) {
+			loadSound(file);
+		}
+	}
+	
 	/**
 	 * Stops playing for all sounds in the {@code SoundBank}.
 	 */
 	public void stopAll() {
 		for (AudioClip clip : clips.values()) {
-			if (clip != null && clip.isPlaying())
-				clip.stop();			
+			if (clip != null && clip.isPlaying()) {
+				clip.stop();
+			}
 		}
-	}
-
-	/**
-	 * Gets the {@code AudioClip}, depending of the specified file name.
-	 * 
-	 * @param file
-	 *            file name of sound file
-	 * @return {@code AudioClip}
-	 */
-	public synchronized AudioClip getClip(String file) {
-		if (!clips.containsKey(file)) {
-			loadSound(file);
-		}
-		return clips.get(file);
 	}
 	
-	@Override
-	public Iterator<AudioClip> iterator() {
-		return clips.values().iterator();
-	}
-
 }

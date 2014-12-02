@@ -11,11 +11,10 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
 
 /**
  * @author noLive
- *  
  */
 public class TetrisGameK extends TetrisGameI {
 	private static final long serialVersionUID = -2765291209922783752L;
-
+	
 	/**
 	 * The Tetris with the changing of the figures instead of rotating
 	 * 
@@ -24,7 +23,7 @@ public class TetrisGameK extends TetrisGameI {
 	public TetrisGameK(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-
+	
 	@Override
 	public void keyPressed(KeyPressed key) {
 		// alternative processing of the KeyRotate
@@ -41,16 +40,19 @@ public class TetrisGameK extends TetrisGameI {
 				// if the super point, than do nothing
 			} else if (curPiece.getShape() != Figures.SuperPoint) {
 				TetrisShape rotatedPiece;
-				if (getRotation() == Rotation.Counterclockwise)
+				if (getRotation() == Rotation.Counterclockwise) {
 					rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
-				else
+				} else {
 					rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
+				}
 				
-				if (tryMove(rotatedPiece, curX, curY))
-					 playEffect(Effects.turn);
+				if (tryMove(rotatedPiece, curX, curY)) {
+					playEffect(Effects.turn);
+				}
 			}
-		} else
+		} else {
 			super.keyPressed(key);
+		}
 	}
-
+	
 }

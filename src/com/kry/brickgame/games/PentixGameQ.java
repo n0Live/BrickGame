@@ -7,7 +7,6 @@ import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
- * 
  */
 public class PentixGameQ extends TetrisGameI {
 	private static final long serialVersionUID = -574749332005947736L;
@@ -15,7 +14,7 @@ public class PentixGameQ extends TetrisGameI {
 	 * Animated splash for game
 	 */
 	public static final Splash splash = new PentixSplash();
-
+	
 	/**
 	 * The Tetris with the Pentominoes figures
 	 * 
@@ -24,15 +23,15 @@ public class PentixGameQ extends TetrisGameI {
 	public PentixGameQ(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-
+	
 	@Override
 	protected TetrisShape getRandomShape() {
 		return TetrisShape.getRandomShapeAndRotate();
 	}
-
+	
 	@Override
 	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
 		return TetrisShape.getRandomShapeAndSuper(superShapes);
 	}
-
+	
 }

@@ -2,20 +2,47 @@ package com.kry.brickgame.boards;
 
 /**
  * @author noLive
- * 
  */
 public class BoardNumbers extends Board {
-	private static final long serialVersionUID = 5903070508565392642L;
-
 	enum Numbers {
 		None, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9
-	};
-
+	}
+	
+	private static final long serialVersionUID = 5903070508565392642L;;
+	
 	public final static int width = 3;
 	public final static int height = 5;
-
+	
+	/**
+	 * Convert an integer to a Numbers object
+	 * 
+	 * @param i
+	 *            - integer from 0 to 9
+	 */
+	public static Numbers intToNumbers(int i) {
+		return stringToNumbers(String.valueOf(i));
+	}
+	
+	/**
+	 * Convert a string to a Numbers object
+	 * 
+	 * @param str
+	 *            - string like "0" .. "9"
+	 */
+	protected static Numbers stringToNumbers(String str) {
+		Numbers result = Numbers.None;
+		
+		try {
+			result = Numbers.valueOf("n" + str);
+		} catch (IllegalArgumentException e) {
+			result = Numbers.None;
+		}
+		
+		return result;
+	}
+	
 	private Numbers number;
-
+	
 	/**
 	 * Table numbers to draw them on the board 5x5: [index][y][x]
 	 */
@@ -86,12 +113,16 @@ public class BoardNumbers extends Board {
 			{ F, F, F },//
 			{ E, E, F },//
 			{ F, F, F } } };
-
+	
 	public BoardNumbers() {
 		super(width, height);
 		setNumber(Numbers.None);
 	}
-
+	
+	protected Numbers getLetter() {
+		return number;
+	}
+	
 	public void setNumber(Numbers number) {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -101,37 +132,5 @@ public class BoardNumbers extends Board {
 		}
 		this.number = number;
 	}
-
-	protected Numbers getLetter() {
-		return number;
-	}
-
-	/**
-	 * Convert a string to a Numbers object
-	 * 
-	 * @param str
-	 *            - string like "0" .. "9"
-	 */
-	protected static Numbers stringToNumbers(String str) {
-		Numbers result = Numbers.None;
-
-		try {
-			result = Numbers.valueOf("n" + str);
-		} catch (IllegalArgumentException e) {
-			result = Numbers.None;
-		}
-
-		return result;
-	}
-
-	/**
-	 * Convert an integer to a Numbers object
-	 * 
-	 * @param i
-	 *            - integer from 0 to 9
-	 */
-	public static Numbers intToNumbers(int i) {
-		return stringToNumbers(String.valueOf(i));
-	}
-
+	
 }
