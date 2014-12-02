@@ -17,13 +17,14 @@ public abstract class CharacterShape extends Shape {
 	protected int type;
 
 	/**
-	 * A set of the coordinates of points of the player character:
-	 * [type][point][coordinate:0-x,1-y]
+	 * Copy constructor of the player character
+	 * 
+	 * @param aShape
+	 *            a shape for copying
 	 */
-	private int[][][] charactersTable;
-	
-	protected int[][][] getCharactersTable(){
-		return charactersTable;
+	public CharacterShape(CharacterShape aShape) {
+		super(aShape);
+		type = aShape.getType();
 	}
 
 	/**
@@ -40,15 +41,27 @@ public abstract class CharacterShape extends Shape {
 		setType(type, RotationAngle.d0, Cell.Full);
 	}
 
+	public CharacterShape changeRotationAngle(RotationAngle rotationAngle) {
+		return setType(getType(), rotationAngle, getFill());
+	}
+
+	abstract protected int[][][] getCharactersTable();
+
 	/**
-	 * Copy constructor of the player character
-	 * 
-	 * @param aShape
-	 *            a shape for copying
+	 * @return type of the character
 	 */
-	public CharacterShape(CharacterShape aShape) {
-		super(aShape);
-		this.type = aShape.getType();
+	public int getType() {
+		return type;
+	}
+
+	/**
+	 * Selection of a random rotation angle
+	 */
+	public CharacterShape setRandomRotate() {
+		Random r = new Random();
+		int x = Math.abs(r.nextInt()) % 4;
+		RotationAngle[] values = RotationAngle.values();
+		return setType(getType(), values[x], getFill());
 	}
 
 	/**
@@ -83,41 +96,20 @@ public abstract class CharacterShape extends Shape {
 		}
 
 		this.type = type;
-		this.setRotationAngle(rotationAngle);
-		this.setFill(fill);
+		setRotationAngle(rotationAngle);
+		setFill(fill);
 
 		return this;
-	}
-
-	/**
-	 * @return type of the character
-	 */
-	public int getType() {
-		return type;
-	}
-
-	public CharacterShape changeRotationAngle(RotationAngle rotationAngle) {
-		return setType(getType(), rotationAngle, getFill());
-	}
-
-	/**
-	 * Selection of a random rotation angle
-	 */
-	public CharacterShape setRandomRotate() {
-		Random r = new Random();
-		int x = Math.abs(r.nextInt()) % 4;
-		RotationAngle[] values = RotationAngle.values();
-		return setType(getType(), values[x], getFill());
 	}
 
 	@Override
 	public String toString() {
 		// the type and rotation angle
-		return "CharacterShape [" + this.getType() + ", "
-				+ this.getRotationAngle()
-				// width and height
-				+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"
-				+ super.toString();
+		return "CharacterShape [" + getType() + ", "
+		+ getRotationAngle()
+		// width and height
+		+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n"
+		+ super.toString();
 	}
 
 }
