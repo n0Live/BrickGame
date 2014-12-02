@@ -22,17 +22,17 @@ public final class GameUtils {
 	}
 
 	/**
-	 * Music
-	 */
-	public enum Music {
-		welcome, start, win, game_over, tetris, kaboom;
-	}
-
-	/**
 	 * Melodies for Dance game
 	 */
 	public enum Melodies {
 		melody1, melody2, melody3, melody4, melody5, melody6, melody7, melody8, melody9;
+	}
+
+	/**
+	 * Music
+	 */
+	public enum Music {
+		welcome, start, win, game_over, tetris, kaboom;
 	}
 
 	public static final SoundBank effects = new SoundBank();
@@ -40,194 +40,87 @@ public final class GameUtils {
 	public static final SoundBank melodies = new SoundBank();
 
 	/**
-	 * Collision check of the new figure with a filled cells on the board
+	 * Add randomly generated lines on the board
 	 * 
 	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            the new figure
-	 * @param x
-	 *            x-coordinate of the figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @param withBorder
-	 *            include in the check collision the area which one cell sized
-	 *            around the figure
-	 * @return {@code true} if there is a collision
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
+	 *            the board for drawing
+	 * @param fromLine
+	 *            line, which starts the addition
+	 * @param linesCount
+	 *            count of added lines
+	 * @param isUpwardDirection
+	 *            if {@code true}, then the bottom-up direction of addition
+	 * @return the board after adding lines
 	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y, boolean withBorder) {
-		int board_x, board_y;
-		if (withBorder) {
-			for (int k = 0; k < piece.getLength(); k++) {
-				// include in the check collision the area around the point
-				for (int i = -1; i <= 1; i++) {
-					for (int j = -1; j <= 1; j++) {
-						board_x = x + piece.x(k) + i;
-						board_y = y + piece.y(k) + j;
+	protected static Board addLinesToBoard(Board board, int fromLine,
+			int linesCount, boolean isUpwardDirection) {
+		if (board == null)
+			return board;
 
-						if ((board_x < 0) || (board_x >= board.getWidth())
-								|| (board_y < 0)
-								|| (board_y >= board.getHeight()))
-							continue;
+		if ((linesCount < 1)//
+				|| ((isUpwardDirection) && //
+						((fromLine + (linesCount - 1)) > board.getHeight()))//
+						//
+						|| ((!isUpwardDirection) && //
+								((fromLine - (linesCount - 1)) < 0)))
+			return board;
 
-						if (board.getCell(board_x, board_y) != Cell.Empty)
-							return true;
-					}
-				}
+		// checks whether there are full cells at a distance of
+		// <i>linesCount</i> from the top or the bottom of the board
+		for (int i = 0; i < board.getWidth(); i++) {
+			if (//
+					((isUpwardDirection) && //
+							(board.getCell(i, ((board.getHeight() - 1) - linesCount)) == Cell.Full))//
+							//
+							|| ((!isUpwardDirection) && //
+									(board.getCell(i, (linesCount - 1)) == Cell.Full))//
+					)
+				return board;
+		}
+
+		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
+
+		// picks up or downs the lines of the board
+		if (isUpwardDirection) {
+			for (int y = (board.getHeight() - 1) - 1; y > fromLine
+					+ (linesCount - 1); y--) {
+				board.setRow(board.getRow(y - 1), y);
 			}
 		} else {
-			for (int i = 0; i < piece.getLength(); i++) {
-				board_x = x + piece.x(i);
-				board_y = y + piece.y(i);
-
-				if ((board_x < 0) || (board_x >= board.getWidth())
-						|| (board_y < 0) || (board_y >= board.getHeight()))
-					continue;
-
-				if (board.getCell(board_x, board_y) != Cell.Empty)
-					return true;
+			for (int y = 0; y < (fromLine - (linesCount - 1)); y++) {
+				board.setRow(board.getRow(y + 1), y);
 			}
 		}
-		return false;
-	}
 
-	/**
-	 * Collision check of the new figure with a filled cells on the board
-	 * 
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            the new figure
-	 * @param x
-	 *            x-coordinate of the figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
-	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y) {
-		return checkCollision(board, piece, x, y, false);
-	}
+		// generates a new lines
+		for (int line = 0; line < linesCount; line++) {
+			Random r = new Random();
 
-	/**
-	 * Collision check of two figures with coordinates
-	 * 
-	 * @param first
-	 *            the first figure
-	 * @param second
-	 *            the second figure
-	 * @return {@code true} if there is a collision
-	 */
-	protected static boolean checkTwoShapeCollision(CoordinatedShape first,
-			CoordinatedShape second) {
-		if (first == null || second == null)
-			return false;
+			boolean hasEmpty = false;
+			boolean hasFull = false;
 
-		// when the figures are placed too far apart, returns false
-		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math
-				.max(first.getHeight(), second.getHeight())
-				&& Math.abs(first.x() + first.minX() - second.x()
-						+ second.minX()) > Math.max(first.getWidth(),
-						second.getWidth()))
-			return false;
-
-		for (int i = 0; i < first.getLength(); i++) {
-			int givenFirstX = first.x() + first.x(i);
-			int givenFirstY = first.y() + first.y(i);
-
-			for (int j = 0; j < second.getLength(); j++) {
-				int givenSecondX = second.x() + second.x(j);
-				int givenSecondY = second.y() + second.y(j);
-
-				if (givenFirstX == givenSecondX && givenFirstY == givenSecondY)
-					return true;
+			for (int i = 0; i < board.getWidth(); i++) {
+				if (r.nextBoolean()) {
+					newLines[line][i] = Cell.Empty;
+					hasEmpty = true;
+				} else {
+					newLines[line][i] = Cell.Full;
+					hasFull = true;
+				}
 			}
+
+			// if all the cells were empty, creates a full one in a random place
+			// of the line
+			if (!hasEmpty || !hasFull) {
+				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty
+						: Cell.Full);
+			}
+
+			// adds the created line to the board
+			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line
+					: fromLine - line));
 		}
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with the vertical boundaries of the
-	 * board
-	 * 
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            the new figure
-	 * @param y
-	 *            y-coordinate of the figure
-	 * @param checkTopBoundary
-	 *            is it necessary to check the upper boundary
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkBoardCollision
-	 * @see #checkCollision
-	 */
-	protected static boolean checkBoardCollisionVertical(Board board,
-			Shape piece, int y, boolean checkTopBoundary) {
-		if (checkTopBoundary && ((y + piece.maxY()) >= board.getHeight()))
-			return true;
-		if ((y + piece.minY()) < 0)
-			return true;
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with the horizontal boundaries of the
-	 * board
-	 * 
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            - the new figure
-	 * @param x
-	 *            - x-coordinate of the figure
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollision
-	 * @see #checkCollision
-	 */
-	protected static boolean checkBoardCollisionHorizontal(Board board,
-			Shape piece, int x) {
-		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= board.getWidth())
-			return true;
-		return false;
-	}
-
-	/**
-	 * Collision check of the new figure with the
-	 * {@link Game#checkBoardCollisionVertical vertical} and the
-	 * {@link Game#checkBoardCollisionHorizontal horizontal} boundaries of the
-	 * board
-	 * 
-	 * @param board
-	 *            the board for collision check
-	 * @param piece
-	 *            - the new figure
-	 * @param x
-	 *            - x-coordinate of the figures
-	 * @param y
-	 *            - y-coordinate of the figures
-	 * @return {@code true} if there is a collision
-	 * 
-	 * @see #checkBoardCollisionVertical
-	 * @see #checkBoardCollisionHorisontal
-	 * @see #checkCollision
-	 */
-	protected static boolean checkBoardCollision(Board board, Shape piece,
-			int x, int y) {
-		return checkBoardCollisionVertical(board, piece, y, true)
-				|| checkBoardCollisionHorizontal(board, piece, x);
+		return board;
 	}
 
 	/**
@@ -279,44 +172,254 @@ public final class GameUtils {
 	}
 
 	/**
-	 * Insert the cells to the board. Coordinate ( {@code x, y}) is set a point,
-	 * which gets the lower left corner of the {@code cells}
+	 * Collision check of the new figure with the
+	 * {@link Game#checkBoardCollisionVertical vertical} and the
+	 * {@link Game#checkBoardCollisionHorizontal horizontal} boundaries of the
+	 * board
 	 * 
 	 * @param board
-	 *            the board for insertion
-	 * @param cells
-	 *            the cells to insert
+	 *            the board for collision check
+	 * @param piece
+	 *            - the new figure
 	 * @param x
-	 *            x-coordinate for the insertion
+	 *            - x-coordinate of the figures
 	 * @param y
-	 *            y-coordinate for the insertion
-	 * @return {@code true} if the insertion is success, otherwise {@code false}
+	 *            - y-coordinate of the figures
+	 * @return {@code true} if there is a collision
+	 * 
+	 * @see #checkBoardCollisionVertical
+	 * @see #checkBoardCollisionHorisontal
+	 * @see #checkCollision
 	 */
-	protected static void insertCellsToBoard(Board board, Cell[][] cells,
+	protected static boolean checkBoardCollision(Board board, Shape piece,
 			int x, int y) {
-		if (board == null)
-			return;
+		return checkBoardCollisionVertical(board, piece, y, true)
+				|| checkBoardCollisionHorizontal(board, piece, x);
+	}
 
-		if ((x >= board.getWidth()) || (y >= board.getHeight())
-				|| (x + cells.length <= 0) || (y + cells[0].length <= 0)) {
-			return;
-		}
+	/**
+	 * Collision check of the new figure with the horizontal boundaries of the
+	 * board
+	 * 
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            - the new figure
+	 * @param x
+	 *            - x-coordinate of the figure
+	 * @return {@code true} if there is a collision
+	 * 
+	 * @see #checkBoardCollisionVertical
+	 * @see #checkBoardCollision
+	 * @see #checkCollision
+	 */
+	protected static boolean checkBoardCollisionHorizontal(Board board,
+			Shape piece, int x) {
+		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= board.getWidth())
+			return true;
+		return false;
+	}
 
-		// calculate the shift when the cells is not completely inserted into
-		// the board
-		int fromX = (x < 0) ? -x : 0;
-		int toX = (x + cells.length >= board.getWidth()) ? board.getWidth() - x
-				: cells.length;
+	/**
+	 * Collision check of the new figure with the vertical boundaries of the
+	 * board
+	 * 
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            the new figure
+	 * @param y
+	 *            y-coordinate of the figure
+	 * @param checkTopBoundary
+	 *            is it necessary to check the upper boundary
+	 * @return {@code true} if there is a collision
+	 * 
+	 * @see #checkBoardCollisionHorisontal
+	 * @see #checkBoardCollision
+	 * @see #checkCollision
+	 */
+	protected static boolean checkBoardCollisionVertical(Board board,
+			Shape piece, int y, boolean checkTopBoundary) {
+		if (checkTopBoundary && ((y + piece.maxY()) >= board.getHeight()))
+			return true;
+		if ((y + piece.minY()) < 0)
+			return true;
+		return false;
+	}
 
-		int fromY = (y < 0) ? -y : 0;
-		int toY = (y + cells[0].length >= board.getHeight()) ? board
-				.getHeight() - y : cells[0].length;
+	/**
+	 * Collision check of the new figure with a filled cells on the board
+	 * 
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            the new figure
+	 * @param x
+	 *            x-coordinate of the figure
+	 * @param y
+	 *            y-coordinate of the figure
+	 * @return {@code true} if there is a collision
+	 * 
+	 * @see #checkBoardCollisionHorisontal
+	 * @see #checkBoardCollisionVertical
+	 * @see #checkBoardCollision
+	 */
+	protected static boolean checkCollision(Board board, Shape piece, int x,
+			int y) {
+		return checkCollision(board, piece, x, y, false);
+	}
 
-		for (int i = fromX; i < toX; i++) {
-			for (int j = fromY; j < toY; j++) {
-				board.setCell(cells[i][j], x + i, y + j);
+	/**
+	 * Collision check of the new figure with a filled cells on the board
+	 * 
+	 * @param board
+	 *            the board for collision check
+	 * @param piece
+	 *            the new figure
+	 * @param x
+	 *            x-coordinate of the figure
+	 * @param y
+	 *            y-coordinate of the figure
+	 * @param withBorder
+	 *            include in the check collision the area which one cell sized
+	 *            around the figure
+	 * @return {@code true} if there is a collision
+	 * @see #checkBoardCollisionHorisontal
+	 * @see #checkBoardCollisionVertical
+	 * @see #checkBoardCollision
+	 */
+	protected static boolean checkCollision(Board board, Shape piece, int x,
+			int y, boolean withBorder) {
+		int board_x, board_y;
+		if (withBorder) {
+			for (int k = 0; k < piece.getLength(); k++) {
+				// include in the check collision the area around the point
+				for (int i = -1; i <= 1; i++) {
+					for (int j = -1; j <= 1; j++) {
+						board_x = x + piece.x(k) + i;
+						board_y = y + piece.y(k) + j;
+
+						if ((board_x < 0) || (board_x >= board.getWidth())
+								|| (board_y < 0)
+								|| (board_y >= board.getHeight())) {
+							continue;
+						}
+
+						if (board.getCell(board_x, board_y) != Cell.Empty)
+							return true;
+					}
+				}
+			}
+		} else {
+			for (int i = 0; i < piece.getLength(); i++) {
+				board_x = x + piece.x(i);
+				board_y = y + piece.y(i);
+
+				if ((board_x < 0) || (board_x >= board.getWidth())
+						|| (board_y < 0) || (board_y >= board.getHeight())) {
+					continue;
+				}
+
+				if (board.getCell(board_x, board_y) != Cell.Empty)
+					return true;
 			}
 		}
+		return false;
+	}
+
+	/**
+	 * Collision check of two figures with coordinates
+	 * 
+	 * @param first
+	 *            the first figure
+	 * @param second
+	 *            the second figure
+	 * @return {@code true} if there is a collision
+	 */
+	protected static boolean checkTwoShapeCollision(CoordinatedShape first,
+			CoordinatedShape second) {
+		if (first == null || second == null)
+			return false;
+
+		// when the figures are placed too far apart, returns false
+		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math
+				.max(first.getHeight(), second.getHeight())
+				&& Math.abs(first.x() + first.minX() - second.x()
+						+ second.minX()) > Math.max(first.getWidth(),
+								second.getWidth()))
+			return false;
+
+		for (int i = 0; i < first.getLength(); i++) {
+			int givenFirstX = first.x() + first.x(i);
+			int givenFirstY = first.y() + first.y(i);
+
+			for (int j = 0; j < second.getLength(); j++) {
+				int givenSecondX = second.x() + second.x(j);
+				int givenSecondY = second.y() + second.y(j);
+
+				if (givenFirstX == givenSecondX && givenFirstY == givenSecondY)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Drawing the point of the figure on the board.
+	 * <p>
+	 * If the point is outside the borders of the board, then drawing it on the
+	 * other side of the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param x
+	 *            x-coordinate position on the board of the figure
+	 * @param y
+	 *            y-coordinate position on the board of the figure
+	 * @param fill
+	 *            type of fill the point
+	 * @return the board with the point
+	 */
+	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
+		if (board == null)
+			return board;
+
+		int board_x = x;
+		int board_y = y;
+
+		// check if the point is outside the borders of the board
+		if (board_x < 0) {
+			board_x = board.getWidth() + board_x;
+		} else if (board_x >= board.getWidth()) {
+			board_x = board_x - board.getWidth();
+		}
+		if (board_y < 0) {
+			board_y = board.getHeight() + board_y;
+		} else if (board_y >= board.getHeight()) {
+			board_y = board_y - board.getHeight();
+		}
+
+		board.setCell(fill, board_x, board_y);
+
+		return board;
+	}
+
+	/**
+	 * Drawing the figure with coordinates on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param shape
+	 *            the figure
+	 * @param fill
+	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
+	 *            figure, {@code Cells.Empty} - to erase the figure
+	 * 
+	 * @return the board with the figure
+	 */
+	protected static Board drawShape(Board board, CoordinatedShape shape,
+			Cell fill) {
+		return drawShape(board, shape.x(), shape.y(), shape, fill);
 	}
 
 	/**
@@ -356,145 +459,6 @@ public final class GameUtils {
 	}
 
 	/**
-	 * Drawing the figure with coordinates on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param shape
-	 *            the figure
-	 * @param fill
-	 *            {@code Cells.Full} or {@code Cells.Blink} - to draw the
-	 *            figure, {@code Cells.Empty} - to erase the figure
-	 * 
-	 * @return the board with the figure
-	 */
-	protected static Board drawShape(Board board, CoordinatedShape shape,
-			Cell fill) {
-		return drawShape(board, shape.x(), shape.y(), shape, fill);
-	}
-
-	/**
-	 * Drawing the point of the figure on the board.
-	 * <p>
-	 * If the point is outside the borders of the board, then drawing it on the
-	 * other side of the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param x
-	 *            x-coordinate position on the board of the figure
-	 * @param y
-	 *            y-coordinate position on the board of the figure
-	 * @param fill
-	 *            type of fill the point
-	 * @return the board with the point
-	 */
-	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
-		if (board == null)
-			return board;
-
-		int board_x = x;
-		int board_y = y;
-
-		// check if the point is outside the borders of the board
-		if (board_x < 0)
-			board_x = board.getWidth() + board_x;
-		else if (board_x >= board.getWidth())
-			board_x = board_x - board.getWidth();
-		if (board_y < 0)
-			board_y = board.getHeight() + board_y;
-		else if (board_y >= board.getHeight())
-			board_y = board_y - board.getHeight();
-
-		board.setCell(fill, board_x, board_y);
-
-		return board;
-	}
-
-	/**
-	 * Add randomly generated lines on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param fromLine
-	 *            line, which starts the addition
-	 * @param linesCount
-	 *            count of added lines
-	 * @param isUpwardDirection
-	 *            if {@code true}, then the bottom-up direction of addition
-	 * @return the board after adding lines
-	 */
-	protected static Board addLinesToBoard(Board board, int fromLine,
-			int linesCount, boolean isUpwardDirection) {
-		if (board == null)
-			return board;
-
-		if ((linesCount < 1)//
-				|| ((isUpwardDirection) && //
-				((fromLine + (linesCount - 1)) > board.getHeight()))//
-				//
-				|| ((!isUpwardDirection) && //
-				((fromLine - (linesCount - 1)) < 0)))
-			return board;
-
-		// checks whether there are full cells at a distance of
-		// <i>linesCount</i> from the top or the bottom of the board
-		for (int i = 0; i < board.getWidth(); i++) {
-			if (//
-			((isUpwardDirection) && //
-					(board.getCell(i, ((board.getHeight() - 1) - linesCount)) == Cell.Full))//
-					//
-					|| ((!isUpwardDirection) && //
-					(board.getCell(i, (linesCount - 1)) == Cell.Full))//
-			)
-				return board;
-		}
-
-		Random r = new Random();
-		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
-
-		// picks up or downs the lines of the board
-		if (isUpwardDirection) {
-			for (int y = (board.getHeight() - 1) - 1; y > fromLine
-					+ (linesCount - 1); y--) {
-				board.setRow(board.getRow(y - 1), y);
-			}
-		} else {
-			for (int y = 0; y < (fromLine - (linesCount - 1)); y++) {
-				board.setRow(board.getRow(y + 1), y);
-			}
-		}
-
-		// generates a new lines
-		for (int line = 0; line < linesCount; line++) {
-			boolean hasEmpty = false;
-			boolean hasFull = false;
-
-			for (int i = 0; i < board.getWidth(); i++) {
-				if (r.nextBoolean()) {
-					newLines[line][i] = Cell.Empty;
-					hasEmpty = true;
-				} else {
-					newLines[line][i] = Cell.Full;
-					hasFull = true;
-				}
-			}
-
-			// if all the cells were empty, creates a full one in a random place
-			// of the line
-			if (!hasEmpty || !hasFull) {
-				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty
-						: Cell.Full);
-			}
-
-			// adds the created line to the board
-			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line
-					: fromLine - line));
-		}
-		return board;
-	}
-
-	/**
 	 * Returns the inverted copy of the specified board
 	 * 
 	 * @param board
@@ -513,59 +477,43 @@ public final class GameUtils {
 	}
 
 	/**
-	 * Play the {@code sound}, from the specified {@code soundBank}.
+	 * Insert the cells to the board. Coordinate ( {@code x, y}) is set a point,
+	 * which gets the lower left corner of the {@code cells}
 	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 * @param sound
-	 *            {@code enum} value, containing the name of the sound
+	 * @param board
+	 *            the board for insertion
+	 * @param cells
+	 *            the cells to insert
+	 * @param x
+	 *            x-coordinate for the insertion
+	 * @param y
+	 *            y-coordinate for the insertion
+	 * @return {@code true} if the insertion is success, otherwise {@code false}
 	 */
-	protected static <E extends Enum<E>> void play(SoundBank soundBank,
-			Enum<E> sound) {
-		if (!Game.isMuted())
-			SoundManager.play(soundBank, sound);
-	}
+	protected static void insertCellsToBoard(Board board, Cell[][] cells,
+			int x, int y) {
+		if (board == null)
+			return;
 
-	/**
-	 * Play the {@code sound}, from the {@code Effects}.
-	 * 
-	 * @param sound
-	 *            {@code Effects} value, containing the name of the sound
-	 */
-	protected static void playEffect(Effects sound) {
-		if (!Game.isMuted() && !SoundManager.isPlaying(music))
-			SoundManager.play(effects, sound);
-	}
+		if ((x >= board.getWidth()) || (y >= board.getHeight())
+				|| (x + cells.length <= 0) || (y + cells[0].length <= 0))
+			return;
 
-	/**
-	 * Play the {@code sound}, from the {@code Music}.
-	 * 
-	 * @param sound
-	 *            {@code Music} value, containing the name of the sound
-	 */
-	protected static void playMusic(Music sound) {
-		if (!Game.isMuted()) {
-			stopAllSounds();
-			if (Music.start.equals(sound))
-				SoundManager.playAndWait(music, sound);
-			else
-				SoundManager.play(music, sound);
-		}
-	}
+		// calculate the shift when the cells is not completely inserted into
+		// the board
+		int fromX = (x < 0) ? -x : 0;
+		int toX = (x + cells.length >= board.getWidth()) ? board.getWidth() - x
+				: cells.length;
 
-	/**
-	 * Play the {@code sound}, from the {@code Melodies} with specified
-	 * {@code rate}.
-	 * 
-	 * @param sound
-	 *            {@code Melodies} value, containing the name of the sound
-	 * @param rate
-	 *            playback rate multiplier
-	 */
-	protected static void playMelody(Melodies sound, double rate) {
-		if (!Game.isMuted()) {
-			SoundManager.play(melodies, sound, rate);
-		}
+		int fromY = (y < 0) ? -y : 0;
+		int toY = (y + cells[0].length >= board.getHeight()) ? board
+				.getHeight() - y : cells[0].length;
+
+				for (int i = fromX; i < toX; i++) {
+					for (int j = fromY; j < toY; j++) {
+						board.setCell(cells[i][j], x + i, y + j);
+					}
+				}
 	}
 
 	/**
@@ -587,6 +535,65 @@ public final class GameUtils {
 			if (echoDelay > 0) {
 				Game.sleep(echoDelay);
 				SoundManager.loop(soundBank, sound);
+			}
+		}
+	}
+
+	/**
+	 * Play the {@code sound}, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param sound
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	protected static <E extends Enum<E>> void play(SoundBank soundBank,
+			Enum<E> sound) {
+		if (!Game.isMuted()) {
+			SoundManager.play(soundBank, sound);
+		}
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Effects}.
+	 * 
+	 * @param sound
+	 *            {@code Effects} value, containing the name of the sound
+	 */
+	protected static void playEffect(Effects sound) {
+		if (!Game.isMuted() && !SoundManager.isPlaying(music)) {
+			SoundManager.play(effects, sound);
+		}
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Melodies} with specified
+	 * {@code rate}.
+	 * 
+	 * @param sound
+	 *            {@code Melodies} value, containing the name of the sound
+	 * @param rate
+	 *            playback rate multiplier
+	 */
+	protected static void playMelody(Melodies sound, double rate) {
+		if (!Game.isMuted()) {
+			SoundManager.play(melodies, sound, rate);
+		}
+	}
+
+	/**
+	 * Play the {@code sound}, from the {@code Music}.
+	 * 
+	 * @param sound
+	 *            {@code Music} value, containing the name of the sound
+	 */
+	protected static void playMusic(Music sound) {
+		if (!Game.isMuted()) {
+			stopAllSounds();
+			if (Music.start.equals(sound)) {
+				SoundManager.playAndWait(music, sound);
+			} else {
+				SoundManager.play(music, sound);
 			}
 		}
 	}

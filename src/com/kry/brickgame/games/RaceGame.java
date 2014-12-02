@@ -9,7 +9,6 @@ import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
@@ -37,7 +36,7 @@ public class RaceGame extends GameWithLives {
 	/**
 	 * Racing car
 	 */
-	private CarShape car;
+	private final CarShape car;
 	/**
 	 * List of the opponents
 	 */
@@ -60,7 +59,7 @@ public class RaceGame extends GameWithLives {
 	 * <p>
 	 * {@code true} - three-lane, {@code false} - two-lane
 	 */
-	private boolean isThreelaneTraffic;
+	private final boolean isThreelaneTraffic;
 
 	/**
 	 * The Race
@@ -107,101 +106,6 @@ public class RaceGame extends GameWithLives {
 	}
 
 	/**
-	 * Launching the game
-	 */
-	@Override
-	public void start() {
-		super.start();
-
-		// don't start playing sound after deserialization
-		if (getStatus() != Status.Paused)
-			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
-
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if (getStatus() != Status.Paused) {
-				int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
-						: getSpeed(true) / 3;
-
-				// moving
-				if (elapsedTime(currentSpeed)) {
-					moveOn();
-				}
-			}
-			// processing of key presses
-			processKeys();
-		}
-	}
-
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// set position
-		curPosition = 1;
-		curX = positions[curPosition];
-		curY = 0 - car.minY();
-
-		borderPosition = 0;
-
-		// initialization of the opponents
-		opponents = new LinkedList<>();
-		addOpponents();
-
-		// draw the car
-		moveCar(curPosition);
-		// draw the opponents and the borders
-		moveOn();
-
-		super.loadNewLevel();
-
-		if (!start)// workaround for serialization
-			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
-	}
-
-	/**
-	 * Shifting the borders and opponents on a one cell down and drawing it
-	 */
-	private void moveOn() {
-		Board board = getBoard();
-		// draw borders
-		setBoard(drawBorder(board, !isThreelaneTraffic));
-		// draw opponents
-		Iterator<int[]> it = opponents.iterator();
-
-		while (it.hasNext()) {
-			int[] opponent = it.next();
-			// erase the opponent from the board
-			board = drawShape(getBoard(), opponent[0], opponent[1], car,
-					Cell.Empty);
-
-			// if the opponent does not leave off the board
-			if (opponent[1] + car.maxY() > 0) {
-
-				// check for accident
-				boolean isAccident = checkCollision(board, car, opponent[0],
-						opponent[1] - 1);
-
-				// draw the opponent on one cell below
-				board = drawShape(getBoard(), opponent[0], --opponent[1], car,
-						Cell.Full);
-
-				if (isAccident) {
-					setBoard(board);
-					loss(curX, curY + car.maxY());
-					return;
-				}
-			} else {
-				it.remove();
-				setScore(getScore() + 1);
-			}
-			setBoard(board);
-		}
-		// add new opponents
-		addOpponents();
-	}
-
-	/**
 	 * Adding the new opponents
 	 * <p>
 	 * The distance between the opponents and their positions depends on the
@@ -215,15 +119,15 @@ public class RaceGame extends GameWithLives {
 		int distance = 10 - getLevel() / 2;
 
 		int lastOpponentY;
-		if (opponents.isEmpty())
+		if (opponents.isEmpty()) {
 			lastOpponentY = boardHeight - distance;
-		else
+		} else {
 			lastOpponentY = opponents.getLast()[1] + car.maxY();
+		}
 
 		if (lastOpponentY > boardHeight - distance)
 			return false;
 
-		Random r = new Random();
 		int positionX;
 		int coordX, coordY;
 
@@ -292,23 +196,54 @@ public class RaceGame extends GameWithLives {
 
 		// generate border
 		for (int i = 0; i < border.length; i++) {
-			if ((i + borderPosition) % spanLength < filledSpanLength)
+			if ((i + borderPosition) % spanLength < filledSpanLength) {
 				border[i] = Cell.Full;
-			else
+			} else {
 				border[i] = Cell.Empty;
+			}
 		}
 		// add borders to the board
 		newBoard.setColumn(border, boardWidth - 1);
-		if (isBoth)
+		if (isBoth) {
 			newBoard.setColumn(border, 0);
+		}
 
 		// shift the position of the border
-		if (borderPosition < (spanLength - 1))
+		if (borderPosition < (spanLength - 1)) {
 			borderPosition++;
-		else
+		} else {
 			borderPosition = 0;
+		}
 
 		return newBoard;
+	}
+
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// set position
+		curPosition = 1;
+		curX = positions[curPosition];
+		curY = 0 - car.minY();
+
+		borderPosition = 0;
+
+		// initialization of the opponents
+		opponents = new LinkedList<>();
+		addOpponents();
+
+		// draw the car
+		moveCar(curPosition);
+		// draw the opponents and the borders
+		moveOn();
+
+		super.loadNewLevel();
+
+		if (!start) {
+			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+		}
 	}
 
 	/**
@@ -338,25 +273,53 @@ public class RaceGame extends GameWithLives {
 		curX = newX;
 		curPosition = position;
 
-		if (isAccident)
+		if (isAccident) {
 			loss(curX, curY);
+		}
 
 		return !isAccident;
 	}
 
-	@Override
-	protected void setScore(int score) {
-		int oldHundreds = getScore() / 100;
+	/**
+	 * Shifting the borders and opponents on a one cell down and drawing it
+	 */
+	private void moveOn() {
+		Board board = getBoard();
+		// draw borders
+		setBoard(drawBorder(board, !isThreelaneTraffic));
+		// draw opponents
+		Iterator<int[]> it = opponents.iterator();
 
-		super.setScore(score);
+		while (it.hasNext()) {
+			int[] opponent = it.next();
+			// erase the opponent from the board
+			board = drawShape(getBoard(), opponent[0], opponent[1], car,
+					Cell.Empty);
 
-		// when a sufficient number of points changes the speed and the level
-		if (getScore() / 100 > oldHundreds) {
-			setLevel(getLevel() + 1);
+			// if the opponent does not leave off the board
+			if (opponent[1] + car.maxY() > 0) {
 
-			if (getLevel() == 1)
-				setSpeed(getSpeed() + 1);
+				// check for accident
+				boolean isAccident = checkCollision(board, car, opponent[0],
+						opponent[1] - 1);
+
+				// draw the opponent on one cell below
+				board = drawShape(getBoard(), opponent[0], --opponent[1], car,
+						Cell.Full);
+
+				if (isAccident) {
+					setBoard(board);
+					loss(curX, curY + car.maxY());
+					return;
+				}
+			} else {
+				it.remove();
+				setScore(getScore() + 1);
+			}
+			setBoard(board);
 		}
+		// add new opponents
+		addOpponents();
 	}
 
 	@Override
@@ -380,13 +343,15 @@ public class RaceGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 
 			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (moveCar(curPosition - 1))
+				if (moveCar(curPosition - 1)) {
 					playEffect(Effects.move);
+				}
 				keys.remove(KeyPressed.KeyLeft);
 			}
 			if (keys.contains(KeyPressed.KeyRight)) {
-				if (moveCar(curPosition + 1))
+				if (moveCar(curPosition + 1)) {
 					playEffect(Effects.move);
+				}
 				keys.remove(KeyPressed.KeyRight);
 			}
 			if (keys.contains(KeyPressed.KeyUp)) {
@@ -397,6 +362,49 @@ public class RaceGame extends GameWithLives {
 				moveOn();
 				sleep(ANIMATION_DELAY);
 			}
+		}
+	}
+
+	@Override
+	protected void setScore(int score) {
+		int oldHundreds = getScore() / 100;
+
+		super.setScore(score);
+
+		// when a sufficient number of points changes the speed and the level
+		if (getScore() / 100 > oldHundreds) {
+			setLevel(getLevel() + 1);
+
+			if (getLevel() == 1) {
+				setSpeed(getSpeed() + 1);
+			}
+		}
+	}
+
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public void start() {
+		super.start();
+
+		// don't start playing sound after deserialization
+		if (getStatus() != Status.Paused) {
+			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+		}
+
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			if (getStatus() != Status.Paused) {
+				int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2
+						: getSpeed(true) / 3;
+
+				// moving
+				if (elapsedTime(currentSpeed)) {
+					moveOn();
+				}
+			}
+			// processing of key presses
+			processKeys();
 		}
 	}
 

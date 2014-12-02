@@ -8,7 +8,6 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.playMusic;
 
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,34 +39,25 @@ public class GunGame extends GameWithGun {
 	private final int FIRST_LEVEL_SPEED = 600;
 	private final int TENTH_LEVEL_SPEED = 250;
 
-	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-
-	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
-	}
-
 	/**
 	 * Kind of game
 	 * <p>
 	 * {@code true} - the shot creates a new cell, {@code false} - the shot
 	 * destroys a cell
 	 */
-	private boolean isCreationMode;
+	private final boolean isCreationMode;
+
 	/**
 	 * Number of barrels
 	 * <p>
 	 * {@code true} - two barrels, {@code false} - one barrel
 	 */
-	private boolean hasTwoSmokingBarrels;
+	private final boolean hasTwoSmokingBarrels;
+
 	/**
 	 * Whether to shift the board?
 	 */
-	private boolean isShiftingBoard;
-
+	private final boolean isShiftingBoard;
 	/**
 	 * The Gun Game
 	 * 
@@ -115,92 +105,19 @@ public class GunGame extends GameWithGun {
 
 		loadNewLevel();
 	}
-
 	/**
-	 * Launching the game
+	 * Add randomly generated lines on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param linesCount
+	 *            count of added lines
+	 * @return the board after adding lines
 	 */
-	@Override
-	public void start() {
-		super.start();
-		// create timer for bullets
-		Timer bulletSwarm = new Timer("BulletSwarm", true);
-		bulletSwarm.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (getStatus() == Status.Running) {
-					if (isCreationMode)
-						flightOfMud();
-					else
-						flightOfBullets();
-				}
-			}
-			// twice as slow if hasTwoSmokingBarrels
-		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
-
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if (getStatus() != Status.Paused) {
-
-				int currentSpeed = getSpeed(true);
-
-				// decrease game speed in CreationMode
-				if (isCreationMode) {
-					currentSpeed *= 5;
-					// increase game speed if has two guns
-				} else if (hasTwoSmokingBarrels) {
-					currentSpeed -= ANIMATION_DELAY * 2;
-				}
-
-				// moving
-				if (elapsedTime(currentSpeed)) {
-					// try drop down lines
-					if (!droppingDown()) {
-						loss(curX, curY);
-					}
-				}
-			}
-			// processing of key presses
-			processKeys();
-		}
-
-		bulletSwarm.cancel();
-	}
-
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 - 1;
-		curY = 0;
-
-		// clear the bullets
-		initBullets(bullets);
-		
-		// draws a rows on the top of the border
-		setBoard(addLines(getBoard(), getLevel()));
-		// draws the gun
-		moveGun(curX, curY);
-
-		super.loadNewLevel();
-	}
-
-	/**
-	 * Shift the board horizontally on a random direction
-	 */
-	private void shiftBoard() {
-		Random r = new Random();
-		Board board = getBoard().clone();
-
-		// erase the gun to not interfere
-		board = drawShape(board, curX, curY, gun, Cell.Empty);
-		// remove bullets from the board
+	private Board addLines(Board board, int linesCount) {
+		// clear bullets
 		clearBullets(board);
-		// shifts the board
-		board = boardHorizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
-		// return the gun to the board
-		board = drawShape(board, curX, curY, gun, Cell.Full);
-		setBoard(board);
+		return addLinesToBoard(board, boardHeight - 1, linesCount, false);
 	}
 
 	/**
@@ -237,19 +154,86 @@ public class GunGame extends GameWithGun {
 		return result;
 	}
 
+	@Override
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	@Override
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
+
 	/**
-	 * Add randomly generated lines on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param linesCount
-	 *            count of added lines
-	 * @return the board after adding lines
+	 * Loading or reloading the specified level
 	 */
-	private Board addLines(Board board, int linesCount) {
-		// clear bullets
-		clearBullets(board);
-		return addLinesToBoard(board, boardHeight - 1, linesCount, false);
+	@Override
+	protected void loadNewLevel() {
+		// starting position - the middle of the bottom border of the board
+		curX = boardWidth / 2 - 1;
+		curY = 0;
+
+		// clear the bullets
+		initBullets(bullets);
+		
+		// draws a rows on the top of the border
+		setBoard(addLines(getBoard(), getLevel()));
+		// draws the gun
+		moveGun(curX, curY);
+
+		super.loadNewLevel();
+	}
+
+	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (getStatus() == Status.None)
+			return;
+
+		super.processKeys();
+
+		if (getStatus() == Status.Running) {
+
+			if (keys.contains(KeyPressed.KeyLeft)) {
+				if (moveGun(curX - 1, curY)) {
+					playEffect(Effects.move);
+					if (isCreationMode) {
+						keys.remove(KeyPressed.KeyLeft);
+					} else {
+						sleep(ANIMATION_DELAY * 2);
+					}
+				}
+			}
+			if (keys.contains(KeyPressed.KeyRight)) {
+				if (moveGun(curX + 1, curY)) {
+					playEffect(Effects.move);
+					if (isCreationMode) {
+						keys.remove(KeyPressed.KeyRight);
+					} else {
+						sleep(ANIMATION_DELAY * 2);
+					}
+				}
+			}
+			if (keys.contains(KeyPressed.KeyDown)) {
+				if (droppingDown()) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 2);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
+				if (isCreationMode) {
+					keys.remove(KeyPressed.KeyRotate);
+				} else {
+					// twice as slow if hasTwoSmokingBarrels
+					sleep(ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
+				}
+			}
+		}
 	}
 
 	@Override
@@ -284,52 +268,70 @@ public class GunGame extends GameWithGun {
 	}
 
 	/**
-	 * Processing of key presses
+	 * Shift the board horizontally on a random direction
+	 */
+	private void shiftBoard() {
+		Board board = getBoard().clone();
+
+		// erase the gun to not interfere
+		board = drawShape(board, curX, curY, gun, Cell.Empty);
+		// remove bullets from the board
+		clearBullets(board);
+		// shifts the board
+		board = boardHorizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
+		// return the gun to the board
+		board = drawShape(board, curX, curY, gun, Cell.Full);
+		setBoard(board);
+	}
+
+	/**
+	 * Launching the game
 	 */
 	@Override
-	protected void processKeys() {
-		if (getStatus() == Status.None)
-			return;
-
-		super.processKeys();
-
-		if (getStatus() == Status.Running) {
-
-			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (moveGun(curX - 1, curY)) {
-					playEffect(Effects.move);
-					if (isCreationMode)
-						keys.remove(KeyPressed.KeyLeft);
-					else
-						sleep(ANIMATION_DELAY * 2);
+	public void start() {
+		super.start();
+		// create timer for bullets
+		Timer bulletSwarm = new Timer("BulletSwarm", true);
+		bulletSwarm.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (getStatus() == Status.Running) {
+					if (isCreationMode) {
+						flightOfMud();
+					} else {
+						flightOfBullets();
+					}
 				}
 			}
-			if (keys.contains(KeyPressed.KeyRight)) {
-				if (moveGun(curX + 1, curY)) {
-					playEffect(Effects.move);
-					if (isCreationMode)
-						keys.remove(KeyPressed.KeyRight);
-					else
-						sleep(ANIMATION_DELAY * 2);
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
+
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			if (getStatus() != Status.Paused) {
+
+				int currentSpeed = getSpeed(true);
+
+				// decrease game speed in CreationMode
+				if (isCreationMode) {
+					currentSpeed *= 5;
+					// increase game speed if has two guns
+				} else if (hasTwoSmokingBarrels) {
+					currentSpeed -= ANIMATION_DELAY * 2;
+				}
+
+				// moving
+				if (elapsedTime(currentSpeed)) {
+					// try drop down lines
+					if (!droppingDown()) {
+						loss(curX, curY);
+					}
 				}
 			}
-			if (keys.contains(KeyPressed.KeyDown)) {
-				if (droppingDown()) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 2);
-				} else {
-					loss(curX, curY);
-				}
-			}
-			if (keys.contains(KeyPressed.KeyRotate)) {
-				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-				if (isCreationMode)
-					keys.remove(KeyPressed.KeyRotate);
-				else
-					// twice as slow if hasTwoSmokingBarrels
-					sleep(ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
-			}
+			// processing of key presses
+			processKeys();
 		}
+
+		bulletSwarm.cancel();
 	}
 
 }

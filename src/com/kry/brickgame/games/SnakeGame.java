@@ -14,7 +14,6 @@ import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.snakeObstacles;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
@@ -44,18 +43,40 @@ public class SnakeGame extends GameWithLives {
 	public static final int subtypesNumber = 4;
 
 	/**
+	 * Drawing of the snake on the board
+	 * 
+	 * @param board
+	 *            the board for drawing
+	 * @param x
+	 *            x-coordinate position on the board
+	 * @param y
+	 *            y-coordinate position on the board
+	 * 
+	 * @return - the board with the snake
+	 */
+	private static Board drawSnake(Board board, SnakeShape snake, int x, int y) {
+		for (int i = 0; i < snake.getLength(); i++) {
+			// draws the snake on the board
+			// the head of the snake is blinking
+			drawPoint(board, x + snake.x(i), y + snake.y(i),
+					((i == 0) ? Cell.Blink : Cell.Full));
+		}
+		return board;
+	}
+
+	/**
 	 * The snake
 	 */
 	private SnakeShape snake;
-
 	/**
 	 * Whether the snake can teleporting from one side of the board to another?
 	 */
-	private boolean isToroidalField;
+	private final boolean isToroidalField;
+
 	/**
 	 * Use preloaded levels or generate new ones?
 	 */
-	private boolean usePreloadedLevels;
+	private final boolean usePreloadedLevels;
 
 	/**
 	 * The Snake
@@ -87,24 +108,118 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Launching the game
+	 * Adds "apple" (the blinking cell) to the board
+	 */
+	private void addApple() {
+		int x, y;
+
+		// finds empty cell
+		do {
+			x = r.nextInt(boardWidth);
+			y = r.nextInt(boardHeight);
+		} while (getBoard().getCell(x, y) != Cell.Empty);
+
+		// adds "apple" - the blinking cell
+		getBoard().setCell(Cell.Blink, x, y);
+	}
+
+	/**
+	 * Generate the random coordinates for placing the gates
+	 * 
+	 * @param gatesCount
+	 *            count of the gates (must be > 0)
+	 * @param isVertical
+	 *            {@code true} - for vertical borders, {@code false} - for
+	 *            horizontal borders
+	 * @return array containing the coordinates of the gates
+	 */
+	private int[] generateGates(int gatesCount, boolean isVertical) {
+		int line = (isVertical) ? boardHeight : boardWidth;
+		int[] gates = new int[gatesCount];
+
+		// calculates the coordinates for the symmetrical arrangement
+		// array must be sorted for Arrays.binarySearch()
+		if (gatesCount > 0) {
+			for (int i = 0; i < gatesCount / 2; i++) {
+				gates[i] = r.nextInt(line / 2 - 1) + 1;
+				gates[gatesCount - 1 - i] = boardHeight - 1 - gates[i];
+			}
+			if (gatesCount % 2 != 0) {
+				gates[gatesCount / 2] = line / 2;
+			}
+		}
+		return gates;
+	}
+
+	/**
+	 * Calculate the offset for the x-coordinate for the selected direction
+	 * 
+	 * @param direction
+	 *            direction of movement of of the snake
+	 * @return the offset for the x-coordinate
+	 */
+	private int getShiftX(RotationAngle direction) {
+		// if snake made a 180-degree turn
+		if (direction == snake.getDirection().getOpposite())
+			// than returns the last cell (tail) of the snake as the offset
+			return snake.x(snake.tail());
+		else
+			// otherwise gets the offset in dependence on the direction
+			return SnakeShape.getShiftX(direction);
+	}
+
+	/**
+	 * Calculate the offset for the y-coordinate for the selected direction
+	 * 
+	 * @param direction
+	 *            direction of movement of of the snake
+	 * @return the offset for the y-coordinate
+	 */
+	private int getShiftY(RotationAngle direction) {
+		// if snake made a 180-degree turn
+		if (direction == snake.getDirection().getOpposite())
+			// than returns the last cell (tail) of the snake as the offset
+			return snake.y(snake.tail());
+		else
+			// otherwise gets the offset in dependence on the direction
+			return SnakeShape.getShiftY(direction);
+	}
+
+	/**
+	 * Loading or reloading the specified level
 	 */
 	@Override
-	public void start() {
-		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			// moving of the snake
-			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-				if (!tryMove(snake.getDirection())) {
-					loss(curX, curY);
-				}
-			}
-			// when the snake has reached the maximum length
-			if (snake.getLength() >= SnakeShape.getMaxLength()) {
-				win();
-			}
-			// processing of key presses
-			processKeys();
+	protected void loadNewLevel() {
+		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
+				: LEFT);
+		// starting position - the middle of the bottom border of the board
+		curX = boardWidth / 2 + ((snake.getDirection() == RIGHT) ? -1 : 1);
+
+		curY = (isToroidalField) ? 1 : 0;
+
+		tryMove(snake.getDirection());
+
+		if (isToroidalField) {
+			prepareBorders(!usePreloadedLevels);
+		}
+
+		if (usePreloadedLevels) {
+			loadPreparedObstacle();
+		} else {
+			loadRandomObstacles();
+		}
+		addApple();
+
+		super.loadNewLevel();
+	}
+
+	/**
+	 * Loading predefined obstacles
+	 */
+	private void loadPreparedObstacle() {
+		if (getLevel() > 1) {
+			setBoard(getPreparedObstacles(getBoard(),
+					snakeObstacles[getLevel()]));
 		}
 	}
 
@@ -126,8 +241,6 @@ public class SnakeGame extends GameWithLives {
 	 *            generate a gates, placed in the middle of the border
 	 */
 	private void prepareBorders(boolean hasRandomGates) {
-		Random r = new Random();
-
 		Cell fill;
 		int gatesCount;
 		int[] gates;
@@ -139,8 +252,9 @@ public class SnakeGame extends GameWithLives {
 			if (hasRandomGates && (gatesCount > 1)) {
 				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty
 						: Cell.Full;
-			} else
+			} else {
 				fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
+			}
 
 			getBoard().setCell(fill, 0, i);
 			getBoard().setCell(fill, boardWidth - 1, i);
@@ -161,8 +275,9 @@ public class SnakeGame extends GameWithLives {
 			if (hasRandomGates && (gatesCount > 1)) {
 				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty
 						: Cell.Full;
-			} else
+			} else {
 				fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
+			}
 
 			getBoard().setCell(fill, i, 0);
 			getBoard().setCell(fill, i, boardHeight - 1);
@@ -170,89 +285,80 @@ public class SnakeGame extends GameWithLives {
 	}
 
 	/**
-	 * Generate the random coordinates for placing the gates
-	 * 
-	 * @param gatesCount
-	 *            count of the gates (must be > 0)
-	 * @param isVertical
-	 *            {@code true} - for vertical borders, {@code false} - for
-	 *            horizontal borders
-	 * @return array containing the coordinates of the gates
+	 * Processing of key presses
 	 */
-	private int[] generateGates(int gatesCount, boolean isVertical) {
-		Random r = new Random();
-		int line = (isVertical) ? boardHeight : boardWidth;
-		int[] gates = new int[gatesCount];
+	@Override
+	protected void processKeys() {
+		if (getStatus() == Status.None)
+			return;
 
-		// calculates the coordinates for the symmetrical arrangement
-		// array must be sorted for Arrays.binarySearch()
-		if (gatesCount > 0) {
-			for (int i = 0; i < gatesCount / 2; i++) {
-				gates[i] = r.nextInt(line / 2 - 1) + 1;
-				gates[gatesCount - 1 - i] = boardHeight - 1 - gates[i];
+		super.processKeys();
+
+		if (getStatus() == Status.Running) {
+
+			if (keys.contains(KeyPressed.KeyLeft)) {
+				if (tryMove(LEFT)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else {
+					loss(curX, curY);
+				}
 			}
-			if (gatesCount % 2 != 0)
-				gates[gatesCount / 2] = line / 2;
+			if (keys.contains(KeyPressed.KeyRight)) {
+				if (tryMove(RIGHT)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			if (keys.contains(KeyPressed.KeyDown)) {
+				if (tryMove(DOWN)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			if (keys.contains(KeyPressed.KeyUp)) {
+				if (tryMove(UP)) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 3);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				if (tryMove(snake.getDirection())) {
+					playEffect(Effects.move);
+					sleep(ANIMATION_DELAY * 2);
+				} else {
+					loss(curX, curY);
+				}
+			}
 		}
-		return gates;
 	}
 
 	/**
-	 * Loading predefined obstacles
+	 * Launching the game
 	 */
-	private void loadPreparedObstacle() {
-		if (getLevel() > 1) {
-			setBoard(getPreparedObstacles(getBoard(),
-					snakeObstacles[getLevel()]));
+	@Override
+	public void start() {
+		super.start();
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			// moving of the snake
+			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
+				if (!tryMove(snake.getDirection())) {
+					loss(curX, curY);
+				}
+			}
+			// when the snake has reached the maximum length
+			if (snake.getLength() >= SnakeShape.getMaxLength()) {
+				win();
+			}
+			// processing of key presses
+			processKeys();
 		}
-	}
-
-	/**
-	 * Loading or reloading the specified level
-	 */
-	protected void loadNewLevel() {
-		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT
-				: LEFT);
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 + ((snake.getDirection() == RIGHT) ? -1 : 1);
-
-		curY = (isToroidalField) ? 1 : 0;
-
-		tryMove(snake.getDirection());
-
-		if (isToroidalField) {
-			prepareBorders(!usePreloadedLevels);
-		}
-
-		if (usePreloadedLevels)
-			loadPreparedObstacle();
-		else
-			loadRandomObstacles();
-		addApple();
-
-		super.loadNewLevel();
-	}
-
-	/**
-	 * Drawing of the snake on the board
-	 * 
-	 * @param board
-	 *            the board for drawing
-	 * @param x
-	 *            x-coordinate position on the board
-	 * @param y
-	 *            y-coordinate position on the board
-	 * 
-	 * @return - the board with the snake
-	 */
-	private static Board drawSnake(Board board, SnakeShape snake, int x, int y) {
-		for (int i = 0; i < snake.getLength(); i++) {
-			// draws the snake on the board
-			// the head of the snake is blinking
-			drawPoint(board, x + snake.x(i), y + snake.y(i),
-					((i == 0) ? Cell.Blink : Cell.Full));
-		}
-		return board;
 	}
 
 	/**
@@ -285,14 +391,16 @@ public class SnakeGame extends GameWithLives {
 		// check the out off the board
 		if (checkBoardCollision(board, headOfSnake, newX, newY)) {
 			if (isToroidalField) {
-				if (newX < 0)
+				if (newX < 0) {
 					newX = boardWidth + newX;
-				else if (newX >= boardWidth)
+				} else if (newX >= boardWidth) {
 					newX = newX - boardWidth;
-				if (newY < 0)
+				}
+				if (newY < 0) {
 					newY = boardHeight + newY;
-				else if (newY >= boardHeight)
+				} else if (newY >= boardHeight) {
 					newY = newY - boardHeight;
+				}
 
 			} else
 				return false;
@@ -321,9 +429,8 @@ public class SnakeGame extends GameWithLives {
 		}
 
 		// check the collision with obstacles
-		if (checkCollision(board, headOfSnake, newX, newY)) {
+		if (checkCollision(board, headOfSnake, newX, newY))
 			return false;
-		}
 
 		// draw the new snake on the board
 		setBoard(drawSnake(board, newSnake, newX, newY));
@@ -333,12 +440,13 @@ public class SnakeGame extends GameWithLives {
 			// increases score
 			setScore(getScore() + 1);
 			// add a new apple
-			if (newSnake.getLength() < SnakeShape.getMaxLength())
+			if (newSnake.getLength() < SnakeShape.getMaxLength()) {
 				addApple();
+			}
 		}
 
 		// the old snake is replaced by the new snake
-		this.snake = newSnake.clone();
+		snake = newSnake.clone();
 		curX = newX;
 		curY = newY;
 
@@ -346,109 +454,6 @@ public class SnakeGame extends GameWithLives {
 		elapsedTime(1);
 
 		return true;
-	}
-
-	/**
-	 * Adds "apple" (the blinking cell) to the board
-	 */
-	private void addApple() {
-		Random r = new Random();
-		int x, y;
-
-		// finds empty cell
-		do {
-			x = r.nextInt(boardWidth);
-			y = r.nextInt(boardHeight);
-		} while (getBoard().getCell(x, y) != Cell.Empty);
-
-		// adds "apple" - the blinking cell
-		getBoard().setCell(Cell.Blink, x, y);
-	}
-
-	/**
-	 * Calculate the offset for the x-coordinate for the selected direction
-	 * 
-	 * @param direction
-	 *            direction of movement of of the snake
-	 * @return the offset for the x-coordinate
-	 */
-	private int getShiftX(RotationAngle direction) {
-		// if snake made a 180-degree turn
-		if (direction == snake.getDirection().getOpposite()) {
-			// than returns the last cell (tail) of the snake as the offset
-			return snake.x(snake.tail());
-		} else {
-			// otherwise gets the offset in dependence on the direction
-			return SnakeShape.getShiftX(direction);
-		}
-	}
-
-	/**
-	 * Calculate the offset for the y-coordinate for the selected direction
-	 * 
-	 * @param direction
-	 *            direction of movement of of the snake
-	 * @return the offset for the y-coordinate
-	 */
-	private int getShiftY(RotationAngle direction) {
-		// if snake made a 180-degree turn
-		if (direction == snake.getDirection().getOpposite()) {
-			// than returns the last cell (tail) of the snake as the offset
-			return snake.y(snake.tail());
-		} else {
-			// otherwise gets the offset in dependence on the direction
-			return SnakeShape.getShiftY(direction);
-		}
-	}
-
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (getStatus() == Status.None)
-			return;
-
-		super.processKeys();
-
-		if (getStatus() == Status.Running) {
-
-			if (keys.contains(KeyPressed.KeyLeft)) {
-				if (tryMove(LEFT)) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 3);
-				} else
-					loss(curX, curY);
-			}
-			if (keys.contains(KeyPressed.KeyRight)) {
-				if (tryMove(RIGHT)) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 3);
-				} else
-					loss(curX, curY);
-			}
-			if (keys.contains(KeyPressed.KeyDown)) {
-				if (tryMove(DOWN)) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 3);
-				} else
-					loss(curX, curY);
-			}
-			if (keys.contains(KeyPressed.KeyUp)) {
-				if (tryMove(UP)) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 3);
-				} else
-					loss(curX, curY);
-			}
-			if (keys.contains(KeyPressed.KeyRotate)) {
-				if (tryMove(snake.getDirection())) {
-					playEffect(Effects.move);
-					sleep(ANIMATION_DELAY * 2);
-				} else
-					loss(curX, curY);
-			}
-		}
 	}
 
 }

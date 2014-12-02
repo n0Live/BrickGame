@@ -37,7 +37,7 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * The frog
 	 */
-	private Shape frog;
+	private final Shape frog;
 
 	private Board road;
 
@@ -55,19 +55,19 @@ public class FroggerGame extends GameWithLives {
 	 * <p>
 	 * {@code true} - left to right, {@code false} - right to left
 	 */
-	private boolean shiftRoadFromLeftToRigth;
+	private final boolean shiftRoadFromLeftToRigth;
 	/**
 	 * Whether the road shifting with the frog?
 	 */
-	private boolean shiftRoadWithFrog;
+	private final boolean shiftRoadWithFrog;
 	/**
 	 * Has the road the oncoming traffic?
 	 */
-	private boolean isRoadWithOncomingTraffic;
+	private final boolean isRoadWithOncomingTraffic;
 	/**
 	 * Use preloaded tracts or generate new ones?
 	 */
-	private boolean usePreloadedTracts;
+	private final boolean usePreloadedTracts;
 
 	/**
 	 * The Frogger
@@ -166,7 +166,7 @@ public class FroggerGame extends GameWithLives {
 		super(speed, level, type);
 
 		// initialize the frog
-		this.frog = new Shape(1);
+		frog = new Shape(1);
 		frog.setCoord(0, new int[] { 0, 0 });
 		frog.setFill(Cell.Blink);
 
@@ -187,19 +187,70 @@ public class FroggerGame extends GameWithLives {
 	}
 
 	/**
-	 * Launching the game
+	 * Checking the conditions of victory
 	 */
-	@Override
-	public void start() {
-		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if ((getStatus() != Status.Paused)
-					&& (elapsedTime(getSpeed(true) * 3))) {
-				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+	private void checkForWin() {
+		boolean isVictory = true;
+		// victory when filled the entire upper row
+		for (int i = 0; i < boardWidth; i++) {
+			if (getBoard().getCell(i, boardHeight - 1) == Cell.Empty) {
+				isVictory = false;
+				break;
 			}
-			// processing of key presses
-			processKeys();
 		}
+
+		setScore(getScore() + 1);
+
+		if (isVictory) {
+			animatedClearLine(getBoard(), curX, boardHeight - 1);
+			sleep(ANIMATION_DELAY);
+
+			win();
+		} else {
+			setFrog();
+		}
+	}
+
+	/**
+	 * Moving the frog to the new position
+	 * 
+	 * @param x
+	 *            x-coordinate position of the new position
+	 * @param y
+	 *            y-coordinate position of the new position
+	 * @return {@code true} if the movement succeeded, otherwise {@code false}
+	 */
+	private boolean jumpFrog(int x, int y) {
+		if ((y < 0) || (y >= boardHeight))
+			return true;
+
+		if ((x < 0) || (x >= boardWidth))
+			return false;
+
+		// Create a temporary board, a copy of the basic board
+		Board board = getBoard().clone();
+
+		// Erase the frog to not interfere with the checks
+		board = drawShape(board, curX, curY, frog, Cell.Empty);
+
+		// check for collisions
+		if (checkCollision(board, frog, x, y))
+			return false;
+
+		// draw the frog on the new place
+		if (y == boardHeight - 1) {
+			setBoard(drawShape(board, x, y, frog, Cell.Full));
+
+			playEffect(Effects.add_cell);
+
+			checkForWin();
+		} else {
+			setBoard(drawShape(board, x, y, frog, frog.getFill()));
+			curX = x;
+			curY = y;
+		}
+
+		return true;
 	}
 
 	/**
@@ -217,23 +268,6 @@ public class FroggerGame extends GameWithLives {
 	protected void loadNewLevel() {
 		loadLevel();
 		super.loadNewLevel();
-	}
-
-	@Override
-	protected void reloadLevel() {
-		loadLevel();
-		setStatus(Status.Running);
-	}
-
-	/**
-	 * Drawing the frog in the start position
-	 */
-	private void setFrog() {
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 - 1;
-		curY = 0;
-
-		jumpFrog(curX, curY);
 	}
 
 	/**
@@ -277,7 +311,7 @@ public class FroggerGame extends GameWithLives {
 			for (int i = 0; i < getLevel() / 3 + 1; i++) {
 				// defines a few random non-recurring tracts
 				while (!oncomingTraffic
-						.add(new Random().nextInt(tracts.length))) {
+						.add(r.nextInt(tracts.length))) {
 				}
 			}
 		}
@@ -325,12 +359,14 @@ public class FroggerGame extends GameWithLives {
 						fullSpanLength = tracts[i].length - j - 1
 								- emptySpanLength;
 						// but not more than 4
-						if (fullSpanLength > 4)
+						if (fullSpanLength > 4) {
 							fullSpanLength = r.nextInt(3) + 1;
+						}
 					}
 					// if "k + j" out of bounds, set "k" such that "k + j = 0"
-					if ((k + j + 1) >= tracts[i].length)
+					if ((k + j + 1) >= tracts[i].length) {
 						k = -(j + 1);
+					}
 				}
 			}
 
@@ -353,8 +389,9 @@ public class FroggerGame extends GameWithLives {
 				int length = width;
 				// if the remainder is less than the width of the tract, copies
 				// only the remainder at first
-				if (tractLength - roadPositions[i / 2] < width)
+				if (tractLength - roadPositions[i / 2] < width) {
 					length = (tractLength - roadPositions[i / 2]);
+				}
 
 				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0,
 						length);
@@ -371,123 +408,6 @@ public class FroggerGame extends GameWithLives {
 	}
 
 	/**
-	 * Does the shift of the road at one position
-	 * 
-	 * @param isLeftToRight
-	 *            direction of the shift of the road: {@code true} - left to
-	 *            right, {@code false} - right to left
-	 * @param withFrog
-	 *            determine, whether the road is shifted with the frog
-	 */
-	private void shiftRoad(boolean isLeftToRight, boolean withFrog) {
-		Board board = getBoard();
-		board = drawShape(board, curX, curY, frog, Cell.Empty);
-
-		Cell[] tract = new Cell[boardWidth];
-
-		int tractLength = tracts[0].length;
-
-		// determines the position for the shift
-		for (int i = 0; i < roadPositions.length; i++) {
-			if (isRoadWithOncomingTraffic && oncomingTraffic.contains(i)) {
-				// for oncoming traffic
-				roadPositions[i] = (isLeftToRight) ? roadPositions[i] + 1
-						: roadPositions[i] - 1;
-			} else {
-				// for direct traffic
-				roadPositions[i] = (isLeftToRight) ? roadPositions[i] - 1
-						: roadPositions[i] + 1;
-			}
-
-			if (roadPositions[i] < 0)
-				roadPositions[i] = tractLength - 1;
-			else if (roadPositions[i] >= tractLength)
-				roadPositions[i] = 0;
-		}
-
-		for (int i = 0; i < road.getHeight(); i++) {
-			if (i % 2 != 0) {
-				int length = boardWidth;
-				// if the remainder is less than the width of the tract, copies
-				// only the remainder at first
-				if (tractLength - roadPositions[i / 2] < boardWidth)
-					length = (tractLength - roadPositions[i / 2]);
-
-				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0,
-						length);
-
-				if (length != boardWidth) {
-					// complement to the width from the beginning of the tract
-					System.arraycopy(tracts[i / 2], 0, tract, length,
-							boardWidth - length);
-				}
-				road.setRow(tract, i);
-			}
-		}
-		insertCellsToBoard(board, road.getBoard(), 0, 1);
-
-		// shifting the frog with the road
-		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
-			if (isRoadWithOncomingTraffic
-					&& oncomingTraffic.contains((curY - 1) / 2))
-				curX = (isLeftToRight) ? curX - 1 : curX + 1;
-			else
-				curX = (isLeftToRight) ? curX + 1 : curX - 1;
-		}
-
-		// checks for collision with the frog and an obstacles
-		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog,
-				curX) || checkCollision(board, frog, curX, curY));
-
-		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
-
-		if (isFrogMustDie)
-			loss();
-	}
-
-	/**
-	 * Moving the frog to the new position
-	 * 
-	 * @param x
-	 *            x-coordinate position of the new position
-	 * @param y
-	 *            y-coordinate position of the new position
-	 * @return {@code true} if the movement succeeded, otherwise {@code false}
-	 */
-	private boolean jumpFrog(int x, int y) {
-		if ((y < 0) || (y >= boardHeight))
-			return true;
-
-		if ((x < 0) || (x >= boardWidth))
-			return false;
-
-		// Create a temporary board, a copy of the basic board
-		Board board = getBoard().clone();
-
-		// Erase the frog to not interfere with the checks
-		board = drawShape(board, curX, curY, frog, Cell.Empty);
-
-		// check for collisions
-		if (checkCollision(board, frog, x, y))
-			return false;
-
-		// draw the frog on the new place
-		if (y == boardHeight - 1) {
-			setBoard(drawShape(board, x, y, frog, Cell.Full));
-
-			playEffect(Effects.add_cell);
-
-			checkForWin();
-		} else {
-			setBoard(drawShape(board, x, y, frog, frog.getFill()));
-			curX = x;
-			curY = y;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Drawing effect of the collisions and decreasing lives
 	 */
 	private void loss() {
@@ -498,31 +418,6 @@ public class FroggerGame extends GameWithLives {
 
 		// restores the frogs' row
 		getBoard().setRow(frogs, boardHeight - 1);
-	}
-
-	/**
-	 * Checking the conditions of victory
-	 */
-	private void checkForWin() {
-		boolean isVictory = true;
-		// victory when filled the entire upper row
-		for (int i = 0; i < boardWidth; i++) {
-			if (getBoard().getCell(i, boardHeight - 1) == Cell.Empty) {
-				isVictory = false;
-				break;
-			}
-		}
-
-		setScore(getScore() + 1);
-
-		if (isVictory) {
-			animatedClearLine(getBoard(), curX, boardHeight - 1);
-			sleep(ANIMATION_DELAY);
-
-			win();
-		} else {
-			setFrog();
-		}
 	}
 
 	/**
@@ -567,12 +462,125 @@ public class FroggerGame extends GameWithLives {
 			}
 
 			if (move) {
-				if (jumpFrog(newX, newY))
+				if (jumpFrog(newX, newY)) {
 					playEffect(Effects.move);
-				else
+				} else {
 					loss();
+				}
 			}
 
+		}
+	}
+
+	@Override
+	protected void reloadLevel() {
+		loadLevel();
+		setStatus(Status.Running);
+	}
+
+	/**
+	 * Drawing the frog in the start position
+	 */
+	private void setFrog() {
+		// starting position - the middle of the bottom border of the board
+		curX = boardWidth / 2 - 1;
+		curY = 0;
+
+		jumpFrog(curX, curY);
+	}
+
+	/**
+	 * Does the shift of the road at one position
+	 * 
+	 * @param isLeftToRight
+	 *            direction of the shift of the road: {@code true} - left to
+	 *            right, {@code false} - right to left
+	 * @param withFrog
+	 *            determine, whether the road is shifted with the frog
+	 */
+	private void shiftRoad(boolean isLeftToRight, boolean withFrog) {
+		Board board = getBoard();
+		board = drawShape(board, curX, curY, frog, Cell.Empty);
+
+		Cell[] tract = new Cell[boardWidth];
+
+		int tractLength = tracts[0].length;
+
+		// determines the position for the shift
+		for (int i = 0; i < roadPositions.length; i++) {
+			if (isRoadWithOncomingTraffic && oncomingTraffic.contains(i)) {
+				// for oncoming traffic
+				roadPositions[i] = (isLeftToRight) ? roadPositions[i] + 1
+						: roadPositions[i] - 1;
+			} else {
+				// for direct traffic
+				roadPositions[i] = (isLeftToRight) ? roadPositions[i] - 1
+						: roadPositions[i] + 1;
+			}
+
+			if (roadPositions[i] < 0) {
+				roadPositions[i] = tractLength - 1;
+			} else if (roadPositions[i] >= tractLength) {
+				roadPositions[i] = 0;
+			}
+		}
+
+		for (int i = 0; i < road.getHeight(); i++) {
+			if (i % 2 != 0) {
+				int length = boardWidth;
+				// if the remainder is less than the width of the tract, copies
+				// only the remainder at first
+				if (tractLength - roadPositions[i / 2] < boardWidth) {
+					length = (tractLength - roadPositions[i / 2]);
+				}
+
+				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0,
+						length);
+
+				if (length != boardWidth) {
+					// complement to the width from the beginning of the tract
+					System.arraycopy(tracts[i / 2], 0, tract, length,
+							boardWidth - length);
+				}
+				road.setRow(tract, i);
+			}
+		}
+		insertCellsToBoard(board, road.getBoard(), 0, 1);
+
+		// shifting the frog with the road
+		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
+			if (isRoadWithOncomingTraffic
+					&& oncomingTraffic.contains((curY - 1) / 2)) {
+				curX = (isLeftToRight) ? curX - 1 : curX + 1;
+			} else {
+				curX = (isLeftToRight) ? curX + 1 : curX - 1;
+			}
+		}
+
+		// checks for collision with the frog and an obstacles
+		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog,
+				curX) || checkCollision(board, frog, curX, curY));
+
+		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
+
+		if (isFrogMustDie) {
+			loss();
+		}
+	}
+
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public void start() {
+		super.start();
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			if ((getStatus() != Status.Paused)
+					&& (elapsedTime(getSpeed(true) * 3))) {
+				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+			}
+			// processing of key presses
+			processKeys();
 		}
 	}
 

@@ -10,7 +10,6 @@ import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 
 import java.awt.Point;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,7 +53,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * The ball breaking bricks
 	 */
-	private Shape ball;
+	private final Shape ball;
 	/**
 	 * X-coordinate position of the ball
 	 */
@@ -80,15 +79,15 @@ public class InvadersGame extends GameWithGun {
 	 * <p>
 	 * {@code true} - two barrels, {@code false} - one barrel
 	 */
-	private boolean hasTwoSmokingBarrels;
+	private final boolean hasTwoSmokingBarrels;
 	/**
 	 * Whether to shift the board?
 	 */
-	private boolean isShiftingBricks;
+	private final boolean isShiftingBricks;
 	/**
 	 * Use preloaded bricks wall or generate new ones?
 	 */
-	private boolean usePreloadedBricks;
+	private final boolean usePreloadedBricks;
 	/**
 	 * Timer for the invasion
 	 */
@@ -105,21 +104,11 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * X-coordinate of the starting position of the gun
 	 */
-	private int startX;
+	private final int startX;
 
 	// increase speed from the original
 	private final int FIRST_LEVEL_SPEED = 300;
 	private final int TENTH_LEVEL_SPEED = 50;
-
-	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-
-	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
-	}
 
 	/**
 	 * The Invaders Game
@@ -162,7 +151,7 @@ public class InvadersGame extends GameWithGun {
 		super(speed, level, type);
 
 		// initialize the ball
-		this.ball = BallUtils.getBall(Cell.Full);
+		ball = BallUtils.getBall(Cell.Full);
 
 		// for every 3rd and 4th type of game
 		hasTwoSmokingBarrels = ((getType() % 4 == 3) || (getType() % 4 == 0));
@@ -187,119 +176,32 @@ public class InvadersGame extends GameWithGun {
 	}
 
 	/**
-	 * Launching the game
-	 */
-	@Override
-	public void start() {
-		super.start();
-		// create timer for invasion,
-		// for the deserialization
-		createInvasionTimer();
-
-		// create timer for bullets
-		Timer bulletSwarm = new Timer("BulletSwarm", true);
-		bulletSwarm.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (getStatus() == Status.Running) {
-					flightOfBullets();
-				}
-			}
-			// twice as slow if hasTwoSmokingBarrels
-		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
-
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			// check the number of remaining bricks
-			if (bricks.getBricksCount() <= 0) {
-				win();
-			}
-			// processing of key presses
-			processKeys();
-		}
-
-		bulletSwarm.cancel();
-		invasionTimer.cancel();
-	}
-
-	/**
-	 * Loading or reloading the specified level
+	 * Processing breaking bricks
 	 * 
+	 * @param board
+	 *            the board for drawing the bricks wall after breaking bricks
+	 * @param x
+	 *            x-coordinate of the brick for breaking
+	 * @param y
+	 *            y-coordinate of the brick for breaking
 	 */
-	@Override
-	protected void loadNewLevel() {
-		// set the X-Dimension flags
-		theXDimension = isReadyToXDimension && !isShiftingBricks;
-		isReadyToXDimension = !theXDimension && !isShiftingBricks;
+	private void breakBrick(Board board, int x, int y) {
+		// coordinates are given to the bricks wall's grid
+		int givenX = x - bricksX;
+		int givenY = y - bricksY;
 
-		// if the invasionTimer was set, then cancel it
-		if (invasionTimer != null)
-			invasionTimer.cancel();
+		if (bricks.breakBrick(givenX, givenY)) {
+			playEffect(Effects.hit_cell);
 
-		// clear the bullets
-		initBullets(bullets);
+			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 
-		// return the ball to the start position
-		initBall();
+			// increase scores
+			setScore(getScore() + 1);
 
-		// create the bricks wall
-		bricks = new BricksWall(getLevel(), usePreloadedBricks);
-		bricksX = 0;
-		bricksY = (boardHeight - bricks.getHeight());
-		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
-
-		// set the starting position of the gun
-		curX = startX;
-		curY = 0;
-		// draws the gun
-		moveGun(curX, curY);
-
-		createBall();
-
-		super.loadNewLevel();
-
-		// create timer for invasion
-		if (!start)// workaround for serialization
-			createInvasionTimer();
-	}
-
-	private void createInvasionTimer() {
-		// if the invasionTimer was set, then cancel it
-		if (invasionTimer != null)
-			invasionTimer.cancel();
-
-		invasionTimer = new Timer("Invasion", true);
-		invasionTimer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				if (getStatus() == Status.Running) {
-					processInvasion();
-				}
-			}
-		}, getSpeed(true) * 2, getSpeed(true));
-	}
-
-	/**
-	 * Processing actions of invaders
-	 */
-	private synchronized void processInvasion() {
-		if (isFlyingBall) { // the ball already created
-			moveBall();
-		} else {
-			// dropping down the bricks wall
-			if (!droppingDown()) {
-				loss(curX, curY);
-			} else {
-				createBall();
+			if (isReadyToXDimension && (x != startX)) {
+				isReadyToXDimension = false;
 			}
 		}
-	}
-
-	/**
-	 * Erasing the ball from the board
-	 */
-	private void initBall() {
-		isFlyingBall = false;
-		setBoard(drawBall(getBoard(), -1, -1));
 	}
 
 	/**
@@ -343,50 +245,21 @@ public class InvadersGame extends GameWithGun {
 
 	}
 
-	/**
-	 * Move the ball to a new position in movement direction
-	 */
-	private void moveBall() {
-		Point newCoords;
-		// set new coordinates from directions
-		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
-				ballVerticalDirection);
-
-		// if the ball fall off the board then remove it
-		if (newCoords.y < 0) {
-			initBall();
-			bricks.setBricksCount(bricks.getBricksCount() - 1);
-			return;
+	private void createInvasionTimer() {
+		// if the invasionTimer was set, then cancel it
+		if (invasionTimer != null) {
+			invasionTimer.cancel();
 		}
 
-		// whether the ball bounced off the surface?
-		boolean bounce = false;
-
-		// check collision with the board's borders
-		if ((newCoords.x < 0) || (newCoords.x >= boardWidth)) {
-			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
-			bounce = true;
-		}
-		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
-				ballVerticalDirection);
-
-		Board board = getBoard().clone();
-
-		// check collision with the gun
-		if (newCoords.y <= curY + gun.maxY()) {
-			if (checkCollision(board, ball, newCoords.x, newCoords.y)) {
-				loss(newCoords.x, newCoords.y);
-				return;
+		invasionTimer = new Timer("Invasion", true);
+		invasionTimer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (getStatus() == Status.Running) {
+					processInvasion();
+				}
 			}
-		}
-
-		if (bounce) {
-			playEffect(Effects.turn);
-		}
-
-		// draw the ball in the new position
-		board = drawBall(board, newCoords.x, newCoords.y);
-		setBoard(board);
+		}, getSpeed(true) * 2, getSpeed(true));
 	}
 
 	/**
@@ -409,34 +282,6 @@ public class InvadersGame extends GameWithGun {
 		ballY = y;
 
 		return newBoard;
-	}
-
-	/**
-	 * Processing breaking bricks
-	 * 
-	 * @param board
-	 *            the board for drawing the bricks wall after breaking bricks
-	 * @param x
-	 *            x-coordinate of the brick for breaking
-	 * @param y
-	 *            y-coordinate of the brick for breaking
-	 */
-	private void breakBrick(Board board, int x, int y) {
-		// coordinates are given to the bricks wall's grid
-		int givenX = x - bricksX;
-		int givenY = y - bricksY;
-
-		if (bricks.breakBrick(givenX, givenY)) {
-			playEffect(Effects.hit_cell);
-
-			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
-
-			// increase scores
-			setScore(getScore() + 1);
-
-			if (isReadyToXDimension && (x != startX))
-				isReadyToXDimension = false;
-		}
 	}
 
 	/**
@@ -499,26 +344,6 @@ public class InvadersGame extends GameWithGun {
 		return result;
 	}
 
-	/**
-	 * Shift the bricks wall horizontally
-	 */
-	private void shiftBricks() {
-		// shift bricks
-		bricks.shift((new Random().nextBoolean()) ? (-1) : (1));
-		// insert shifted bricks to the board
-		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
-	}
-
-	@Override
-	protected void removeCell(Board board, int x, int y) {
-		if ((x == ballX) && (y == ballY)) {
-			initBall();
-			bricks.setBricksCount(bricks.getBricksCount() - 1);
-		} else {
-			breakBrick(board, x, y);
-		}
-	}
-
 	@Override
 	protected synchronized void fireBoardChanged(Board board) {
 		Board newBoard = board.clone();
@@ -528,7 +353,7 @@ public class InvadersGame extends GameWithGun {
 			for (int i = 0; i < newBoard.getWidth(); i++) {
 				for (int j = 0; j < newBoard.getHeight(); j++) {
 					if ((newBoard.getCell(i, j) == Cell.Full)
-							&& (new Random().nextInt(3) != 0)) {
+							&& (r.nextInt(4) != 0)) {
 						newBoard.setCell(Cell.Empty, i, j);
 					}
 				}
@@ -540,9 +365,132 @@ public class InvadersGame extends GameWithGun {
 	}
 
 	@Override
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	@Override
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
+
+	/**
+	 * Erasing the ball from the board
+	 */
+	private void initBall() {
+		isFlyingBall = false;
+		setBoard(drawBall(getBoard(), -1, -1));
+	}
+
+	/**
+	 * Loading or reloading the specified level
+	 * 
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// set the X-Dimension flags
+		theXDimension = isReadyToXDimension && !isShiftingBricks;
+		isReadyToXDimension = !theXDimension && !isShiftingBricks;
+
+		// if the invasionTimer was set, then cancel it
+		if (invasionTimer != null) {
+			invasionTimer.cancel();
+		}
+
+		// clear the bullets
+		initBullets(bullets);
+
+		// return the ball to the start position
+		initBall();
+
+		// create the bricks wall
+		bricks = new BricksWall(getLevel(), usePreloadedBricks);
+		bricksX = 0;
+		bricksY = (boardHeight - bricks.getHeight());
+		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
+
+		// set the starting position of the gun
+		curX = startX;
+		curY = 0;
+		// draws the gun
+		moveGun(curX, curY);
+
+		createBall();
+
+		super.loadNewLevel();
+
+		// create timer for invasion
+		if (!start) {
+			createInvasionTimer();
+		}
+	}
+
+	@Override
 	protected void loss(int x, int y) {
 		isReadyToXDimension = false;
 		super.loss(x, y);
+	}
+
+	/**
+	 * Move the ball to a new position in movement direction
+	 */
+	private void moveBall() {
+		Point newCoords;
+		// set new coordinates from directions
+		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
+				ballVerticalDirection);
+
+		// if the ball fall off the board then remove it
+		if (newCoords.y < 0) {
+			initBall();
+			bricks.setBricksCount(bricks.getBricksCount() - 1);
+			return;
+		}
+
+		// whether the ball bounced off the surface?
+		boolean bounce = false;
+
+		// check collision with the board's borders
+		if ((newCoords.x < 0) || (newCoords.x >= boardWidth)) {
+			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
+			bounce = true;
+		}
+		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
+				ballVerticalDirection);
+
+		Board board = getBoard().clone();
+
+		// check collision with the gun
+		if (newCoords.y <= curY + gun.maxY()) {
+			if (checkCollision(board, ball, newCoords.x, newCoords.y)) {
+				loss(newCoords.x, newCoords.y);
+				return;
+			}
+		}
+
+		if (bounce) {
+			playEffect(Effects.turn);
+		}
+
+		// draw the ball in the new position
+		board = drawBall(board, newCoords.x, newCoords.y);
+		setBoard(board);
+	}
+
+	/**
+	 * Processing actions of invaders
+	 */
+	private synchronized void processInvasion() {
+		if (isFlyingBall) { // the ball already created
+			moveBall();
+		} else {
+			// dropping down the bricks wall
+			if (!droppingDown()) {
+				loss(curX, curY);
+			} else {
+				createBall();
+			}
+		}
 	}
 
 	/**
@@ -587,5 +535,60 @@ public class InvadersGame extends GameWithGun {
 				sleep(ANIMATION_DELAY / 2);
 			}
 		}
+	}
+
+	@Override
+	protected void removeCell(Board board, int x, int y) {
+		if ((x == ballX) && (y == ballY)) {
+			initBall();
+			bricks.setBricksCount(bricks.getBricksCount() - 1);
+		} else {
+			breakBrick(board, x, y);
+		}
+	}
+
+	/**
+	 * Shift the bricks wall horizontally
+	 */
+	private void shiftBricks() {
+		// shift bricks
+		bricks.shift(r.nextBoolean() ? -1 : 1);
+		// insert shifted bricks to the board
+		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
+	}
+
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public void start() {
+		super.start();
+		// create timer for invasion,
+		// for the deserialization
+		createInvasionTimer();
+
+		// create timer for bullets
+		Timer bulletSwarm = new Timer("BulletSwarm", true);
+		bulletSwarm.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (getStatus() == Status.Running) {
+					flightOfBullets();
+				}
+			}
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
+
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			// check the number of remaining bricks
+			if (bricks.getBricksCount() <= 0) {
+				win();
+			}
+			// processing of key presses
+			processKeys();
+		}
+
+		bulletSwarm.cancel();
+		invasionTimer.cancel();
 	}
 }

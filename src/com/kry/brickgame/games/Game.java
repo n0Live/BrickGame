@@ -15,6 +15,7 @@ import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import com.kry.brickgame.GameEvent;
@@ -37,7 +38,7 @@ import com.kry.brickgame.splashes.Splash;
  */
 public abstract class Game extends Thread implements Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
-	
+
 	/**
 	 * Animated splash for game
 	 */
@@ -50,14 +51,55 @@ public abstract class Game extends Thread implements Serializable {
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 
 	/**
-	 * Set of the pressed keys
-	 */
-	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
-
-	/**
 	 * Is the sound turned off?
 	 */
 	private static boolean mute = true;
+
+	public static synchronized void addGameListener(GameListener listener) {
+		listeners.add(listener);
+	}
+
+	public static synchronized GameListener[] getGameListeners() {
+		return listeners.toArray(new GameListener[listeners.size()]);
+	}
+
+	/**
+	 * Get the splash screen for game
+	 * 
+	 * @return the splash
+	 */
+	protected static Splash getSplash() {
+		return splash;
+	}
+
+	protected static boolean isMuted() {
+		return mute;
+	}
+
+	public static synchronized void removeGameListener(GameListener listener) {
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Sleep for the specified number of milliseconds
+	 * 
+	 * @param millis
+	 *            the length of time to sleep in milliseconds
+	 */
+	public static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	protected final Random r;
+
+	/**
+	 * Set of the pressed keys
+	 */
+	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
 	/**
 	 * Speed
 	 */
@@ -98,6 +140,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * X-coordinate position on the board
 	 */
 	protected int curX;
+
 	/**
 	 * Y-coordinate position on the board
 	 */
@@ -106,18 +149,22 @@ public abstract class Game extends Thread implements Serializable {
 	 * Game status
 	 */
 	private volatile Status status;
+
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
 	private long timePoint;
+
 	/**
 	 * The main (base) board
 	 */
 	private volatile Board board;
+
 	/**
 	 * The preview board
 	 */
 	private volatile Board preview;
+
 	/**
 	 * Whether to draw the board upside down?
 	 */
@@ -127,24 +174,19 @@ public abstract class Game extends Thread implements Serializable {
 	// Game speed constants. May be overrided by means of
 	// getFIRST_LEVEL_SPEED(), getTENTH_LEVEL_SPEED()
 	private final int FIRST_LEVEL_SPEED = 500;
+
 	private final int TENTH_LEVEL_SPEED = 80;
-
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
-	}
 
 	/**
 	 * The Game
 	 */
 	public Game() {
+		r = new Random();
+
 		setStatus(Status.None);
-		
+
 		stopAllSounds();
-		
+
 		setSpeed(1);
 		setLevel(1);
 		setRotation(Rotation.None);
@@ -156,8 +198,8 @@ public abstract class Game extends Thread implements Serializable {
 
 		setScore(0);
 
-		this.curX = 0;
-		this.curY = 0;
+		curX = 0;
+		curY = 0;
 
 		timePoint = System.currentTimeMillis();
 
@@ -168,6 +210,52 @@ public abstract class Game extends Thread implements Serializable {
 
 		clearBoard();
 		clearPreview();
+	}
+
+	/**
+	 * The Game
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param board
+	 *            main board
+	 * @param preview
+	 *            preview board
+	 * @param rotation
+	 *            direction of rotation
+	 * @param type
+	 *            type of the game
+	 */
+	protected Game(int speed, int level, Board board, Board preview,
+			Rotation rotation, int type) {
+		this(speed, level, rotation, type);
+
+		setBoard(board);
+		setPreview(preview);
+
+		boardWidth = board.getWidth();
+		boardHeight = board.getHeight();
+		previewWidth = preview.getWidth();
+		previewHeight = preview.getHeight();
+
+		clearBoard();
+		clearPreview();
+	}
+
+	/**
+	 * The Game without rotation
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param type
+	 *            type of the game
+	 */
+	public Game(int speed, int level, int type) {
+		this(speed, level, Rotation.None, type);
 	}
 
 	/**
@@ -193,438 +281,11 @@ public abstract class Game extends Thread implements Serializable {
 	}
 
 	/**
-	 * The Game without rotation
+	 * Animated clearing of the board on Game Over
 	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param type
-	 *            type of the game
 	 */
-	public Game(int speed, int level, int type) {
-		this(speed, level, Rotation.None, type);
-	}
-
-	/**
-	 * The Game
-	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param board
-	 *            main board
-	 * @param preview
-	 *            preview board
-	 * @param rotation
-	 *            direction of rotation
-	 * @param type
-	 *            type of the game
-	 */
-	protected Game(int speed, int level, Board board, Board preview,
-			Rotation rotation, int type) {
-		this(speed, level, rotation, type);
-		
-		setBoard(board);
-		setPreview(preview);
-	
-		boardWidth = board.getWidth();
-		boardHeight = board.getHeight();
-		previewWidth = preview.getWidth();
-		previewHeight = preview.getHeight();
-
-		clearBoard();
-		clearPreview();
-	}
-	
-	@Override
-	public void start() {
-		fireBoardChanged(board);
-		firePreviewChanged(preview);
-		fireSpeedChanged(speed);
-		fireLevelChanged(level);
-		fireRotationChanged(rotation);
-		fireMuteChanged(mute);
-		fireStatusChanged(status);
-		fireInfoChanged(String.valueOf(score));
-		fireInfoChanged(String.valueOf("HI" + getHiScore()));
-	}
-	
-
-	public static synchronized void addGameListener(GameListener listener) {
-		listeners.add(listener);
-	}
-
-	public static synchronized GameListener[] getGameListeners() {
-		return listeners.toArray(new GameListener[listeners.size()]);
-	}
-
-	public static synchronized void removeGameListener(GameListener listener) {
-		listeners.remove(listener);
-	}
-
-	protected synchronized void fireBoardChanged(Board board) {
-		GameEvent event = new GameEvent(this,
-				(isInvertedBoard() ? getInvertedBoard(board) : board));
-		for (GameListener listener : listeners) {
-			listener.boardChanged(event);
-		}
-	}
-
-	protected synchronized void firePreviewChanged(Board preview) {
-		GameEvent event = new GameEvent(this, preview);
-		for (GameListener listener : listeners) {
-			listener.previewChanged(event);
-		}
-	}
-
-	protected synchronized void fireStatusChanged(Status status) {
-		GameEvent event = new GameEvent(this, status);
-		for (GameListener listener : listeners) {
-			listener.statusChanged(event);
-		}
-	}
-
-	protected synchronized void fireInfoChanged(String info) {
-		GameEvent event = new GameEvent(this, info);
-		for (GameListener listener : listeners) {
-			listener.infoChanged(event);
-		}
-	}
-
-	protected synchronized void fireSpeedChanged(int speed) {
-		GameEvent event = new GameEvent(this, (float) speed);
-		for (GameListener listener : listeners) {
-			listener.speedChanged(event);
-		}
-	}
-
-	protected synchronized void fireLevelChanged(int level) {
-		GameEvent event = new GameEvent(this, level);
-		for (GameListener listener : listeners) {
-			listener.levelChanged(event);
-		}
-	}
-
-	protected void fireRotationChanged(Rotation rotation) {
-		GameEvent event = new GameEvent(this, rotation);
-		for (GameListener listener : listeners) {
-			listener.rotationChanged(event);
-		}
-	}
-
-	protected void fireMuteChanged(boolean mute) {
-		GameEvent event = new GameEvent(this, mute);
-		for (GameListener listener : listeners) {
-			listener.muteChanged(event);
-		}
-	}
-
-	protected void fireExit() {
-		GameEvent event = new GameEvent(this);
-		for (GameListener listener : listeners) {
-			listener.exit(event);
-		}
-	}
-
-	/**
-	 * Get the splash screen for game
-	 * 
-	 * @return the splash
-	 */
-	protected static Splash getSplash() {
-		return splash;
-	}
-
-	/**
-	 * Get the status of game
-	 * 
-	 * @return the status
-	 */
-	protected synchronized Status getStatus() {
-		return status;
-	}
-
-	/**
-	 * Set the status of game and fire the {@link #fireStatusChanged(Status)}
-	 * event
-	 * 
-	 * @param status
-	 *            the status of game
-	 */
-	protected synchronized void setStatus(Status status) {
-		this.status = status;
-		fireStatusChanged(status);
-	}
-
-	/**
-	 * Speed
-	 * 
-	 * @param genuine
-	 *            return genuine speed (true) or speed level (false)
-	 * @return if genuine than return genuine speed in millisecond else return
-	 *         speed level 1-10
-	 */
-	protected synchronized int getSpeed(boolean genuine) {
-		if (genuine) {
-			// getting a uniform distribution from FIRST_LEVEL_SPEED to
-			// TENTH_LEVEL_SPEED
-			return (getFIRST_LEVEL_SPEED() - (getFIRST_LEVEL_SPEED() - getTENTH_LEVEL_SPEED())
-					/ (10 - 1) * (speed - 1));
-		}
-		return speed;
-	}
-
-	/**
-	 * Speed level
-	 * 
-	 * @return speed level 1-10
-	 */
-	protected int getSpeed() {
-		return getSpeed(false);
-	}
-
-	/**
-	 * Set speed level and fire the {@link #fireSpeedChanged(int)} event
-	 * 
-	 * @param speed
-	 *            speed level 1-10
-	 */
-	protected void setSpeed(int speed) {
-		if (speed < 1) {
-			this.speed = 10;
-		} else if (speed > 10) {
-			this.speed = 1;
-		} else
-			this.speed = speed;
-		fireSpeedChanged(this.speed);
-	}
-
-	/**
-	 * Level
-	 * 
-	 * @return level 1-10
-	 */
-	protected int getLevel() {
-		return level;
-	}
-
-	/**
-	 * Set level and fire the {@link #fireLevelChanged(int)} event
-	 * 
-	 * @param level
-	 *            level 1-10
-	 */
-	protected void setLevel(int level) {
-		if (level < 1) {
-			this.level = 10;
-		} else if (level > 10) {
-			this.level = 1;
-		} else
-			this.level = level;
-		fireLevelChanged(this.level);
-	}
-
-	/**
-	 * Get the score
-	 * 
-	 * @return the score
-	 */
-	protected synchronized int getScore() {
-		return score;
-	}
-
-	/**
-	 * Set the score and fire the {@link #fireInfoChanged(String)} event
-	 * 
-	 * @param score
-	 *            score 0 - 19999
-	 */
-	protected synchronized void setScore(int score) {
-		if (score > 19999)
-			this.score = 19999;
-		else if (score < 0)
-			this.score = 0;
-		else
-			this.score = score;
-		fireInfoChanged(String.valueOf(score));
-	}
-
-	/**
-	 * Get the type of game
-	 * 
-	 * @return the type
-	 */
-	protected int getType() {
-		return type;
-	}
-
-	/**
-	 * Get the direction of rotation
-	 * 
-	 * @return the direction of rotation
-	 */
-	protected Rotation getRotation() {
-		return rotation;
-	}
-
-	/**
-	 * Set the direction of rotation and fire the
-	 * {@link #fireRotationChanged(Rotation)} event
-	 * 
-	 * @param rotation
-	 *            the direction of rotation
-	 */
-	protected void setRotation(Rotation rotation) {
-		this.rotation = rotation;
-		fireRotationChanged(rotation);
-	}
-
-	/**
-	 * Select another rotation
-	 */
-	protected void changeRotation() {
-		setRotation(rotation.getNext());
-	}
-
-	/**
-	 * Get the flag for the drawing the board invertedly
-	 * 
-	 * @return {@code true} if needed to draw the inverted board
-	 */
-	public boolean isInvertedBoard() {
-		return drawInvertedBoard;
-	}
-
-	protected static boolean isMuted() {
-		return mute;
-	}
-
-	protected void setMuted(boolean mute) {
-		Game.mute = mute;
-		if (mute) {
-			stopAllSounds();
-		}
-		fireMuteChanged(mute);
-	}
-
-	/**
-	 * Set the flag for the drawing the board invertedly
-	 * 
-	 * @param drawInvertedBoard
-	 *            {@code true} if needed to draw the inverted board
-	 */
-	public void setDrawInvertedBoard(boolean drawInvertedBoard) {
-		this.drawInvertedBoard = drawInvertedBoard;
-	}
-
-	/**
-	 * Get the main board
-	 * 
-	 * @return the main board
-	 */
-	protected synchronized Board getBoard() {
-		return board;
-	}
-
-	/**
-	 * Set the main board and fire the {@link #fireBoardChanged(Board)} event
-	 * 
-	 * @param board
-	 *            the main board
-	 */
-	protected synchronized void setBoard(Board board) {
-		this.board = board;
-		fireBoardChanged(board);
-	}
-
-	/**
-	 * Get the preview board
-	 * 
-	 * @return the preview board
-	 */
-	protected synchronized Board getPreview() {
-		return preview;
-	}
-
-	/**
-	 * Set the main preview and fire the {@link #firePreviewChanged(Board)}
-	 * event
-	 * 
-	 * @param preview
-	 *            the preview board
-	 */
-	protected synchronized void setPreview(Board preview) {
-		this.preview = preview;
-		firePreviewChanged(preview);
-	}
-
-	/**
-	 * Calculates if elapsed of {@code millis} since the last time point. If
-	 * elapsed, the time point is set the current time.
-	 * 
-	 * @param millis
-	 *            delay in milliseconds
-	 * @return true - if elapsed of {@code millis} since the last time point
-	 */
-	protected boolean elapsedTime(int millis) {
-		long nowTime = System.currentTimeMillis();
-		boolean result = ((nowTime - timePoint) >= millis);
-		if (result)
-			timePoint = nowTime;
-		return result;
-	}
-
-	/**
-	 * Clears the cells of the board and fire the
-	 * {@link #fireBoardChanged(Board)} event
-	 */
-	protected void clearBoard() {
-		board.clearBoard();
-		fireBoardChanged(board);
-	}
-
-	/**
-	 * Clears the cells of the preview and fire the
-	 * {@link #firePreviewChanged(Board)} event
-	 */
-	protected void clearPreview() {
-		preview.clearBoard();
-		firePreviewChanged(preview);
-	}
-
-	/**
-	 * Animated clearing of a full line
-	 * 
-	 * @param x
-	 *            point, on both sides of which cells will be removed
-	 *            (x-coordinate)
-	 * @param y
-	 *            number of the line to be removed (y-coordinate)
-	 */
-	protected void animatedClearLine(Board board, int x, int y) {
-		int x1 = x - 1; // left direction
-		int x2 = x; // right direction
-
-		// change status form stopping other work
-		Status prevStatus = getStatus();
-		setStatus(Status.DoSomeWork);
-
-		playEffect(Effects.remove_line);
-
-		while ((x1 >= 0) || (x2 < board.getWidth())) {
-			if (x1 >= 0)
-				board.setCell(Cell.Empty, x1--, y);
-			if (x2 < board.getWidth())
-				board.setCell(Cell.Empty, x2++, y);
-
-			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY * 2);
-		}
-
-		// restore previous status
-		setStatus(prevStatus);
+	protected void animatedClearBoard() {
+		animatedClearBoard(CB_GAME_OVER);
 	}
 
 	/**
@@ -656,11 +317,284 @@ public abstract class Game extends Thread implements Serializable {
 	}
 
 	/**
-	 * Animated clearing of the board on Game Over
+	 * Animated clearing of a full line
 	 * 
+	 * @param x
+	 *            point, on both sides of which cells will be removed
+	 *            (x-coordinate)
+	 * @param y
+	 *            number of the line to be removed (y-coordinate)
 	 */
-	protected void animatedClearBoard() {
-		animatedClearBoard(CB_GAME_OVER);
+	protected void animatedClearLine(Board board, int x, int y) {
+		int x1 = x - 1; // left direction
+		int x2 = x; // right direction
+
+		// change status form stopping other work
+		Status prevStatus = getStatus();
+		setStatus(Status.DoSomeWork);
+
+		playEffect(Effects.remove_line);
+
+		while ((x1 >= 0) || (x2 < board.getWidth())) {
+			if (x1 >= 0) {
+				board.setCell(Cell.Empty, x1--, y);
+			}
+			if (x2 < board.getWidth()) {
+				board.setCell(Cell.Empty, x2++, y);
+			}
+
+			fireBoardChanged(board);
+			sleep(ANIMATION_DELAY * 2);
+		}
+
+		// restore previous status
+		setStatus(prevStatus);
+	}
+
+	/**
+	 * Select another rotation
+	 */
+	protected void changeRotation() {
+		setRotation(rotation.getNext());
+	}
+
+	/**
+	 * Clears the cells of the board and fire the
+	 * {@link #fireBoardChanged(Board)} event
+	 */
+	protected void clearBoard() {
+		board.clearBoard();
+		fireBoardChanged(board);
+	}
+
+	/**
+	 * Clears the cells of the preview and fire the
+	 * {@link #firePreviewChanged(Board)} event
+	 */
+	protected void clearPreview() {
+		preview.clearBoard();
+		firePreviewChanged(preview);
+	}
+
+	/**
+	 * Calculates if elapsed of {@code millis} since the last time point. If
+	 * elapsed, the time point is set the current time.
+	 * 
+	 * @param millis
+	 *            delay in milliseconds
+	 * @return true - if elapsed of {@code millis} since the last time point
+	 */
+	protected boolean elapsedTime(int millis) {
+		long nowTime = System.currentTimeMillis();
+		boolean result = ((nowTime - timePoint) >= millis);
+		if (result) {
+			timePoint = nowTime;
+		}
+		return result;
+	}
+
+	/**
+	 * Exit to Main menu
+	 */
+	protected void exitToMainMenu() {
+		stopAllSounds();
+
+		setHiScore();
+
+		Main.gameSelector.setSpeed(speed);
+		Main.gameSelector.setLevel(level);
+
+		Thread.currentThread().interrupt();
+		Main.setGame(Main.gameSelector);
+	}
+
+	protected synchronized void fireBoardChanged(Board board) {
+		GameEvent event = new GameEvent(this,
+				(isInvertedBoard() ? getInvertedBoard(board) : board));
+		for (GameListener listener : listeners) {
+			listener.boardChanged(event);
+		}
+	}
+
+	protected void fireExit() {
+		GameEvent event = new GameEvent(this);
+		for (GameListener listener : listeners) {
+			listener.exit(event);
+		}
+	}
+
+	protected synchronized void fireInfoChanged(String info) {
+		GameEvent event = new GameEvent(this, info);
+		for (GameListener listener : listeners) {
+			listener.infoChanged(event);
+		}
+	}
+
+	protected synchronized void fireLevelChanged(int level) {
+		GameEvent event = new GameEvent(this, level);
+		for (GameListener listener : listeners) {
+			listener.levelChanged(event);
+		}
+	}
+
+	protected void fireMuteChanged(boolean mute) {
+		GameEvent event = new GameEvent(this, mute);
+		for (GameListener listener : listeners) {
+			listener.muteChanged(event);
+		}
+	}
+
+	protected synchronized void firePreviewChanged(Board preview) {
+		GameEvent event = new GameEvent(this, preview);
+		for (GameListener listener : listeners) {
+			listener.previewChanged(event);
+		}
+	}
+
+	protected void fireRotationChanged(Rotation rotation) {
+		GameEvent event = new GameEvent(this, rotation);
+		for (GameListener listener : listeners) {
+			listener.rotationChanged(event);
+		}
+	}
+
+	protected synchronized void fireSpeedChanged(int speed) {
+		GameEvent event = new GameEvent(this, (float) speed);
+		for (GameListener listener : listeners) {
+			listener.speedChanged(event);
+		}
+	}
+
+	protected synchronized void fireStatusChanged(Status status) {
+		GameEvent event = new GameEvent(this, status);
+		for (GameListener listener : listeners) {
+			listener.statusChanged(event);
+		}
+	}
+
+	/**
+	 * Game Over
+	 */
+	protected void gameOver() {
+		setStatus(Status.GameOver);
+
+		playMusic(Music.game_over);
+
+		animatedClearBoard();
+
+		exitToMainMenu();
+	}
+
+	/**
+	 * Get the main board
+	 * 
+	 * @return the main board
+	 */
+	protected synchronized Board getBoard() {
+		return board;
+	}
+
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected int getHiScore() {
+		return ScoresManager.getInstance().getHiScore(
+				(Class<Game>) this.getClass());
+	}
+
+	/**
+	 * Level
+	 * 
+	 * @return level 1-10
+	 */
+	protected int getLevel() {
+		return level;
+	}
+
+	/**
+	 * Get the preview board
+	 * 
+	 * @return the preview board
+	 */
+	protected synchronized Board getPreview() {
+		return preview;
+	}
+
+	/**
+	 * Get the direction of rotation
+	 * 
+	 * @return the direction of rotation
+	 */
+	protected Rotation getRotation() {
+		return rotation;
+	}
+
+	/**
+	 * Get the score
+	 * 
+	 * @return the score
+	 */
+	protected synchronized int getScore() {
+		return score;
+	}
+
+	/**
+	 * Speed level
+	 * 
+	 * @return speed level 1-10
+	 */
+	protected int getSpeed() {
+		return getSpeed(false);
+	}
+
+	/**
+	 * Speed
+	 * 
+	 * @param genuine
+	 *            return genuine speed (true) or speed level (false)
+	 * @return if genuine than return genuine speed in millisecond else return
+	 *         speed level 1-10
+	 */
+	protected synchronized int getSpeed(boolean genuine) {
+		if (genuine)
+			// getting a uniform distribution from FIRST_LEVEL_SPEED to
+			// TENTH_LEVEL_SPEED
+			return (getFIRST_LEVEL_SPEED() - (getFIRST_LEVEL_SPEED() - getTENTH_LEVEL_SPEED())
+					/ (10 - 1) * (speed - 1));
+		return speed;
+	}
+
+	/**
+	 * Get the status of game
+	 * 
+	 * @return the status
+	 */
+	protected synchronized Status getStatus() {
+		return status;
+	}
+
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
+	}
+
+	/**
+	 * Get the type of game
+	 * 
+	 * @return the type
+	 */
+	protected int getType() {
+		return type;
+	}
+
+	/**
+	 * Get the flag for the drawing the board invertedly
+	 * 
+	 * @return {@code true} if needed to draw the inverted board
+	 */
+	public boolean isInvertedBoard() {
+		return drawInvertedBoard;
 	}
 
 	/**
@@ -682,46 +616,46 @@ public abstract class Game extends Thread implements Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-					// 0
-					{ F, F, F },//
-					{ F, E, F },//
-					{ F, F, F } }, {
+				// 0
+				{ F, F, F },//
+				{ F, E, F },//
+				{ F, F, F } }, {
 					// 1
 					{ F, F, F, F, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, F, F, F, F } }, {
-					// 2
-					{ F, E, F, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, E, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, F, E, F } }, {
-					// 3
-					{ F, E, F, E, F },//
-					{ E, F, F, F, E },//
-					{ F, F, E, F, F },//
-					{ E, F, F, F, E },//
-					{ F, E, F, E, F } }, {
-					// 4
-					{ E, E, E, E, E },//
-					{ E, F, F, F, E },//
-					{ E, F, E, F, E },//
-					{ E, F, F, F, E },//
-					{ E, E, E, E, E } }, {
-					// 5
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, F, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }, {
-					// 6
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }
+						// 2
+						{ F, E, F, E, F },//
+						{ E, E, E, E, E },//
+						{ F, E, E, E, F },//
+						{ E, E, E, E, E },//
+						{ F, E, F, E, F } }, {
+							// 3
+							{ F, E, F, E, F },//
+							{ E, F, F, F, E },//
+							{ F, F, E, F, F },//
+							{ E, F, F, F, E },//
+							{ F, E, F, E, F } }, {
+								// 4
+								{ E, E, E, E, E },//
+								{ E, F, F, F, E },//
+								{ E, F, E, F, E },//
+								{ E, F, F, F, E },//
+								{ E, E, E, E, E } }, {
+									// 5
+									{ E, E, E, E, E },//
+									{ E, E, E, E, E },//
+									{ E, E, F, E, E },//
+									{ E, E, E, E, E },//
+									{ E, E, E, E, E } }, {
+										// 6
+										{ E, E, E, E, E },//
+										{ E, E, E, E, E },//
+										{ E, E, E, E, E },//
+										{ E, E, E, E, E },//
+										{ E, E, E, E, E } }
 
 			};
 
@@ -785,6 +719,48 @@ public abstract class Game extends Thread implements Serializable {
 	}
 
 	/**
+	 * Processing key pressing
+	 * 
+	 * @param key
+	 *            keyCode associated with the pressed key
+	 */
+	public void keyPressed(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.add(KeyPressed.KeyUp);
+			} else if (key == KeyPressed.KeyUp) {
+				keys.add(KeyPressed.KeyDown);
+			} else {
+				keys.add(key);
+			}
+		} else {
+			keys.add(key);
+		}
+	}
+
+	/**
+	 * Processing key releasing
+	 * 
+	 * @param key
+	 *            keyCode associated with the released key
+	 */
+	public void keyReleased(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.remove(KeyPressed.KeyUp);
+			} else if (key == KeyPressed.KeyUp) {
+				keys.remove(KeyPressed.KeyDown);
+			} else {
+				keys.remove(key);
+			}
+		} else {
+			keys.remove(key);
+		}
+	}
+
+	/**
 	 * Pause / Resume
 	 */
 	protected void pause() {
@@ -799,116 +775,6 @@ public abstract class Game extends Thread implements Serializable {
 		} else if (getStatus() == Status.Paused) {
 			setStatus(Status.Running);
 		}
-	}
-
-	/**
-	 * Game Over
-	 */
-	protected void gameOver() {
-		setStatus(Status.GameOver);
-
-		playMusic(Music.game_over);
-
-		animatedClearBoard();
-
-		exitToMainMenu();
-	}
-
-	@SuppressWarnings("unchecked")
-	protected int setHiScore() {
-		return ScoresManager.getInstance().setHiScore(
-				(Class<Game>) this.getClass(), getScore());
-	}
-
-	@SuppressWarnings("unchecked")
-	protected int getHiScore() {
-		return ScoresManager.getInstance().getHiScore(
-				(Class<Game>) this.getClass());
-	}
-
-	/**
-	 * Exit to Main menu
-	 */
-	protected void exitToMainMenu() {
-		stopAllSounds();
-
-		setHiScore();
-
-		Main.gameSelector.setSpeed(speed);
-		Main.gameSelector.setLevel(level);
-		
-		Thread.currentThread().interrupt();
-		Main.setGame(Main.gameSelector);
-	}
-
-	/**
-	 * Quit from the game
-	 */
-	protected void quit() {
-		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
-			setStatus(Status.Paused);
-			GameLoader.saveGame(this);
-		}else{
-			GameLoader.deleteSavedGame();
-		}
-		fireExit();
-	}
-
-	@Override
-	public void run() {
-		this.start();
-	}
-
-	/**
-	 * Sleep for the specified number of milliseconds
-	 * 
-	 * @param millis
-	 *            the length of time to sleep in milliseconds
-	 */
-	public static void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-	}
-
-	/**
-	 * Processing key pressing
-	 * 
-	 * @param key
-	 *            keyCode associated with the pressed key
-	 */
-	public void keyPressed(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown)
-				keys.add(KeyPressed.KeyUp);
-			else if (key == KeyPressed.KeyUp)
-				keys.add(KeyPressed.KeyDown);
-			else
-				keys.add(key);
-		} else
-			keys.add(key);
-	}
-
-	/**
-	 * Processing key releasing
-	 * 
-	 * @param key
-	 *            keyCode associated with the released key
-	 */
-	public void keyReleased(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown)
-				keys.remove(KeyPressed.KeyUp);
-			else if (key == KeyPressed.KeyUp)
-				keys.remove(KeyPressed.KeyDown);
-			else
-				keys.remove(key);
-		} else
-			keys.remove(key);
 	}
 
 	/**
@@ -948,6 +814,159 @@ public abstract class Game extends Thread implements Serializable {
 				changeRotation();
 			}
 		}
+	}
+
+	/**
+	 * Quit from the game
+	 */
+	protected void quit() {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
+			setStatus(Status.Paused);
+			GameLoader.saveGame(this);
+		} else {
+			GameLoader.deleteSavedGame();
+		}
+		fireExit();
+	}
+
+	@Override
+	public void run() {
+		start();
+	}
+
+	/**
+	 * Set the main board and fire the {@link #fireBoardChanged(Board)} event
+	 * 
+	 * @param board
+	 *            the main board
+	 */
+	protected synchronized void setBoard(Board board) {
+		this.board = board;
+		fireBoardChanged(board);
+	}
+
+	/**
+	 * Set the flag for the drawing the board invertedly
+	 * 
+	 * @param drawInvertedBoard
+	 *            {@code true} if needed to draw the inverted board
+	 */
+	public void setDrawInvertedBoard(boolean drawInvertedBoard) {
+		this.drawInvertedBoard = drawInvertedBoard;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected int setHiScore() {
+		return ScoresManager.getInstance().setHiScore(
+				(Class<Game>) this.getClass(), getScore());
+	}
+
+	/**
+	 * Set level and fire the {@link #fireLevelChanged(int)} event
+	 * 
+	 * @param level
+	 *            level 1-10
+	 */
+	protected void setLevel(int level) {
+		if (level < 1) {
+			this.level = 10;
+		} else if (level > 10) {
+			this.level = 1;
+		} else {
+			this.level = level;
+		}
+		fireLevelChanged(this.level);
+	}
+
+	protected void setMuted(boolean mute) {
+		Game.mute = mute;
+		if (mute) {
+			stopAllSounds();
+		}
+		fireMuteChanged(mute);
+	}
+
+	/**
+	 * Set the main preview and fire the {@link #firePreviewChanged(Board)}
+	 * event
+	 * 
+	 * @param preview
+	 *            the preview board
+	 */
+	protected synchronized void setPreview(Board preview) {
+		this.preview = preview;
+		firePreviewChanged(preview);
+	}
+
+	/**
+	 * Set the direction of rotation and fire the
+	 * {@link #fireRotationChanged(Rotation)} event
+	 * 
+	 * @param rotation
+	 *            the direction of rotation
+	 */
+	protected void setRotation(Rotation rotation) {
+		this.rotation = rotation;
+		fireRotationChanged(rotation);
+	}
+
+	/**
+	 * Set the score and fire the {@link #fireInfoChanged(String)} event
+	 * 
+	 * @param score
+	 *            score 0 - 19999
+	 */
+	protected synchronized void setScore(int score) {
+		if (score > 19999) {
+			this.score = 19999;
+		} else if (score < 0) {
+			this.score = 0;
+		} else {
+			this.score = score;
+		}
+		fireInfoChanged(String.valueOf(score));
+	}
+
+	/**
+	 * Set speed level and fire the {@link #fireSpeedChanged(int)} event
+	 * 
+	 * @param speed
+	 *            speed level 1-10
+	 */
+	protected void setSpeed(int speed) {
+		if (speed < 1) {
+			this.speed = 10;
+		} else if (speed > 10) {
+			this.speed = 1;
+		} else {
+			this.speed = speed;
+		}
+		fireSpeedChanged(this.speed);
+	}
+
+	/**
+	 * Set the status of game and fire the {@link #fireStatusChanged(Status)}
+	 * event
+	 * 
+	 * @param status
+	 *            the status of game
+	 */
+	protected synchronized void setStatus(Status status) {
+		this.status = status;
+		fireStatusChanged(status);
+	}
+
+	@Override
+	public void start() {
+		fireBoardChanged(board);
+		firePreviewChanged(preview);
+		fireSpeedChanged(speed);
+		fireLevelChanged(level);
+		fireRotationChanged(rotation);
+		fireMuteChanged(mute);
+		fireStatusChanged(status);
+		fireInfoChanged(String.valueOf(score));
+		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
 
 }
