@@ -14,10 +14,10 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameJ extends TetrisGameI {
 	private static final long serialVersionUID = 4703415063910078444L;
-	
-	final int TIME_BETWEEN_ADDING_LINE = 30;
-	volatile int time;
-	volatile boolean isTimeToAddLine;
+
+	private final int TIME_BETWEEN_ADDING_LINE = 30;
+	private volatile int time;
+	private volatile boolean isTimeToAddLine;
 
 	/**
 	 * The Tetris with the addition of new lines every few seconds
@@ -31,6 +31,25 @@ public class TetrisGameJ extends TetrisGameI {
 	}
 
 	@Override
+	protected void doRepetitiveWork() {
+		// if it's time to add a line, trying to add a line
+		if ((isTimeToAddLine) && (tryAddLine())) {
+			setTime(TIME_BETWEEN_ADDING_LINE);
+			isTimeToAddLine = false;
+		} else {
+			super.doRepetitiveWork();
+		}
+	}
+
+	private synchronized int getTime() {
+		return time;
+	}
+
+	private synchronized void setTime(int time) {
+		this.time = time;
+	}
+
+	@Override
 	public void start() {
 		// create timer for addition of lines
 		Timer addLineTimer = new Timer("AddLineTicTac", true);
@@ -38,30 +57,20 @@ public class TetrisGameJ extends TetrisGameI {
 			@Override
 			public void run() {
 				if (getStatus() == Status.Running) {
-					fireInfoChanged("-" + String.format("%02d", time) + "-");
-					if (time == 0) {
+					fireInfoChanged("-" + String.format("%02d", getTime())
+							+ "-");
+					if (getTime() == 0) {
 						isTimeToAddLine = true;
 					} else {
-						time--;
+						setTime(getTime() - 1);
 					}
 				}
 			}
 		}, 0, 1000);
-		
-		super.start();
-		
-		addLineTimer.cancel();
-	}
 
-	@Override
-	protected void doRepetitiveWork() {
-		// if it's time to add a line, trying to add a line
-		if ((isTimeToAddLine) && (tryAddLine())) {
-			time = TIME_BETWEEN_ADDING_LINE;
-			isTimeToAddLine = false;
-		} else {
-			super.doRepetitiveWork();
-		}
+		super.start();
+
+		addLineTimer.cancel();
 	}
 
 	protected boolean tryAddLine() {
