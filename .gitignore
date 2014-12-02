@@ -2,3 +2,6 @@
 *.log
 /hiscores.dat
 /lastgame.sav
+/.checkstyle
+/.eclipse-pmd
+/.settings/
