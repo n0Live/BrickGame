@@ -826,7 +826,7 @@ public final class Drawer {
 				GAME_FIELD_ASPECT_RATIO);
 		
 		// calculate size of a one square
-		squareSideLength = Math.round((float) d.height / (GameConsts.BOARD_HEIGHT + 1));
+		squareSideLength = d.height / (GameConsts.BOARD_HEIGHT + 1);
 		
 		canvas = initCanvas(d.width, d.height);
 		
