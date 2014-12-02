@@ -28,36 +28,11 @@ import com.kry.brickgame.games.TetrisGameI;
 public class GameDrawPanel extends JPanel implements GameListener {
 	private static final long serialVersionUID = 1007369595836803061L;
 	
-	/**
-	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
-	 * and vice versa, for blinking "Pause" icon
-	 */
-	public static void blinkingPauseIcon(Status status) {
-		if (status == Status.Paused) {
-			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
-			getDrawer().showHiScores = getDrawer().showPauseIcon;
-		} else {
-			getDrawer().showPauseIcon = false;
-		}
-	}
-	
-	/**
-	 * Changes the {@code blinkColor} color from {@code fullColor} to
-	 * {@code emptyColor} and vice versa
-	 */
-	public static void blinkingSquares() {
-		if (getDrawer().blinkColor.equals(fullColor)) {
-			getDrawer().blinkColor = emptyColor;
-		} else {
-			getDrawer().blinkColor = fullColor;
-		}
-	}
-	
 	private final GameProperties properties;
+	
 	private BufferedImage canvas;
 	
 	private BufferedImage backgroundImage;
-	
 	private Dimension size;
 	
 	MouseInputListener resizeListener = new GameMouseListener();
@@ -98,13 +73,39 @@ public class GameDrawPanel extends JPanel implements GameListener {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						blinkingPauseIcon(properties.status);
-						repaint();
+						blinkingPauseIcon();
 					}
 				});
 			}
 		}, 0, 500);
 		
+	}
+	
+	/**
+	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
+	 * and vice versa, for blinking "Pause" icon
+	 */
+	public void blinkingPauseIcon() {
+		if (properties.status == Status.Paused) {
+			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
+			getDrawer().showHiScores = getDrawer().showPauseIcon;
+		} else {
+			getDrawer().showPauseIcon = false;
+		}
+		repaint();
+	}
+	
+	/**
+	 * Changes the {@code blinkColor} color from {@code fullColor} to
+	 * {@code emptyColor} and vice versa
+	 */
+	public void blinkingSquares() {
+		if (getDrawer().blinkColor.equals(fullColor)) {
+			getDrawer().blinkColor = emptyColor;
+		} else {
+			getDrawer().blinkColor = fullColor;
+		}
+		repaint();
 	}
 	
 	/* Events */
