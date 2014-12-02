@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class RaceSplash extends Splash {
 	private static final long serialVersionUID = -8749547688773888492L;
@@ -44,9 +43,9 @@ public class RaceSplash extends Splash {
 			{ E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E } } };
-
+	
 	public RaceSplash() {
 		super(frameTable);
 	}
-
+	
 }

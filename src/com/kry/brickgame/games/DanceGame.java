@@ -29,39 +29,12 @@ import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
- * 
  */
 public class DanceGame extends Game {
-	private static final long serialVersionUID = 1329642134274377275L;
-	/**
-	 * Animated splash for game
-	 */
-	public static final Splash splash = new DanceSplash();
-	/**
-	 * Number of subtypes
-	 */
-	public static final int subtypesNumber = 2;
-
-	/**
-	 * Positions of the {@code DancerShape}s on x-axis
-	 */
-	final private static int[] columns = new int[] { 0, 3, 6, 9 };
-	/**
-	 * Comparison of the keys and directions of the {@code DancerShape}s
-	 */
-	final private static Map<RotationAngle, KeyPressed> keysToRotate;
-	static {
-		keysToRotate = new HashMap<>();
-		keysToRotate.put(LEFT, KeyPressed.KeyLeft);
-		keysToRotate.put(RIGHT, KeyPressed.KeyRight);
-		keysToRotate.put(UP, KeyPressed.KeyUp);
-		keysToRotate.put(DOWN, KeyPressed.KeyDown);
-	}
-
 	/**
 	 * Class describes a dance position
 	 */
-	private class DancePosition implements Serializable{
+	private class DancePosition implements Serializable {
 		private static final long serialVersionUID = 8936725072827465123L;
 		/**
 		 * Positions of the {@code DancerShape} on y-axis
@@ -87,7 +60,7 @@ public class DanceGame extends Game {
 		 * {@code DancerShape} rightward
 		 */
 		public final DancerShape rightShape;
-
+		
 		/**
 		 * Dance position
 		 * 
@@ -104,15 +77,15 @@ public class DanceGame extends Game {
 		 */
 		public DancePosition(int y, boolean left, boolean up, boolean down,
 				boolean right) {
-			this.caught = false;
-
+			caught = false;
+			
 			this.y = y;
-			this.leftShape = (left) ? new DancerShape(LEFT) : null;
-			this.upShape = (up) ? new DancerShape(UP) : null;
-			this.downShape = (down) ? new DancerShape(DOWN) : null;
-			this.rightShape = (right) ? new DancerShape(RIGHT) : null;
+			leftShape = (left) ? new DancerShape(LEFT) : null;
+			upShape = (up) ? new DancerShape(UP) : null;
+			downShape = (down) ? new DancerShape(DOWN) : null;
+			rightShape = (right) ? new DancerShape(RIGHT) : null;
 		}
-
+		
 		/**
 		 * Has taken the dance position?
 		 * 
@@ -121,7 +94,7 @@ public class DanceGame extends Game {
 		protected boolean isCaught() {
 			return caught;
 		}
-
+		
 		/**
 		 * Caught the dance position.
 		 * <p>
@@ -148,29 +121,48 @@ public class DanceGame extends Game {
 			}
 		}
 	}
-
+	
+	private static final long serialVersionUID = 1329642134274377275L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final Splash splash = new DanceSplash();
+	
+	/**
+	 * Number of subtypes
+	 */
+	public static final int subtypesNumber = 2;
+	/**
+	 * Positions of the {@code DancerShape}s on x-axis
+	 */
+	final private static int[] columns = new int[] { 0, 3, 6, 9 };
+	/**
+	 * Comparison of the keys and directions of the {@code DancerShape}s
+	 */
+	final private static Map<RotationAngle, KeyPressed> keysToRotate;
+	
+	static {
+		keysToRotate = new HashMap<>();
+		keysToRotate.put(LEFT, KeyPressed.KeyLeft);
+		keysToRotate.put(RIGHT, KeyPressed.KeyRight);
+		keysToRotate.put(UP, KeyPressed.KeyUp);
+		keysToRotate.put(DOWN, KeyPressed.KeyDown);
+	}
+	
 	// change speed from the original
 	private final int FIRST_LEVEL_SPEED = 300;
 	private final int TENTH_LEVEL_SPEED = 80;
-
-	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-
-	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
-	}
-
+	
 	/**
 	 * Dance positions
 	 */
-	private DancePosition[] positions;
+	private final DancePosition[] positions;
+	
 	/**
 	 * Count of bonus points
 	 */
 	private int bonus;
+	
 	/**
 	 * Count of positions passed
 	 */
@@ -183,7 +175,7 @@ public class DanceGame extends Game {
 	 * Playback rate of the current melody
 	 */
 	private double rate;
-
+	
 	/**
 	 * The Dance game
 	 * 
@@ -199,80 +191,46 @@ public class DanceGame extends Game {
 	 */
 	public DanceGame(int speed, int level, int type) {
 		super(speed, level, type);
-
+		
 		positions = new DancePosition[(boardHeight / DancerShape.height)];
 		bonus = -1; // will change to 0 at first caught
 		stepsGone = 0;
 		// set random first melody
 		melodyNumber = new Random().nextInt(Melodies.values().length);
 		rate = calculateRate();
-
+		
 		// for type 1 - draw inverted board
 		setDrawInvertedBoard(type == 1);
-
+		
 		move();
 		setStatus(Status.Running);
 		// play the first melody
 		playMelody(getMelody(), rate);
 	}
-
+	
 	/**
-	 * Launching the game
+	 * Get the current playback rate
+	 * 
+	 * @return playback rate
 	 */
-	@Override
-	public void start() {
-		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-
-				// change speed and melody after finished playing the melody
-				if (!isMuted() && !SoundManager.isPlaying(melodies)) {
-					setSpeed(getSpeed() + 1);
-					if (getSpeed() == 1) {
-						melodyNumber++;
-					}
-					rate = calculateRate();
-					playMelody(getMelody(), rate);
-					// if muted, then speed changes every 10 + getSpeed()
-					// positions
-				} else if (stepsGone >= 10 + getSpeed()) {
-					stepsGone = 0;
-					setSpeed(getSpeed() + 1);
-					// after unmuted will be a new melody
-					if (getSpeed() == 1) {
-						melodyNumber++;
-					}
-				}
-
-				// move positions
-				move();
-			}
-			// processing of key presses
-			processKeys();
-		}
+	protected double calculateRate() {
+		return (1 + (double) getSpeed() / 10);
 	}
-
+	
 	/**
-	 * Moving of the dance positions
+	 * Checking the coincidence of the {@code DancerShape} direction and
+	 * pressing keys
+	 * 
+	 * @param dancer
+	 *            checking {@code DancerShape}
+	 * @return {@code true} if is the coincidence
 	 */
-	protected void move() {
-		for (int i = 0; i < positions.length; i++) {
-			if (positions[i] == null) {
-				positions[i] = createPosition();
-			} else if (positions[i].y + DancerShape.maxY < 0) {
-				if (isMuted())
-					stepsGone++;
-				// if position is gone and no catch, then bonus resets
-				if (!positions[i].isCaught())
-					bonus = -1;
-				positions[i] = createPosition();
-			} else {
-				positions[i].y--;
-			}
-			draw();
-		}
+	protected boolean checkDanceStep(DancerShape dancer) {
+		if (dancer == null) return true;
+		
+		return keys.contains(keysToRotate.get(dancer.getRotationAngle()));
 	}
-
+	
 	/**
 	 * Create a new dance position
 	 * 
@@ -281,14 +239,13 @@ public class DanceGame extends Game {
 	protected DancePosition createPosition() {
 		// interval between positions from 3 to 1
 		int interval = (3 - getSpeed() / 3);
-		if (interval <= 0)
+		if (interval <= 0) {
 			interval = 1;
+		}
 		interval += 1 + DancerShape.maxY - DancerShape.minY;
-
+		
 		int upperBorder = boardHeight - getLevel();
-
-		Random r = new Random();
-
+		
 		byte pos;
 		// 1 chance from 20 to create a triple position
 		if (r.nextInt(20) == 0) {
@@ -312,23 +269,23 @@ public class DanceGame extends Game {
 				pos = (byte) (r.nextInt(12) + 1);
 			} while (pos == 7 || pos == 11);
 		}
-
+		
 		// calculate y-coordinates of the previous position
 		int prevY = upperBorder - interval - DancerShape.height;
-		for (int i = 0; i < positions.length; i++) {
-			if (positions[i] != null) {
-				prevY = Math.max(prevY, positions[i].y);
+		for (DancePosition position : positions) {
+			if (position != null) {
+				prevY = Math.max(prevY, position.y);
 			}
 		}
 		int newY = prevY + interval;
-
+		
 		return new DancePosition(newY,//
 				(pos & 8) == 8,// 1000
 				(pos & 4) == 4,// 0100
 				(pos & 2) == 2,// 0010
 				(pos & 1) == 1);// 0001
 	}
-
+	
 	/**
 	 * Drawing the dance positions on the board
 	 */
@@ -336,25 +293,25 @@ public class DanceGame extends Game {
 		// create new board of suitable size
 		Board drawBoard = new Board(boardWidth, boardHeight - getLevel() + 1);
 		// draw positions
-		for (int i = 0; i < positions.length; i++) {
-			if (positions[i] != null) {
-				int y = positions[i].y;
-				if (positions[i].leftShape != null)
+		for (DancePosition position : positions) {
+			if (position != null) {
+				int y = position.y;
+				if (position.leftShape != null) {
 					drawBoard = drawShape(drawBoard, columns[0], y,
-							positions[i].leftShape,
-							positions[i].leftShape.getFill());
-				if (positions[i].upShape != null)
+							position.leftShape, position.leftShape.getFill());
+				}
+				if (position.upShape != null) {
 					drawBoard = drawShape(drawBoard, columns[1], y,
-							positions[i].upShape,
-							positions[i].upShape.getFill());
-				if (positions[i].downShape != null)
+							position.upShape, position.upShape.getFill());
+				}
+				if (position.downShape != null) {
 					drawBoard = drawShape(drawBoard, columns[2], y,
-							positions[i].downShape,
-							positions[i].downShape.getFill());
-				if (positions[i].rightShape != null)
+							position.downShape, position.downShape.getFill());
+				}
+				if (position.rightShape != null) {
 					drawBoard = drawShape(drawBoard, columns[3], y,
-							positions[i].rightShape,
-							positions[i].rightShape.getFill());
+							position.rightShape, position.rightShape.getFill());
+				}
 			}
 		}
 		// create a board of full size
@@ -363,7 +320,24 @@ public class DanceGame extends Game {
 		insertCellsToBoard(mainBoard, drawBoard.getBoard(), 0, 0);
 		setBoard(mainBoard);
 	}
-
+	
+	@Override
+	protected int getFIRST_LEVEL_SPEED() {
+		return FIRST_LEVEL_SPEED;
+	}
+	
+	/**
+	 * Get the current melody
+	 * 
+	 * @return current melody
+	 */
+	protected Melodies getMelody() {
+		if (melodyNumber >= Melodies.values().length) {
+			melodyNumber = 0;
+		}
+		return Melodies.values()[melodyNumber];
+	}
+	
 	/**
 	 * Get the currently required dance position (position at the lower edge of
 	 * the board)
@@ -371,35 +345,25 @@ public class DanceGame extends Game {
 	 * @return a dance position or {@code null} if no suitable position
 	 */
 	protected DancePosition getPosition() {
-		for (int i = 0; i < positions.length; i++) {
+		for (DancePosition position : positions) {
 			// if that position at the lower edge of the board
-			if (positions[i] != null && positions[i].y <= DancerShape.height
-					&& positions[i].y >= 0) {
+			if (position != null && position.y <= DancerShape.height
+					&& position.y >= 0) {
 				// if that position is already caught - return null
-				if (positions[i].isCaught())
+				if (position.isCaught())
 					return null;
 				else
-					return positions[i];
+					return position;
 			}
 		}
 		return null;
 	}
-
-	/**
-	 * Checking the coincidence of the {@code DancerShape} direction and
-	 * pressing keys
-	 * 
-	 * @param dancer
-	 *            checking {@code DancerShape}
-	 * @return {@code true} if is the coincidence
-	 */
-	protected boolean checkDanceStep(DancerShape dancer) {
-		if (dancer == null)
-			return true;
-
-		return keys.contains(keysToRotate.get(dancer.getRotationAngle()));
+	
+	@Override
+	protected int getTENTH_LEVEL_SPEED() {
+		return TENTH_LEVEL_SPEED;
 	}
-
+	
 	/**
 	 * Increase the scores and play sound
 	 * 
@@ -408,59 +372,54 @@ public class DanceGame extends Game {
 	 */
 	protected void increaseScores(int score) {
 		playEffect(Effects.turn);
-
+		
 		setScore(getScore() + score + bonus);
-
+		
 		draw();
 	}
-
+	
 	/**
-	 * Get the current melody
-	 * 
-	 * @return current melody
+	 * Moving of the dance positions
 	 */
-	protected Melodies getMelody() {
-		if (melodyNumber >= Melodies.values().length)
-			melodyNumber = 0;
-		return Melodies.values()[melodyNumber];
+	protected void move() {
+		for (int i = 0; i < positions.length; i++) {
+			if (positions[i] == null) {
+				positions[i] = createPosition();
+			} else if (positions[i].y + DancerShape.maxY < 0) {
+				if (isMuted()) {
+					stepsGone++;
+				}
+				// if position is gone and no catch, then bonus resets
+				if (!positions[i].isCaught()) {
+					bonus = -1;
+				}
+				positions[i] = createPosition();
+			} else {
+				positions[i].y--;
+			}
+			draw();
+		}
 	}
-
-	/**
-	 * Get the current playback rate
-	 * 
-	 * @return playback rate
-	 */
-	protected double calculateRate() {
-		return (1 + (double) getSpeed() / 10);
-	}
-
-	@Override
-	protected void setSpeed(int speed) {
-		super.setSpeed(speed);
-
-		if (getSpeed() == 1)
-			setLevel(getLevel() + 1);
-	}
-
+	
 	@Override
 	protected void pause() {
-		if (getStatus() == Status.Paused)
+		if (getStatus() == Status.Paused) {
 			playMelody(getMelody(), rate);
+		}
 		super.pause();
 	}
-
+	
 	/**
 	 * Processing of key presses
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None)
-			return;
-
+		if (getStatus() == Status.None) return;
+		
 		super.processKeys();
-
+		
 		if (getStatus() == Status.Running) {
-
+			
 			DancePosition position = getPosition();
 			if (position != null) {
 				// checking the coincidence of the all DancerShape in the
@@ -468,12 +427,12 @@ public class DanceGame extends Game {
 				if (!checkDanceStep(position.leftShape)
 						|| !checkDanceStep(position.upShape)
 						|| !checkDanceStep(position.downShape)
-						|| !checkDanceStep(position.rightShape)) {
+						|| !checkDanceStep(position.rightShape))
 					return;
-				} else {
+				else {
 					int score = 0;
 					position.setCaught(true);
-
+					
 					// add points for every caught DancerShape
 					if (position.leftShape != null) {
 						score++;
@@ -488,12 +447,58 @@ public class DanceGame extends Game {
 						score++;
 					}
 					// increase bonus
-					if (++bonus > 4)
+					if (++bonus > 4) {
 						bonus = 4;
+					}
 					increaseScores(score);
 				}
 			}
 		}
 	}
-
+	
+	@Override
+	protected void setSpeed(int speed) {
+		super.setSpeed(speed);
+		
+		if (getSpeed() == 1) {
+			setLevel(getLevel() + 1);
+		}
+	}
+	
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public void start() {
+		super.start();
+		while (!interrupted() && (getStatus() != Status.GameOver)) {
+			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
+				
+				// change speed and melody after finished playing the melody
+				if (!isMuted() && !SoundManager.isPlaying(melodies)) {
+					setSpeed(getSpeed() + 1);
+					if (getSpeed() == 1) {
+						melodyNumber++;
+					}
+					rate = calculateRate();
+					playMelody(getMelody(), rate);
+					// if muted, then speed changes every 10 + getSpeed()
+					// positions
+				} else if (stepsGone >= 10 + getSpeed()) {
+					stepsGone = 0;
+					setSpeed(getSpeed() + 1);
+					// after unmuted will be a new melody
+					if (getSpeed() == 1) {
+						melodyNumber++;
+					}
+				}
+				
+				// move positions
+				move();
+			}
+			// processing of key presses
+			processKeys();
+		}
+	}
+	
 }

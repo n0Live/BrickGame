@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class PentixSplash extends Splash {
 	private static final long serialVersionUID = -3040854159282989785L;
@@ -33,9 +32,9 @@ public class PentixSplash extends Splash {
 			// 3
 			{ F, E, E, F, F, F, F, F, E, E },//
 			{ F, F, F, F, E, F, F, F, F, F } } };
-
+	
 	public PentixSplash() {
 		super(frameTable);
 	}
-
+	
 }

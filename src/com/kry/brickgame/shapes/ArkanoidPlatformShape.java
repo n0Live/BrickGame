@@ -2,7 +2,6 @@ package com.kry.brickgame.shapes;
 
 /**
  * @author noLive
- * 
  */
 public class ArkanoidPlatformShape extends CharacterShape {
 	private static final long serialVersionUID = -4308280159216035580L;
@@ -16,12 +15,7 @@ public class ArkanoidPlatformShape extends CharacterShape {
 			{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // 2 - platform3
 			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // 3 - platform4
 	}; //
-
-	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
-	}
-
+	
 	/**
 	 * Constructor for the Arkanoid Platform
 	 * 
@@ -32,5 +26,10 @@ public class ArkanoidPlatformShape extends CharacterShape {
 	public ArkanoidPlatformShape(int type) {
 		super(type, charactersTable[type].length);
 	}
-
+	
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
 }

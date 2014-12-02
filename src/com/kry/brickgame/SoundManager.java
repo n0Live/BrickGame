@@ -8,7 +8,27 @@ import javafx.scene.media.AudioClip;
 public class SoundManager {
 	private final static String soundFolder = "/sounds/";
 	private final static String soundExtension = ".m4a";
-
+	
+	/**
+	 * Play the {@code AudioClip} at once in normal rate, depending of the
+	 * specified {@code enum} value, from the specified {@code soundBank}. If
+	 * the {@code AudioClip} is already playing, then stopped it at first.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank,
+			Enum<E> value) {
+		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(1);
+		if (clip.isPlaying()) {
+			clip.stop();
+		}
+		clip.play();
+	}
+	
 	/**
 	 * Gets the string array of resources from the {@code enum} values.
 	 * 
@@ -21,13 +41,28 @@ public class SoundManager {
 		EnumSet<E> values = EnumSet.allOf(enumClass);
 		int i = 0;
 		String[] result = new String[values.size()];
-
+		
 		for (E value : values) {
 			result[i++] = getResourceFromName(value.toString());
 		}
 		return result;
 	}
-
+	
+	/**
+	 * Gets the {@code AudioClip}, depending of the specified {@code enum}
+	 * value, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 * @return {@code AudioClip}
+	 */
+	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank,
+			Enum<E> value) {
+		return soundBank.getClip(getResourceFromName(value.toString()));
+	}
+	
 	/**
 	 * Gets the resource name from {@code soundName}.
 	 * <p>
@@ -43,7 +78,38 @@ public class SoundManager {
 				+ soundExtension);
 		return resource.toExternalForm();
 	}
-
+	
+	/**
+	 * Indicate whether any {@code AudioClip} in the specified {@code soundBank}
+	 * is playing.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @return {@code true} if any {@code AudioClip} in {@code soundBank} is
+	 *         playing
+	 */
+	public static boolean isPlaying(SoundBank soundBank) {
+		for (AudioClip clip : soundBank) {
+			if (clip.isPlaying()) return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Indicate whether the {@code AudioClip}, depending of the specified
+	 * {@code enum} value, from the specified {@code soundBank}, is playing.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 * @return {@code true} if the {@code AudioClip} is playing
+	 */
+	public static <E extends Enum<E>> boolean isPlaying(SoundBank soundBank,
+			Enum<E> value) {
+		return getClip(soundBank, value).isPlaying();
+	}
+	
 	/**
 	 * Loads files to the SoundBank from the {@code enum} values.
 	 * 
@@ -56,32 +122,25 @@ public class SoundManager {
 			Class<E> enumClass) {
 		soundBank.loadSounds(enumToResourceArray(enumClass));
 	}
-
+	
 	/**
-	 * Stops playing for all sounds in the specified {@code soundBank}.
-	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 */
-	public static void stopAll(SoundBank soundBank) {
-		soundBank.stopAll();
-	}
-
-	/**
-	 * Gets the {@code AudioClip}, depending of the specified {@code enum}
-	 * value, from the specified {@code soundBank}.
+	 * Play the {@code AudioClip} in a circle, depending of the specified
+	 * {@code enum} value, from the specified {@code soundBank}.
 	 * 
 	 * @param soundBank
 	 *            specified SoundBank
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
-	 * @return {@code AudioClip}
 	 */
-	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank,
+	public static <E extends Enum<E>> void loop(SoundBank soundBank,
 			Enum<E> value) {
-		return soundBank.getClip(getResourceFromName(value.toString()));
+		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(AudioClip.INDEFINITE);
+		// Use default parameters except priority
+		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(),
+				clip.getPan(), Thread.MAX_PRIORITY);
 	}
-
+	
 	/**
 	 * Play the {@code AudioClip} at once in normal rate, depending of the
 	 * specified {@code enum} value, from the specified {@code soundBank}.
@@ -97,26 +156,7 @@ public class SoundManager {
 		clip.setCycleCount(1);
 		clip.play();
 	}
-
-	/**
-	 * Play the {@code AudioClip} at once in normal rate, depending of the
-	 * specified {@code enum} value, from the specified {@code soundBank}. If
-	 * the {@code AudioClip} is already playing, then stopped it at first.
-	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 * @param value
-	 *            {@code enum} value, containing the name of the sound
-	 */
-	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank,
-			Enum<E> value) {
-		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(1);
-		if (clip.isPlaying())
-			clip.stop();
-		clip.play();
-	}
-
+	
 	/**
 	 * Play the {@code AudioClip} at once in specified {@code rate}, depending
 	 * of the specified {@code enum} value, from the specified
@@ -139,7 +179,7 @@ public class SoundManager {
 		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(),
 				Thread.MAX_PRIORITY); // clip.getPriority());
 	}
-
+	
 	/**
 	 * Play the {@code AudioClip}, depending of the specified {@code enum}
 	 * value, from the specified {@code soundBank} and wait for its ending.
@@ -164,23 +204,23 @@ public class SoundManager {
 	}
 	
 	/**
-	 * Play the {@code AudioClip} in a circle, depending of the specified
-	 * {@code enum} value, from the specified {@code soundBank}.
+	 * Play the {@code AudioClip}, depending of the specified {@code enum}
+	 * value, from the specified {@code soundBank} with zero volume.
+	 * <p>
+	 * Workaround for delay in first call to an {@code AudioClip}.
 	 * 
 	 * @param soundBank
 	 *            specified SoundBank
 	 * @param value
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	public static <E extends Enum<E>> void loop(SoundBank soundBank,
+	public static <E extends Enum<E>> void prepare(SoundBank soundBank,
 			Enum<E> value) {
+		
 		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(AudioClip.INDEFINITE);
-		// Use default parameters except priority
-		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(),
-				clip.getPan(), Thread.MAX_PRIORITY);
+		clip.play(0); // silent play
 	}
-
+	
 	/**
 	 * Stop playing the {@code AudioClip}, depending of the specified
 	 * {@code enum} value, from the specified {@code soundBank}.
@@ -197,55 +237,15 @@ public class SoundManager {
 			clip.stop();
 		}
 	}
-
+	
 	/**
-	 * Indicate whether any {@code AudioClip} in the specified {@code soundBank}
-	 * is playing.
+	 * Stops playing for all sounds in the specified {@code soundBank}.
 	 * 
 	 * @param soundBank
 	 *            specified SoundBank
-	 * @return {@code true} if any {@code AudioClip} in {@code soundBank} is
-	 *         playing
 	 */
-	public static boolean isPlaying(SoundBank soundBank) {
-		for (AudioClip clip : soundBank) {
-			if (clip.isPlaying())
-				return true;
-		}
-		return false;
+	public static void stopAll(SoundBank soundBank) {
+		soundBank.stopAll();
 	}
-
-	/**
-	 * Indicate whether the {@code AudioClip}, depending of the specified
-	 * {@code enum} value, from the specified {@code soundBank}, is playing.
-	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 * @param value
-	 *            {@code enum} value, containing the name of the sound
-	 * @return {@code true} if the {@code AudioClip} is playing
-	 */
-	public static <E extends Enum<E>> boolean isPlaying(SoundBank soundBank,
-			Enum<E> value) {
-		return getClip(soundBank, value).isPlaying();
-	}
-
-	/**
-	 * Play the {@code AudioClip}, depending of the specified {@code enum}
-	 * value, from the specified {@code soundBank} with zero volume.
-	 * <p>
-	 * Workaround for delay in first call to an {@code AudioClip}.
-	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 * @param value
-	 *            {@code enum} value, containing the name of the sound
-	 */
-	public static <E extends Enum<E>> void prepare(SoundBank soundBank,
-			Enum<E> value) {
-
-		final AudioClip clip = getClip(soundBank, value);
-		clip.play(0); // silent play
-	}
-
+	
 }

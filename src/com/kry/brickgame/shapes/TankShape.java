@@ -1,5 +1,8 @@
 package com.kry.brickgame.shapes;
 
+/**
+ * @author noLive
+ */
 public class TankShape extends CoordinatedShape {
 	private static final long serialVersionUID = 3770507302625800510L;
 	/**
@@ -15,12 +18,7 @@ public class TankShape extends CoordinatedShape {
 			// 2 - tank in box (for check)
 			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
 					{ -1, 1 }, { 0, 1 }, { 1, 1 } } }; //
-
-	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
-	}
-
+	
 	/**
 	 * Constructor for the Tank
 	 * 
@@ -31,7 +29,7 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(int type) {
 		super(type, charactersTable[type].length);
 	}
-
+	
 	/**
 	 * Copy constructor of the tank
 	 * 
@@ -41,10 +39,16 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(TankShape aTank) {
 		super(aTank);
 	}
-
+	
+	@Override
 	public TankShape clone() {
 		TankShape newTank = new TankShape(this);
 		return newTank;
 	}
-
+	
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
 }

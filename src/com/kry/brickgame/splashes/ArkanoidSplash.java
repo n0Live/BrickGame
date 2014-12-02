@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class ArkanoidSplash extends Splash {
 	private static final long serialVersionUID = 5591689903182020140L;
@@ -44,9 +43,9 @@ public class ArkanoidSplash extends Splash {
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ E, E, E, F, F, F, F, E, E, E } } };
-
+	
 	public ArkanoidSplash() {
 		super(frameTable);
 	}
-
+	
 }

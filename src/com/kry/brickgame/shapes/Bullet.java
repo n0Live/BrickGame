@@ -1,5 +1,8 @@
 package com.kry.brickgame.shapes;
 
+/**
+ * @author noLive
+ */
 public class Bullet extends CoordinatedShape {
 	private static final long serialVersionUID = 8131536153963633602L;
 	/**
@@ -7,19 +10,14 @@ public class Bullet extends CoordinatedShape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private static int[][][] charactersTable = new int[][][] { { { 0, 0 } } };
-
-	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
-	}
-
+	
 	public Bullet(int x, int y, RotationAngle direction) {
 		super(0, charactersTable[0].length, x, y, direction);
-
+		
 		this.x = x;
 		this.y = y;
 	}
-
+	
 	/**
 	 * Setting the coordinates of the new position depending of the direction
 	 * 
@@ -30,5 +28,10 @@ public class Bullet extends CoordinatedShape {
 		move(getDirection());
 		return this;
 	}
-
+	
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
 }

@@ -6,7 +6,6 @@ import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
- * 
  */
 public class Obstacle extends CharacterShape {
 	private static final long serialVersionUID = 3456812497392122162L;
@@ -15,16 +14,31 @@ public class Obstacle extends CharacterShape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private static int[][][] charactersTable = new int[][][] {//
-		// 0 - square
-		{ { 0, 0 } },
-		// 1 - corner
-		{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
-		// 2 - rectangle
-		{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
+	// 0 - square
+			{ { 0, 0 } },
+			// 1 - corner
+			{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
+			// 2 - rectangle
+			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
 	
-	@Override
-	protected int[][][] getCharactersTable(){
-		return charactersTable;
+	/**
+	 * Get instance of a random obstacle
+	 */
+	public static Obstacle getRandomTypeInstance() {
+		Random r = new Random();
+		int x = r.nextInt(charactersTable.length - 1) + 1;
+		return new Obstacle(x);
+	}
+	
+	/**
+	 * Get instance of a {@link #setRandomShape random obstacle} and a
+	 * {@link #setRandomRotate random rotation angle}
+	 * 
+	 * @see #setRandomShape
+	 * @see #setRandomRotate
+	 */
+	public static Obstacle setRandomShapeAndRotate() {
+		return (Obstacle) getRandomTypeInstance().setRandomRotate();
 	}
 	
 	/**
@@ -36,7 +50,17 @@ public class Obstacle extends CharacterShape {
 	public Obstacle(int type) {
 		super(type, charactersTable[type].length);
 	}
-
+	
+	@Override
+	public Obstacle changeRotationAngle(RotationAngle rotationAngle) {
+		return setType(getType(), rotationAngle, getFill());
+	}
+	
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
 	/**
 	 * Selection of the obstacle
 	 * 
@@ -50,7 +74,7 @@ public class Obstacle extends CharacterShape {
 	@Override
 	protected Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
 		super.setType(type, rotationAngle, fill);
-
+		
 		// sets the lower left corner to the coordinates [0, 0]
 		while (minX() < 0) {
 			for (int i = 0; i < getCharactersTable()[type].length; i++) {
@@ -62,32 +86,8 @@ public class Obstacle extends CharacterShape {
 				setY(i, y(i) + 1);
 			}
 		}
-
+		
 		return this;
 	}
-
-	public Obstacle changeRotationAngle(RotationAngle rotationAngle) {
-		return setType(getType(), rotationAngle, getFill());
-	}
-
-	/**
-	 * Get instance of a random obstacle
-	 */
-	public static Obstacle getRandomTypeInstance() {
-		Random r = new Random();
-		int x = r.nextInt(charactersTable.length - 1) + 1;
-		return new Obstacle(x);
-	}
-
-	/**
-	 * Get instance of a {@link #setRandomShape random obstacle} and a
-	 * {@link #setRandomRotate random rotation angle}
-	 * 
-	 * @see #setRandomShape
-	 * @see #setRandomRotate
-	 */
-	public static Obstacle setRandomShapeAndRotate() {
-		return (Obstacle) getRandomTypeInstance().setRandomRotate();
-	}
-
+	
 }

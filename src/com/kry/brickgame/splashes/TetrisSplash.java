@@ -2,7 +2,6 @@ package com.kry.brickgame.splashes;
 
 /**
  * @author noLive
- * 
  */
 public class TetrisSplash extends Splash {
 	private static final long serialVersionUID = 534555333873259137L;
@@ -33,9 +32,9 @@ public class TetrisSplash extends Splash {
 			// 3
 			{ F, E, E, F, E, F, F, E, E, E },//
 			{ F, F, F, F, E, F, F, F, F, F } } };
-
+	
 	public TetrisSplash() {
 		super(frameTable);
 	}
-
+	
 }

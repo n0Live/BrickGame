@@ -26,7 +26,6 @@ import com.kry.brickgame.splashes.Splash;
  * The selection screen of a game
  * 
  * @author noLive
- * 
  */
 @SuppressWarnings("rawtypes")
 public class GameSelector extends Game {
@@ -182,19 +181,17 @@ public class GameSelector extends Game {
 			gamesList.put('X', null);
 		}
 		try {
-			gamesList.put('Y',
-					Class.forName("com.kry.brickgame.games.???"));
+			gamesList.put('Y', Class.forName("com.kry.brickgame.games.???"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('Y', null);
 		}
 		try {
-			gamesList.put('Z',
-					Class.forName("com.kry.brickgame.games.???"));
+			gamesList.put('Z', Class.forName("com.kry.brickgame.games.???"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('Z', null);
 		}
 	}
-
+	
 	/**
 	 * Letter - kind of game
 	 */
@@ -203,131 +200,72 @@ public class GameSelector extends Game {
 	 * Number - subtypes of game
 	 */
 	private int number;
-
+	
 	/**
 	 * Number of subtypes for the current game
 	 */
 	private int maxNumber;
-
+	
 	/**
 	 * Class of the current game
 	 */
 	private Class<Game> c;
-
+	
 	/**
 	 * Timer for the splash screen of the game
 	 */
 	private Timer splashTimer;
-
+	
 	public GameSelector() {
 		super();
-		this.letter = 'A';
-		this.number = 1;
-
+		letter = 'A';
+		number = 1;
+		
 		setRotation(Rotation.Clockwise);
 	}
-
+	
 	/**
-	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
-	 * {@code x, y}) is set a point, which gets the lower left corner of the
-	 * {@code boardToInsert}
-	 * 
-	 * @param boardToInsert
-	 *            a Letters or a Numbers board
-	 * @param x
-	 *            x-coordinate for the insertion
-	 * @param y
-	 *            y-coordinate for the insertion
-	 * 
+	 * Launching a game depending on the chosen letters and numbers
 	 */
-	private void insertBoard(Board boardToInsert, int x, int y) {
-		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
-	}
-
-	/**
-	 * Displays a letter at the top of the basic board
-	 */
-	protected void drawLetter(char letter) {
-		BoardLetters boardLetter = new BoardLetters();
-		boardLetter.setLetter(BoardLetters.charToLetters(letter));
-		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
-				boardHeight - BoardLetters.height);// y
-	}
-
-	/**
-	 * Displays a two numbers at the bottom of the basic board
-	 */
-	protected void drawNumber(int number) {
-		int number_1;
-		int number_2;
-
-		if (number < 10) {
-			number_1 = 0;
-			number_2 = number;
-		} else {
-			number_1 = number / 10;
-			number_2 = number % 10;
+	public void changeGame() {
+		// if the class for the current game was found
+		if (c != null) {
+			try {
+				Class[] paramTypes;
+				Constructor<Game> constructor;
+				Object[] args;
+				
+				try {
+					// gets constructor(speed, level, rotation, type)
+					paramTypes = new Class[] { int.class, int.class,
+							Rotation.class, int.class };
+					constructor = c.getConstructor(paramTypes);
+					// gets parameters
+					args = new Object[] { getSpeed(), getLevel(),
+							getRotation(), number };
+				} catch (NoSuchMethodException e) {
+					// if constructor with rotation is not exist,
+					// gets constructor(speed, level, type)
+					paramTypes = new Class[] { int.class, int.class, int.class };
+					constructor = c.getConstructor(paramTypes);
+					// gets parameters without rotation
+					args = new Object[] { getSpeed(), getLevel(), number };
+				}
+				
+				// creates an instance of the game
+				Game game = constructor.newInstance(args);
+				// stop the splash animation timer
+				if (splashTimer != null) {
+					splashTimer.cancel();
+				}
+				// starts the selected game
+				Main.setGame(game);
+			} catch (Exception e) {
+				setStatus(Status.ComingSoon);
+			}
 		}
-
-		BoardNumbers boardNumber = new BoardNumbers();
-
-		// 1st number
-		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
-		insertBoard(boardNumber, (boardWidth / 2 - BoardNumbers.width - 1),// x
-				0);// y
-
-		// 2nd number
-		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
-		insertBoard(boardNumber, (boardWidth / 2),// x
-				0);// y
 	}
-
-	/**
-	 * Next allowable letter
-	 */
-	private void nextLetter() {
-		if (letter < 'Z') {
-			letter++;
-		} else {
-			letter = 'A';
-		}
-		if (drawAll())
-			setStatus(Status.DoSomeWork);
-		else
-			setStatus(Status.ComingSoon);
-	}
-
-	/**
-	 * Previous allowable letter
-	 */
-	private void prevLetter() {
-		if (letter > 'A') {
-			letter--;
-		} else {
-			letter = 'Z';
-		}
-		if (drawAll())
-			setStatus(Status.DoSomeWork);
-		else
-			setStatus(Status.ComingSoon);
-	}
-
-	/**
-	 * Next allowable number
-	 */
-	private void nextNumber() {
-		number = (number < maxNumber) ? number + 1 : 1;
-		drawNumber(number);
-	}
-
-	/**
-	 * Previous allowable number
-	 */
-	private void prevNumber() {
-		number = (number > 1) ? number - 1 : maxNumber;
-		drawNumber(number);
-	}
-
+	
 	/**
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
@@ -335,13 +273,14 @@ public class GameSelector extends Game {
 	@SuppressWarnings("unchecked")
 	private boolean drawAll() {
 		// stop the splash animation timer
-		if (splashTimer != null)
+		if (splashTimer != null) {
 			splashTimer.cancel();
-
+		}
+		
 		drawLetter(letter);
-
+		
 		c = gamesList.get(letter);
-
+		
 		if (c != null) {
 			// trying to get number of subtypes from the class of the game
 			try {
@@ -352,7 +291,7 @@ public class GameSelector extends Game {
 				// if unable - sets 1
 				maxNumber = 1;
 			}
-
+			
 			// trying to get the splash screen instance from the class of
 			// the game
 			try {
@@ -362,7 +301,7 @@ public class GameSelector extends Game {
 				e.printStackTrace();
 				splash = null;
 			}
-
+			
 			if (splash != null) {
 				// starts the timer to show splash screen of the game
 				splashTimer = new Timer(splash.getClass().getName(), true);
@@ -370,6 +309,7 @@ public class GameSelector extends Game {
 					@Override
 					public void run() {
 						SwingUtilities.invokeLater(new Runnable() {
+							@Override
 							public void run() {
 								drawGameSplash(splash);
 							}
@@ -381,21 +321,22 @@ public class GameSelector extends Game {
 				drawGameSplash(null);
 			}
 			
-			fireInfoChanged(String.valueOf("HI" + ScoresManager.getInstance().getHiScore(c)));
+			fireInfoChanged(String.valueOf("HI"
+					+ ScoresManager.getInstance().getHiScore(c)));
 		} else {
 			maxNumber = 1;
 			drawGameSplash(null);
 		}
-
+		
 		// checks that the current number does not exceed the maximum number
 		if (number > maxNumber) {
 			number = 1;
 		}
 		drawNumber(number);
-
+		
 		return (c != null);
 	}
-
+	
 	/**
 	 * Displays one frame of the splash screen of the game
 	 * <p>
@@ -414,62 +355,63 @@ public class GameSelector extends Game {
 					BoardNumbers.height + 1);// y
 		}
 	}
-
-	public void start() {
-		clearBoard();
-		clearPreview();
-		
-		if (drawAll())
-			setStatus(Status.DoSomeWork);
-		else
-			setStatus(Status.ComingSoon);
-	}
-
+	
 	/**
-	 * Launching a game depending on the chosen letters and numbers
+	 * Displays a letter at the top of the basic board
 	 */
-	public void changeGame() {
-		// if the class for the current game was found
-		if (c != null) {
-			try {
-				Class[] paramTypes;
-				Constructor<Game> constructor;
-				Object[] args;
-				
-				try {
-					// gets constructor(speed, level, rotation, type)
-					paramTypes = new Class[] { int.class, int.class,
-							Rotation.class, int.class };
-					constructor = (Constructor<Game>) c
-							.getConstructor(paramTypes);
-					// gets parameters
-					args = new Object[] { getSpeed(), getLevel(),
-							getRotation(), number };
-				} catch (NoSuchMethodException e) {
-					// if constructor with rotation is not exist,
-					// gets constructor(speed, level, type)
-					paramTypes = new Class[] { int.class, int.class, int.class };
-					constructor = (Constructor<Game>) c
-							.getConstructor(paramTypes);
-					// gets parameters without rotation
-					args = new Object[] { getSpeed(), getLevel(), number };
-				}
-
-				// creates an instance of the game
-				Game game = constructor.newInstance(args);
-				// stop the splash animation timer
-				if (splashTimer != null)
-					splashTimer.cancel();
-				// starts the selected game
-				Main.setGame(game);
-			} catch (Exception e) {
-				setStatus(Status.ComingSoon);
-			}
-		}
+	protected void drawLetter(char letter) {
+		BoardLetters boardLetter = new BoardLetters();
+		boardLetter.setLetter(BoardLetters.charToLetters(letter));
+		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
+				boardHeight - BoardLetters.height);// y
 	}
-
+	
+	/**
+	 * Displays a two numbers at the bottom of the basic board
+	 */
+	protected void drawNumber(int number) {
+		int number_1;
+		int number_2;
+		
+		if (number < 10) {
+			number_1 = 0;
+			number_2 = number;
+		} else {
+			number_1 = number / 10;
+			number_2 = number % 10;
+		}
+		
+		BoardNumbers boardNumber = new BoardNumbers();
+		
+		// 1st number
+		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
+		insertBoard(boardNumber, (boardWidth / 2 - BoardNumbers.width - 1),// x
+				0);// y
+		
+		// 2nd number
+		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
+		insertBoard(boardNumber, (boardWidth / 2),// x
+				0);// y
+	}
+	
+	/**
+	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
+	 * {@code x, y}) is set a point, which gets the lower left corner of the
+	 * {@code boardToInsert}
+	 * 
+	 * @param boardToInsert
+	 *            a Letters or a Numbers board
+	 * @param x
+	 *            x-coordinate for the insertion
+	 * @param y
+	 *            y-coordinate for the insertion
+	 */
+	private void insertBoard(Board boardToInsert, int x, int y) {
+		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
+	}
+	
 	@Override
-	public void keyPressed(KeyPressed key) {		
+	public void keyPressed(KeyPressed key) {
 		switch (key) {
 		case KeyLeft:
 			playEffect(Effects.select);
@@ -481,10 +423,11 @@ public class GameSelector extends Game {
 			break;
 		case KeyRotate:
 			playEffect(Effects.select);
-			if (getRotation() == Rotation.Counterclockwise)
+			if (getRotation() == Rotation.Counterclockwise) {
 				prevLetter();
-			else
+			} else {
 				nextLetter();
+			}
 			break;
 		case KeyUp:
 			playEffect(Effects.select);
@@ -504,18 +447,80 @@ public class GameSelector extends Game {
 			break;
 		case KeyReset:
 			// stop the splash animation timer
-			if (splashTimer != null)
+			if (splashTimer != null) {
 				splashTimer.cancel();
+			}
 			Main.setGame(new SplashScreen());
 			break;
 		case KeyOnOff:
-			if (splashTimer != null)
+			if (splashTimer != null) {
 				splashTimer.cancel();
+			}
 			quit();
 			break;
 		default:
 			break;
 		}
-
+		
+	}
+	
+	/**
+	 * Next allowable letter
+	 */
+	private void nextLetter() {
+		if (letter < 'Z') {
+			letter++;
+		} else {
+			letter = 'A';
+		}
+		if (drawAll()) {
+			setStatus(Status.DoSomeWork);
+		} else {
+			setStatus(Status.ComingSoon);
+		}
+	}
+	
+	/**
+	 * Next allowable number
+	 */
+	private void nextNumber() {
+		number = (number < maxNumber) ? number + 1 : 1;
+		drawNumber(number);
+	}
+	
+	/**
+	 * Previous allowable letter
+	 */
+	private void prevLetter() {
+		if (letter > 'A') {
+			letter--;
+		} else {
+			letter = 'Z';
+		}
+		if (drawAll()) {
+			setStatus(Status.DoSomeWork);
+		} else {
+			setStatus(Status.ComingSoon);
+		}
+	}
+	
+	/**
+	 * Previous allowable number
+	 */
+	private void prevNumber() {
+		number = (number > 1) ? number - 1 : maxNumber;
+		drawNumber(number);
+	}
+	
+	@Override
+	public void start() {
+		clearBoard();
+		clearPreview();
+		
+		if (drawAll()) {
+			setStatus(Status.DoSomeWork);
+		} else {
+			setStatus(Status.ComingSoon);
+		}
 	}
 }

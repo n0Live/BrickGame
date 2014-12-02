@@ -4,16 +4,15 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
 
 /**
  * @author User
- *
  */
 public final class GameConsts {
-	public static enum Status {
-		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
+	public static enum KeyPressed {
+		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
-
+	
 	public static enum Rotation {
 		None, Clockwise, Counterclockwise;
-
+		
 		/**
 		 * Get the next rotation
 		 * <p>
@@ -26,15 +25,15 @@ public final class GameConsts {
 			if (this == Rotation.None)
 				return this;
 			else
-				return this.ordinal() < Rotation.values().length - 1 ? Rotation
-						.values()[this.ordinal() + 1] : Rotation.values()[1];
+				return ordinal() < Rotation.values().length - 1 ? Rotation
+						.values()[ordinal() + 1] : Rotation.values()[1];
 		}
 	};
-
-	public static enum KeyPressed {
-		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
+	
+	public static enum Status {
+		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
 	};
-
+	
 	// ** Direction constants **
 	protected static final RotationAngle UP = RotationAngle.d0;
 	protected static final RotationAngle DOWN = RotationAngle.d180;
@@ -61,12 +60,11 @@ public final class GameConsts {
 	/**
 	 * Animation delay in milliseconds
 	 */
-	public static final int ANIMATION_DELAY = 30;
-
+	protected static final int ANIMATION_DELAY = 30;
+	
 	// ** anumatedClearBoard constants **
 	protected static final int CB_GAME_OVER = 6000;
 	protected static final int CB_WIN = 5240;
 	protected static final int CB_LOSE = 1200;
 	// **
-
 }

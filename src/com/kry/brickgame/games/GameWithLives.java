@@ -11,7 +11,6 @@ import com.kry.brickgame.games.GameUtils.Music;
 
 /**
  * @author noLive
- * 
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
@@ -21,9 +20,23 @@ public abstract class GameWithLives extends Game {
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-
+	
 	protected boolean start;
-
+	
+	/**
+	 * The Game with lives without rotation
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param type
+	 *            type of the game
+	 */
+	public GameWithLives(int speed, int level, int type) {
+		this(speed, level, Rotation.None, type);
+	}
+	
 	/**
 	 * The Game with lives
 	 * <p>
@@ -40,35 +53,11 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-
+		
 		setLives(4);
 		start = true;
 	}
-
-	/**
-	 * The Game with lives without rotation
-	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param type
-	 *            type of the game
-	 */
-	public GameWithLives(int speed, int level, int type) {
-		this(speed, level, Rotation.None, type);
-	}
-
-	@Override
-	public void start() {
-		super.start();
-		// play music only in first start, not after deserialization
-		if (start) {
-			start = false;
-			playMusic(Music.start);
-		}
-	}
-
+	
 	/**
 	 * Lives
 	 * 
@@ -77,7 +66,47 @@ public abstract class GameWithLives extends Game {
 	protected synchronized int getLives() {
 		return lives;
 	}
-
+	
+	/**
+	 * Loading the specified level
+	 */
+	protected void loadNewLevel() {
+		// play music always except the first start
+		if (!start) {
+			playMusic(Music.start);
+		}
+		setStatus(Status.Running);
+	}
+	
+	/**
+	 * Drawing effect of the explosion and decreasing lives
+	 * 
+	 * @param x
+	 *            x-coordinate of the epicenter of the explosion
+	 * @param y
+	 *            y-coordinate of the epicenter of the explosion
+	 */
+	protected void loss(int x, int y) {
+		setStatus(Status.DoSomeWork);
+		
+		// kaboom and decrease lives
+		kaboom(x, y);
+		setLives(getLives() - 1);
+		if (getLives() > 0) {
+			animatedClearBoard(CB_LOSE);
+			reloadLevel();
+		} else {
+			gameOver();
+		}
+	}
+	
+	/**
+	 * Reloading the specified level
+	 */
+	protected void reloadLevel() {
+		loadNewLevel();
+	}
+	
 	/**
 	 * Set lives
 	 * 
@@ -101,61 +130,32 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-
-	/**
-	 * Loading the specified level
-	 */
-	protected void loadNewLevel() {
-		// play music always except the first start
-		if (!start) {
+	
+	@Override
+	public void start() {
+		super.start();
+		// play music only in first start, not after deserialization
+		if (start) {
+			start = false;
 			playMusic(Music.start);
 		}
-		setStatus(Status.Running);
 	}
-
-	/**
-	 * Reloading the specified level
-	 */
-	protected void reloadLevel() {
-		loadNewLevel();
-	}
-
-	/**
-	 * Drawing effect of the explosion and decreasing lives
-	 * 
-	 * @param x
-	 *            x-coordinate of the epicenter of the explosion
-	 * @param y
-	 *            y-coordinate of the epicenter of the explosion
-	 */
-	protected void loss(int x, int y) {
-		setStatus(Status.DoSomeWork);
-
-		// kaboom and decrease lives
-		kaboom(x, y);
-		setLives(getLives() - 1);
-		if (getLives() > 0) {
-			animatedClearBoard(CB_LOSE);
-			reloadLevel();
-		} else {
-			gameOver();
-		}
-	}
-
+	
 	/**
 	 * Increase the level and load it
 	 */
 	protected void win() {
 		setStatus(Status.DoSomeWork);
-
+		
 		playMusic(Music.win);
 		animatedClearBoard(CB_WIN);
-
+		
 		setLevel(getLevel() + 1);
-		if (getLevel() == 1)
+		if (getLevel() == 1) {
 			setSpeed(getSpeed() + 1);
-
+		}
+		
 		loadNewLevel();
 	}
-
+	
 }

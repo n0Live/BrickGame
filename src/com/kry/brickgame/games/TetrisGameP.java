@@ -8,11 +8,10 @@ import com.kry.brickgame.games.GameConsts.Status;
 
 /**
  * @author noLive
- * 
  */
 public class TetrisGameP extends TetrisGameL {
 	private static final long serialVersionUID = 3734423526420480573L;
-
+	
 	/**
 	 * The Tetris with the addition of new lines every few seconds, and the
 	 * changing of the figures instead of rotating, and the shifting board
@@ -23,7 +22,7 @@ public class TetrisGameP extends TetrisGameL {
 	public TetrisGameP(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-
+	
 	@Override
 	protected void pieceDropped() {
 		super.pieceDropped();
@@ -33,5 +32,5 @@ public class TetrisGameP extends TetrisGameL {
 			setBoard(board);
 		}
 	}
-
+	
 }

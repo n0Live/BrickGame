@@ -2,7 +2,6 @@ package com.kry.brickgame.shapes;
 
 /**
  * @author noLive
- * 
  */
 public class CarShape extends CharacterShape {
 	private static final long serialVersionUID = -2252007263544922105L;
@@ -13,17 +12,17 @@ public class CarShape extends CharacterShape {
 	private static int[][][] charactersTable = new int[][][] {//
 	{ { -1, -1 }, { 1, -1 }, { 0, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 0, 2 } }, // car
 	}; //
-
-	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
-	}
-
+	
 	/**
 	 * Constructor for the Car
 	 */
 	public CarShape() {
 		super(0, charactersTable[0].length);
 	}
-
+	
+	@Override
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
 }
