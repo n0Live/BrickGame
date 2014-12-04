@@ -24,7 +24,7 @@ import javax.swing.border.Border;
  * @author noLive
  */
 public class ResizableBorder implements Border {
-	private final int triangleSize = 15;
+	private int triangleSize;
 	
 	private boolean mouseOver = false;
 	
@@ -64,30 +64,27 @@ public class ResizableBorder implements Border {
 	
 	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+		// calculate the resize triangle size
+		triangleSize = (width / 20);
 		
-		// don't draw triangle if size of the component less than triangle size
-		if (width > triangleSize && height > triangleSize) {
-			Graphics2D g2d = (Graphics2D) g;
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
-			
-			g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
-			g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
-			
-			// drawing three lines (or two lines and dot?)
-			g2d.drawLine(width - triangleSize, height, width, height - triangleSize);
-			g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height
-					- (triangleSize * 2 / 3));
-			g2d.drawLine(width - (triangleSize / 3), height, width, height - (triangleSize / 3));
-			
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-		}
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
+		// save previous graphical properties for the further restore
+		Stroke oldStroke = g2d.getStroke();
+		Paint oldPaint = g2d.getPaint();
+		
+		g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
+		g2d.setPaint(mouseOver ? lineOverColor : lineNormalColor);
+		
+		// drawing three lines (or two lines and dot?)
+		g2d.drawLine(width - triangleSize, height, width, height - triangleSize);
+		g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height - (triangleSize * 2 / 3));
+		g2d.drawLine(width - (triangleSize / 3), height, width, height - (triangleSize / 3));
+		
+		// restore properties from the backup
+		g2d.setStroke(oldStroke);
+		g2d.setPaint(oldPaint);
 	}
 	
 }
