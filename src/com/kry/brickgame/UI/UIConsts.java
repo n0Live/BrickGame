@@ -4,7 +4,6 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
 
-
 /**
  * @author noLive
  */
@@ -55,12 +54,14 @@ public class UIConsts {
 	/**
 	 * Device background color
 	 */
-	protected static final Color deviceBgColor = Color.darkGray;// new Color(60,
-	// 60, 60);
+	protected static final Color deviceBgColor = Color.darkGray;
 
 	protected static final Color lineNormalColor = UIUtils.getBWInverted(deviceBgColor);
 	protected static final Color lineOverColor = UIUtils.getReduced(lineNormalColor);
 
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
+	
+	protected final static int MIN_WIDTH = 187;
+	protected final static int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
 }
