@@ -1,5 +1,6 @@
 /bin/
 *.log
+*.zip
 /hiscores.dat
 /lastgame.sav
 /.checkstyle
