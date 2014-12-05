@@ -2,6 +2,7 @@ package com.kry.brickgame.UI;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -10,6 +11,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import com.kry.brickgame.Main;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
@@ -56,12 +59,14 @@ class ButtonMouseListener extends MouseAdapter {
 		final JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 		
-		// process the pressing buttons as well as pressing a key
-		ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(key),
-				300, 40, TimeUnit.MILLISECONDS);
-		pressedKeys.put(key, pressedKey);
-		
-		Main.getGame().keyPressed(key);
+		if (key != KeyPressed.KeyOnOff) {
+			// process the pressing buttons as well as pressing a key
+			ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(
+					key), 300, 40, TimeUnit.MILLISECONDS);
+			pressedKeys.put(key, pressedKey);
+			
+			Main.getGame().keyPressed(key);
+		}
 	}
 	
 	@Override
@@ -69,9 +74,19 @@ class ButtonMouseListener extends MouseAdapter {
 		JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 		
-		pressedKeys.get(key).cancel(true);
-		pressedKeys.remove(key);
-		
-		Main.getGame().keyReleased(key);
+		if (key == KeyPressed.KeyOnOff) {
+			// if released mouse upon the pressed KeyOnOff button
+			if (e.getComponent().contains(e.getPoint())) {
+				// send closing event to parent frame
+				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
+						e.getComponent());
+				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			}
+		} else {
+			pressedKeys.get(key).cancel(true);
+			pressedKeys.remove(key);
+			
+			Main.getGame().keyReleased(key);
+		}
 	}
 }
