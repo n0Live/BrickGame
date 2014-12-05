@@ -822,7 +822,7 @@ public final class Drawer {
 	 */
 	public BufferedImage getDrawnGameField(int width, int height, GameProperties properties) {
 		// set the size of the canvas based on GAME_FIELD_ASPECT_RATIO
-		Dimension d = UIConsts.getDimensionWithAspectRatio(new Dimension(width, height),
+		Dimension d = UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
 				GAME_FIELD_ASPECT_RATIO);
 		
 		// calculate size of a one square
