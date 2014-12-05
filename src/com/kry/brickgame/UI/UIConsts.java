@@ -1,5 +1,8 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.UI.UIUtils.getBWInverted;
+import static com.kry.brickgame.UI.UIUtils.getReduced;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Stroke;
@@ -20,16 +23,16 @@ public class UIConsts {
 	protected static final String GAME_OVER = "GAME OVER";
 	protected static final String COMING = "COMING";
 	protected static final String SOON = "SOON";
-
+	
 	protected static final String SCORE_SUBSTRATE = "18888";
 	protected static final String NUMBER_SUBSTRATE = "18";
-
+	
 	/* ICONS */
 	protected static final String ICON_MUSIC = "\ue602";
 	protected static final String ICON_ROTATE_RIGHT = "\ue600";
 	protected static final String ICON_ROTATE_LEFT = "\ue601";
 	protected static final String ICON_PAUSE = "\ue603";
-
+	
 	/**
 	 * Aspect ratio of the game field (4/3)
 	 */
@@ -38,7 +41,7 @@ public class UIConsts {
 	 * Aspect ratio of the game device (16/9)
 	 */
 	protected static final float DEVICE_ASPECT_RATIO = (float) 16 / 9;
-
+	
 	/**
 	 * Color of inactive elements
 	 */
@@ -54,14 +57,43 @@ public class UIConsts {
 	/**
 	 * Device background color
 	 */
-	protected static final Color deviceBgColor = Color.darkGray;
-
-	protected static final Color lineNormalColor = UIUtils.getBWInverted(deviceBgColor);
-	protected static final Color lineOverColor = UIUtils.getReduced(lineNormalColor);
-
+	protected static final Color deviceBgColor = Color.gray;
+	
+	protected static final Color lineNormalColor = getBWInverted(deviceBgColor);
+	protected static final Color lineOverColor = getReduced(lineNormalColor);
+	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
 	
+	protected static final int TYPICAL_DEVICE_WIDTH = 720;
+	protected static final int TYPICAL_DEVICE_HEIGHT = (int) (TYPICAL_DEVICE_WIDTH * DEVICE_ASPECT_RATIO);
+	
 	protected final static int MIN_WIDTH = 187;
 	protected final static int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
+	// Insets
+	static final int INSET_TOP = 25;
+	static final int INSET_LEFT = 40;
+	static final int INSET_BOTTOM = 50;
+	static final int INSET_RIGHT = 25;
+	// Buttons size
+	/**
+	 * Window buttons (minimize, close) size
+	 */
+	static final int WINDOW_BTN_SIZE = 30;
+	/**
+	 * Control buttons size
+	 */
+	static final int CONTROL_BTN_SIZE = 85;
+	/**
+	 * Rotate button size
+	 */
+	static final int ROTATE_BTN_SIZE = 150;
+	/**
+	 * Menu buttons (OnOff, Reset, Mute) size
+	 */
+	static final int MENU_BTN_SIZE = 55;
+	/**
+	 * Start button size
+	 */
+	static final int START_BTN_SIZE = 80;
 }
