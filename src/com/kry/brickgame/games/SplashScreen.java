@@ -10,6 +10,7 @@ import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.boards.BoardNumbers;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Music;
 
@@ -41,10 +42,9 @@ public class SplashScreen extends Game {
 		// until it reaches the middle of the board
 		while (fromX != board.getWidth() / 2) {
 			// spiral motion with a gradually narrowing
-			if (!horizontalMove(fromX, toX, fromY--)
-					|| !verticalMove(fromY, toY, toX--)
-					|| !horizontalMove(toX, fromX, toY++)
-					|| !verticalMove(toY, fromY, fromX++)) return;
+			if (!horizontalMove(fromX, toX, fromY--) || !verticalMove(fromY, toY, toX--)
+					|| !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
+				return;
 		}
 		sleep(ANIMATION_DELAY * 2);
 	}
@@ -93,8 +93,7 @@ public class SplashScreen extends Game {
 				if (isInterrupted()) return false;
 				
 				// invert cells
-				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
-						: Cell.Empty), i, y);
+				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
 				fireBoardChanged(board);
 				sleep(ANIMATION_DELAY);
 			}
@@ -105,8 +104,7 @@ public class SplashScreen extends Game {
 				if (isInterrupted()) return false;
 				
 				// invert cells
-				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full
-						: Cell.Empty), i, y);
+				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
 				fireBoardChanged(board);
 				sleep(ANIMATION_DELAY);
 			}
@@ -124,18 +122,16 @@ public class SplashScreen extends Game {
 		boardNumber.setNumber(BoardNumbers.intToNumbers(9));
 		
 		// upper left
-		insertCellsToBoard(board, boardNumber.getBoard(), 1, board.getHeight()
-				- boardNumber.getHeight() - 1);
-		// lower left
 		insertCellsToBoard(board, boardNumber.getBoard(), 1,
-				boardNumber.getHeight());
+				board.getHeight() - boardNumber.getHeight() - 1);
+		// lower left
+		insertCellsToBoard(board, boardNumber.getBoard(), 1, boardNumber.getHeight());
 		// upper right
-		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth()
-				- boardNumber.getWidth() - 1,
-				board.getHeight() - boardNumber.getHeight() * 2);
+		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth() - boardNumber.getWidth()
+				- 1, board.getHeight() - boardNumber.getHeight() * 2);
 		// lower right
-		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth()
-				- boardNumber.getWidth() - 1, 1);
+		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth() - boardNumber.getWidth()
+				- 1, 1);
 		
 		if (!isInterrupted()) {
 			setBoard(board);
@@ -148,6 +144,13 @@ public class SplashScreen extends Game {
 	@Override
 	protected void processKeys() {
 		if (getStatus() == Status.None) return;
+		
+		if (keys.contains(KeyPressed.KeyOnOff)) {
+			keys.remove(KeyPressed.KeyOnOff);
+			quit();
+			return;
+		}
+		
 		if (!keys.isEmpty()) {
 			setStatus(Status.None);
 		}
@@ -213,8 +216,7 @@ public class SplashScreen extends Game {
 				if (isInterrupted()) return false;
 				
 				// invert cells
-				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
-						: Cell.Empty), x, i);
+				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);
 				fireBoardChanged(board);
 				sleep(ANIMATION_DELAY);
 			}
@@ -225,8 +227,7 @@ public class SplashScreen extends Game {
 				if (isInterrupted()) return false;
 				
 				// invert cells
-				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full
-						: Cell.Empty), x, i);
+				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);
 				fireBoardChanged(board);
 				sleep(ANIMATION_DELAY);
 			}
