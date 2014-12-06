@@ -4,7 +4,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,6 +28,7 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * @author noLive
  */
 class ButtonMouseListener extends MouseAdapter {
+	
 	private class Repeater implements Runnable {
 		private final KeyPressed key;
 		
@@ -37,6 +40,19 @@ class ButtonMouseListener extends MouseAdapter {
 		public void run() {
 			Main.getGame().keyPressed(key);
 		}
+	}
+	
+	/**
+	 * Menu buttons (OnOff, Reset, Mute, Start)
+	 */
+	private static final Set<KeyPressed> menuKeys;
+	
+	static {
+		menuKeys = new HashSet<>(5, 1f);
+		menuKeys.add(KeyPressed.KeyOnOff);
+		menuKeys.add(KeyPressed.KeyReset);
+		menuKeys.add(KeyPressed.KeyMute);
+		menuKeys.add(KeyPressed.KeyStart);
 	}
 	
 	/**
@@ -59,7 +75,12 @@ class ButtonMouseListener extends MouseAdapter {
 		final JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 		
-		if (key != KeyPressed.KeyOnOff) {
+		if (menuKeys.contains(key)) {
+			// special behavior for KeyOnOff
+			if (key != KeyPressed.KeyOnOff) {
+				Main.getGame().keyPressed(key);
+			}
+		} else {
 			// process the pressing buttons as well as pressing a key
 			ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(
 					key), 300, 40, TimeUnit.MILLISECONDS);
@@ -74,13 +95,16 @@ class ButtonMouseListener extends MouseAdapter {
 		JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 		
-		if (key == KeyPressed.KeyOnOff) {
-			// if released mouse upon the pressed KeyOnOff button
-			if (e.getComponent().contains(e.getPoint())) {
+		if (menuKeys.contains(key)) {
+			// special behavior for KeyOnOff (when mouse released upon the
+			// pressed KeyOnOff button)
+			if (key == KeyPressed.KeyOnOff && e.getComponent().contains(e.getPoint())) {
 				// send closing event to parent frame
 				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
 						e.getComponent());
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			} else {
+				Main.getGame().keyReleased(key);
 			}
 		} else {
 			pressedKeys.get(key).cancel(true);
