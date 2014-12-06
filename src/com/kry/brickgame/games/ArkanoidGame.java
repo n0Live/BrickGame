@@ -256,8 +256,7 @@ public class ArkanoidGame extends GameWithLives {
 		ball = BallUtils.getBall(Cell.Full);
 		
 		// for types 1-16 and 33-48
-		usePreloadedBricks = ((getType() <= 16))
-				|| ((getType() >= 33) && (getType() <= 48));
+		usePreloadedBricks = ((getType() <= 16)) || ((getType() >= 33) && (getType() <= 48));
 		// for every 5-8 types
 		isShiftingBricks = ((getType() % 8 >= 5) || (getType() % 8 == 0));
 		// for every 9-16 types
@@ -345,16 +344,15 @@ public class ArkanoidGame extends GameWithLives {
 		ballX = curX;
 		ballY = curY + 1;
 		ballVerticalDirection = UP;
-		ballHorizontalDirection = (getRotation() == Rotation.Clockwise) ? RIGHT
-				: LEFT;
+		ballHorizontalDirection = (getRotation() == Rotation.Clockwise) ? RIGHT : LEFT;
 		
 		// create the bricks wall
 		if (setBricks) {
 			bricks = new BricksWall(getLevel(), usePreloadedBricks);
 			
 			bricksX = 0;
-			bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks
-					.getHeight()) / 2) : (boardHeight - bricks.getHeight());
+			bricksY = (useDoubleSidedPlatform) ? ((boardHeight - bricks.getHeight()) / 2)
+					: (boardHeight - bricks.getHeight());
 			
 			insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		}
@@ -396,12 +394,11 @@ public class ArkanoidGame extends GameWithLives {
 		Point newCoords;
 		
 		// set new coordinates from directions
-		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
-				ballVerticalDirection);
+		newCoords = BallUtils
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// if the ball fall off the board then game_over live
-		if ((newCoords.y < 0)
-				|| (useDoubleSidedPlatform && (newCoords.y >= boardHeight))) {
+		if ((newCoords.y < 0) || (useDoubleSidedPlatform && (newCoords.y >= boardHeight))) {
 			loss();
 			return;
 		}
@@ -418,8 +415,8 @@ public class ArkanoidGame extends GameWithLives {
 			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 			bounce = true;
 		}
-		newCoords = BallUtils.moveBall(ballX, ballY, ballHorizontalDirection,
-				ballVerticalDirection);
+		newCoords = BallUtils
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// try to break brick under current position of the ball
 		breakBrick(board, ballX, ballY);
@@ -433,8 +430,7 @@ public class ArkanoidGame extends GameWithLives {
 			if ((board.getCell(newCoords.x, ballY) != Cell.Empty)
 					|| (board.getCell(ballX, newCoords.y) != Cell.Empty)) {
 				if (board.getCell(newCoords.x, ballY) != Cell.Empty) {
-					ballHorizontalDirection = ballHorizontalDirection
-							.getOpposite();
+					ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 					if (!isPlatform(newCoords.x, ballY)) {
 						breakBrick(board, newCoords.x, ballY);
 					} else {
@@ -486,8 +482,7 @@ public class ArkanoidGame extends GameWithLives {
 	 * @return {@code true} if the movement succeeded, otherwise {@code false}
 	 */
 	private boolean movePlatform(int x) {
-		if ((x + platform.minX() < 0) || (x + platform.maxX() >= boardWidth))
-			return false;
+		if ((x + platform.minX() < 0) || (x + platform.maxX() >= boardWidth)) return false;
 		
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
@@ -570,6 +565,7 @@ public class ArkanoidGame extends GameWithLives {
 	@Override
 	protected void reloadLevel() {
 		loadLevel(false);
+		setStatus(Status.Running);
 	}
 	
 	/**
@@ -608,12 +604,11 @@ public class ArkanoidGame extends GameWithLives {
 		final float speedStep = 0.25f;
 		
 		while (!interrupted() && (getStatus() != Status.GameOver)) {
-			if (getStatus() != Status.Paused) {
+			if (getStatus() == Status.Running) {
 				// change the speed in depending of the platform size
 				// (slower when used small platform)
-				int speedFactor = (int) (slowestSpeed - platform.getType()
-						* speedStep);
-				int currentSpeed = getSpeed(true) * speedFactor;
+				float speedFactor = (slowestSpeed - platform.getType() * speedStep);
+				int currentSpeed = Math.round(getSpeed(true) * speedFactor);
 				
 				// decrease game speed if use double sided platform
 				if (useDoubleSidedPlatform) {
