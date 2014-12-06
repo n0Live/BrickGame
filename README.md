@@ -2,16 +2,17 @@
 This project - an attempt to recreate the "Brick Game" console on a modern PC as accurately as possible.
 
 ###Available games
-* Tetris (Brick Game)
-* Pentix
-* Snakes
-* Arcanoid
-* Tanks
-* Car
-* Race
-* Frogger
 * Dancer
-* ... coming soon
+* Tanks
+* Arcanoid
+* Racing
+* Gun game
+* Snakes
+* Frogger
+* Invaders
+* Tetris
+* Pentix
+* more coming soon...
 
 ###Project Maintainers
 * noLive
