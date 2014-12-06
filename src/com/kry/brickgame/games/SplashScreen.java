@@ -6,13 +6,13 @@ import static com.kry.brickgame.games.GameUtils.music;
 import static com.kry.brickgame.games.GameUtils.playMusic;
 
 import com.kry.brickgame.Main;
-import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.boards.BoardNumbers;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Music;
+import com.kry.brickgame.sound.SoundManager;
 
 /**
  * @author noLive

@@ -1,4 +1,4 @@
-package com.kry.brickgame;
+package com.kry.brickgame.IO;
 
 import java.io.File;
 import java.io.FileInputStream;

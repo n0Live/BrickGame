@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
@@ -24,6 +23,7 @@ import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.games.GameUtils.Melodies;
 import com.kry.brickgame.shapes.DancerShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
+import com.kry.brickgame.sound.SoundManager;
 import com.kry.brickgame.splashes.DanceSplash;
 import com.kry.brickgame.splashes.Splash;
 

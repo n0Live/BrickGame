@@ -2,12 +2,12 @@ package com.kry.brickgame.games;
 
 import java.util.Random;
 
-import com.kry.brickgame.SoundBank;
-import com.kry.brickgame.SoundManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.shapes.CoordinatedShape;
 import com.kry.brickgame.shapes.Shape;
+import com.kry.brickgame.sound.SoundBank;
+import com.kry.brickgame.sound.SoundManager;
 
 /**
  * @author noLive

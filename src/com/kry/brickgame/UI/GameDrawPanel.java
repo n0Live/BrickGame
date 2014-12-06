@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputListener;
 
-import com.kry.brickgame.GameListener;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSelector;
 import com.kry.brickgame.games.GameWithLives;

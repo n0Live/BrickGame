@@ -36,8 +36,8 @@ import javax.swing.WindowConstants;
 
 import net.miginfocom.swing.MigLayout;
 
-import com.kry.brickgame.GameLoader;
 import com.kry.brickgame.Main;
+import com.kry.brickgame.IO.GameLoader;
 import com.kry.brickgame.games.Game;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.SplashScreen;

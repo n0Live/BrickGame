@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 
 import com.kry.brickgame.Main;
-import com.kry.brickgame.ScoresManager;
+import com.kry.brickgame.IO.ScoresManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.BoardLetters;
 import com.kry.brickgame.boards.BoardNumbers;

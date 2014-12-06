@@ -1,7 +1,8 @@
-package com.kry.brickgame;
+package com.kry.brickgame.sound;
 
 import java.net.URL;
 import java.util.EnumSet;
+
 
 import javafx.scene.media.AudioClip;
 
