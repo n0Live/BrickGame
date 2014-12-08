@@ -10,8 +10,6 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.kry.brickgame.games.Game;
-
 /**
  * @author noLive
  */
@@ -24,24 +22,24 @@ public class ScoresManager {
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static ScoresManager singleton;
-	
+
 	/**
 	 * Get instance of the {@code ScoresManager}
 	 * 
 	 * @return instance of the {@code ScoresManager}
 	 */
-	public static ScoresManager getInstance() {
+	public static ScoresManager getScoresManager() {
 		if (null == singleton) {
 			singleton = new ScoresManager();
 		}
 		return singleton;
 	}
-	
+
 	/**
 	 * Comparison of the game class and high scores
 	 */
-	private Map<Class<Game>, Integer> hiScores;
-	
+	private Map<String, Integer> hiScores;
+
 	/**
 	 * Singleton class, which manages the high scores
 	 */
@@ -50,21 +48,21 @@ public class ScoresManager {
 			hiScores = new HashMap<>();
 		}
 	}
-	
+
 	/**
 	 * Get stored high score of the specified game
 	 * 
-	 * @param gameClass
-	 *            class of the game
+	 * @param className
+	 *            name of class of the game
 	 * @return high score
 	 */
-	public int getHiScore(Class<Game> gameClass) {
-		if (!hiScores.containsKey(gameClass)) {
-			hiScores.put(gameClass, 0);
-		}
-		return hiScores.get(gameClass);
+	public int getHiScore(String className) {
+		if (hiScores.containsKey(className))
+			return hiScores.get(className);
+		else
+			return 0;
 	}
-	
+
 	/**
 	 * Read the high scores from the file (deserialization)
 	 * 
@@ -74,10 +72,11 @@ public class ScoresManager {
 	private boolean loadScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
 		if (hiScoreFile.exists()) {
-			
-			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(hiScoreFile))) {
+
+			try (ObjectInputStream in = new ObjectInputStream(
+					new FileInputStream(hiScoreFile))) {
 				try {
-					hiScores = (HashMap<Class<Game>, Integer>) in.readObject();
+					hiScores = (HashMap<String, Integer>) in.readObject();
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -88,13 +87,14 @@ public class ScoresManager {
 		} else
 			return false;
 	}
-	
+
 	/**
 	 * Write the high scores to the file (serialization)
 	 */
 	private void saveScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(hiScoreFile))) {
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				new FileOutputStream(hiScoreFile))) {
 			out.writeObject(hiScores);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class ScoresManager {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Set the high score of the specified game when it more then previously
 	 * stored value.
@@ -110,21 +110,21 @@ public class ScoresManager {
 	 * Each call of that method causes writing high scores to the file
 	 * (serialization)
 	 * 
-	 * @param gameClass
-	 *            class of the game
+	 * @param className
+	 *            name of class of the game
 	 * @param score
 	 *            new score
 	 * @return new score if it more then previously high score, otherwise -
 	 *         return previously high score
 	 */
-	public int setHiScore(Class<Game> gameClass, int score) {
-		int prevScore = getHiScore(gameClass);
+	public int setHiScore(String className, int score) {
+		int prevScore = getHiScore(className);
 		if (prevScore < score) {
-			hiScores.put(gameClass, score);
+			hiScores.put(className, score);
 			saveScores();
 			return score;
 		} else
 			return prevScore;
 	}
-	
+
 }

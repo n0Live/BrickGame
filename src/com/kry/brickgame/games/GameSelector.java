@@ -1,5 +1,6 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.IO.ScoresManager.getScoresManager;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 
@@ -12,7 +13,6 @@ import java.util.TimerTask;
 import javax.swing.SwingUtilities;
 
 import com.kry.brickgame.Main;
-import com.kry.brickgame.IO.ScoresManager;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.BoardLetters;
 import com.kry.brickgame.boards.BoardNumbers;
@@ -62,7 +62,7 @@ public class GameSelector extends Game {
 		}
 		try {
 			gamesList
-					.put('E', Class.forName("com.kry.brickgame.games.GunGame"));
+			.put('E', Class.forName("com.kry.brickgame.games.GunGame"));
 		} catch (ClassNotFoundException e) {
 			gamesList.put('E', null);
 		}
@@ -191,7 +191,7 @@ public class GameSelector extends Game {
 			gamesList.put('Z', null);
 		}
 	}
-	
+
 	/**
 	 * Letter - kind of game
 	 */
@@ -200,30 +200,30 @@ public class GameSelector extends Game {
 	 * Number - subtypes of game
 	 */
 	private int number;
-	
+
 	/**
 	 * Number of subtypes for the current game
 	 */
 	private int maxNumber;
-	
+
 	/**
 	 * Class of the current game
 	 */
 	private Class<Game> c;
-	
+
 	/**
 	 * Timer for the splash screen of the game
 	 */
 	private Timer splashTimer;
-	
+
 	public GameSelector() {
 		super();
 		letter = 'A';
 		number = 1;
-		
+
 		setRotation(Rotation.Clockwise);
 	}
-	
+
 	/**
 	 * Launching a game depending on the chosen letters and numbers
 	 */
@@ -234,7 +234,7 @@ public class GameSelector extends Game {
 				Class[] paramTypes;
 				Constructor<Game> constructor;
 				Object[] args;
-				
+
 				try {
 					// gets constructor(speed, level, rotation, type)
 					paramTypes = new Class[] { int.class, int.class,
@@ -251,7 +251,7 @@ public class GameSelector extends Game {
 					// gets parameters without rotation
 					args = new Object[] { getSpeed(), getLevel(), number };
 				}
-				
+
 				// creates an instance of the game
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer
@@ -265,7 +265,7 @@ public class GameSelector extends Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
@@ -276,11 +276,11 @@ public class GameSelector extends Game {
 		if (splashTimer != null) {
 			splashTimer.cancel();
 		}
-		
+
 		drawLetter(letter);
-		
+
 		c = gamesList.get(letter);
-		
+
 		if (c != null) {
 			// trying to get number of subtypes from the class of the game
 			try {
@@ -291,7 +291,7 @@ public class GameSelector extends Game {
 				// if unable - sets 1
 				maxNumber = 1;
 			}
-			
+
 			// trying to get the splash screen instance from the class of
 			// the game
 			try {
@@ -301,7 +301,7 @@ public class GameSelector extends Game {
 				e.printStackTrace();
 				splash = null;
 			}
-			
+
 			if (splash != null) {
 				// starts the timer to show splash screen of the game
 				splashTimer = new Timer(splash.getClass().getName(), true);
@@ -320,23 +320,23 @@ public class GameSelector extends Game {
 				// if unable - clears the rectangle of the splash screen
 				drawGameSplash(null);
 			}
-			
+
 			fireInfoChanged(String.valueOf("HI"
-					+ ScoresManager.getInstance().getHiScore(c)));
+					+ getScoresManager().getHiScore(c.getCanonicalName())));
 		} else {
 			maxNumber = 1;
 			drawGameSplash(null);
 		}
-		
+
 		// checks that the current number does not exceed the maximum number
 		if (number > maxNumber) {
 			number = 1;
 		}
 		drawNumber(number);
-		
+
 		return (c != null);
 	}
-	
+
 	/**
 	 * Displays one frame of the splash screen of the game
 	 * <p>
@@ -355,7 +355,7 @@ public class GameSelector extends Game {
 					BoardNumbers.height + 1);// y
 		}
 	}
-	
+
 	/**
 	 * Displays a letter at the top of the basic board
 	 */
@@ -365,14 +365,14 @@ public class GameSelector extends Game {
 		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
 				boardHeight - BoardLetters.height);// y
 	}
-	
+
 	/**
 	 * Displays a two numbers at the bottom of the basic board
 	 */
 	protected void drawNumber(int number) {
 		int number_1;
 		int number_2;
-		
+
 		if (number < 10) {
 			number_1 = 0;
 			number_2 = number;
@@ -380,20 +380,20 @@ public class GameSelector extends Game {
 			number_1 = number / 10;
 			number_2 = number % 10;
 		}
-		
+
 		BoardNumbers boardNumber = new BoardNumbers();
-		
+
 		// 1st number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
 		insertBoard(boardNumber, (boardWidth / 2 - BoardNumbers.width - 1),// x
 				0);// y
-		
+
 		// 2nd number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
 		insertBoard(boardNumber, (boardWidth / 2),// x
 				0);// y
 	}
-	
+
 	/**
 	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
 	 * {@code x, y}) is set a point, which gets the lower left corner of the
@@ -409,7 +409,7 @@ public class GameSelector extends Game {
 	private void insertBoard(Board boardToInsert, int x, int y) {
 		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
 	}
-	
+
 	@Override
 	public void keyPressed(KeyPressed key) {
 		switch (key) {
@@ -461,9 +461,9 @@ public class GameSelector extends Game {
 		default:
 			break;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Next allowable letter
 	 */
@@ -479,7 +479,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Next allowable number
 	 */
@@ -487,7 +487,7 @@ public class GameSelector extends Game {
 		number = (number < maxNumber) ? number + 1 : 1;
 		drawNumber(number);
 	}
-	
+
 	/**
 	 * Previous allowable letter
 	 */
@@ -503,7 +503,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Previous allowable number
 	 */
@@ -511,12 +511,12 @@ public class GameSelector extends Game {
 		number = (number > 1) ? number - 1 : maxNumber;
 		drawNumber(number);
 	}
-	
+
 	@Override
 	public void start() {
 		clearBoard();
 		clearPreview();
-		
+
 		if (drawAll()) {
 			setStatus(Status.DoSomeWork);
 		} else {
