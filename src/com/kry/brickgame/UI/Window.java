@@ -1,5 +1,6 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.UIConsts.CONTROL_BTN_SIZE;
 import static com.kry.brickgame.UI.UIConsts.DEVICE_ASPECT_RATIO;
 import static com.kry.brickgame.UI.UIConsts.INSET_BOTTOM;
@@ -47,6 +48,8 @@ public class Window extends JFrame {
 	WindowListener windowListener = new WindowAdapter() {
 		@Override
 		public void windowClosing(WindowEvent e) {
+			// save current window size
+			getSettingsManager().setSize(e.getWindow().getSize());
 			try {
 				if (CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
 					Main.getGame().keyPressed(KeyPressed.KeyOnOff);
@@ -70,8 +73,7 @@ public class Window extends JFrame {
 			Component c = e.getComponent();
 			
 			// get size in compliance with DEVICE_ASPECT_RATIO
-			Dimension size = UIUtils.getDimensionWithAspectRatio(
-					new Dimension(c.getSize().width, c.getSize().height), DEVICE_ASPECT_RATIO);
+			Dimension size = UIUtils.getDimensionWithAspectRatio(c.getSize(), DEVICE_ASPECT_RATIO);
 			
 			// check the size not less than min values
 			int width = Math.max(size.width, MIN_WIDTH);
@@ -97,6 +99,7 @@ public class Window extends JFrame {
 				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		getSettingsManager().loadProperties();
 		initialize();
 	}
 	
@@ -108,13 +111,19 @@ public class Window extends JFrame {
 		
 		setUndecorated(true);
 		
-		// set initial size of window as half of screen height
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int winHeight = screenSize.height / 2;
-		int winWidth = Math.round(winHeight * DEVICE_ASPECT_RATIO);
+		// try to load saved window size
+		Dimension windowSize = getSettingsManager().getSize();
 		
-		setSize(UIUtils.getDimensionWithAspectRatio(new Dimension(winWidth, winHeight),
-				DEVICE_ASPECT_RATIO));
+		if (windowSize == null) {
+			// set initial size of window as half of screen height
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			
+			int winHeight = screenSize.height / 2;
+			int winWidth = Math.round(winHeight * DEVICE_ASPECT_RATIO);
+			windowSize = new Dimension(winWidth, winHeight);
+		}
+		
+		setSize(UIUtils.getDimensionWithAspectRatio(windowSize, DEVICE_ASPECT_RATIO));
 		
 		// place window in the center of the screen
 		setLocationRelativeTo(null);
@@ -200,6 +209,10 @@ public class Window extends JFrame {
 		if (game == null) {
 			game = new SplashScreen();
 		}
+		// try to load saved properties
+		game.setMuted(getSettingsManager().getMuted());
+		Main.gameSelector.setRotation(getSettingsManager().getRotation());
+		
 		Main.setGame(game);
 	}
 }

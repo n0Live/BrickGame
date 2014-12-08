@@ -1,5 +1,6 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.Drawer.getDrawer;
 import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
@@ -24,28 +25,28 @@ import com.kry.brickgame.games.TetrisGameI;
 
 public class GameDrawPanel extends JPanel implements GameListener {
 	private static final long serialVersionUID = 1007369595836803061L;
-
+	
 	private final GameProperties properties;
-
+	
 	private BufferedImage canvas;
-
+	
 	private final BufferedImage backgroundImage;
 	private Dimension size;
-
+	
 	MouseInputListener resizeListener = new GameMouseListener();
-
+	
 	public GameDrawPanel() {
 		properties = new GameProperties();
 		canvas = null;
 		size = null;
-
+		
 		setBorder(new ResizableBorder());
-
+		
 		addMouseListener(resizeListener);
 		addMouseMotionListener(resizeListener);
-
+		
 		backgroundImage = UIUtils.getImage("/images/background.png");
-
+		
 		new Timer("BlinkingSquares", true).schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -57,7 +58,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 				});
 			}
 		}, 0, 10);
-
+		
 		new Timer("BlinkingPause", true).schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -69,9 +70,9 @@ public class GameDrawPanel extends JPanel implements GameListener {
 				});
 			}
 		}, 0, 500);
-
+		
 	}
-
+	
 	/**
 	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
 	 * and vice versa, for blinking "Pause" icon
@@ -85,7 +86,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		}
 		repaint();
 	}
-
+	
 	/**
 	 * Changes the {@code blinkColor} color from {@code fullColor} to
 	 * {@code emptyColor} and vice versa
@@ -98,18 +99,18 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		}
 		repaint();
 	}
-
+	
 	/* Events */
 	@Override
 	public void boardChanged(GameEvent event) {
 		properties.board = event.getBoard();
 	}
-
+	
 	@Override
 	public void exit(GameEvent event) {
 		System.exit(0);
 	}
-
+	
 	@Override
 	public void infoChanged(GameEvent event) {
 		if (event.getInfo() != null) {
@@ -119,95 +120,91 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			properties.hiScores = event.gethiScores();
 		}
 	}
-
+	
 	@Override
 	public void levelChanged(GameEvent event) {
 		properties.level = event.getLevel();
 	}
-
+	
 	@Override
 	public void muteChanged(GameEvent event) {
 		properties.mute = event.isMute();
+		// save muted state
+		getSettingsManager().setMuted(properties.mute);
 	}
-
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
+		
 		size = getSize();
 		Graphics2D g2d;
-
+		
 		// if the main canvas is not created or the size changed
 		if ((null == canvas) || (canvas.getWidth() != size.width)
 				|| (canvas.getHeight() != size.height)) {
 			// create the new main canvas
-			canvas = new BufferedImage(size.width, size.height,
-					BufferedImage.TYPE_INT_ARGB);
+			canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
 			g2d = (Graphics2D) canvas.getGraphics();
-
+			
 			g2d.setBackground(deviceBgColor);
 			g2d.clearRect(0, 0, size.width, size.height);
-
+			
 			if (backgroundImage != null) {
-				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height,
-						deviceBgColor, this);
+				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, deviceBgColor, this);
 			} else {
 				g2d.setBackground(deviceBgColor);
 				g2d.clearRect(0, 0, size.width, size.height);
 			}
-
+			
 			g2d.dispose();
 		}
-
+		
 		// TODO remove -2 +4
 		int outBorderSpace = Math.round((float) size.width / 12);
 		int inBorderHorSpace = Math.round((float) size.width / 24);
 		int inBorderVertSpace = Math.round((float) size.width / 18);
-
-		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace)
-				* 2;
-		int gameFieldHeight = Math.round(gameFieldWidth
-				* UIConsts.GAME_FIELD_ASPECT_RATIO);
-
-		BufferedImage gameField = getDrawer().getDrawnGameField(
-				gameFieldWidth + 4, gameFieldHeight + 4, properties);
-
+		
+		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace) * 2;
+		int gameFieldHeight = Math.round(gameFieldWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
+		
+		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldWidth + 4,
+				gameFieldHeight + 4, properties);
+		
 		/* Canvas graphics */
 		g2d = (Graphics2D) canvas.getGraphics();
-
-		g2d.drawImage(gameField, outBorderSpace + inBorderHorSpace - 2,
-				outBorderSpace + inBorderVertSpace - 2, gameField.getWidth(),
-				gameField.getHeight(), this);
-
+		
+		g2d.drawImage(gameField, outBorderSpace + inBorderHorSpace - 2, outBorderSpace
+				+ inBorderVertSpace - 2, gameField.getWidth(), gameField.getHeight(), this);
+		
 		g2d.dispose();
-
+		
 		/* Component graphics */
 		g2d = (Graphics2D) g.create();
-
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-
+		
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
 		g2d.drawRenderedImage(canvas, null);
 		g2d.dispose();
 	}
-
+	
 	@Override
 	public void previewChanged(GameEvent event) {
 		properties.preview = event.getPreview();
 		getDrawer().isGameWithLives = (event.getSource() instanceof GameWithLives);
 		getDrawer().isTetris = (event.getSource() instanceof TetrisGameI);
 	}
-
+	
 	@Override
 	public void rotationChanged(GameEvent event) {
 		properties.rotation = event.getRotation();
 	}
-
+	
 	@Override
 	public void speedChanged(GameEvent event) {
 		properties.speed = event.getSpeed();
 	}
-
+	
 	@Override
 	public void statusChanged(GameEvent event) {
 		properties.status = event.getStatus();

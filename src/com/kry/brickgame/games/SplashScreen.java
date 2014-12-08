@@ -189,7 +189,7 @@ public class SplashScreen extends Game {
 			;// wait
 		}
 		
-		Main.setGame(Main.gameSelector = new GameSelector());
+		Main.setGame(Main.gameSelector.reset());
 	}
 	
 	/**

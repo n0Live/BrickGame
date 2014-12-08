@@ -1,7 +1,9 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.UIUtils.getBWInverted;
 import static com.kry.brickgame.UI.UIUtils.getReduced;
+import static com.kry.brickgame.UI.UIUtils.isDarkColor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -57,12 +59,14 @@ public class UIConsts {
 	/**
 	 * Device background color
 	 */
-	protected static final Color deviceBgColor = Color.gray;
+	protected static final Color deviceBgColor = getSettingsManager().getColor();
 	
 	protected static final Color lineNormalColor = getBWInverted(deviceBgColor);
 	protected static final Color lineOverColor = getReduced(lineNormalColor);
 	
-	protected static final Color resizerNormalColor = Color.white;
+	// white if dark device color or same as device color otherwise
+	protected static final Color resizerNormalColor = (isDarkColor(deviceBgColor) ? Color.white
+			: deviceBgColor);
 	protected static final Color resizerOverColor = getReduced(resizerNormalColor);
 	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
