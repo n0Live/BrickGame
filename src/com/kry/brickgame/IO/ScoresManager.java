@@ -17,12 +17,28 @@ public class ScoresManager {
 	/**
 	 * Name of file containing the high scores
 	 */
-	private final String HI_SCORE_FILE = "hiscores.dat";
+	private final static String HI_SCORE_FILE = "hiscores.dat";
 	/**
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static ScoresManager instance;
-
+	
+	/**
+	 * Delete a high scores file.
+	 * 
+	 * @return {@code true} if success; {@code false} otherwise
+	 */
+	private static boolean deleteScores() {
+		File hiScoreFile = new File(HI_SCORE_FILE);
+		if (hiScoreFile.exists()) {
+			if (hiScoreFile.canWrite())
+				return hiScoreFile.delete();
+			else
+				return false;
+		} else
+			return true;
+	}
+	
 	/**
 	 * Get instance of the {@code ScoresManager}
 	 * 
@@ -34,12 +50,12 @@ public class ScoresManager {
 		}
 		return instance;
 	}
-
+	
 	/**
 	 * Comparison of the game class and high scores
 	 */
 	private Map<String, Integer> hiScores;
-
+	
 	/**
 	 * Singleton class, which manages the high scores
 	 */
@@ -48,7 +64,7 @@ public class ScoresManager {
 			hiScores = new HashMap<>();
 		}
 	}
-
+	
 	/**
 	 * Get stored high score of the specified game
 	 * 
@@ -62,7 +78,7 @@ public class ScoresManager {
 		else
 			return 0;
 	}
-
+	
 	/**
 	 * Read the high scores from the file (deserialization)
 	 * 
@@ -72,29 +88,28 @@ public class ScoresManager {
 	private boolean loadScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
 		if (hiScoreFile.exists()) {
-
-			try (ObjectInputStream in = new ObjectInputStream(
-					new FileInputStream(hiScoreFile))) {
-				try {
-					hiScores = (HashMap<String, Integer>) in.readObject();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
+			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(hiScoreFile))) {
+				hiScores = (HashMap<String, Integer>) in.readObject();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				// delete corrupted file
+				deleteScores();
+				return false;
 			} catch (IOException e) {
+				e.printStackTrace();
 				return false;
 			}
 			return true;
 		} else
 			return false;
 	}
-
+	
 	/**
 	 * Write the high scores to the file (serialization)
 	 */
 	private void saveScores() {
 		File hiScoreFile = new File(HI_SCORE_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new FileOutputStream(hiScoreFile))) {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(hiScoreFile))) {
 			out.writeObject(hiScores);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -102,7 +117,7 @@ public class ScoresManager {
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Set the high score of the specified game when it more then previously
 	 * stored value.
@@ -126,5 +141,5 @@ public class ScoresManager {
 		} else
 			return prevScore;
 	}
-
+	
 }
