@@ -40,8 +40,13 @@ public class GameLoader {
 		if (savedGameFile.exists()) {
 			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(savedGameFile))) {
 				return (Game) in.readObject();
-			} catch (Exception e) {
+			} catch (IOException e) {
 				e.printStackTrace();
+				return null;
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				// delete corrupted file
+				deleteSavedGame();
 				return null;
 			}
 		}
