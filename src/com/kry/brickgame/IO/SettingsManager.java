@@ -27,6 +27,7 @@ public class SettingsManager {
 		defaults.put("muted", Boolean.FALSE.toString());
 		defaults.put("rotation", Rotation.Clockwise.toString());
 		defaults.put("color", colorToHexString(Color.gray));
+		defaults.put("exit_confirmation", Boolean.TRUE.toString());
 	}
 	
 	/**
@@ -106,6 +107,21 @@ public class SettingsManager {
 			e.printStackTrace();
 			properties.remove("color");
 			return hexStringToColor(defaults.getProperty("color"));
+		}
+	}
+	
+	/**
+	 * Returns the saved "exit_confirmation" property
+	 * 
+	 * @return {@code boolean} exit confirmation
+	 */
+	public boolean getExitConfirmation() {
+		try {
+			return Boolean.valueOf(properties.getProperty("exit_confirmation"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			properties.remove("exit_confirmation");
+			return Boolean.valueOf(defaults.getProperty("exit_confirmation"));
 		}
 	}
 	
@@ -222,6 +238,17 @@ public class SettingsManager {
 	 */
 	public void setColor(Color c) {
 		properties.setProperty("color", colorToHexString(c));
+		saveProperties(true);
+	}
+	
+	/**
+	 * Sets and saves the "exit_confirmation" property
+	 * 
+	 * @param needConfirmation
+	 *            need to exit confirmation
+	 */
+	public void setExitConfirmation(boolean needConfirmation) {
+		properties.setProperty("exit_confirmation", String.valueOf(needConfirmation));
 		saveProperties(true);
 	}
 	

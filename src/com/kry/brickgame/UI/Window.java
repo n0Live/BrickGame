@@ -51,7 +51,8 @@ public class Window extends JFrame {
 			// save current window size
 			getSettingsManager().setSize(e.getWindow().getSize());
 			try {
-				if (CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
+				if (!getSettingsManager().getExitConfirmation()
+						|| CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
 					Main.getGame().keyPressed(KeyPressed.KeyOnOff);
 				}
 			} catch (Exception exp) {
