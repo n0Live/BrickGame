@@ -62,6 +62,9 @@ public class UIConsts {
 	protected static final Color lineNormalColor = getBWInverted(deviceBgColor);
 	protected static final Color lineOverColor = getReduced(lineNormalColor);
 	
+	protected static final Color resizerNormalColor = Color.white;
+	protected static final Color resizerOverColor = getReduced(resizerNormalColor);
+	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
 	
