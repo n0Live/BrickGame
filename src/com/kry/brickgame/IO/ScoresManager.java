@@ -21,7 +21,7 @@ public class ScoresManager {
 	/**
 	 * Single instance of the {@code ScoresManager}
 	 */
-	private static ScoresManager singleton;
+	private static ScoresManager instance;
 
 	/**
 	 * Get instance of the {@code ScoresManager}
@@ -29,10 +29,10 @@ public class ScoresManager {
 	 * @return instance of the {@code ScoresManager}
 	 */
 	public static ScoresManager getScoresManager() {
-		if (null == singleton) {
-			singleton = new ScoresManager();
+		if (null == instance) {
+			instance = new ScoresManager();
 		}
-		return singleton;
+		return instance;
 	}
 
 	/**
