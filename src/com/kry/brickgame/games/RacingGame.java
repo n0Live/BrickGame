@@ -22,7 +22,7 @@ import com.kry.brickgame.splashes.Splash;
 /**
  * @author noLive
  */
-public class RaceGame extends GameWithLives {
+public class RacingGame extends GameWithLives {
 	private static final long serialVersionUID = 4304043854809432310L;
 	/**
 	 * Animated splash for game
@@ -78,7 +78,7 @@ public class RaceGame extends GameWithLives {
 	 *            <li>race with three possible positions of the car, the board
 	 *            is upside down;
 	 */
-	public RaceGame(int speed, int level, int type) {
+	public RacingGame(int speed, int level, int type) {
 		super(speed, level, type);
 		
 		car = new CarShape();
