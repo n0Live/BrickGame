@@ -194,8 +194,6 @@ public abstract class Game extends Thread implements Serializable {
 
 		setDrawInvertedBoard(false);
 
-		setScore(0);
-
 		curX = 0;
 		curY = 0;
 
@@ -495,7 +493,7 @@ public abstract class Game extends Thread implements Serializable {
 	protected int getHiScore() {
 		return getScoresManager()
 				.getHiScore(
-				this.getClass().getCanonicalName());
+						this.getClass().getCanonicalName());
 	}
 
 	/**
