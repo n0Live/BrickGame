@@ -191,8 +191,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void previewChanged(GameEvent event) {
 		properties.preview = event.getPreview();
-		getDrawer().isGameWithLives = (event.getSource() instanceof GameWithLives);
-		getDrawer().isTetris = (event.getSource() instanceof TetrisGameI);
+		getDrawer().showLives = (event.getSource() instanceof GameWithLives);
+		getDrawer().showNext = (event.getSource() instanceof TetrisGameI);
 	}
 	
 	@Override
