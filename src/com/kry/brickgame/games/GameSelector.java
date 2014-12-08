@@ -33,163 +33,35 @@ public class GameSelector extends Game {
 	/**
 	 * List of games with the letters associated with them
 	 */
-	private static Map<Character, Class> gamesList;
+	private static Map<Character, String> gamesList;
 	static {
-		gamesList = new HashMap<Character, Class>();
-		try {
-			gamesList.put('A',
-					Class.forName("com.kry.brickgame.games.DanceGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('A', null);
-		}
-		try {
-			gamesList.put('B',
-					Class.forName("com.kry.brickgame.games.TanksGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('B', null);
-		}
-		try {
-			gamesList.put('C',
-					Class.forName("com.kry.brickgame.games.ArkanoidGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('C', null);
-		}
-		try {
-			gamesList.put('D',
-					Class.forName("com.kry.brickgame.games.RaceGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('D', null);
-		}
-		try {
-			gamesList
-			.put('E', Class.forName("com.kry.brickgame.games.GunGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('E', null);
-		}
-		try {
-			gamesList.put('F',
-					Class.forName("com.kry.brickgame.games.SnakeGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('F', null);
-		}
-		try {
-			gamesList.put('G',
-					Class.forName("com.kry.brickgame.games.FroggerGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('G', null);
-		}
-		try {
-			gamesList.put('H',
-					Class.forName("com.kry.brickgame.games.InvadersGame"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('H', null);
-		}
-		try {
-			gamesList.put('I',
-					Class.forName("com.kry.brickgame.games.TetrisGameI"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('I', null);
-		}
-		try {
-			gamesList.put('J',
-					Class.forName("com.kry.brickgame.games.TetrisGameJ"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('J', null);
-		}
-		try {
-			gamesList.put('K',
-					Class.forName("com.kry.brickgame.games.TetrisGameK"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('K', null);
-		}
-		try {
-			gamesList.put('L',
-					Class.forName("com.kry.brickgame.games.TetrisGameL"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('L', null);
-		}
-		try {
-			gamesList.put('M',
-					Class.forName("com.kry.brickgame.games.TetrisGameM"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('M', null);
-		}
-		try {
-			gamesList.put('N',
-					Class.forName("com.kry.brickgame.games.TetrisGameN"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('N', null);
-		}
-		try {
-			gamesList.put('O',
-					Class.forName("com.kry.brickgame.games.TetrisGameO"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('O', null);
-		}
-		try {
-			gamesList.put('P',
-					Class.forName("com.kry.brickgame.games.TetrisGameP"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('P', null);
-		}
-		try {
-			gamesList.put('Q',
-					Class.forName("com.kry.brickgame.games.PentixGameQ"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('Q', null);
-		}
-		try {
-			gamesList.put('R',
-					Class.forName("com.kry.brickgame.games.PentixGameR"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('R', null);
-		}
-		try {
-			gamesList.put('S',
-					Class.forName("com.kry.brickgame.games.PentixGameS"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('S', null);
-		}
-		try {
-			gamesList.put('T',
-					Class.forName("com.kry.brickgame.games.PentixGameT"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('T', null);
-		}
-		try {
-			gamesList.put('U',
-					Class.forName("com.kry.brickgame.games.PentixGameU"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('U', null);
-		}
-		try {
-			gamesList.put('V',
-					Class.forName("com.kry.brickgame.games.PentixGameV"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('V', null);
-		}
-		try {
-			gamesList.put('W',
-					Class.forName("com.kry.brickgame.games.PentixGameW"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('W', null);
-		}
-		try {
-			gamesList.put('X',
-					Class.forName("com.kry.brickgame.games.PentixGameX"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('X', null);
-		}
-		try {
-			gamesList.put('Y', Class.forName("com.kry.brickgame.games.???"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('Y', null);
-		}
-		try {
-			gamesList.put('Z', Class.forName("com.kry.brickgame.games.???"));
-		} catch (ClassNotFoundException e) {
-			gamesList.put('Z', null);
-		}
+		gamesList = new HashMap<Character, String>();
+		gamesList.put('A', "com.kry.brickgame.games.DanceGame");
+		gamesList.put('B', "com.kry.brickgame.games.TanksGame");
+		gamesList.put('C', "com.kry.brickgame.games.ArkanoidGame");
+		gamesList.put('D', "com.kry.brickgame.games.RacingGame");
+		gamesList.put('E', "com.kry.brickgame.games.GunGame");
+		gamesList.put('F', "com.kry.brickgame.games.SnakeGame");
+		gamesList.put('G', "com.kry.brickgame.games.FroggerGame");
+		gamesList.put('H', "com.kry.brickgame.games.InvadersGame");
+		gamesList.put('I', "com.kry.brickgame.games.TetrisGameI");
+		gamesList.put('J', "com.kry.brickgame.games.TetrisGameJ");
+		gamesList.put('K', "com.kry.brickgame.games.TetrisGameK");
+		gamesList.put('L', "com.kry.brickgame.games.TetrisGameL");
+		gamesList.put('M', "com.kry.brickgame.games.TetrisGameM");
+		gamesList.put('N', "com.kry.brickgame.games.TetrisGameN");
+		gamesList.put('O', "com.kry.brickgame.games.TetrisGameO");
+		gamesList.put('P', "com.kry.brickgame.games.TetrisGameP");
+		gamesList.put('Q', "com.kry.brickgame.games.PentixGameQ");
+		gamesList.put('R', "com.kry.brickgame.games.PentixGameR");
+		gamesList.put('S', "com.kry.brickgame.games.PentixGameS");
+		gamesList.put('T', "com.kry.brickgame.games.PentixGameT");
+		gamesList.put('U', "com.kry.brickgame.games.PentixGameU");
+		gamesList.put('V', "com.kry.brickgame.games.PentixGameV");
+		gamesList.put('W', "com.kry.brickgame.games.PentixGameW");
+		gamesList.put('X', "com.kry.brickgame.games.PentixGameX");
+		gamesList.put('Y', "com.kry.brickgame.games.???");
+		gamesList.put('Z', "com.kry.brickgame.games.???");
 	}
 
 	/**
@@ -279,9 +151,9 @@ public class GameSelector extends Game {
 
 		drawLetter(letter);
 
-		c = gamesList.get(letter);
+		try {
+			c = (Class<Game>) Class.forName(gamesList.get(letter));
 
-		if (c != null) {
 			// trying to get number of subtypes from the class of the game
 			try {
 				maxNumber = c.getField("subtypesNumber").getInt(c);
@@ -321,9 +193,12 @@ public class GameSelector extends Game {
 				drawGameSplash(null);
 			}
 
+			// show high scores
 			fireInfoChanged(String.valueOf("HI"
 					+ getScoresManager().getHiScore(c.getCanonicalName())));
-		} else {
+
+		} catch (ClassNotFoundException e) {
+			c = null;
 			maxNumber = 1;
 			drawGameSplash(null);
 		}
