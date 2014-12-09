@@ -135,6 +135,8 @@ public class GameSelector extends Game {
 				}
 				// starts the selected game
 				Main.setGame(game);
+			} catch (RuntimeException e) {
+				throw e;
 			} catch (Exception e) {
 				setStatus(Status.ComingSoon);
 			}
