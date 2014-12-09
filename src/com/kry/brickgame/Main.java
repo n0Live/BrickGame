@@ -14,7 +14,7 @@ import com.kry.brickgame.games.GameSelector;
  * @since 01.08.2014
  */
 public final class Main {
-	
+
 	/**
 	 * The current game
 	 */
@@ -26,16 +26,16 @@ public final class Main {
 	/**
 	 * The selection screen of a game
 	 */
-	public static GameSelector gameSelector = new GameSelector();
+	public static final GameSelector gameSelector = new GameSelector();
 	/**
 	 * Observer to {@code KeyEvent}
 	 */
-	public static GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
-	
+	public static final GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
+
 	public static Game getGame() {
 		return game;
 	}
-	
+
 	/**
 	 * Launch the application
 	 */
@@ -52,11 +52,11 @@ public final class Main {
 			}
 		});
 	}
-	
+
 	public static void setGame(Game game) {
 		Main.game = game;
 		gameThread = new Thread(game, "TGameThread");
 		gameThread.start();
 	}
-	
+
 }
