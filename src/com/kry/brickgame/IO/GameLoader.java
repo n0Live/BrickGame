@@ -1,8 +1,6 @@
 package com.kry.brickgame.IO;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,48 +9,43 @@ import com.kry.brickgame.games.Game;
 import com.kry.brickgame.games.GameSelector;
 import com.kry.brickgame.games.SplashScreen;
 
+/**
+ * @author User
+ */
 public class GameLoader {
 	private final static String SAVED_GAME_FILE = "lastgame.sav";
-	
+
 	/**
 	 * Delete a file of the saved game.
 	 * 
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public static boolean deleteSavedGame() {
-		File savedGameFile = new File(SAVED_GAME_FILE);
-		if (savedGameFile.exists()) {
-			if (savedGameFile.canWrite())
-				return savedGameFile.delete();
-			else
-				return false;
-		} else
-			return true;
+		return IOUtils.deleteFile(SAVED_GAME_FILE);
 	}
-	
+
 	/**
 	 * Load the saved game from a file.
 	 * 
 	 * @return {@code Game} if success; {@code null} otherwise
 	 */
 	public static Game loadGame() {
-		File savedGameFile = new File(SAVED_GAME_FILE);
-		if (savedGameFile.exists()) {
-			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(savedGameFile))) {
-				return (Game) in.readObject();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				// delete corrupted file
-				deleteSavedGame();
-				return null;
-			}
+		try (ObjectInputStream in = new ObjectInputStream(
+				IOUtils.getInputStream(SAVED_GAME_FILE))) {
+			return (Game) in.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			// delete corrupted file
+			deleteSavedGame();
+			return null;
+		} catch (FileNotFoundException e) {
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
-	
+
 	/**
 	 * Save the game to a file.
 	 * 
@@ -61,16 +54,16 @@ public class GameLoader {
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public static <T extends Game> boolean saveGame(T game) {
-		if (game instanceof GameSelector || game instanceof SplashScreen) return false;
-		
-		File savedGameFile = new File(SAVED_GAME_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(savedGameFile))) {
+		if (game instanceof GameSelector || game instanceof SplashScreen)
+			return false;
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				IOUtils.getOutputStream(SAVED_GAME_FILE))) {
 			out.writeObject(game);
+			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		return true;
 	}
-	
+
 }

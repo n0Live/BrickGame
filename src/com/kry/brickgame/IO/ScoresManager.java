@@ -1,9 +1,6 @@
 package com.kry.brickgame.IO;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,23 +19,16 @@ public class ScoresManager {
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static ScoresManager instance;
-	
+
 	/**
 	 * Delete a high scores file.
 	 * 
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	private static boolean deleteScores() {
-		File hiScoreFile = new File(HI_SCORE_FILE);
-		if (hiScoreFile.exists()) {
-			if (hiScoreFile.canWrite())
-				return hiScoreFile.delete();
-			else
-				return false;
-		} else
-			return true;
+		return IOUtils.deleteFile(HI_SCORE_FILE);
 	}
-	
+
 	/**
 	 * Get instance of the {@code ScoresManager}
 	 * 
@@ -50,12 +40,12 @@ public class ScoresManager {
 		}
 		return instance;
 	}
-	
+
 	/**
 	 * Comparison of the game class and high scores
 	 */
 	private Map<String, Integer> hiScores;
-	
+
 	/**
 	 * Singleton class, which manages the high scores
 	 */
@@ -64,7 +54,7 @@ public class ScoresManager {
 			hiScores = new HashMap<>();
 		}
 	}
-	
+
 	/**
 	 * Get stored high score of the specified game
 	 * 
@@ -78,7 +68,7 @@ public class ScoresManager {
 		else
 			return 0;
 	}
-	
+
 	/**
 	 * Read the high scores from the file (deserialization)
 	 * 
@@ -86,38 +76,39 @@ public class ScoresManager {
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean loadScores() {
-		File hiScoreFile = new File(HI_SCORE_FILE);
-		if (hiScoreFile.exists()) {
-			try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(hiScoreFile))) {
-				hiScores = (HashMap<String, Integer>) in.readObject();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				// delete corrupted file
-				deleteScores();
-				return false;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
+		try (ObjectInputStream in = new ObjectInputStream(
+				IOUtils.getInputStream(HI_SCORE_FILE))) {
+			hiScores = (HashMap<String, Integer>) in.readObject();
 			return true;
-		} else
-			return false;
-	}
-	
-	/**
-	 * Write the high scores to the file (serialization)
-	 */
-	private void saveScores() {
-		File hiScoreFile = new File(HI_SCORE_FILE);
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(hiScoreFile))) {
-			out.writeObject(hiScores);
-		} catch (FileNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			// delete corrupted file
+			deleteScores();
+			return false;
+		} catch (FileNotFoundException e) {
+			return false;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
-	
+
+	/**
+	 * Write the high scores to the file (serialization)
+	 * 
+	 * @return {@code true} if success; {@code false} otherwise
+	 */
+	private boolean saveScores() {
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				IOUtils.getOutputStream(HI_SCORE_FILE))) {
+			out.writeObject(hiScores);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	/**
 	 * Set the high score of the specified game when it more then previously
 	 * stored value.
@@ -141,5 +132,5 @@ public class ScoresManager {
 		} else
 			return prevScore;
 	}
-	
+
 }

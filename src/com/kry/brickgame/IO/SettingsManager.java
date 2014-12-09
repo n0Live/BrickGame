@@ -3,8 +3,7 @@ package com.kry.brickgame.IO;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,6 +26,7 @@ public class SettingsManager {
 		defaults.put("muted", Boolean.FALSE.toString());
 		defaults.put("rotation", Rotation.Clockwise.toString());
 		defaults.put("color", colorToHexString(Color.gray));
+		defaults.put("exit_confirmation", Boolean.TRUE.toString());
 	}
 
 	/**
@@ -68,14 +68,7 @@ public class SettingsManager {
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public static boolean deleteSettingsFile() {
-		File propertiesFile = new File(PROPERTIES_FILE);
-		if (propertiesFile.exists()) {
-			if (propertiesFile.canWrite())
-				return propertiesFile.delete();
-			else
-				return false;
-		} else
-			return true;
+		return IOUtils.deleteFile(PROPERTIES_FILE);
 	}
 
 	/**
@@ -106,6 +99,21 @@ public class SettingsManager {
 			e.printStackTrace();
 			properties.remove("color");
 			return hexStringToColor(defaults.getProperty("color"));
+		}
+	}
+
+	/**
+	 * Returns the saved "exit_confirmation" property
+	 * 
+	 * @return {@code boolean} exit confirmation
+	 */
+	public boolean getExitConfirmation() {
+		try {
+			return Boolean.valueOf(properties.getProperty("exit_confirmation"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			properties.remove("exit_confirmation");
+			return Boolean.valueOf(defaults.getProperty("exit_confirmation"));
 		}
 	}
 
@@ -167,19 +175,15 @@ public class SettingsManager {
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public boolean loadProperties() {
-		File propertiesFile = new File(PROPERTIES_FILE);
-		if (propertiesFile.exists()) {
-			InputStream in;
-			try {
-				in = new FileInputStream(propertiesFile);
-				properties.loadFromXML(in);
-				return true;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		} else
+		try (InputStream in = IOUtils.getInputStream(PROPERTIES_FILE)) {
+			properties.loadFromXML(in);
+			return true;
+		} catch (FileNotFoundException e) {
 			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	/**
@@ -201,9 +205,7 @@ public class SettingsManager {
 	public boolean saveProperties(boolean inExistFileOnly) {
 		File propertiesFile = new File(PROPERTIES_FILE);
 		if (!inExistFileOnly || propertiesFile.exists()) {
-			OutputStream os;
-			try {
-				os = new FileOutputStream(propertiesFile);
+			try (OutputStream os = IOUtils.getOutputStream(PROPERTIES_FILE)) {
 				properties.storeToXML(os, "Brick Game Settings");
 				return true;
 			} catch (IOException e) {
@@ -222,6 +224,18 @@ public class SettingsManager {
 	 */
 	public void setColor(Color c) {
 		properties.setProperty("color", colorToHexString(c));
+		saveProperties(true);
+	}
+
+	/**
+	 * Sets and saves the "exit_confirmation" property
+	 * 
+	 * @param needConfirmation
+	 *            need to exit confirmation
+	 */
+	public void setExitConfirmation(boolean needConfirmation) {
+		properties.setProperty("exit_confirmation",
+				String.valueOf(needConfirmation));
 		saveProperties(true);
 	}
 
