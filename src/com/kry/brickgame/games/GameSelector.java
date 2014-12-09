@@ -91,7 +91,7 @@ public class GameSelector extends Game {
 	/**
 	 * Timer for the splash screen of the game
 	 */
-	private Timer splashTimer;
+	transient private Timer splashTimer;
 
 	public GameSelector() {
 		super();

@@ -1,5 +1,7 @@
 package com.kry.brickgame.UI;
 
+import java.io.Serializable;
+
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
@@ -9,7 +11,9 @@ import com.kry.brickgame.games.GameConsts.Status;
  * 
  * @author noLive
  */
-public class GameProperties {
+public class GameProperties implements Serializable {
+	private static final long serialVersionUID = 8838905157373710196L;
+
 	protected Board board;
 	protected Board preview;
 	protected Status status;
@@ -19,7 +23,7 @@ public class GameProperties {
 	protected int level;
 	protected Rotation rotation;
 	protected boolean mute;
-	
+
 	protected GameProperties() {
 		board = null;
 		preview = null;
@@ -31,5 +35,5 @@ public class GameProperties {
 		rotation = null;
 		mute = false;
 	}
-	
+
 }
