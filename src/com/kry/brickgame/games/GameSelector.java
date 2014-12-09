@@ -84,12 +84,18 @@ public class GameSelector extends Game {
 	private Class<Game> c;
 
 	/**
+	 * Animated splash for a game
+	 */
+	private Splash splash;
+
+	/**
 	 * Timer for the splash screen of the game
 	 */
 	private Timer splashTimer;
 
 	public GameSelector() {
 		super();
+		splash = null;
 		restart();
 	}
 

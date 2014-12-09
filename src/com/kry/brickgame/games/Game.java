@@ -30,7 +30,6 @@ import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.games.GameUtils.Music;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -38,10 +37,6 @@ import com.kry.brickgame.splashes.Splash;
 public abstract class Game extends Thread implements Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 
-	/**
-	 * Animated splash for game
-	 */
-	public static Splash splash;
 	/**
 	 * Number of subtypes
 	 */
@@ -67,15 +62,6 @@ public abstract class Game extends Thread implements Serializable {
 
 	public static synchronized GameListener[] getGameListeners() {
 		return listeners.toArray(new GameListener[listeners.size()]);
-	}
-
-	/**
-	 * Get the splash screen for game
-	 * 
-	 * @return the splash
-	 */
-	protected static Splash getSplash() {
-		return splash;
 	}
 
 	protected static boolean isMuted() {
