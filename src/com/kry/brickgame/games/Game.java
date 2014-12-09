@@ -399,8 +399,6 @@ public abstract class Game extends Thread implements Serializable {
 		Main.gameSelector.setLevel(level);
 		
 		Thread.currentThread().interrupt();
-		// show default rotation
-		Main.gameSelector.fireRotationChanged(Main.gameSelector.getRotation());
 		Main.setGame(Main.gameSelector);
 	}
 	
