@@ -150,8 +150,8 @@ public class DanceGame extends Game {
 	}
 
 	// change speed from the original
-	private final int FIRST_LEVEL_SPEED = 300;
-	private final int TENTH_LEVEL_SPEED = 80;
+	private static final int FIRST_LEVEL_SPEED = 300;
+	private static final int TENTH_LEVEL_SPEED = 80;
 
 	/**
 	 * Dance positions

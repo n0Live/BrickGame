@@ -106,8 +106,8 @@ public class InvadersGame extends GameWithGun {
 	private final int startX;
 
 	// increase speed from the original
-	private final int FIRST_LEVEL_SPEED = 300;
-	private final int TENTH_LEVEL_SPEED = 50;
+	private static final int FIRST_LEVEL_SPEED = 300;
+	private static final int TENTH_LEVEL_SPEED = 50;
 
 	/**
 	 * The Invaders Game
