@@ -10,15 +10,15 @@ public class TankShape extends CoordinatedShape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private static int[][][] charactersTable = new int[][][] {//
-	// 0 - tank
-			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
-					{ 0, 1 } },
+		// 0 - tank
+		{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
+			{ 0, 1 } },
 			// 1 - enemy tank
 			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
 			// 2 - tank in box (for check)
 			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
-					{ -1, 1 }, { 0, 1 }, { 1, 1 } } }; //
-	
+				{ -1, 1 }, { 0, 1 }, { 1, 1 } } }; //
+
 	/**
 	 * Constructor for the Tank
 	 * 
@@ -29,7 +29,7 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(int type) {
 		super(type, charactersTable[type].length);
 	}
-	
+
 	/**
 	 * Copy constructor of the tank
 	 * 
@@ -39,16 +39,16 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(TankShape aTank) {
 		super(aTank);
 	}
-	
+
 	@Override
 	public TankShape clone() {
-		TankShape newTank = new TankShape(this);
-		return newTank;
+		super.clone();
+		return new TankShape(this);
 	}
-	
+
 	@Override
 	protected int[][][] getCharactersTable() {
 		return charactersTable;
 	}
-	
+
 }
