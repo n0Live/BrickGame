@@ -556,6 +556,31 @@ public class TetrisShape extends Shape {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Arrays.hashCode(boardFill);
+		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TetrisShape other = (TetrisShape) obj;
+		if (!Arrays.equals(boardFill, other.boardFill))
+			return false;
+		if (shape != other.shape)
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		// the figure and its rotation angle
 		return "TetrisShape [" + getShape() + ", " + getRotationAngle()

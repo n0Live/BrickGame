@@ -8,34 +8,34 @@ public class BricksWall extends Board {
 	private static final long serialVersionUID = -5524132721347429556L;
 
 	static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
-		{ // 1
-		{ E, F, E, F, E, E, F, E, F, E },
-		{ E, E, F, E, E, E, E, F, E, E },//
-		{ E, F, F, F, E, E, F, F, F, E },
-		{ F, F, F, F, F, F, F, F, F, F },
-		{ F, F, F, E, F, F, E, F, F, F },
-		{ E, F, F, F, F, F, F, F, F, E },
-		{ E, E, F, F, F, F, F, F, E, E },
-		{ E, E, E, F, F, F, F, E, E, E }, },//
-		{// 2
-			{ F, F, F, F, F, F, F, F, F, F },
-			{ F, F, F, F, F, F, F, F, F, F },//
-			{ F, F, F, F, F, F, F, F, F, F },
-			{ E, F, F, F, F, F, F, F, F, E },
-			{ E, F, F, F, F, F, F, F, F, E },
-			{ E, E, E, F, F, F, F, E, E, E },
-			{ E, E, E, F, F, F, F, E, E, E }, },//
+			{ // 1
+					{ E, F, E, F, E, E, F, E, F, E },
+					{ E, E, F, E, E, E, E, F, E, E },//
+					{ E, F, F, F, E, E, F, F, F, E },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, E, F, F, E, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, E, E, F, F, F, F, E, E, E }, },//
+			{// 2
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, E, F, F, F, F, E, E, E },
+					{ E, E, E, F, F, F, F, E, E, E }, },//
 
 			{// 3
-				{ F, F, F, F, F, F, F, F, F, F },
-				{ E, F, F, F, F, F, F, F, F, E },//
-				{ E, F, F, F, E, E, F, F, F, E },
-				{ F, F, F, F, F, F, F, F, F, F },
-				{ F, F, F, F, F, F, F, F, F, F },
-				{ E, F, F, F, E, E, F, F, F, E },
-				{ E, F, F, F, F, F, F, F, F, E },
-				{ F, F, F, F, F, F, F, F, F, F }, },//
-				{// 4
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ E, F, F, F, E, E, F, F, F, E },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, F, F, F, E, E, F, F, F, E },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ F, F, F, F, F, F, F, F, F, F }, },//
+			{// 4
 					{ E, F, F, F, F, F, F, F, F, E },
 					{ F, E, F, F, F, F, F, F, E, F },//
 					{ F, F, E, F, F, F, F, E, F, F },
@@ -44,59 +44,59 @@ public class BricksWall extends Board {
 					{ F, E, F, F, F, F, F, F, E, F },
 					{ E, F, F, F, F, F, F, F, F, E }, },//
 
-					{// 5
-						{ F, F, F, F, F, F, F, F, F, F },
-						{ E, F, F, F, F, F, F, F, F, E },//
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, E, F, F, F, F, F, F, E, E },
-						{ E, F, F, F, F, F, F, F, F, E },
-						{ F, F, F, F, F, F, F, F, F, F }, },//
-						{// 6
-							{ F, F, E, F, F, F, F, E, F, F },
-							{ F, E, F, F, E, E, F, F, E, F },//
-							{ E, E, F, E, F, F, E, F, E, E },
-							{ E, F, F, F, F, F, F, F, F, E },
-							{ F, F, F, F, E, E, F, F, F, F },
-							{ F, F, F, F, E, E, F, F, F, F },
-							{ E, F, F, F, F, F, F, F, F, E },
-							{ E, E, F, F, F, F, F, F, E, E }, },//
-							{// 7
-								{ F, E, E, F, E, E, F, E, E, F },
-								{ F, E, F, F, F, F, F, F, E, F },//
-								{ F, E, F, F, F, F, F, F, E, F },
-								{ F, F, F, F, F, F, F, F, F, F },
-								{ F, F, F, F, F, F, F, F, F, F },
-								{ F, E, F, F, F, F, F, F, E, F },
-								{ F, E, F, F, F, F, F, F, E, F },
-								{ F, E, E, F, E, E, F, E, E, F }, },//
-								{// 8
-									{ E, E, F, F, F, F, F, F, E, E },
-									{ E, F, F, F, F, F, F, F, F, E },//
-									{ F, F, F, F, F, F, F, F, F, F },
-									{ E, E, F, E, F, F, E, F, E, E },
-									{ E, F, E, E, F, F, E, E, F, E },
-									{ F, F, F, F, F, F, F, F, F, F },
-									{ E, F, F, F, F, F, F, F, F, E },
-									{ E, E, F, F, F, F, F, F, E, E }, },//
-									{ // 9
-										{ F, F, E, E, F, F, E, E, F, F },
-										{ E, F, F, E, F, F, E, F, F, E },//
-										{ E, E, F, F, F, F, F, F, E, E },
-										{ F, F, F, F, F, F, F, F, F, F },
-										{ F, F, F, F, F, F, F, F, F, F },
-										{ E, E, F, F, F, F, F, F, E, E },
-										{ E, F, F, E, F, F, E, F, F, E },
-										{ F, F, E, E, F, F, E, E, F, F }, },//
-										{// 10
-											{ E, E, F, F, F, F, F, F, E, E },
-											{ E, F, F, F, F, F, E, F, F, E },//
-											{ F, F, E, E, F, F, F, F, F, F },
-											{ E, F, F, E, F, F, E, E, E, E },
-											{ E, F, F, F, F, F, F, F, F, E },
-											{ E, E, F, F, F, F, F, F, E, E },
-											{ E, E, E, F, F, F, F, E, E, E },
-											{ E, E, E, E, F, F, E, E, E, E }, },//
+			{// 5
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ F, F, F, F, F, F, F, F, F, F }, },//
+			{// 6
+					{ F, F, E, F, F, F, F, E, F, F },
+					{ F, E, F, F, E, E, F, F, E, F },//
+					{ E, E, F, E, F, F, E, F, E, E },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ F, F, F, F, E, E, F, F, F, F },
+					{ F, F, F, F, E, E, F, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E }, },//
+			{// 7
+					{ F, E, E, F, E, E, F, E, E, F },
+					{ F, E, F, F, F, F, F, F, E, F },//
+					{ F, E, F, F, F, F, F, F, E, F },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, E, F, F, F, F, F, F, E, F },
+					{ F, E, F, F, F, F, F, F, E, F },
+					{ F, E, E, F, E, E, F, E, E, F }, },//
+			{// 8
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, E, F, E, F, F, E, F, E, E },
+					{ E, F, E, E, F, F, E, E, F, E },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E }, },//
+			{ // 9
+					{ F, F, E, E, F, F, E, E, F, F },
+					{ E, F, F, E, F, F, E, F, F, E },//
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, F, F, F, F, F, F, F },
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, F, F, E, F, F, E, F, F, E },
+					{ F, F, E, E, F, F, E, E, F, F }, },//
+			{// 10
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, F, F, F, F, F, E, F, F, E },//
+					{ F, F, E, E, F, F, F, F, F, F },
+					{ E, F, F, E, F, F, E, E, E, E },
+					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, E, E, F, F, F, F, E, E, E },
+					{ E, E, E, E, F, F, E, E, E, E }, },//
 	};
 
 	/**
@@ -156,10 +156,23 @@ public class BricksWall extends Board {
 			setCell(Cell.Empty, x, y);
 			// decrease bricks count
 			setBricksCount(getBricksCount() - 1);
-
 			return true;
-		} else
+		}
+		return false;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
 			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BricksWall other = (BricksWall) obj;
+		if (bricksCount != other.bricksCount)
+			return false;
+		return true;
 	}
 
 	/**
@@ -205,6 +218,14 @@ public class BricksWall extends Board {
 
 	public int getBricksCount() {
 		return bricksCount;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + bricksCount;
+		return result;
 	}
 
 	public void setBricksCount(int bricksCount) {
