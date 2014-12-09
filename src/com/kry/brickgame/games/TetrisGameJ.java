@@ -16,7 +16,7 @@ public class TetrisGameJ extends TetrisGameI {
 
 	private static final int TIME_BETWEEN_ADDING_LINE = 30;
 	private volatile int time;
-	private volatile boolean isTimeToAddLine;
+	volatile boolean isTimeToAddLine;
 
 	/**
 	 * The Tetris with the addition of new lines every few seconds
@@ -40,11 +40,11 @@ public class TetrisGameJ extends TetrisGameI {
 		}
 	}
 
-	private synchronized int getTime() {
+	synchronized int getTime() {
 		return time;
 	}
 
-	private synchronized void setTime(int time) {
+	synchronized void setTime(int time) {
 		this.time = time;
 	}
 
@@ -78,8 +78,8 @@ public class TetrisGameJ extends TetrisGameI {
 			// the current y-coordinate lifts by one cell upward
 			curY++;
 			return true;
-		} else
-			return false;
+		}
+		return false;
 	}
 
 }

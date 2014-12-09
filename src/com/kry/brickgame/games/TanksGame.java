@@ -317,8 +317,7 @@ public class TanksGame extends GameWithLives {
 		Bullet result = checkCollisionWithBullets(bullet, enemyBullets);
 		if (result != null)
 			return result;
-		else
-			return checkCollisionWithBullets(bullet, playerBullets);
+		return checkCollisionWithBullets(bullet, playerBullets);
 	}
 
 	/**
@@ -331,10 +330,9 @@ public class TanksGame extends GameWithLives {
 	private boolean checkCollisionWithTank(Bullet bullet, boolean isPlayerTank) {
 		if (isPlayerTank)
 			return checkTwoShapeCollision(playerTank, bullet);
-		else {
-			for (TankShape enemyTank : enemyTanks) {
-				if (checkTwoShapeCollision(enemyTank, bullet)) return true;
-			}
+		for (TankShape enemyTank : enemyTanks) {
+			if (checkTwoShapeCollision(enemyTank, bullet))
+				return true;
 		}
 		return false;
 	}
@@ -555,7 +553,7 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Processing the flight of bullets
 	 */
-	private void flightOfBullets() {
+	void flightOfBullets() {
 		for (int i = 0; i < enemyBullets.length(); i++) {
 			if (!flightOfBullet(enemyBullets.get(i), false)) return;
 		}

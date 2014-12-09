@@ -9,10 +9,10 @@ public final class GameConsts {
 	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyOnOff
 	};
-	
+
 	public static enum Rotation {
 		None, Clockwise, Counterclockwise;
-		
+
 		/**
 		 * Get the next rotation
 		 * <p>
@@ -24,23 +24,22 @@ public final class GameConsts {
 			// if None then getNext() return None
 			if (this == Rotation.None)
 				return this;
-			else
-				return ordinal() < Rotation.values().length - 1 ? Rotation
-						.values()[ordinal() + 1] : Rotation.values()[1];
+			return ordinal() < Rotation.values().length - 1 ? Rotation.values()[ordinal() + 1]
+					: Rotation.values()[1];
 		}
 	};
-	
+
 	public static enum Status {
 		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
 	};
-	
+
 	// ** Direction constants **
 	protected static final RotationAngle UP = RotationAngle.d0;
 	protected static final RotationAngle DOWN = RotationAngle.d180;
 	protected static final RotationAngle RIGHT = RotationAngle.d90;
 	protected static final RotationAngle LEFT = RotationAngle.d270;
 	// **
-	
+
 	/**
 	 * Width of the default board ({@value} )
 	 */
@@ -61,7 +60,7 @@ public final class GameConsts {
 	 * Animation delay in milliseconds
 	 */
 	protected static final int ANIMATION_DELAY = 30;
-	
+
 	// ** anumatedClearBoard constants **
 	protected static final int CB_GAME_OVER = 6000;
 	protected static final int CB_WIN = 5240;

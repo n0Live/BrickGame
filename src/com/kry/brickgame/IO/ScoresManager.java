@@ -65,8 +65,7 @@ public class ScoresManager {
 	public int getHiScore(String className) {
 		if (hiScores.containsKey(className))
 			return hiScores.get(className);
-		else
-			return 0;
+		return 0;
 	}
 
 	/**
@@ -129,8 +128,8 @@ public class ScoresManager {
 			hiScores.put(className, score);
 			saveScores();
 			return score;
-		} else
-			return prevScore;
+		}
+		return prevScore;
 	}
 
 }

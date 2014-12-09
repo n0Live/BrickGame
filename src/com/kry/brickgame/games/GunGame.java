@@ -44,7 +44,7 @@ public class GunGame extends GameWithGun {
 	 * {@code true} - the shot creates a new cell, {@code false} - the shot
 	 * destroys a cell
 	 */
-	private final boolean isCreationMode;
+	final boolean isCreationMode;
 
 	/**
 	 * Number of barrels

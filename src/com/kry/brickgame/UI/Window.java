@@ -211,7 +211,7 @@ public class Window extends JFrame {
 			game = new SplashScreen();
 		}
 		// try to load saved properties
-		game.setMuted(getSettingsManager().getMuted());
+		Game.setMuted(getSettingsManager().getMuted());
 		Main.gameSelector.setRotation(getSettingsManager().getRotation());
 
 		Main.setGame(game);

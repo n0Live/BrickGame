@@ -82,6 +82,10 @@ public class ButtonsFactory {
 	private static class ButtonClose extends AbstractWindowButton {
 		private static final long serialVersionUID = -7518553794423312339L;
 
+		public ButtonClose() {
+			super();
+		}
+
 		@Override
 		void doWhenMouseReleased(MouseEvent e) {
 			// if mouse released upon the component
@@ -119,6 +123,10 @@ public class ButtonsFactory {
 
 	private static class ButtonMinimize extends AbstractWindowButton {
 		private static final long serialVersionUID = -7518553794423312339L;
+
+		public ButtonMinimize() {
+			super();
+		}
 
 		@Override
 		void doWhenMouseReleased(MouseEvent e) {
@@ -222,15 +230,15 @@ public class ButtonsFactory {
 		/**
 		 * The button's default icon
 		 */
-		transient private final BufferedImage normal;
+		transient final BufferedImage normal;
 		/**
 		 * The button's rollover (hover) icon
 		 */
-		transient private final BufferedImage hover;
+		transient final BufferedImage hover;
 		/**
 		 * The button's pressed icon
 		 */
-		transient private final BufferedImage pressed;
+		transient final BufferedImage pressed;
 
 		/**
 		 * Changes icon size when changing the button size
@@ -284,7 +292,7 @@ public class ButtonsFactory {
 		 *            image in normal size
 		 * @return scaled icon
 		 */
-		private ImageIcon getScaledIcon(BufferedImage image) {
+		ImageIcon getScaledIcon(BufferedImage image) {
 			return new ImageIcon(image.getScaledInstance(getWidth(), getHeight(),
 					Image.SCALE_SMOOTH));
 		}
@@ -293,12 +301,12 @@ public class ButtonsFactory {
 	/**
 	 * Mouse listener for the buttons
 	 */
-	private static ButtonMouseListener btnMouseListener = null;
+	static ButtonMouseListener btnMouseListener = null;
 
 	/**
 	 * Map of the added buttons, assigned to the keys
 	 */
-	private static Map<KeyPressed, GameButton> buttons = null;
+	static Map<KeyPressed, GameButton> buttons = null;
 
 	/**
 	 * Returns button, assigned to the specified key

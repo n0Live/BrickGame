@@ -98,17 +98,17 @@ public final class Drawer {
 		/**
 		 * Font for digital data (score, etc.)
 		 */
-		private Font digitalFont;
+		Font digitalFont;
 
 		/**
 		 * Font for textual data (labels, etc.)
 		 */
-		private Font textFont;
+		Font textFont;
 
 		/**
 		 * Font of icons
 		 */
-		private Font iconFont;
+		Font iconFont;
 
 		private FontManager() {
 			initFonts();

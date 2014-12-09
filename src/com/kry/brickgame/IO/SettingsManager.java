@@ -212,8 +212,8 @@ public class SettingsManager {
 				e.printStackTrace();
 				return false;
 			}
-		} else
-			return false;
+		}
+		return false;
 	}
 
 	/**

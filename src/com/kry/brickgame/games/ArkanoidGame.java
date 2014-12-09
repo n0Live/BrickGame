@@ -571,7 +571,7 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * Shift the bricks wall horizontally
 	 */
-	private synchronized void shiftBricks() {
+	synchronized void shiftBricks() {
 		// shift bricks
 		bricks = bricks.shift((getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board

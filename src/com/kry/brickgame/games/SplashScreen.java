@@ -4,6 +4,7 @@ import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.music;
 import static com.kry.brickgame.games.GameUtils.playMusic;
+import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
 import com.kry.brickgame.Main;
 import com.kry.brickgame.boards.Board;
@@ -198,6 +199,8 @@ public class SplashScreen extends Game {
 		while (getStatus() == Status.DoSomeWork) {
 			processKeys();
 		}
+
+		stopAllSounds();
 
 		splashScreenThread.interrupt();
 		// Waits for end of interrupting splashScreenThread

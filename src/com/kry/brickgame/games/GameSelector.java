@@ -86,7 +86,7 @@ public class GameSelector extends Game {
 	/**
 	 * Animated splash for a game
 	 */
-	private Splash splash;
+	Splash splash;
 
 	/**
 	 * Timer for the splash screen of the game
@@ -225,7 +225,7 @@ public class GameSelector extends Game {
 	 * @param splash
 	 *            splash screen instance
 	 */
-	private void drawGameSplash(Splash splash) {
+	void drawGameSplash(Splash splash) {
 		if (splash != null) {
 			insertBoard(splash.getNextFrame(), 0,// x
 					BoardNumbers.height + 1);// y

@@ -24,10 +24,9 @@ public class IOUtils {
 		if (file.exists()) {
 			if (file.canWrite())
 				return file.delete();
-			else
-				return false;
-		} else
-			return true;
+			return false;
+		}
+		return true;
 	}
 
 	/**

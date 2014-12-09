@@ -320,12 +320,9 @@ public class SnakeShape extends Shape {
 	protected SnakeShape turn(RotationAngle direction, boolean isAppleAhead) {
 		if (direction == getDirection().getOpposite())
 			return turnAround();
-		else {
-			if (isAppleAhead)
-				return eatApple(direction);
-			else
-				return move(direction);
-		}
+		if (isAppleAhead)
+			return eatApple(direction);
+		return move(direction);
 	}
 
 	/**

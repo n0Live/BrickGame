@@ -823,8 +823,8 @@ public abstract class Game extends Thread implements Serializable {
 		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
 			setStatus(Status.Paused);
 			return GameLoader.saveGame(this);
-		} else
-			return false;
+		}
+		return false;
 	}
 
 	/**

@@ -226,7 +226,8 @@ public class DanceGame extends Game {
 	 * @return {@code true} if is the coincidence
 	 */
 	protected boolean checkDanceStep(DancerShape dancer) {
-		if (dancer == null) return true;
+		if (dancer == null)
+			return true;
 
 		return keys.contains(keysToRotate.get(dancer.getRotationAngle()));
 	}
@@ -352,8 +353,7 @@ public class DanceGame extends Game {
 				// if that position is already caught - return null
 				if (position.isCaught())
 					return null;
-				else
-					return position;
+				return position;
 			}
 		}
 		return null;
@@ -414,7 +414,8 @@ public class DanceGame extends Game {
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None) return;
+		if (getStatus() == Status.None)
+			return;
 
 		super.processKeys();
 
@@ -429,29 +430,27 @@ public class DanceGame extends Game {
 						|| !checkDanceStep(position.downShape)
 						|| !checkDanceStep(position.rightShape))
 					return;
-				else {
-					int score = 0;
-					position.setCaught(true);
+				int score = 0;
+				position.setCaught(true);
 
-					// add points for every caught DancerShape
-					if (position.leftShape != null) {
-						score++;
-					}
-					if (position.upShape != null) {
-						score++;
-					}
-					if (position.downShape != null) {
-						score++;
-					}
-					if (position.rightShape != null) {
-						score++;
-					}
-					// increase bonus
-					if (++bonus > 4) {
-						bonus = 4;
-					}
-					increaseScores(score);
+				// add points for every caught DancerShape
+				if (position.leftShape != null) {
+					score++;
 				}
+				if (position.upShape != null) {
+					score++;
+				}
+				if (position.downShape != null) {
+					score++;
+				}
+				if (position.rightShape != null) {
+					score++;
+				}
+				// increase bonus
+				if (++bonus > 4) {
+					bonus = 4;
+				}
+				increaseScores(score);
 			}
 		}
 	}

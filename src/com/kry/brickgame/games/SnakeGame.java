@@ -161,9 +161,8 @@ public class SnakeGame extends GameWithLives {
 		if (direction == snake.getDirection().getOpposite())
 			// than returns the last cell (tail) of the snake as the offset
 			return snake.x(snake.tail());
-		else
-			// otherwise gets the offset in dependence on the direction
-			return SnakeShape.getShiftX(direction);
+		// otherwise gets the offset in dependence on the direction
+		return SnakeShape.getShiftX(direction);
 	}
 
 	/**
@@ -178,9 +177,8 @@ public class SnakeGame extends GameWithLives {
 		if (direction == snake.getDirection().getOpposite())
 			// than returns the last cell (tail) of the snake as the offset
 			return snake.y(snake.tail());
-		else
-			// otherwise gets the offset in dependence on the direction
-			return SnakeShape.getShiftY(direction);
+		// otherwise gets the offset in dependence on the direction
+		return SnakeShape.getShiftY(direction);
 	}
 
 	/**

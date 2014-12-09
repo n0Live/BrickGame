@@ -37,9 +37,9 @@ public class FroggerGame extends GameWithLives {
 	 * The frog
 	 */
 	private final Shape frog;
-	
+
 	private Board road;
-	
+
 	private Cell[][] tracts;
 	/**
 	 * Positions of the road's tract shift
@@ -67,7 +67,7 @@ public class FroggerGame extends GameWithLives {
 	 * Use preloaded tracts or generate new ones?
 	 */
 	private final boolean usePreloadedTracts;
-	
+
 	/**
 	 * The Frogger
 	 * 
@@ -163,12 +163,12 @@ public class FroggerGame extends GameWithLives {
 	 */
 	public FroggerGame(int speed, int level, int type) {
 		super(speed, level, type);
-		
+
 		// initialize the frog
 		frog = new Shape(1);
 		frog.setCoord(0, new int[] { 0, 0 });
 		frog.setFill(Cell.Blink);
-		
+
 		// ==define the parameters of the types of game==
 		// for every odd type of game
 		shiftRoadFromLeftToRigth = (getType() % 2 != 0);
@@ -181,10 +181,10 @@ public class FroggerGame extends GameWithLives {
 		usePreloadedTracts = ((getType() <= 8) || ((getType() >= 16) && (getType() <= 24)));
 		// for types 16-32
 		setDrawInvertedBoard((getType() > 16));
-		
+
 		loadNewLevel();
 	}
-	
+
 	/**
 	 * Checking the conditions of victory
 	 */
@@ -197,19 +197,19 @@ public class FroggerGame extends GameWithLives {
 				break;
 			}
 		}
-		
+
 		setScore(getScore() + 1);
-		
+
 		if (isVictory) {
 			animatedClearLine(getBoard(), curX, boardHeight - 1);
 			sleep(ANIMATION_DELAY);
-			
+
 			win();
 		} else {
 			setFrog();
 		}
 	}
-	
+
 	/**
 	 * Moving the frog to the new position
 	 * 
@@ -221,34 +221,34 @@ public class FroggerGame extends GameWithLives {
 	 */
 	private boolean jumpFrog(int x, int y) {
 		if ((y < 0) || (y >= boardHeight)) return true;
-		
+
 		if ((x < 0) || (x >= boardWidth)) return false;
-		
+
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard().clone();
-		
+
 		// Erase the frog to not interfere with the checks
 		board = drawShape(board, curX, curY, frog, Cell.Empty);
-		
+
 		// check for collisions
 		if (checkCollision(board, frog, x, y)) return false;
-		
+
 		// draw the frog on the new place
 		if (y == boardHeight - 1) {
 			setBoard(drawShape(board, x, y, frog, Cell.Full));
-			
+
 			playEffect(Effects.add_cell);
-			
+
 			checkForWin();
 		} else {
 			setBoard(drawShape(board, x, y, frog, frog.getFill()));
 			curX = x;
 			curY = y;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Loading or reloading the specified level
 	 */
@@ -259,13 +259,13 @@ public class FroggerGame extends GameWithLives {
 		// initialize the frog
 		setFrog();
 	}
-	
+
 	@Override
 	protected void loadNewLevel() {
 		loadLevel();
 		super.loadNewLevel();
 	}
-	
+
 	/**
 	 * Creating the road
 	 * 
@@ -288,13 +288,13 @@ public class FroggerGame extends GameWithLives {
 				{ F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
 				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
 				{ F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
-		
+
 		// initial position changes from level
 		roadPositions = new int[tracts.length];
 		for (int i = 0; i < roadPositions.length; i++) {
 			roadPositions[i] = getLevel() - 1;
 		}
-		
+
 		// generate the oncoming traffic, who move in the direction opposite the
 		// rest road
 		oncomingTraffic = new HashSet<>();
@@ -307,27 +307,28 @@ public class FroggerGame extends GameWithLives {
 			for (int i = 0; i < getLevel() / 3 + 1; i++) {
 				// defines a few random non-recurring tracts
 				while (!oncomingTraffic.add(r.nextInt(tracts.length))) {
+					// do nothing until filled oncomingTraffic
 				}
 			}
 		}
-		
+
 		// generated random tracts
 		if (!usePreloaded) {
 			Random r = new Random();
 			int emptySpanLength, fullSpanLength;
 			int k;
-			
+
 			for (int i = 0; i < tracts.length; i++) {
 				// set length of full and empty span
 				emptySpanLength = r.nextInt(2) + 3;
 				fullSpanLength = r.nextInt(3) + 1;
-				
+
 				do {
 					// start point
 					k = r.nextInt(tracts[i].length);
 					// checking if under the start point has an empty cell
 				} while ((i > 1) && (tracts[i - 1][k] != E));
-				
+
 				for (int j = 0; j < tracts[i].length; j++) {
 					// in first, create the empty span
 					if (emptySpanLength > 0) {
@@ -339,11 +340,11 @@ public class FroggerGame extends GameWithLives {
 						tracts[i][k + j] = F;
 						fullSpanLength--;
 					}
-					
+
 					if ((emptySpanLength == 0) && (fullSpanLength == 0)) {
 						// when created both, regenerating their length
 						emptySpanLength = r.nextInt(2) + 3;
-						
+
 						while (tracts[i].length - j - 1 <= emptySpanLength) {
 							// check the empty span does not leave the tract
 							// and there is at least one cell to the full span
@@ -364,15 +365,15 @@ public class FroggerGame extends GameWithLives {
 					}
 				}
 			}
-			
+
 		}
-		
+
 		int width = boardWidth;
 		int height = boardHeight - 3;
 		Board board = new Board(width, height);
-		
+
 		Cell[] tract = new Cell[width];
-		
+
 		for (int i = 0; i < height; i++) {
 			if (i % 2 == 0) {
 				// even lines must be filled
@@ -387,10 +388,10 @@ public class FroggerGame extends GameWithLives {
 				if (tractLength - roadPositions[i / 2] < width) {
 					length = (tractLength - roadPositions[i / 2]);
 				}
-				
+
 				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0,
 						length);
-				
+
 				if (length != width) {
 					// complement to the width from the beginning of the tract
 					System.arraycopy(tracts[i / 2], 0, tract, length, width
@@ -401,33 +402,33 @@ public class FroggerGame extends GameWithLives {
 		}
 		return board;
 	}
-	
+
 	/**
 	 * Drawing effect of the collisions and decreasing lives
 	 */
 	private void loss() {
 		// saves the upper row with the frogs, who went over the road
 		Cell[] frogs = getBoard().getRow(boardHeight - 1);
-		
+
 		super.loss(curX, curY);
-		
+
 		// restores the frogs' row
 		getBoard().setRow(frogs, boardHeight - 1);
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */
 	@Override
 	protected void processKeys() {
 		if (getStatus() == Status.None) return;
-		
+
 		super.processKeys();
-		
+
 		if (getStatus() == Status.Running) {
 			int newX = curX, newY = curY;
 			boolean move = false;
-			
+
 			if (keys.contains(KeyPressed.KeyLeft)) {
 				newX = newX - 1;
 				move = true;
@@ -438,7 +439,7 @@ public class FroggerGame extends GameWithLives {
 				move = true;
 				keys.remove(KeyPressed.KeyRight);
 			}
-			
+
 			if (keys.contains(KeyPressed.KeyDown)) {
 				newY = newY - 2;
 				move = true;
@@ -454,7 +455,7 @@ public class FroggerGame extends GameWithLives {
 				move = true;
 				keys.remove(KeyPressed.KeyRotate);
 			}
-			
+
 			if (move) {
 				if (jumpFrog(newX, newY)) {
 					playEffect(Effects.move);
@@ -462,16 +463,16 @@ public class FroggerGame extends GameWithLives {
 					loss();
 				}
 			}
-			
+
 		}
 	}
-	
+
 	@Override
 	protected void reloadLevel() {
 		loadLevel();
 		setStatus(Status.Running);
 	}
-	
+
 	/**
 	 * Drawing the frog in the start position
 	 */
@@ -479,10 +480,10 @@ public class FroggerGame extends GameWithLives {
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
-		
+
 		jumpFrog(curX, curY);
 	}
-	
+
 	/**
 	 * Does the shift of the road at one position
 	 * 
@@ -495,11 +496,11 @@ public class FroggerGame extends GameWithLives {
 	private void shiftRoad(boolean isLeftToRight, boolean withFrog) {
 		Board board = getBoard();
 		board = drawShape(board, curX, curY, frog, Cell.Empty);
-		
+
 		Cell[] tract = new Cell[boardWidth];
-		
+
 		int tractLength = tracts[0].length;
-		
+
 		// determines the position for the shift
 		for (int i = 0; i < roadPositions.length; i++) {
 			if (isRoadWithOncomingTraffic && oncomingTraffic.contains(i)) {
@@ -511,14 +512,14 @@ public class FroggerGame extends GameWithLives {
 				roadPositions[i] = (isLeftToRight) ? roadPositions[i] - 1
 						: roadPositions[i] + 1;
 			}
-			
+
 			if (roadPositions[i] < 0) {
 				roadPositions[i] = tractLength - 1;
 			} else if (roadPositions[i] >= tractLength) {
 				roadPositions[i] = 0;
 			}
 		}
-		
+
 		for (int i = 0; i < road.getHeight(); i++) {
 			if (i % 2 != 0) {
 				int length = boardWidth;
@@ -527,10 +528,10 @@ public class FroggerGame extends GameWithLives {
 				if (tractLength - roadPositions[i / 2] < boardWidth) {
 					length = (tractLength - roadPositions[i / 2]);
 				}
-				
+
 				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0,
 						length);
-				
+
 				if (length != boardWidth) {
 					// complement to the width from the beginning of the tract
 					System.arraycopy(tracts[i / 2], 0, tract, length,
@@ -540,7 +541,7 @@ public class FroggerGame extends GameWithLives {
 			}
 		}
 		insertCellsToBoard(board, road.getBoard(), 0, 1);
-		
+
 		// shifting the frog with the road
 		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
 			if (isRoadWithOncomingTraffic
@@ -550,18 +551,18 @@ public class FroggerGame extends GameWithLives {
 				curX = (isLeftToRight) ? curX + 1 : curX - 1;
 			}
 		}
-		
+
 		// checks for collision with the frog and an obstacles
 		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog,
 				curX) || checkCollision(board, frog, curX, curY));
-		
+
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
-		
+
 		if (isFrogMustDie) {
 			loss();
 		}
 	}
-	
+
 	/**
 	 * Launching the game
 	 */
@@ -577,5 +578,5 @@ public class FroggerGame extends GameWithLives {
 			processKeys();
 		}
 	}
-	
+
 }
