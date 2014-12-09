@@ -3,8 +3,7 @@ package com.kry.brickgame.IO;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,7 +16,7 @@ import com.kry.brickgame.games.GameConsts.Rotation;
  */
 public class SettingsManager {
 	private static final String PROPERTIES_FILE = "settings.xml";
-	
+
 	/**
 	 * Default properties
 	 */
@@ -29,7 +28,7 @@ public class SettingsManager {
 		defaults.put("color", colorToHexString(Color.gray));
 		defaults.put("exit_confirmation", Boolean.TRUE.toString());
 	}
-	
+
 	/**
 	 * Converts a {@code Color} to a {@code HexString}.
 	 * 
@@ -40,7 +39,7 @@ public class SettingsManager {
 	private static String colorToHexString(Color c) {
 		return String.format("#%06X", (0xFFFFFF & c.getRGB()));
 	}
-	
+
 	/**
 	 * Converts a {@code HexString} to a {@code Color}.
 	 * 
@@ -52,33 +51,26 @@ public class SettingsManager {
 		// skip the '#' character
 		return new Color(Integer.parseInt(hexString.substring(1), 16));
 	}
-	
+
 	/**
 	 * Current properties
 	 */
 	private final Properties properties;
-	
+
 	/**
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static SettingsManager instance;
-	
+
 	/**
 	 * Delete a file with saved properties.
 	 * 
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public static boolean deleteSettingsFile() {
-		File propertiesFile = new File(PROPERTIES_FILE);
-		if (propertiesFile.exists()) {
-			if (propertiesFile.canWrite())
-				return propertiesFile.delete();
-			else
-				return false;
-		} else
-			return true;
+		return IOUtils.deleteFile(PROPERTIES_FILE);
 	}
-	
+
 	/**
 	 * Get instance of the {@code SettingsManager}
 	 * 
@@ -90,11 +82,11 @@ public class SettingsManager {
 		}
 		return instance;
 	}
-	
+
 	private SettingsManager() {
 		properties = new Properties(defaults);
 	}
-	
+
 	/**
 	 * Returns the saved "color" property
 	 * 
@@ -109,7 +101,7 @@ public class SettingsManager {
 			return hexStringToColor(defaults.getProperty("color"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "exit_confirmation" property
 	 * 
@@ -124,7 +116,7 @@ public class SettingsManager {
 			return Boolean.valueOf(defaults.getProperty("exit_confirmation"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "muted" property
 	 * 
@@ -139,7 +131,7 @@ public class SettingsManager {
 			return Boolean.valueOf(defaults.getProperty("muted"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "rotation" property
 	 * 
@@ -154,7 +146,7 @@ public class SettingsManager {
 			return Rotation.valueOf(defaults.getProperty("rotation"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "size" property
 	 * 
@@ -176,28 +168,24 @@ public class SettingsManager {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Load the saved properties from a file.
 	 * 
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	public boolean loadProperties() {
-		File propertiesFile = new File(PROPERTIES_FILE);
-		if (propertiesFile.exists()) {
-			InputStream in;
-			try {
-				in = new FileInputStream(propertiesFile);
-				properties.loadFromXML(in);
-				return true;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		} else
+		try (InputStream in = IOUtils.getInputStream(PROPERTIES_FILE)) {
+			properties.loadFromXML(in);
+			return true;
+		} catch (FileNotFoundException e) {
 			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-	
+
 	/**
 	 * Save the properties to a file.
 	 * 
@@ -206,7 +194,7 @@ public class SettingsManager {
 	public boolean saveProperties() {
 		return saveProperties(false);
 	}
-	
+
 	/**
 	 * Save the properties to a file.
 	 * 
@@ -217,9 +205,7 @@ public class SettingsManager {
 	public boolean saveProperties(boolean inExistFileOnly) {
 		File propertiesFile = new File(PROPERTIES_FILE);
 		if (!inExistFileOnly || propertiesFile.exists()) {
-			OutputStream os;
-			try {
-				os = new FileOutputStream(propertiesFile);
+			try (OutputStream os = IOUtils.getOutputStream(PROPERTIES_FILE)) {
 				properties.storeToXML(os, "Brick Game Settings");
 				return true;
 			} catch (IOException e) {
@@ -229,7 +215,7 @@ public class SettingsManager {
 		} else
 			return false;
 	}
-	
+
 	/**
 	 * Sets and saves the "color" property
 	 * 
@@ -240,7 +226,7 @@ public class SettingsManager {
 		properties.setProperty("color", colorToHexString(c));
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "exit_confirmation" property
 	 * 
@@ -248,10 +234,11 @@ public class SettingsManager {
 	 *            need to exit confirmation
 	 */
 	public void setExitConfirmation(boolean needConfirmation) {
-		properties.setProperty("exit_confirmation", String.valueOf(needConfirmation));
+		properties.setProperty("exit_confirmation",
+				String.valueOf(needConfirmation));
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "muted" property
 	 * 
@@ -261,7 +248,7 @@ public class SettingsManager {
 		properties.setProperty("muted", String.valueOf(muted));
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "rotation" property
 	 * 
@@ -272,7 +259,7 @@ public class SettingsManager {
 		properties.setProperty("rotation", r.toString());
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "size" property
 	 * 
@@ -282,7 +269,7 @@ public class SettingsManager {
 	public void setSize(Dimension d) {
 		setSize(d.width, d.height);
 	}
-	
+
 	/**
 	 * Sets and saves the "size" property
 	 * 
