@@ -112,7 +112,6 @@ public class BricksWall extends Board {
 	 */
 	public BricksWall(BricksWall aBricksWall) {
 		super(aBricksWall);
-
 		setBricksCount(aBricksWall.getBricksCount());
 	}
 
@@ -159,6 +158,12 @@ public class BricksWall extends Board {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public BricksWall clone() {
+		super.clone();
+		return new BricksWall(this);
 	}
 
 	@Override
