@@ -450,7 +450,7 @@ public class TetrisShape extends Shape {
 	}
 
 	public Cell[] getBoardFill() {
-		return boardFill;
+		return boardFill.clone();
 	}
 
 	public Figures getShape() {

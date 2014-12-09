@@ -69,7 +69,7 @@ public class Shape implements Cloneable, Serializable {
 	 * A set of coordinates of a points of a figures:
 	 * [index][coordinate:0-x,1-y]
 	 */
-	private int[][] coords;
+	private final int[][] coords;
 
 	/**
 	 * Constructor of the shape
@@ -126,11 +126,15 @@ public class Shape implements Cloneable, Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		Shape other = (Shape) obj;
-		if (!Arrays.deepEquals(coords, other.coords)) return false;
+		if (!Arrays.deepEquals(coords, other.coords))
+			return false;
 		return true;
 	}
 
@@ -146,7 +150,11 @@ public class Shape implements Cloneable, Serializable {
 	}
 
 	public int[][] getCoords() {
-		return coords;
+		int[][] newCoords = coords.clone();
+		for (int i = 0; i < coords.length; i++) {
+			newCoords[i] = coords[i].clone();
+		}
+		return newCoords;
 	}
 
 	public Cell getFill() {
@@ -279,13 +287,6 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	public void setCoord(int i, int[] value) {
 		coords[i] = value.clone();
-	}
-
-	protected void setCoords(int[][] coords) {
-		this.coords = new int[coords.length][coords[0].length];
-		for (int i = 0; i < coords.length; i++) {
-			this.coords[i] = coords[i].clone();
-		}
 	}
 
 	public void setFill(Cell fill) {

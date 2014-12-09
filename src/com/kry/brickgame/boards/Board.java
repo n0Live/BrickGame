@@ -90,7 +90,11 @@ public class Board implements Cloneable, Serializable {
 	}
 
 	public Cell[][] getBoard() {
-		return board;
+		Cell[][] newBoard = board.clone();
+		for (int i = 0; i < board.length; i++) {
+			newBoard[i] = board[i].clone();
+		}
+		return newBoard;
 	}
 
 	public Cell getCell(int x, int y) {
