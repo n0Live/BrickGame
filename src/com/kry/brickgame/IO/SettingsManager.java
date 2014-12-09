@@ -17,7 +17,7 @@ import com.kry.brickgame.games.GameConsts.Rotation;
  */
 public class SettingsManager {
 	private static final String PROPERTIES_FILE = "settings.xml";
-	
+
 	/**
 	 * Default properties
 	 */
@@ -28,7 +28,7 @@ public class SettingsManager {
 		defaults.put("rotation", Rotation.Clockwise.toString());
 		defaults.put("color", colorToHexString(Color.gray));
 	}
-	
+
 	/**
 	 * Converts a {@code Color} to a {@code HexString}.
 	 * 
@@ -39,7 +39,7 @@ public class SettingsManager {
 	private static String colorToHexString(Color c) {
 		return String.format("#%06X", (0xFFFFFF & c.getRGB()));
 	}
-	
+
 	/**
 	 * Converts a {@code HexString} to a {@code Color}.
 	 * 
@@ -51,17 +51,17 @@ public class SettingsManager {
 		// skip the '#' character
 		return new Color(Integer.parseInt(hexString.substring(1), 16));
 	}
-	
+
 	/**
 	 * Current properties
 	 */
 	private final Properties properties;
-	
+
 	/**
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static SettingsManager instance;
-	
+
 	/**
 	 * Delete a file with saved properties.
 	 * 
@@ -77,7 +77,7 @@ public class SettingsManager {
 		} else
 			return true;
 	}
-	
+
 	/**
 	 * Get instance of the {@code SettingsManager}
 	 * 
@@ -89,11 +89,11 @@ public class SettingsManager {
 		}
 		return instance;
 	}
-	
+
 	private SettingsManager() {
 		properties = new Properties(defaults);
 	}
-	
+
 	/**
 	 * Returns the saved "color" property
 	 * 
@@ -108,7 +108,7 @@ public class SettingsManager {
 			return hexStringToColor(defaults.getProperty("color"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "muted" property
 	 * 
@@ -123,7 +123,7 @@ public class SettingsManager {
 			return Boolean.valueOf(defaults.getProperty("muted"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "rotation" property
 	 * 
@@ -138,7 +138,7 @@ public class SettingsManager {
 			return Rotation.valueOf(defaults.getProperty("rotation"));
 		}
 	}
-	
+
 	/**
 	 * Returns the saved "size" property
 	 * 
@@ -149,8 +149,8 @@ public class SettingsManager {
 		if (size != null) {
 			try {
 				String[] sizes = size.split("x");
-				int width = Integer.valueOf(sizes[0]);
-				int height = Integer.valueOf(sizes[1]);
+				int width = Integer.parseInt(sizes[0]);
+				int height = Integer.parseInt(sizes[1]);
 				return new Dimension(width, height);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -160,7 +160,7 @@ public class SettingsManager {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Load the saved properties from a file.
 	 * 
@@ -181,7 +181,7 @@ public class SettingsManager {
 		} else
 			return false;
 	}
-	
+
 	/**
 	 * Save the properties to a file.
 	 * 
@@ -190,7 +190,7 @@ public class SettingsManager {
 	public boolean saveProperties() {
 		return saveProperties(false);
 	}
-	
+
 	/**
 	 * Save the properties to a file.
 	 * 
@@ -213,7 +213,7 @@ public class SettingsManager {
 		} else
 			return false;
 	}
-	
+
 	/**
 	 * Sets and saves the "color" property
 	 * 
@@ -224,7 +224,7 @@ public class SettingsManager {
 		properties.setProperty("color", colorToHexString(c));
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "muted" property
 	 * 
@@ -234,7 +234,7 @@ public class SettingsManager {
 		properties.setProperty("muted", String.valueOf(muted));
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "rotation" property
 	 * 
@@ -245,7 +245,7 @@ public class SettingsManager {
 		properties.setProperty("rotation", r.toString());
 		saveProperties(true);
 	}
-	
+
 	/**
 	 * Sets and saves the "size" property
 	 * 
@@ -255,7 +255,7 @@ public class SettingsManager {
 	public void setSize(Dimension d) {
 		setSize(d.width, d.height);
 	}
-	
+
 	/**
 	 * Sets and saves the "size" property
 	 * 
