@@ -28,9 +28,9 @@ public class GameDrawPanel extends JPanel implements GameListener {
 
 	private final GameProperties properties;
 
-	private BufferedImage canvas;
+	transient private BufferedImage canvas;
+	transient private final BufferedImage backgroundImage;
 
-	private final BufferedImage backgroundImage;
 	private Dimension size;
 
 	transient MouseInputListener resizeListener = new GameMouseListener();

@@ -44,7 +44,7 @@ public class ButtonsFactory {
 	private static abstract class AbstractWindowButton extends JButton {
 		private static final long serialVersionUID = 7175204924783660101L;
 
-		protected final int gap = 2;
+		protected static final int GAP = 2;
 		protected boolean isMouseOver;
 
 		private final MouseAdapter menuMouseAdapter = new MouseAdapter() {
@@ -106,8 +106,8 @@ public class ButtonsFactory {
 
 			int sideLength = Math.min(getWidth(), getHeight());
 
-			g2d.drawLine(gap, gap, sideLength - gap, sideLength - gap);
-			g2d.drawLine(gap, sideLength - gap, sideLength - gap, gap);
+			g2d.drawLine(GAP, GAP, sideLength - GAP, sideLength - GAP);
+			g2d.drawLine(GAP, sideLength - GAP, sideLength - GAP, GAP);
 
 			// restore properties from the backup
 			g2d.setStroke(oldStroke);
@@ -144,7 +144,8 @@ public class ButtonsFactory {
 
 			int sideLength = Math.min(getWidth(), getHeight());
 
-			g2d.drawLine(gap, sideLength - gap, sideLength - gap, sideLength - gap);
+			g2d.drawLine(GAP, sideLength - GAP, sideLength - GAP, sideLength
+					- GAP);
 
 			// restore properties from the backup
 			g2d.setStroke(oldStroke);
@@ -221,15 +222,15 @@ public class ButtonsFactory {
 		/**
 		 * The button's default icon
 		 */
-		private final BufferedImage normal;
+		transient private final BufferedImage normal;
 		/**
 		 * The button's rollover (hover) icon
 		 */
-		private final BufferedImage hover;
+		transient private final BufferedImage hover;
 		/**
 		 * The button's pressed icon
 		 */
-		private final BufferedImage pressed;
+		transient private final BufferedImage pressed;
 
 		/**
 		 * Changes icon size when changing the button size
