@@ -13,18 +13,18 @@ public class Board implements Cloneable, Serializable {
 	public static enum Cell {
 		Empty, Full, Blink
 	}
-	
+
 	private static final long serialVersionUID = -2792579857001935997L;
-	
+
 	protected final static Cell E = Cell.Empty;
 	protected final static Cell F = Cell.Full;
 	protected final static Cell B = Cell.Blink;
-	
+
 	private final int width;
 	private final int height;
-	
-	private Cell[][] board;
-	
+
+	private final Cell[][] board;
+
 	/**
 	 * The copy constructor of a Board
 	 * 
@@ -37,7 +37,7 @@ public class Board implements Cloneable, Serializable {
 			board[i] = aBoard.board[i].clone();
 		}
 	}
-	
+
 	/**
 	 * Creating the board of the given size
 	 * 
@@ -51,10 +51,10 @@ public class Board implements Cloneable, Serializable {
 		this.width = width;
 		this.height = height;
 		board = new Cell[width][height];
-		
+
 		clearBoard();
 	}
-	
+
 	/**
 	 * Clears the cells of the board
 	 */
@@ -65,7 +65,7 @@ public class Board implements Cloneable, Serializable {
 			}
 		}
 	}
-	
+
 	@Override
 	public Board clone() {
 		try {
@@ -76,7 +76,7 @@ public class Board implements Cloneable, Serializable {
 		Board newBoard = new Board(this);
 		return newBoard;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
@@ -88,43 +88,43 @@ public class Board implements Cloneable, Serializable {
 		if (width != other.width) return false;
 		return true;
 	}
-	
+
 	public Cell[][] getBoard() {
 		return board;
 	}
-	
+
 	public Cell getCell(int x, int y) {
 		return board[x][y];
 	}
-	
+
 	public Cell[] getColumn(int x) {
 		Cell column[] = new Cell[getHeight()];
-		
+
 		for (int i = 0; i < column.length; i++) {
 			column[i] = board[x][i];
 		}
-		
+
 		return column;
 	}
-	
+
 	public int getHeight() {
 		return height;
 	}
-	
+
 	public Cell[] getRow(int y) {
 		Cell row[] = new Cell[getWidth()];
-		
+
 		for (int i = 0; i < row.length; i++) {
 			row[i] = board[i][y];
 		}
-		
+
 		return row;
 	}
-	
+
 	public int getWidth() {
 		return width;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -134,15 +134,11 @@ public class Board implements Cloneable, Serializable {
 		result = prime * result + width;
 		return result;
 	}
-	
-	public void setBoard(Cell[][] board) {
-		this.board = board;
-	}
-	
+
 	public void setCell(Cell cell, int x, int y) {
 		board[x][y] = cell;
 	}
-	
+
 	/**
 	 * Replacing a single column of the board
 	 * 
@@ -160,7 +156,7 @@ public class Board implements Cloneable, Serializable {
 			}
 		}
 	}
-	
+
 	/**
 	 * Replacing a single row of the board
 	 * 
@@ -178,11 +174,11 @@ public class Board implements Cloneable, Serializable {
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		
+
 		result.append("Board [" + width + "x" + height + "]").append("\n");
 		// Going through the board (the board is filled from the bottom up)
 		for (int i = height - 1; i >= 0; i--) {
