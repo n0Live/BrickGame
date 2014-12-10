@@ -287,6 +287,7 @@ public abstract class Game implements Runnable, Serializable {
 	 *            duration of the animation in milliseconds
 	 */
 	protected void animatedClearBoard(int millis) {
+		setStatus(Status.DoSomeWork);
 		// delay between animation frames
 		int delay = millis / (boardHeight * 2);
 		
@@ -296,6 +297,7 @@ public abstract class Game implements Runnable, Serializable {
 				board.setCell(Cell.Full, x, y);
 			}
 			fireBoardChanged(board);
+			processKeys();
 			sleep(delay);
 		}
 		// and is cleaned downwards
@@ -304,6 +306,7 @@ public abstract class Game implements Runnable, Serializable {
 				board.setCell(Cell.Empty, x, y);
 			}
 			fireBoardChanged(board);
+			processKeys();
 			sleep(delay);
 		}
 	}
@@ -708,6 +711,7 @@ public abstract class Game implements Runnable, Serializable {
 			// draw the blast waves
 			for (int k = 0; k < kaboom.waves.length; k++) {
 				kaboom.blast(newX, newY, k);
+				processKeys();
 			}
 		}
 	}
@@ -841,7 +845,8 @@ public abstract class Game implements Runnable, Serializable {
 	 * @return {@code true} - when success, {@code false} - otherwise
 	 */
 	public boolean saveState() {
-		if (!(this instanceof GameSelector || this instanceof SplashScreen)) {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)
+				&& (getStatus() == Status.Running || getStatus() == Status.Paused)) {
 			setStatus(Status.Paused);
 			return GameLoader.saveGame(this);
 		}
