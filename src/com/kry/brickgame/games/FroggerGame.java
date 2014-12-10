@@ -210,6 +210,16 @@ public class FroggerGame extends GameWithLives {
 		}
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 100;
+	}
+	
 	/**
 	 * Moving the frog to the new position
 	 * 

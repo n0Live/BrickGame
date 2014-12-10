@@ -106,10 +106,6 @@ public class InvadersGame extends GameWithGun {
 	 */
 	private final int startX;
 	
-	// increase speed from the original
-	private static final int FIRST_LEVEL_SPEED = 300;
-	private static final int TENTH_LEVEL_SPEED = 50;
-	
 	/**
 	 * The Invaders Game
 	 * 
@@ -364,13 +360,13 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
+	protected int getSpeedOfFirstLevel() {
+		return 300;
 	}
 	
 	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
+	protected int getSpeedOfTenthLevel() {
+		return 80;
 	}
 	
 	/**

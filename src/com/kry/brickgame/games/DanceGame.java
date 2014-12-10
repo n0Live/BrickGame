@@ -148,10 +148,6 @@ public class DanceGame extends Game {
 		keysToRotate.put(DOWN, KeyPressed.KeyDown);
 	}
 	
-	// change speed from the original
-	private static final int FIRST_LEVEL_SPEED = 300;
-	private static final int TENTH_LEVEL_SPEED = 80;
-	
 	/**
 	 * Dance positions
 	 */
@@ -320,11 +316,6 @@ public class DanceGame extends Game {
 		setBoard(mainBoard);
 	}
 	
-	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-	
 	/**
 	 * Get the current melody
 	 * 
@@ -356,8 +347,13 @@ public class DanceGame extends Game {
 	}
 	
 	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
+	protected int getSpeedOfFirstLevel() {
+		return 300;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 80;
 	}
 	
 	/**

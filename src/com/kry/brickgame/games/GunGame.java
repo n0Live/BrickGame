@@ -35,10 +35,6 @@ public class GunGame extends GameWithGun {
 	 */
 	public static final int subtypesNumber = 16;
 	
-	// decrease speed from the original
-	private static final int FIRST_LEVEL_SPEED = 500;
-	private static final int TENTH_LEVEL_SPEED = 230;
-	
 	/**
 	 * Kind of game
 	 * <p>
@@ -157,13 +153,13 @@ public class GunGame extends GameWithGun {
 	}
 	
 	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
+	protected int getSpeedOfFirstLevel() {
+		return 500;
 	}
 	
 	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
+	protected int getSpeedOfTenthLevel() {
+		return 250;
 	}
 	
 	/**

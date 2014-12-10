@@ -217,6 +217,16 @@ public class RacingGame extends GameWithLives {
 		return newBoard;
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 80;
+	}
+	
 	/**
 	 * Loading or reloading the specified level
 	 */

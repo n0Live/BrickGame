@@ -173,11 +173,6 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	private boolean drawInvertedBoard;
 	
-	// Game speed constants. May be overrided by means of
-	// getFIRST_LEVEL_SPEED(), getTENTH_LEVEL_SPEED()
-	private final int FIRST_LEVEL_SPEED = 500;
-	private final int TENTH_LEVEL_SPEED = 100;
-	
 	/**
 	 * The Game
 	 */
@@ -494,10 +489,6 @@ public abstract class Game implements Runnable, Serializable {
 		return board;
 	}
 	
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-	
 	protected int getHiScore() {
 		return getScoresManager().getHiScore(this.getClass().getCanonicalName());
 	}
@@ -559,10 +550,20 @@ public abstract class Game implements Runnable, Serializable {
 		if (genuine)
 		// getting a uniform distribution from FIRST_LEVEL_SPEED to
 		// TENTH_LEVEL_SPEED
-			return (getFIRST_LEVEL_SPEED() - (getFIRST_LEVEL_SPEED() - getTENTH_LEVEL_SPEED())
+			return (getSpeedOfFirstLevel() - (getSpeedOfFirstLevel() - getSpeedOfTenthLevel())
 					/ (10 - 1) * (speed - 1));
 		return speed;
 	}
+	
+	/**
+	 * Game speed on the 1st level
+	 */
+	abstract protected int getSpeedOfFirstLevel();
+	
+	/**
+	 * Game speed on the 10th level
+	 */
+	abstract protected int getSpeedOfTenthLevel();
 	
 	/**
 	 * Get the status of game
@@ -571,10 +572,6 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected synchronized Status getStatus() {
 		return status;
-	}
-	
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
 	}
 	
 	/**

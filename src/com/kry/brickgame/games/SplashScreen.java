@@ -76,6 +76,16 @@ public class SplashScreen extends Game {
 		}
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 0;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 0;
+	}
+	
 	/**
 	 * Animated horizontal moving and inverting cells
 	 * 

@@ -689,6 +689,16 @@ public class TanksGame extends GameWithLives {
 		return result;
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 80;
+	}
+	
 	/**
 	 * Checking if one of the enemy tanks is located in the
 	 * {@code viewDirection} from the another enemy {@code tank} no further the

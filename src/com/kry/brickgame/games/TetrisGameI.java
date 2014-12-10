@@ -527,6 +527,16 @@ public class TetrisGameI extends Game {
 		return TetrisShape.getRandomTetraminoesAndSuper(superShapes);
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 450;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 120;
+	}
+	
 	/**
 	 * Filling (setting {@code Cell.Full}) a single cell, located under the cell
 	 * with the specified coordinates {@code [x, y]}

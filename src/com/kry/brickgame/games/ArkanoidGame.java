@@ -315,6 +315,16 @@ public class ArkanoidGame extends GameWithLives {
 		return newBoard;
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 80;
+	}
+	
 	/**
 	 * Checks for the platform to the coordinates {@code x, y}
 	 * 
@@ -587,7 +597,7 @@ public class ArkanoidGame extends GameWithLives {
 						shiftBricks();
 					}
 				}
-			}, 0, getFIRST_LEVEL_SPEED());
+			}, 0, getSpeedOfFirstLevel());
 		}
 		
 		final float slowestSpeed = 1.20f;

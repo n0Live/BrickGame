@@ -42,10 +42,6 @@ public class SnakeGame extends GameWithLives {
 	 */
 	public static final int subtypesNumber = 4;
 	
-	// change speed from the original
-	private static final int FIRST_LEVEL_SPEED = 400;
-	private static final int TENTH_LEVEL_SPEED = 150;
-	
 	/**
 	 * Drawing of the snake on the board
 	 * 
@@ -153,11 +149,6 @@ public class SnakeGame extends GameWithLives {
 		return gates;
 	}
 	
-	@Override
-	protected int getFIRST_LEVEL_SPEED() {
-		return FIRST_LEVEL_SPEED;
-	}
-	
 	/**
 	 * Calculate the offset for the x-coordinate for the selected direction
 	 * 
@@ -191,8 +182,13 @@ public class SnakeGame extends GameWithLives {
 	}
 	
 	@Override
-	protected int getTENTH_LEVEL_SPEED() {
-		return TENTH_LEVEL_SPEED;
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 150;
 	}
 	
 	/**
