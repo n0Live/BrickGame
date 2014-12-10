@@ -44,11 +44,11 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * X-coordinate for insertion of the bricks wall
 	 */
-	private int bricksX;
+	private volatile int bricksX;
 	/**
 	 * Y-coordinate for insertion of the bricks wall
 	 */
-	private int bricksY;
+	private volatile int bricksY;
 	/**
 	 * The ball breaking bricks
 	 */
@@ -95,11 +95,11 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * The X-Dimension, which has its own laws
 	 */
-	private boolean theXDimension;
+	private  boolean theXDimension;
 	/**
 	 * Are you ready to teleport to the X-Dimension?
 	 */
-	private boolean isReadyToXDimension;
+	private volatile boolean isReadyToXDimension;
 	/**
 	 * X-coordinate of the starting position of the gun
 	 */
@@ -478,7 +478,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * Processing actions of invaders
 	 */
-	private synchronized void processInvasion() {
+	synchronized void processInvasion() {
 		if (isFlyingBall) { // the ball already created
 			moveBall();
 		} else {
@@ -496,7 +496,8 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None) return;
+		if (getStatus() == Status.None)
+			return;
 
 		super.processKeys();
 
@@ -535,7 +536,7 @@ public class InvadersGame extends GameWithGun {
 	}
 
 	@Override
-	protected void removeCell(Board board, int x, int y) {
+	protected synchronized void removeCell(Board board, int x, int y) {
 		if ((x == ballX) && (y == ballY)) {
 			initBall();
 			bricks.setBricksCount(bricks.getBricksCount() - 1);
