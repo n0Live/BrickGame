@@ -218,7 +218,11 @@ public class SplashScreen extends Game {
 		}
 		
 		if (resetFlag) {
-			Main.setGame(new SplashScreen());
+			SplashScreen ss = new SplashScreen();
+			// show actual speed and level
+			ss.setLevel(getLevel());
+			ss.setSpeed(getSpeed());
+			Main.setGame(ss);
 		} else {
 			Main.setGame(Main.gameSelector.restart());
 		}
