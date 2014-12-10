@@ -7,6 +7,7 @@ import static com.kry.brickgame.games.GameUtils.playEffect;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -409,6 +410,25 @@ public class GameSelector extends Game {
 		letter = 'A';
 		number = 1;
 		return this;
+	}
+	
+	/**
+	 * Sets displaying letter and number related to specified game class name
+	 * and game type.
+	 * 
+	 * @param gameClassName
+	 *            canonical class name of a game
+	 * @param type
+	 *            type of a game
+	 */
+	public void setGameAndType(String gameClassName, int type) {
+		number = type;
+		for (Entry<Character, String> entry : gamesList.entrySet()) {
+			if (entry.getValue().equals(gameClassName)) {
+				letter = entry.getKey();
+				break;
+			}
+		}
 	}
 	
 	@Override
