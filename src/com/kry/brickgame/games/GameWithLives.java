@@ -14,6 +14,19 @@ import com.kry.brickgame.games.GameUtils.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
+	
+	/**
+	 * Play "start" music and wait for its ending or, if muted, jast wait 1.5
+	 * sec.
+	 */
+	private static void playAndWaitMusic() {
+		if (!isMuted()) {
+			playMusic(Music.start);
+		} else {
+			sleep(1500);
+		}
+	}
+	
 	/**
 	 * Count of lives
 	 * <p>
@@ -73,7 +86,7 @@ public abstract class GameWithLives extends Game {
 	protected void loadNewLevel() {
 		// play music always except the first start
 		if (!start) {
-			playMusic(Music.start);
+			playAndWaitMusic();
 		}
 		setStatus(Status.Running);
 	}
@@ -137,7 +150,7 @@ public abstract class GameWithLives extends Game {
 		// play music only in first start, not after deserialization
 		if (start) {
 			start = false;
-			playMusic(Music.start);
+			playAndWaitMusic();
 		}
 	}
 	
