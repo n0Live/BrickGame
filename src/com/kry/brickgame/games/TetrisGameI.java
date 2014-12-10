@@ -887,7 +887,8 @@ public class TetrisGameI extends Game {
 	@Override
 	public void start() {
 		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			doRepetitiveWork();
 		}
 	}

@@ -68,7 +68,8 @@ public class SplashScreen extends Game {
 
 		for (int i = 0; i < repeatCount; i++) {
 
-			if (isInterrupted()) return;
+			if (Thread.currentThread().isInterrupted())
+				return;
 
 			clearBoard();
 			sleep(ANIMATION_DELAY * 5);
@@ -98,7 +99,8 @@ public class SplashScreen extends Game {
 		if (isRightDirection) {
 			for (int i = fromX; i <= toX; i++) {
 
-				if (isInterrupted()) return false;
+				if (Thread.currentThread().isInterrupted())
+					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
@@ -109,7 +111,8 @@ public class SplashScreen extends Game {
 		} else {
 			for (int i = fromX; i >= toX; i--) {
 
-				if (isInterrupted()) return false;
+				if (Thread.currentThread().isInterrupted())
+					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
@@ -141,7 +144,7 @@ public class SplashScreen extends Game {
 		insertCellsToBoard(board, boardNumber.getBoard(), board.getWidth() - boardNumber.getWidth()
 				- 1, 1);
 
-		if (!isInterrupted()) {
+		if (!Thread.currentThread().isInterrupted()) {
 			setBoard(board);
 		}
 	}
@@ -186,7 +189,7 @@ public class SplashScreen extends Game {
 		Thread splashScreenThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				while (!interrupted()) {
+				while (!Thread.currentThread().isInterrupted()) {
 					animatedInvertBoard();
 					blinkNumbers(5);
 				}
@@ -236,7 +239,8 @@ public class SplashScreen extends Game {
 		if (isUpDirection) {
 			for (int i = fromY; i <= toY; i++) {
 
-				if (isInterrupted()) return false;
+				if (Thread.currentThread().isInterrupted())
+					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);
@@ -247,7 +251,8 @@ public class SplashScreen extends Game {
 		} else {
 			for (int i = fromY; i >= toY; i--) {
 
-				if (isInterrupted()) return false;
+				if (Thread.currentThread().isInterrupted())
+					return false;
 
 				// invert cells
 				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);

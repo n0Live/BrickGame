@@ -307,7 +307,8 @@ public class GunGame extends GameWithGun {
 			// twice as slow if hasTwoSmokingBarrels
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if (getStatus() != Status.Paused) {
 
 				int currentSpeed = getSpeed(true);

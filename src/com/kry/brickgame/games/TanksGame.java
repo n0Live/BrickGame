@@ -966,7 +966,8 @@ public class TanksGame extends GameWithLives {
 			}
 		}, 0, ANIMATION_DELAY * 4);
 
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if (getStatus() == Status.Running) {
 				int currentSpeed;
 				currentSpeed = getSpeed(true) * 3;

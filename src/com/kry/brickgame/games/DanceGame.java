@@ -401,14 +401,6 @@ public class DanceGame extends Game {
 		}
 	}
 
-	@Override
-	protected void pause() {
-		if (getStatus() == Status.Paused) {
-			playMelody(getMelody(), rate);
-		}
-		super.pause();
-	}
-
 	/**
 	 * Processing of key presses
 	 */
@@ -456,6 +448,14 @@ public class DanceGame extends Game {
 	}
 
 	@Override
+	public void resume() {
+		if (getStatus() == Status.Paused) {
+			playMelody(getMelody(), rate);
+		}
+		super.resume();
+	}
+
+	@Override
 	protected void setSpeed(int speed) {
 		super.setSpeed(speed);
 
@@ -470,7 +470,8 @@ public class DanceGame extends Game {
 	@Override
 	public void start() {
 		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 
 				// change speed and melody after finished playing the melody

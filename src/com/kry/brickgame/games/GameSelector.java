@@ -404,6 +404,11 @@ public class GameSelector extends Game {
 	}
 
 	@Override
+	public void setRotation(Rotation rotation) {
+		super.setRotation(rotation);
+	}
+
+	@Override
 	public void start() {
 		clearBoard();
 		clearPreview();

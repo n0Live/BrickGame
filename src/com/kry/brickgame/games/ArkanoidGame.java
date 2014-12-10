@@ -603,7 +603,8 @@ public class ArkanoidGame extends GameWithLives {
 		final float slowestSpeed = 1.25f;
 		final float speedStep = 0.25f;
 
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if (getStatus() == Status.Running) {
 				// change the speed in depending of the platform size
 				// (slower when used small platform)

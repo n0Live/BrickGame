@@ -569,7 +569,8 @@ public class FroggerGame extends GameWithLives {
 	@Override
 	public void start() {
 		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused)
 					&& (elapsedTime(getSpeed(true) * 3))) {
 				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);

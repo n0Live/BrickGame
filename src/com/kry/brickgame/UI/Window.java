@@ -50,6 +50,8 @@ public class Window extends JFrame {
 		public void windowClosing(WindowEvent e) {
 			// save current window size
 			getSettingsManager().setSize(e.getWindow().getSize());
+			// set game paused
+			Main.getGame().pause();
 			try {
 				if (!getSettingsManager().getExitConfirmation()
 						|| CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {

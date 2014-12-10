@@ -34,7 +34,7 @@ import com.kry.brickgame.games.GameUtils.Music;
 /**
  * @author noLive
  */
-public abstract class Game extends Thread implements Serializable {
+public abstract class Game implements Runnable, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 
 	/**
@@ -512,7 +512,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * 
 	 * @return the direction of rotation
 	 */
-	public Rotation getRotation() {
+	protected Rotation getRotation() {
 		return rotation;
 	}
 
@@ -578,7 +578,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * 
 	 * @return {@code true} if needed to draw the inverted board
 	 */
-	public boolean isInvertedBoard() {
+	protected boolean isInvertedBoard() {
 		return drawInvertedBoard;
 	}
 
@@ -745,9 +745,9 @@ public abstract class Game extends Thread implements Serializable {
 	}
 
 	/**
-	 * Pause / Resume
+	 * Pause
 	 */
-	protected void pause() {
+	public void pause() {
 		if (getStatus() == Status.Running) {
 			// send score
 			fireInfoChanged(String.valueOf(score));
@@ -756,8 +756,6 @@ public abstract class Game extends Thread implements Serializable {
 
 			setStatus(Status.Paused);
 			stopAllSounds();
-		} else if (getStatus() == Status.Paused) {
-			setStatus(Status.Running);
 		}
 	}
 
@@ -781,7 +779,11 @@ public abstract class Game extends Thread implements Serializable {
 
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
-			pause();
+			if (getStatus() != Status.Paused) {
+				pause();
+			} else {
+				resume();
+			}
 			return;
 		}
 
@@ -807,6 +809,15 @@ public abstract class Game extends Thread implements Serializable {
 			GameLoader.deleteSavedGame();
 		}
 		fireExit();
+	}
+
+	/**
+	 * Resume
+	 */
+	public void resume() {
+		if (getStatus() == Status.Paused) {
+			setStatus(Status.Running);
+		}
 	}
 
 	@Override
@@ -844,7 +855,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * @param drawInvertedBoard
 	 *            {@code true} if needed to draw the inverted board
 	 */
-	public void setDrawInvertedBoard(boolean drawInvertedBoard) {
+	protected void setDrawInvertedBoard(boolean drawInvertedBoard) {
 		this.drawInvertedBoard = drawInvertedBoard;
 	}
 
@@ -888,7 +899,7 @@ public abstract class Game extends Thread implements Serializable {
 	 * @param rotation
 	 *            the direction of rotation
 	 */
-	public void setRotation(Rotation rotation) {
+	protected void setRotation(Rotation rotation) {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
 	}
@@ -939,7 +950,6 @@ public abstract class Game extends Thread implements Serializable {
 		fireStatusChanged(status);
 	}
 
-	@Override
 	public void start() {
 		fireBoardChanged(board);
 		firePreviewChanged(preview);

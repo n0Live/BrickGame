@@ -340,7 +340,8 @@ public class SnakeGame extends GameWithLives {
 	@Override
 	public void start() {
 		super.start();
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			// moving of the snake
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
 				if (!tryMove(snake.getDirection())) {

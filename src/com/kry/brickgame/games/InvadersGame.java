@@ -577,7 +577,8 @@ public class InvadersGame extends GameWithGun {
 			// twice as slow if hasTwoSmokingBarrels
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
 
-		while (!interrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			// check the number of remaining bricks
 			if (bricks.getBricksCount() <= 0) {
 				clearBullets(getBoard());
