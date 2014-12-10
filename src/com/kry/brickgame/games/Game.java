@@ -9,6 +9,7 @@ import static com.kry.brickgame.games.GameConsts.PREVIEW_HEIGHT;
 import static com.kry.brickgame.games.GameConsts.PREVIEW_WIDTH;
 import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.isKeySuspended;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.stopAllSounds;
@@ -36,42 +37,42 @@ import com.kry.brickgame.games.GameUtils.Music;
  */
 public abstract class Game implements Runnable, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
-
+	
 	/**
 	 * Number of subtypes
 	 */
 	public static int subtypesNumber;
-
+	
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
-
+	
 	/**
 	 * Is the sound turned off?
 	 */
 	private static boolean mute;
-
+	
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
-
+	
 	protected static void fireMuteChanged(boolean mute) {
 		GameEvent event = new GameEvent(Game.class, mute);
 		for (GameListener listener : listeners) {
 			listener.muteChanged(event);
 		}
 	}
-
+	
 	public static synchronized GameListener[] getGameListeners() {
 		return listeners.toArray(new GameListener[listeners.size()]);
 	}
-
+	
 	protected static boolean isMuted() {
 		return mute;
 	}
-
+	
 	public static synchronized void removeGameListener(GameListener listener) {
 		listeners.remove(listener);
 	}
-
+	
 	public static void setMuted(boolean mute) {
 		Game.mute = mute;
 		if (mute) {
@@ -79,6 +80,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		fireMuteChanged(mute);
 	}
+	
 	/**
 	 * Sleep for the specified number of milliseconds
 	 * 
@@ -92,6 +94,7 @@ public abstract class Game implements Runnable, Serializable {
 			Thread.currentThread().interrupt();
 		}
 	}
+	
 	final Random r;
 	/**
 	 * Set of the pressed keys
@@ -125,7 +128,7 @@ public abstract class Game implements Runnable, Serializable {
 	 * Height of the board
 	 */
 	protected int boardHeight;
-
+	
 	/**
 	 * Width of the preview board
 	 */
@@ -134,81 +137,80 @@ public abstract class Game implements Runnable, Serializable {
 	 * Height of the preview board
 	 */
 	protected int previewHeight;
-
+	
 	/**
 	 * X-coordinate position on the board
 	 */
 	protected int curX;
-
+	
 	/**
 	 * Y-coordinate position on the board
 	 */
 	protected int curY;
-
+	
 	/**
 	 * Game status
 	 */
 	private volatile Status status;
-
+	
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
 	private long timePoint;
-
+	
 	/**
 	 * The main (base) board
 	 */
 	private volatile Board board;
-
+	
 	/**
 	 * The preview board
 	 */
 	private volatile Board preview;
-
+	
 	/**
 	 * Whether to draw the board upside down?
 	 */
 	private boolean drawInvertedBoard;
-
+	
 	// Game speed constants. May be overrided by means of
 	// getFIRST_LEVEL_SPEED(), getTENTH_LEVEL_SPEED()
 	private final int FIRST_LEVEL_SPEED = 500;
-
-	private final int TENTH_LEVEL_SPEED = 80;
-
+	private final int TENTH_LEVEL_SPEED = 100;
+	
 	/**
 	 * The Game
 	 */
 	public Game() {
 		r = new Random();
-
+		
 		setStatus(Status.None);
-
+		
 		stopAllSounds();
-
+		
 		setSpeed(1);
 		setLevel(1);
 		setRotation(Rotation.None);
-
+		
 		setBoard(new Board(BOARD_WIDTH, BOARD_HEIGHT));
 		setPreview(new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));
-
+		
 		setDrawInvertedBoard(false);
-
+		
 		curX = 0;
 		curY = 0;
-
+		
 		timePoint = System.currentTimeMillis();
-
+		
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
-
+		
 		clearBoard();
 		clearPreview();
 	}
-
+	
 	/**
 	 * The Game
 	 * 
@@ -227,19 +229,19 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected Game(int speed, int level, Board board, Board preview, Rotation rotation, int type) {
 		this(speed, level, rotation, type);
-
+		
 		setBoard(board);
 		setPreview(preview);
-
+		
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
-
+		
 		clearBoard();
 		clearPreview();
 	}
-
+	
 	/**
 	 * The Game without rotation
 	 * 
@@ -253,7 +255,7 @@ public abstract class Game implements Runnable, Serializable {
 	public Game(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
 	}
-
+	
 	/**
 	 * The Game
 	 * 
@@ -268,21 +270,21 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	public Game(int speed, int level, Rotation rotation, int type) {
 		this();
-
+		
 		setSpeed(speed);
 		setLevel(level);
 		setRotation(rotation);
-
+		
 		this.type = type;
 	}
-
+	
 	/**
 	 * Animated clearing of the board on Game Over
 	 */
 	protected void animatedClearBoard() {
 		animatedClearBoard(CB_GAME_OVER);
 	}
-
+	
 	/**
 	 * Animated clearing of the board (upwards then downwards)
 	 * 
@@ -292,7 +294,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected void animatedClearBoard(int millis) {
 		// delay between animation frames
 		int delay = millis / (boardHeight * 2);
-
+		
 		// the board is filled upwards
 		for (int y = 0; y < boardHeight; y++) {
 			for (int x = 0; x < boardWidth; x++) {
@@ -310,7 +312,7 @@ public abstract class Game implements Runnable, Serializable {
 			sleep(delay);
 		}
 	}
-
+	
 	/**
 	 * Animated clearing of a full line
 	 * 
@@ -323,13 +325,13 @@ public abstract class Game implements Runnable, Serializable {
 	protected void animatedClearLine(Board board, int x, int y) {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
-
+		
 		// change status form stopping other work
 		Status prevStatus = getStatus();
 		setStatus(Status.DoSomeWork);
-
+		
 		playEffect(Effects.remove_line);
-
+		
 		while ((x1 >= 0) || (x2 < board.getWidth())) {
 			if (x1 >= 0) {
 				board.setCell(Cell.Empty, x1--, y);
@@ -337,22 +339,22 @@ public abstract class Game implements Runnable, Serializable {
 			if (x2 < board.getWidth()) {
 				board.setCell(Cell.Empty, x2++, y);
 			}
-
+			
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
 		}
-
+		
 		// restore previous status
 		setStatus(prevStatus);
 	}
-
+	
 	/**
 	 * Select another rotation
 	 */
 	protected void changeRotation() {
 		setRotation(rotation.getNext());
 	}
-
+	
 	/**
 	 * Clears the cells of the board and fire the
 	 * {@link #fireBoardChanged(Board)} event
@@ -361,7 +363,7 @@ public abstract class Game implements Runnable, Serializable {
 		board.clearBoard();
 		fireBoardChanged(board);
 	}
-
+	
 	/**
 	 * Clears the cells of the preview and fire the
 	 * {@link #firePreviewChanged(Board)} event
@@ -370,7 +372,18 @@ public abstract class Game implements Runnable, Serializable {
 		preview.clearBoard();
 		firePreviewChanged(preview);
 	}
-
+	
+	/**
+	 * Returns {@code true} if the {@code keys} set contains the specified
+	 * {@code key} and processing of this {@code key} isn't suspended.
+	 * 
+	 * @param key
+	 *            specified key
+	 */
+	protected boolean containsKey(KeyPressed key) {
+		return keys.contains(key) && !isKeySuspended(key);
+	}
+	
 	/**
 	 * Calculates if elapsed of {@code millis} since the last time point. If
 	 * elapsed, the time point is set the current time.
@@ -387,91 +400,91 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Exit to Main menu
 	 */
 	protected void exitToMainMenu() {
 		stopAllSounds();
-
+		
 		setHiScore();
-
+		
 		Main.gameSelector.setSpeed(speed);
 		Main.gameSelector.setLevel(level);
-
+		
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
-
+	
 	protected synchronized void fireBoardChanged(Board board) {
 		GameEvent event = new GameEvent(this, (isInvertedBoard() ? getInvertedBoard(board) : board));
 		for (GameListener listener : listeners) {
 			listener.boardChanged(event);
 		}
 	}
-
+	
 	protected void fireExit() {
 		GameEvent event = new GameEvent(this);
 		for (GameListener listener : listeners) {
 			listener.exit(event);
 		}
 	}
-
+	
 	protected synchronized void fireInfoChanged(String info) {
 		GameEvent event = new GameEvent(this, info);
 		for (GameListener listener : listeners) {
 			listener.infoChanged(event);
 		}
 	}
-
+	
 	protected synchronized void fireLevelChanged(int level) {
 		GameEvent event = new GameEvent(this, level);
 		for (GameListener listener : listeners) {
 			listener.levelChanged(event);
 		}
 	}
-
+	
 	protected synchronized void firePreviewChanged(Board preview) {
 		GameEvent event = new GameEvent(this, preview);
 		for (GameListener listener : listeners) {
 			listener.previewChanged(event);
 		}
 	}
-
+	
 	protected void fireRotationChanged(Rotation rotation) {
 		GameEvent event = new GameEvent(this, rotation);
 		for (GameListener listener : listeners) {
 			listener.rotationChanged(event);
 		}
 	}
-
+	
 	protected synchronized void fireSpeedChanged(int speed) {
 		GameEvent event = new GameEvent(this, (float) speed);
 		for (GameListener listener : listeners) {
 			listener.speedChanged(event);
 		}
 	}
-
+	
 	protected synchronized void fireStatusChanged(Status status) {
 		GameEvent event = new GameEvent(this, status);
 		for (GameListener listener : listeners) {
 			listener.statusChanged(event);
 		}
 	}
-
+	
 	/**
 	 * Game Over
 	 */
 	protected void gameOver() {
 		setStatus(Status.GameOver);
-
+		
 		playMusic(Music.game_over);
-
+		
 		animatedClearBoard();
-
+		
 		exitToMainMenu();
 	}
-
+	
 	/**
 	 * Get the main board
 	 * 
@@ -480,15 +493,15 @@ public abstract class Game implements Runnable, Serializable {
 	protected synchronized Board getBoard() {
 		return board;
 	}
-
+	
 	protected int getFIRST_LEVEL_SPEED() {
 		return FIRST_LEVEL_SPEED;
 	}
-
+	
 	protected int getHiScore() {
 		return getScoresManager().getHiScore(this.getClass().getCanonicalName());
 	}
-
+	
 	/**
 	 * Level
 	 * 
@@ -497,7 +510,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected int getLevel() {
 		return level;
 	}
-
+	
 	/**
 	 * Get the preview board
 	 * 
@@ -506,7 +519,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected synchronized Board getPreview() {
 		return preview;
 	}
-
+	
 	/**
 	 * Get the direction of rotation
 	 * 
@@ -515,7 +528,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected Rotation getRotation() {
 		return rotation;
 	}
-
+	
 	/**
 	 * Get the score
 	 * 
@@ -524,7 +537,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected synchronized int getScore() {
 		return score;
 	}
-
+	
 	/**
 	 * Speed level
 	 * 
@@ -533,7 +546,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected int getSpeed() {
 		return getSpeed(false);
 	}
-
+	
 	/**
 	 * Speed
 	 * 
@@ -544,13 +557,13 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected synchronized int getSpeed(boolean genuine) {
 		if (genuine)
-			// getting a uniform distribution from FIRST_LEVEL_SPEED to
-			// TENTH_LEVEL_SPEED
+		// getting a uniform distribution from FIRST_LEVEL_SPEED to
+		// TENTH_LEVEL_SPEED
 			return (getFIRST_LEVEL_SPEED() - (getFIRST_LEVEL_SPEED() - getTENTH_LEVEL_SPEED())
 					/ (10 - 1) * (speed - 1));
 		return speed;
 	}
-
+	
 	/**
 	 * Get the status of game
 	 * 
@@ -559,11 +572,11 @@ public abstract class Game implements Runnable, Serializable {
 	protected synchronized Status getStatus() {
 		return status;
 	}
-
+	
 	protected int getTENTH_LEVEL_SPEED() {
 		return TENTH_LEVEL_SPEED;
 	}
-
+	
 	/**
 	 * Get the type of game
 	 * 
@@ -572,7 +585,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected int getType() {
 		return type;
 	}
-
+	
 	/**
 	 * Get the flag for the drawing the board invertedly
 	 * 
@@ -581,7 +594,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected boolean isInvertedBoard() {
 		return drawInvertedBoard;
 	}
-
+	
 	/**
 	 * Drawing effect of the explosion
 	 * 
@@ -601,49 +614,49 @@ public abstract class Game implements Runnable, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-				// 0
-				{ F, F, F },//
-				{ F, E, F },//
-				{ F, F, F } }, {
+					// 0
+					{ F, F, F },//
+					{ F, E, F },//
+					{ F, F, F } }, {
 					// 1
 					{ F, F, F, F, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, F, F, F, F } }, {
-						// 2
-						{ F, E, F, E, F },//
-						{ E, E, E, E, E },//
-						{ F, E, E, E, F },//
-						{ E, E, E, E, E },//
-						{ F, E, F, E, F } }, {
-							// 3
-							{ F, E, F, E, F },//
-							{ E, F, F, F, E },//
-							{ F, F, E, F, F },//
-							{ E, F, F, F, E },//
-							{ F, E, F, E, F } }, {
-								// 4
-								{ E, E, E, E, E },//
-								{ E, F, F, F, E },//
-								{ E, F, E, F, E },//
-								{ E, F, F, F, E },//
-								{ E, E, E, E, E } }, {
-									// 5
-									{ E, E, E, E, E },//
-									{ E, E, E, E, E },//
-									{ E, E, F, E, E },//
-									{ E, E, E, E, E },//
-									{ E, E, E, E, E } }, {
-										// 6
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E } }
-
+					// 2
+					{ F, E, F, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, E, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, F, E, F } }, {
+					// 3
+					{ F, E, F, E, F },//
+					{ E, F, F, F, E },//
+					{ F, F, E, F, F },//
+					{ E, F, F, F, E },//
+					{ F, E, F, E, F } }, {
+					// 4
+					{ E, E, E, E, E },//
+					{ E, F, F, F, E },//
+					{ E, F, E, F, E },//
+					{ E, F, F, F, E },//
+					{ E, E, E, E, E } }, {
+					// 5
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }, {
+					// 6
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }
+			
 			};
-
+			
 			/**
 			 * Drawing a single pass of the blast wave
 			 * 
@@ -659,23 +672,23 @@ public abstract class Game implements Runnable, Serializable {
 				// of the lower left corner
 				int lowerLeftX = x - (waves[wave][0].length / 2);
 				int lowerLeftY = y - (waves[wave].length / 2);
-
+				
 				insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY);
 				fireBoardChanged(getBoard());
-
+				
 				sleep(ANIMATION_DELAY * 2);
 			}
 		}
-
+		
 		// diameter of the explosion
 		// must be an odd number
 		final int EXPLODE_SIZE = 5;
-
+		
 		final int BLAST_WAVE_PASSES = 4;
-
+		
 		int newX = x;
 		int newY = y;
-
+		
 		// if the explosion leave off the board, move the epicenter point
 		while ((newX - EXPLODE_SIZE / 2) < 0) {
 			newX++;
@@ -689,11 +702,11 @@ public abstract class Game implements Runnable, Serializable {
 		while ((newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardHeight) {
 			newY--;
 		}
-
+		
 		playMusic(Music.kaboom);
-
+		
 		Kaboom kaboom = new Kaboom();
-
+		
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
 			// draw the blast waves
 			for (int k = 0; k < kaboom.waves.length; k++) {
@@ -701,7 +714,7 @@ public abstract class Game implements Runnable, Serializable {
 			}
 		}
 	}
-
+	
 	/**
 	 * Processing key pressing
 	 * 
@@ -713,16 +726,16 @@ public abstract class Game implements Runnable, Serializable {
 			// swap the up and down buttons
 			if (key == KeyPressed.KeyDown) {
 				keys.add(KeyPressed.KeyUp);
-			} else if (key == KeyPressed.KeyUp) {
-				keys.add(KeyPressed.KeyDown);
-			} else {
-				keys.add(key);
+				return;
 			}
-		} else {
-			keys.add(key);
+			if (key == KeyPressed.KeyUp) {
+				keys.add(KeyPressed.KeyDown);
+				return;
+			}
 		}
+		keys.add(key);
 	}
-
+	
 	/**
 	 * Processing key releasing
 	 * 
@@ -743,7 +756,7 @@ public abstract class Game implements Runnable, Serializable {
 			keys.remove(key);
 		}
 	}
-
+	
 	/**
 	 * Pause
 	 */
@@ -753,30 +766,30 @@ public abstract class Game implements Runnable, Serializable {
 			fireInfoChanged(String.valueOf(score));
 			// send high score
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
-
+			
 			setStatus(Status.Paused);
 			stopAllSounds();
 		}
 	}
-
+	
 	/**
 	 * Processing of key presses
 	 */
 	protected void processKeys() {
 		if (getStatus() == Status.None) return;
-
+		
 		if (keys.contains(KeyPressed.KeyOnOff)) {
 			keys.remove(KeyPressed.KeyOnOff);
 			quit();
 			return;
 		}
-
+		
 		if (keys.contains(KeyPressed.KeyReset)) {
 			keys.remove(KeyPressed.KeyReset);
 			exitToMainMenu();
 			return;
 		}
-
+		
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
 			if (getStatus() != Status.Paused) {
@@ -786,13 +799,13 @@ public abstract class Game implements Runnable, Serializable {
 			}
 			return;
 		}
-
+		
 		if (keys.contains(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
 			setMuted(!isMuted());
 			return;
 		}
-
+		
 		if (getStatus() == Status.Paused) {
 			if (keys.contains(KeyPressed.KeyRotate)) {
 				keys.remove(KeyPressed.KeyRotate);
@@ -800,7 +813,7 @@ public abstract class Game implements Runnable, Serializable {
 			}
 		}
 	}
-
+	
 	/**
 	 * Quit from the game
 	 */
@@ -810,7 +823,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		fireExit();
 	}
-
+	
 	/**
 	 * Resume
 	 */
@@ -819,12 +832,12 @@ public abstract class Game implements Runnable, Serializable {
 			setStatus(Status.Running);
 		}
 	}
-
+	
 	@Override
 	public void run() {
 		start();
 	}
-
+	
 	/**
 	 * Save state of the current game
 	 * 
@@ -837,7 +850,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Set the main board and fire the {@link #fireBoardChanged(Board)} event
 	 * 
@@ -848,7 +861,7 @@ public abstract class Game implements Runnable, Serializable {
 		this.board = board;
 		fireBoardChanged(board);
 	}
-
+	
 	/**
 	 * Set the flag for the drawing the board invertedly
 	 * 
@@ -858,11 +871,11 @@ public abstract class Game implements Runnable, Serializable {
 	protected void setDrawInvertedBoard(boolean drawInvertedBoard) {
 		this.drawInvertedBoard = drawInvertedBoard;
 	}
-
+	
 	protected int setHiScore() {
 		return getScoresManager().setHiScore(this.getClass().getCanonicalName(), getScore());
 	}
-
+	
 	/**
 	 * Set level and fire the {@link #fireLevelChanged(int)} event
 	 * 
@@ -879,7 +892,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		fireLevelChanged(this.level);
 	}
-
+	
 	/**
 	 * Set the main preview and fire the {@link #firePreviewChanged(Board)}
 	 * event
@@ -891,7 +904,7 @@ public abstract class Game implements Runnable, Serializable {
 		this.preview = preview;
 		firePreviewChanged(preview);
 	}
-
+	
 	/**
 	 * Set the direction of rotation and fire the
 	 * {@link #fireRotationChanged(Rotation)} event
@@ -903,7 +916,7 @@ public abstract class Game implements Runnable, Serializable {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
 	}
-
+	
 	/**
 	 * Set the score and fire the {@link #fireInfoChanged(String)} event
 	 * 
@@ -920,7 +933,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		fireInfoChanged(String.valueOf(score));
 	}
-
+	
 	/**
 	 * Set speed level and fire the {@link #fireSpeedChanged(int)} event
 	 * 
@@ -937,7 +950,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		fireSpeedChanged(this.speed);
 	}
-
+	
 	/**
 	 * Set the status of game and fire the {@link #fireStatusChanged(Status)}
 	 * event
@@ -949,7 +962,7 @@ public abstract class Game implements Runnable, Serializable {
 		this.status = status;
 		fireStatusChanged(status);
 	}
-
+	
 	public void start() {
 		fireBoardChanged(board);
 		firePreviewChanged(preview);
@@ -961,5 +974,5 @@ public abstract class Game implements Runnable, Serializable {
 		fireInfoChanged(String.valueOf(score));
 		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
-
+	
 }

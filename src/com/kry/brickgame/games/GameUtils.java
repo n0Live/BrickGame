@@ -1,9 +1,12 @@
 package com.kry.brickgame.games;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.shapes.CoordinatedShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.sound.SoundBank;
@@ -39,6 +42,15 @@ public final class GameUtils {
 	public static final SoundBank melodies = new SoundBank();
 	
 	/**
+	 * Suspended keys
+	 * <p>
+	 * {@code Long} <b>value</b> - time to which the processing of a key is
+	 * suspended.
+	 */
+	protected static final Map<KeyPressed, Long> suspendedKeys = new HashMap<>(
+			KeyPressed.values().length);
+	
+	/**
 	 * Add randomly generated lines on the board
 	 * 
 	 * @param board
@@ -51,8 +63,8 @@ public final class GameUtils {
 	 *            if {@code true}, then the bottom-up direction of addition
 	 * @return the board after adding lines
 	 */
-	protected static Board addLinesToBoard(Board board, int fromLine,
-			int linesCount, boolean isUpwardDirection) {
+	protected static Board addLinesToBoard(Board board, int fromLine, int linesCount,
+			boolean isUpwardDirection) {
 		if (board == null) return board;
 		
 		if ((linesCount < 1)//
@@ -78,8 +90,7 @@ public final class GameUtils {
 		
 		// picks up or downs the lines of the board
 		if (isUpwardDirection) {
-			for (int y = (board.getHeight() - 1) - 1; y > fromLine
-					+ (linesCount - 1); y--) {
+			for (int y = (board.getHeight() - 1) - 1; y > fromLine + (linesCount - 1); y--) {
 				board.setRow(board.getRow(y - 1), y);
 			}
 		} else {
@@ -108,13 +119,11 @@ public final class GameUtils {
 			// if all the cells were empty, creates a full one in a random place
 			// of the line
 			if (!hasEmpty || !hasFull) {
-				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty
-						: Cell.Full);
+				newLines[line][r.nextInt(board.getWidth())] = ((!hasEmpty) ? Cell.Empty : Cell.Full);
 			}
 			
 			// adds the created line to the board
-			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line
-					: fromLine - line));
+			board.setRow(newLines[line], (isUpwardDirection ? fromLine + line : fromLine - line));
 		}
 		return board;
 	}
@@ -142,8 +151,8 @@ public final class GameUtils {
 		for (int i = 0; i < Math.abs(reducedDX); i++) {
 			// if shift to the right, then get the first column as temporary,
 			// otherwise get the last column
-			Cell[] tempColumn = (reducedDX > 0) ? board.getColumn(board
-					.getWidth() - 1) : board.getColumn(0);
+			Cell[] tempColumn = (reducedDX > 0) ? board.getColumn(board.getWidth() - 1) : board
+					.getColumn(0);
 			
 			for (int j = 0; j < board.getWidth(); j++) {
 				Cell[] nextColumn = null;
@@ -155,8 +164,7 @@ public final class GameUtils {
 				} else {
 					// replace the column in the middle of the board to the
 					// appropriate adjacent column
-					nextColumn = board.getColumn(j
-							+ ((reducedDX > 0) ? (-1) : 1));
+					nextColumn = board.getColumn(j + ((reducedDX > 0) ? (-1) : 1));
 				}
 				resultBoard.setColumn(nextColumn, j);
 			}
@@ -184,8 +192,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionHorisontal
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollision(Board board, Shape piece,
-			int x, int y) {
+	protected static boolean checkBoardCollision(Board board, Shape piece, int x, int y) {
 		return checkBoardCollisionVertical(board, piece, y, true)
 				|| checkBoardCollisionHorizontal(board, piece, x);
 	}
@@ -205,10 +212,8 @@ public final class GameUtils {
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollisionHorizontal(Board board,
-			Shape piece, int x) {
-		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= board.getWidth())
-			return true;
+	protected static boolean checkBoardCollisionHorizontal(Board board, Shape piece, int x) {
+		if ((x + piece.minX()) < 0 || (x + piece.maxX()) >= board.getWidth()) return true;
 		return false;
 	}
 	
@@ -229,10 +234,9 @@ public final class GameUtils {
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollisionVertical(Board board,
-			Shape piece, int y, boolean checkTopBoundary) {
-		if (checkTopBoundary && ((y + piece.maxY()) >= board.getHeight()))
-			return true;
+	protected static boolean checkBoardCollisionVertical(Board board, Shape piece, int y,
+			boolean checkTopBoundary) {
+		if (checkTopBoundary && ((y + piece.maxY()) >= board.getHeight())) return true;
 		if ((y + piece.minY()) < 0) return true;
 		return false;
 	}
@@ -253,8 +257,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y) {
+	protected static boolean checkCollision(Board board, Shape piece, int x, int y) {
 		return checkCollision(board, piece, x, y, false);
 	}
 	
@@ -277,8 +280,8 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x,
-			int y, boolean withBorder) {
+	protected static boolean checkCollision(Board board, Shape piece, int x, int y,
+			boolean withBorder) {
 		int board_x, board_y;
 		if (withBorder) {
 			for (int k = 0; k < piece.getLength(); k++) {
@@ -288,14 +291,12 @@ public final class GameUtils {
 						board_x = x + piece.x(k) + i;
 						board_y = y + piece.y(k) + j;
 						
-						if ((board_x < 0) || (board_x >= board.getWidth())
-								|| (board_y < 0)
+						if ((board_x < 0) || (board_x >= board.getWidth()) || (board_y < 0)
 								|| (board_y >= board.getHeight())) {
 							continue;
 						}
 						
-						if (board.getCell(board_x, board_y) != Cell.Empty)
-							return true;
+						if (board.getCell(board_x, board_y) != Cell.Empty) return true;
 					}
 				}
 			}
@@ -304,8 +305,8 @@ public final class GameUtils {
 				board_x = x + piece.x(i);
 				board_y = y + piece.y(i);
 				
-				if ((board_x < 0) || (board_x >= board.getWidth())
-						|| (board_y < 0) || (board_y >= board.getHeight())) {
+				if ((board_x < 0) || (board_x >= board.getWidth()) || (board_y < 0)
+						|| (board_y >= board.getHeight())) {
 					continue;
 				}
 				
@@ -324,16 +325,14 @@ public final class GameUtils {
 	 *            the second figure
 	 * @return {@code true} if there is a collision
 	 */
-	protected static boolean checkTwoShapeCollision(CoordinatedShape first,
-			CoordinatedShape second) {
+	protected static boolean checkTwoShapeCollision(CoordinatedShape first, CoordinatedShape second) {
 		if (first == null || second == null) return false;
 		
 		// when the figures are placed too far apart, returns false
-		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math
-				.max(first.getHeight(), second.getHeight())
-				&& Math.abs(first.x() + first.minX() - second.x()
-						+ second.minX()) > Math.max(first.getWidth(),
-						second.getWidth())) return false;
+		if (Math.abs(first.y() + first.minY() - second.y() + second.minY()) > Math.max(
+				first.getHeight(), second.getHeight())
+				&& Math.abs(first.x() + first.minX() - second.x() + second.minX()) > Math.max(
+						first.getWidth(), second.getWidth())) return false;
 		
 		for (int i = 0; i < first.getLength(); i++) {
 			int givenFirstX = first.x() + first.x(i);
@@ -343,8 +342,7 @@ public final class GameUtils {
 				int givenSecondX = second.x() + second.x(j);
 				int givenSecondY = second.y() + second.y(j);
 				
-				if (givenFirstX == givenSecondX && givenFirstY == givenSecondY)
-					return true;
+				if (givenFirstX == givenSecondX && givenFirstY == givenSecondY) return true;
 			}
 		}
 		return false;
@@ -401,8 +399,7 @@ public final class GameUtils {
 	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * @return the board with the figure
 	 */
-	protected static Board drawShape(Board board, CoordinatedShape shape,
-			Cell fill) {
+	protected static Board drawShape(Board board, CoordinatedShape shape, Cell fill) {
 		return drawShape(board, shape.x(), shape.y(), shape, fill);
 	}
 	
@@ -422,8 +419,7 @@ public final class GameUtils {
 	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * @return the board with the figure
 	 */
-	protected static Board drawShape(Board board, int x, int y, Shape shape,
-			Cell fill) {
+	protected static Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
 		if (shape == null || board == null) return board;
 		
 		for (int i = 0; i < shape.getLength(); i++) {
@@ -471,29 +467,39 @@ public final class GameUtils {
 	 *            y-coordinate for the insertion
 	 * @return {@code true} if the insertion is success, otherwise {@code false}
 	 */
-	protected static void insertCellsToBoard(Board board, Cell[][] cells,
-			int x, int y) {
+	protected static void insertCellsToBoard(Board board, Cell[][] cells, int x, int y) {
 		if (board == null) return;
 		
-		if ((x >= board.getWidth()) || (y >= board.getHeight())
-				|| (x + cells.length <= 0) || (y + cells[0].length <= 0))
-			return;
+		if ((x >= board.getWidth()) || (y >= board.getHeight()) || (x + cells.length <= 0)
+				|| (y + cells[0].length <= 0)) return;
 		
 		// calculate the shift when the cells is not completely inserted into
 		// the board
 		int fromX = (x < 0) ? -x : 0;
-		int toX = (x + cells.length >= board.getWidth()) ? board.getWidth() - x
-				: cells.length;
+		int toX = (x + cells.length >= board.getWidth()) ? board.getWidth() - x : cells.length;
 		
 		int fromY = (y < 0) ? -y : 0;
-		int toY = (y + cells[0].length >= board.getHeight()) ? board
-				.getHeight() - y : cells[0].length;
+		int toY = (y + cells[0].length >= board.getHeight()) ? board.getHeight() - y
+				: cells[0].length;
 		
 		for (int i = fromX; i < toX; i++) {
 			for (int j = fromY; j < toY; j++) {
 				board.setCell(cells[i][j], x + i, y + j);
 			}
 		}
+	}
+	
+	/**
+	 * Returns {@code true} if processing of the {@code key} is suspended.
+	 * 
+	 * @param key
+	 *            specified key
+	 */
+	protected static boolean isKeySuspended(KeyPressed key) {
+		if (!suspendedKeys.containsKey(key)) return false;
+		if (suspendedKeys.get(key) > System.currentTimeMillis()) return true;
+		suspendedKeys.remove(key);
+		return false;
 	}
 	
 	/**
@@ -507,8 +513,7 @@ public final class GameUtils {
 	 *            delay before starting the second audio stream. 0 -without
 	 *            echo.
 	 */
-	protected static <E extends Enum<E>> void loop(SoundBank soundBank,
-			Enum<E> sound, int echoDelay) {
+	protected static <E extends Enum<E>> void loop(SoundBank soundBank, Enum<E> sound, int echoDelay) {
 		if (!Game.isMuted()) {
 			SoundManager.loop(soundBank, sound);
 			// double loop - workaround for ending gap
@@ -527,8 +532,7 @@ public final class GameUtils {
 	 * @param sound
 	 *            {@code enum} value, containing the name of the sound
 	 */
-	protected static <E extends Enum<E>> void play(SoundBank soundBank,
-			Enum<E> sound) {
+	protected static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> sound) {
 		if (!Game.isMuted()) {
 			SoundManager.play(soundBank, sound);
 		}
@@ -576,6 +580,19 @@ public final class GameUtils {
 				SoundManager.play(music, sound);
 			}
 		}
+	}
+	
+	/**
+	 * Suspends processing of the {@code key} for a specified period of time in
+	 * milliseconds.
+	 * 
+	 * @param key
+	 *            specified key
+	 * @param millis
+	 *            period of time
+	 */
+	protected static void setKeyDelay(KeyPressed key, int millis) {
+		suspendedKeys.put(key, System.currentTimeMillis() + millis);
 	}
 	
 	/**
