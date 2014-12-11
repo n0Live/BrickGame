@@ -518,7 +518,7 @@ public final class GameUtils {
 			SoundManager.loop(soundBank, sound);
 			// double loop - workaround for ending gap
 			if (echoDelay > 0) {
-				Game.sleep(echoDelay);
+				sleep(echoDelay);
 				SoundManager.loop(soundBank, sound);
 			}
 		}
@@ -602,6 +602,20 @@ public final class GameUtils {
 		effects.stopAll();
 		music.stopAll();
 		melodies.stopAll();
+	}
+
+	/**
+	 * Sleep for the specified number of milliseconds
+	 * 
+	 * @param millis
+	 *            the length of time to sleep in milliseconds
+	 */
+	public static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
 	}
 	
 }

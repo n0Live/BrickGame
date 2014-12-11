@@ -3,6 +3,7 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
 import static com.kry.brickgame.games.GameUtils.playMusic;
+import static com.kry.brickgame.games.GameUtils.sleep;
 
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.Rotation;
@@ -14,7 +15,7 @@ import com.kry.brickgame.games.GameUtils.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
-	
+
 	/**
 	 * Play "start" music and wait for its ending or, if muted, jast wait 1.5
 	 * sec.
@@ -26,16 +27,16 @@ public abstract class GameWithLives extends Game {
 			sleep(1500);
 		}
 	}
-	
+
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-	
+
 	protected boolean start;
-	
+
 	/**
 	 * The Game with lives without rotation
 	 * 
@@ -49,7 +50,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
 	}
-	
+
 	/**
 	 * The Game with lives
 	 * <p>
@@ -66,11 +67,11 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		
+
 		setLives(4);
 		start = true;
 	}
-	
+
 	/**
 	 * Lives
 	 * 
@@ -79,7 +80,7 @@ public abstract class GameWithLives extends Game {
 	protected synchronized int getLives() {
 		return lives;
 	}
-	
+
 	/**
 	 * Loading the specified level
 	 */
@@ -90,7 +91,7 @@ public abstract class GameWithLives extends Game {
 		}
 		setStatus(Status.Running);
 	}
-	
+
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -101,7 +102,7 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void loss(int x, int y) {
 		setStatus(Status.DoSomeWork);
-		
+
 		// kaboom and decrease lives
 		kaboom(x, y);
 		setLives(getLives() - 1);
@@ -112,14 +113,14 @@ public abstract class GameWithLives extends Game {
 			gameOver();
 		}
 	}
-	
+
 	/**
 	 * Reloading the specified level
 	 */
 	protected void reloadLevel() {
 		loadNewLevel();
 	}
-	
+
 	/**
 	 * Set lives
 	 * 
@@ -143,7 +144,7 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-	
+
 	@Override
 	public void start() {
 		super.start();
@@ -153,22 +154,22 @@ public abstract class GameWithLives extends Game {
 			playAndWaitMusic();
 		}
 	}
-	
+
 	/**
 	 * Increase the level and load it
 	 */
 	protected void win() {
 		setStatus(Status.DoSomeWork);
-		
+
 		playMusic(Music.win);
 		animatedClearBoard(CB_WIN);
-		
+
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1) {
 			setSpeed(getSpeed() + 1);
 		}
-		
+
 		loadNewLevel();
 	}
-	
+
 }
