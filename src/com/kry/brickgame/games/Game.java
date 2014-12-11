@@ -397,6 +397,8 @@ public abstract class Game implements Runnable, Serializable {
 		Main.gameSelector.setSpeed(speed);
 		Main.gameSelector.setLevel(level);
 		
+		Main.gameSelector.setGameAndType(this.getClass().getCanonicalName(), getType());
+		
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
