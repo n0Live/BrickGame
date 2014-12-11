@@ -250,7 +250,7 @@ public class RacingGame extends GameWithLives {
 		
 		super.loadNewLevel();
 		
-		if (!start) {
+		if (!isStarted) {
 			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
 		}
 	}
@@ -388,7 +388,7 @@ public class RacingGame extends GameWithLives {
 	 * Launching the game
 	 */
 	@Override
-	public void start() {
+	protected void start() {
 		super.start();
 		
 		// don't start playing sound after deserialization

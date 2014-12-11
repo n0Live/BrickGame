@@ -6,104 +6,104 @@ import com.kry.brickgame.games.GameUtils;
 
 public class BricksWall extends Board {
 	private static final long serialVersionUID = -5524132721347429556L;
-
+	
 	static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
 			{ // 1
-					{ E, F, E, F, E, E, F, E, F, E },
+			{ E, F, E, F, E, E, F, E, F, E }, //
 					{ E, E, F, E, E, E, E, F, E, E },//
-					{ E, F, F, F, E, E, F, F, F, E },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ F, F, F, E, F, F, E, F, F, F },
-					{ E, F, F, F, F, F, F, F, F, E },
-					{ E, E, F, F, F, F, F, F, E, E },
+					{ E, F, F, F, E, E, F, F, F, E },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, F, F, E, F, F, E, F, F, F }, //
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ E, E, F, F, F, F, F, F, E, E },//
 					{ E, E, E, F, F, F, F, E, E, E }, },//
 			{// 2
-					{ F, F, F, F, F, F, F, F, F, F },
+			{ F, F, F, F, F, F, F, F, F, F },//
 					{ F, F, F, F, F, F, F, F, F, F },//
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ E, F, F, F, F, F, F, F, F, E },
-					{ E, F, F, F, F, F, F, F, F, E },
-					{ E, E, E, F, F, F, F, E, E, E },
-					{ E, E, E, F, F, F, F, E, E, E }, },//
-
-			{// 3
-					{ F, F, F, F, F, F, F, F, F, F },
+					{ F, F, F, F, F, F, F, F, F, F }, //
 					{ E, F, F, F, F, F, F, F, F, E },//
-					{ E, F, F, F, E, E, F, F, F, E },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ E, F, F, F, E, E, F, F, F, E },
-					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, F, F, F, F, F, F, F, F, E }, //
+					{ E, E, E, F, F, F, F, E, E, E },//
+					{ E, E, E, F, F, F, F, E, E, E }, },//
+			
+			{// 3
+			{ F, F, F, F, F, F, F, F, F, F },//
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ E, F, F, F, E, E, F, F, F, E },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ E, F, F, F, E, E, F, F, F, E },//
+					{ E, F, F, F, F, F, F, F, F, E },//
 					{ F, F, F, F, F, F, F, F, F, F }, },//
 			{// 4
-					{ E, F, F, F, F, F, F, F, F, E },
+			{ E, F, F, F, F, F, F, F, F, E },//
 					{ F, E, F, F, F, F, F, F, E, F },//
-					{ F, F, E, F, F, F, F, E, F, F },
-					{ F, F, F, E, F, F, E, F, F, F },
-					{ F, F, E, F, F, F, F, E, F, F },
-					{ F, E, F, F, F, F, F, F, E, F },
+					{ F, F, E, F, F, F, F, E, F, F },//
+					{ F, F, F, E, F, F, E, F, F, F },//
+					{ F, F, E, F, F, F, F, E, F, F },//
+					{ F, E, F, F, F, F, F, F, E, F },//
 					{ E, F, F, F, F, F, F, F, F, E }, },//
-
+			
 			{// 5
-					{ F, F, F, F, F, F, F, F, F, F },
+			{ F, F, F, F, F, F, F, F, F, F },//
 					{ E, F, F, F, F, F, F, F, F, E },//
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ E, F, F, F, F, F, F, F, F, E },//
 					{ F, F, F, F, F, F, F, F, F, F }, },//
 			{// 6
-					{ F, F, E, F, F, F, F, E, F, F },
+			{ F, F, E, F, F, F, F, E, F, F },//
 					{ F, E, F, F, E, E, F, F, E, F },//
-					{ E, E, F, E, F, F, E, F, E, E },
-					{ E, F, F, F, F, F, F, F, F, E },
-					{ F, F, F, F, E, E, F, F, F, F },
-					{ F, F, F, F, E, E, F, F, F, F },
-					{ E, F, F, F, F, F, F, F, F, E },
+					{ E, E, F, E, F, F, E, F, E, E },//
+					{ E, F, F, F, F, F, F, F, F, E },//
+					{ F, F, F, F, E, E, F, F, F, F }, //
+					{ F, F, F, F, E, E, F, F, F, F },//
+					{ E, F, F, F, F, F, F, F, F, E },//
 					{ E, E, F, F, F, F, F, F, E, E }, },//
 			{// 7
-					{ F, E, E, F, E, E, F, E, E, F },
+			{ F, E, E, F, E, E, F, E, E, F },//
 					{ F, E, F, F, F, F, F, F, E, F },//
-					{ F, E, F, F, F, F, F, F, E, F },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ F, E, F, F, F, F, F, F, E, F },
-					{ F, E, F, F, F, F, F, F, E, F },
+					{ F, E, F, F, F, F, F, F, E, F },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, E, F, F, F, F, F, F, E, F },//
+					{ F, E, F, F, F, F, F, F, E, F },//
 					{ F, E, E, F, E, E, F, E, E, F }, },//
 			{// 8
-					{ E, E, F, F, F, F, F, F, E, E },
+			{ E, E, F, F, F, F, F, F, E, E },//
 					{ E, F, F, F, F, F, F, F, F, E },//
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ E, E, F, E, F, F, E, F, E, E },
-					{ E, F, E, E, F, F, E, E, F, E },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ E, F, F, F, F, F, F, F, F, E },
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ E, E, F, E, F, F, E, F, E, E },//
+					{ E, F, E, E, F, F, E, E, F, E }, //
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ E, F, F, F, F, F, F, F, F, E }, //
 					{ E, E, F, F, F, F, F, F, E, E }, },//
 			{ // 9
-					{ F, F, E, E, F, F, E, E, F, F },
+			{ F, F, E, E, F, F, E, E, F, F },//
 					{ E, F, F, E, F, F, E, F, F, E },//
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ F, F, F, F, F, F, F, F, F, F },
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ E, F, F, E, F, F, E, F, F, E },
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ F, F, F, F, F, F, F, F, F, F },//
+					{ F, F, F, F, F, F, F, F, F, F }, //
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ E, F, F, E, F, F, E, F, F, E }, //
 					{ F, F, E, E, F, F, E, E, F, F }, },//
 			{// 10
-					{ E, E, F, F, F, F, F, F, E, E },
+			{ E, E, F, F, F, F, F, F, E, E },//
 					{ E, F, F, F, F, F, E, F, F, E },//
-					{ F, F, E, E, F, F, F, F, F, F },
-					{ E, F, F, E, F, F, E, E, E, E },
-					{ E, F, F, F, F, F, F, F, F, E },
-					{ E, E, F, F, F, F, F, F, E, E },
-					{ E, E, E, F, F, F, F, E, E, E },
+					{ F, F, E, E, F, F, F, F, F, F },//
+					{ E, F, F, E, F, F, E, E, E, E },//
+					{ E, F, F, F, F, F, F, F, F, E }, //
+					{ E, E, F, F, F, F, F, F, E, E },//
+					{ E, E, E, F, F, F, F, E, E, E },//
 					{ E, E, E, E, F, F, E, E, E, E }, },//
 	};
-
+	
 	/**
 	 * Number of bricks is not broken at the current level
 	 */
-	private int bricksCount;
-
+	private volatile int bricksCount;
+	
 	/**
 	 * The copy constructor of a bricks wall
 	 * 
@@ -114,7 +114,7 @@ public class BricksWall extends Board {
 		super(aBricksWall);
 		setBricksCount(aBricksWall.getBricksCount());
 	}
-
+	
 	/**
 	 * Creating the bricks wall
 	 * 
@@ -127,18 +127,16 @@ public class BricksWall extends Board {
 	public BricksWall(int level, boolean usePreloadedBricks) {
 		// for generated bricks wall is height from 6 on level 1, to 9 on level
 		// 10
-		super(preloadedBricks[level][0].length,
-				usePreloadedBricks ? preloadedBricks[level].length
-						: level / 2 + 5);
-
-		if (usePreloadedBricks
-				&& ((level >= 0) && (level < preloadedBricks.length))) {
+		super(preloadedBricks[level][0].length, usePreloadedBricks ? preloadedBricks[level].length
+				: level / 2 + 5);
+		
+		if (usePreloadedBricks && ((level >= 0) && (level < preloadedBricks.length))) {
 			setPreloadedBricks(level);
 		} else {
 			generateBricks();
 		}
 	}
-
+	
 	/**
 	 * Processing breaking bricks
 	 * 
@@ -148,9 +146,8 @@ public class BricksWall extends Board {
 	 *            y-coordinate of the brick for breaking
 	 */
 	public boolean breakBrick(int x, int y) {
-		if ((x < 0) || (x >= getWidth()) || (y < 0) || (y >= getHeight()))
-			return false;
-
+		if ((x < 0) || (x >= getWidth()) || (y < 0) || (y >= getHeight())) return false;
+		
 		if (getCell(x, y) != Cell.Empty) {
 			setCell(Cell.Empty, x, y);
 			// decrease bricks count
@@ -159,46 +156,42 @@ public class BricksWall extends Board {
 		}
 		return false;
 	}
-
+	
 	@Override
 	public BricksWall clone() {
 		super.clone();
 		return new BricksWall(this);
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		if (this == obj) return true;
+		if (!super.equals(obj)) return false;
+		if (getClass() != obj.getClass()) return false;
 		BricksWall other = (BricksWall) obj;
-		if (bricksCount != other.bricksCount)
-			return false;
+		if (bricksCount != other.bricksCount) return false;
 		return true;
 	}
-
+	
 	/**
 	 * Creating the randomly generated bricks wall
 	 */
 	private void generateBricks() {
 		Random r = new Random();
-
+		
 		setBricksCount(0);
-
+		
 		// on one chance from 3 - the wall has a vertical symmetry
 		boolean isVerticalSymmetry = (r.nextInt(3) == 0);
 		// calculate center for a vertical symmetry
 		// (for odd and even lines count)
 		int centerPoint = getHeight() / 2 + ((getHeight() % 2 != 0) ? 1 : 0);
-
+		
 		for (int i = 0; i < getHeight(); i++) {
 			if (isVerticalSymmetry && (i >= centerPoint)) {
-
+				
 				setRow(getRow(getHeight() - 1 - i), i);
-
+				
 				for (int j = 0; j < getWidth() / 2; j++) {
 					// calculate count of the bricks
 					if (getCell(j, i) == Cell.Full) {
@@ -211,7 +204,7 @@ public class BricksWall extends Board {
 					Cell brick = (r.nextInt(3) == 0) ? Cell.Empty : Cell.Full;
 					setCell(brick, j, i);
 					setCell(brick, getWidth() - 1 - j, i);
-
+					
 					// calculate count of the bricks
 					if (brick == Cell.Full) {
 						setBricksCount(getBricksCount() + 2);
@@ -220,11 +213,11 @@ public class BricksWall extends Board {
 			}
 		}
 	}
-
+	
 	public int getBricksCount() {
 		return bricksCount;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -232,11 +225,11 @@ public class BricksWall extends Board {
 		result = prime * result + bricksCount;
 		return result;
 	}
-
+	
 	public void setBricksCount(int bricksCount) {
 		this.bricksCount = bricksCount;
 	}
-
+	
 	/**
 	 * Setting predefined bricks wall
 	 */
@@ -245,7 +238,7 @@ public class BricksWall extends Board {
 		for (int i = 0; i < getHeight(); i++) {
 			// the bricks is filled from the bottom up
 			setRow(preloadedBricks[level][getHeight() - 1 - i], i);
-
+			
 			// calculate count of the bricks
 			for (int j = 0; j < getWidth(); j++) {
 				if (getCell(j, i) == Cell.Full) {
@@ -253,9 +246,9 @@ public class BricksWall extends Board {
 				}
 			}
 		}
-
+		
 	}
-
+	
 	/**
 	 * Shift the bricks wall horizontally on the delta x
 	 * 
@@ -267,5 +260,5 @@ public class BricksWall extends Board {
 	public BricksWall shift(int dX) {
 		return (BricksWall) GameUtils.boardHorizontalShift(this, dX);
 	}
-
+	
 }

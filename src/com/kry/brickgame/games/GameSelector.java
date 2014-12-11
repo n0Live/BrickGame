@@ -421,7 +421,7 @@ public class GameSelector extends Game {
 	}
 	
 	@Override
-	public void start() {
+	protected void start() {
 		clearBoard();
 		clearPreview();
 		

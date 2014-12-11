@@ -571,11 +571,12 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * Shift the bricks wall horizontally
 	 */
-	synchronized void shiftBricks() {
+	void shiftBricks() {
 		// shift bricks
 		bricks = bricks.shift((getRotation() == Rotation.Clockwise) ? 1 : -1);
 		// insert shifted bricks to the board
-		Board board = getBoard().clone();
+		Board board = getBoard();
+		// .clone();
 		insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
 		setBoard(drawBall(board, ballX, ballY));
@@ -585,7 +586,7 @@ public class ArkanoidGame extends GameWithLives {
 	 * Launching the game
 	 */
 	@Override
-	public void start() {
+	protected void start() {
 		super.start();
 		// create timer for shift the bricks
 		Timer shiftBricksTimer = new Timer("ShiftBricksTimer", true);

@@ -3,7 +3,6 @@ package com.kry.brickgame.UI;
 import java.util.EventObject;
 
 import com.kry.brickgame.boards.Board;
-import com.kry.brickgame.games.GameConsts;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 
@@ -18,16 +17,6 @@ public class GameEvent extends EventObject {
 	public GameEvent(Object source) {
 		super(source);
 		properties = new GameProperties();
-	}
-	
-	public GameEvent(Object source, Board board) {
-		this(source);
-		if (board.getWidth() == GameConsts.PREVIEW_WIDTH
-				&& board.getHeight() == GameConsts.PREVIEW_HEIGHT) {
-			properties.preview = board;
-		} else {
-			properties.board = board;
-		}
 	}
 	
 	/**
@@ -62,6 +51,15 @@ public class GameEvent extends EventObject {
 		properties.level = level;
 		properties.rotation = rotation;
 		properties.mute = mute;
+	}
+	
+	public GameEvent(Object source, Board board, boolean isPreview) {
+		this(source);
+		if (isPreview) {
+			properties.preview = board;
+		} else {
+			properties.board = board;
+		}
 	}
 	
 	public GameEvent(Object source, boolean mute) {

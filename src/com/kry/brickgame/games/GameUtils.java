@@ -19,27 +19,27 @@ public final class GameUtils {
 	/**
 	 * Sound effects
 	 */
-	public enum Effects {
+	protected enum Effects {
 		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, start_engine, engine;
 	}
 	
 	/**
 	 * Melodies for Dance game
 	 */
-	public enum Melodies {
+	protected enum Melodies {
 		melody1, melody2, melody3, melody4, melody5, melody6, melody7, melody8, melody9;
 	}
 	
 	/**
 	 * Music
 	 */
-	public enum Music {
+	protected enum Music {
 		welcome, start, win, game_over, tetris, kaboom;
 	}
 	
-	public static final SoundBank effects = new SoundBank();
-	public static final SoundBank music = new SoundBank();
-	public static final SoundBank melodies = new SoundBank();
+	protected static final SoundBank effects = new SoundBank();
+	protected static final SoundBank music = new SoundBank();
+	protected static final SoundBank melodies = new SoundBank();
 	
 	/**
 	 * Suspended keys
@@ -596,26 +596,26 @@ public final class GameUtils {
 	}
 	
 	/**
+	 * Sleep for the specified number of milliseconds
+	 * 
+	 * @param millis
+	 *            the length of time to sleep in milliseconds
+	 */
+	protected static void sleep(long millis) {
+		try {
+			Thread.sleep(millis);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+	
+	/**
 	 * Stops playing for all sounds
 	 */
 	protected static void stopAllSounds() {
 		effects.stopAll();
 		music.stopAll();
 		melodies.stopAll();
-	}
-
-	/**
-	 * Sleep for the specified number of milliseconds
-	 * 
-	 * @param millis
-	 *            the length of time to sleep in milliseconds
-	 */
-	public static void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
 	}
 	
 }

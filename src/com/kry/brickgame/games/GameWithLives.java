@@ -15,10 +15,10 @@ import com.kry.brickgame.games.GameUtils.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
-
+	
 	/**
-	 * Play "start" music and wait for its ending or, if muted, jast wait 1.5
-	 * sec.
+	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
+	 * seconds
 	 */
 	private static void playAndWaitMusic() {
 		if (!isMuted()) {
@@ -27,16 +27,16 @@ public abstract class GameWithLives extends Game {
 			sleep(1500);
 		}
 	}
-
+	
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-
-	protected boolean start;
-
+	
+	protected boolean isStarted;
+	
 	/**
 	 * The Game with lives without rotation
 	 * 
@@ -50,7 +50,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
 	}
-
+	
 	/**
 	 * The Game with lives
 	 * <p>
@@ -67,31 +67,31 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-
+		
 		setLives(4);
-		start = true;
+		isStarted = true;
 	}
-
+	
 	/**
 	 * Lives
 	 * 
 	 * @return lives 0 - 4
 	 */
-	protected synchronized int getLives() {
+	protected int getLives() {
 		return lives;
 	}
-
+	
 	/**
 	 * Loading the specified level
 	 */
 	protected void loadNewLevel() {
-		// play music always except the first start
-		if (!start) {
+		// play music always except the first isStarted
+		if (!isStarted) {
 			playAndWaitMusic();
 		}
 		setStatus(Status.Running);
 	}
-
+	
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -102,7 +102,7 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void loss(int x, int y) {
 		setStatus(Status.DoSomeWork);
-
+		
 		// kaboom and decrease lives
 		kaboom(x, y);
 		setLives(getLives() - 1);
@@ -113,21 +113,21 @@ public abstract class GameWithLives extends Game {
 			gameOver();
 		}
 	}
-
+	
 	/**
 	 * Reloading the specified level
 	 */
 	protected void reloadLevel() {
 		loadNewLevel();
 	}
-
+	
 	/**
 	 * Set lives
 	 * 
 	 * @param lives
 	 *            lives 0 - 4
 	 */
-	protected synchronized void setLives(int lives) {
+	protected void setLives(int lives) {
 		if (lives > 4) {
 			this.lives = 4;
 		} else if (lives < 0) {
@@ -144,32 +144,32 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-
+	
 	@Override
-	public void start() {
+	protected void start() {
 		super.start();
-		// play music only in first start, not after deserialization
-		if (start) {
-			start = false;
+		// play music only in first isStarted, not after deserialization
+		if (isStarted) {
+			isStarted = false;
 			playAndWaitMusic();
 		}
 	}
-
+	
 	/**
 	 * Increase the level and load it
 	 */
 	protected void win() {
 		setStatus(Status.DoSomeWork);
-
+		
 		playMusic(Music.win);
 		animatedClearBoard(CB_WIN);
-
+		
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1) {
 			setSpeed(getSpeed() + 1);
 		}
-
+		
 		loadNewLevel();
 	}
-
+	
 }

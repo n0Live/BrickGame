@@ -208,7 +208,7 @@ public class DanceGame extends Game {
 	 * 
 	 * @return playback rate
 	 */
-	protected double calculateRate() {
+	private double calculateRate() {
 		return (1 + (double) getSpeed() / 10);
 	}
 	
@@ -220,7 +220,7 @@ public class DanceGame extends Game {
 	 *            checking {@code DancerShape}
 	 * @return {@code true} if is the coincidence
 	 */
-	protected boolean checkDanceStep(DancerShape dancer) {
+	private boolean checkDanceStep(DancerShape dancer) {
 		if (dancer == null) return true;
 		
 		return containsKey(keysToRotate.get(dancer.getRotationAngle()));
@@ -231,7 +231,7 @@ public class DanceGame extends Game {
 	 * 
 	 * @return a new dance position
 	 */
-	protected DancePosition createPosition() {
+	private DancePosition createPosition() {
 		// interval between positions from 3 to 1
 		int interval = (3 - getSpeed() / 3);
 		if (interval <= 0) {
@@ -284,7 +284,7 @@ public class DanceGame extends Game {
 	/**
 	 * Drawing the dance positions on the board
 	 */
-	protected void draw() {
+	private void draw() {
 		// create new board of suitable size
 		Board drawBoard = new Board(boardWidth, boardHeight - getLevel() + 1);
 		// draw positions
@@ -321,7 +321,7 @@ public class DanceGame extends Game {
 	 * 
 	 * @return current melody
 	 */
-	protected Melodies getMelody() {
+	private Melodies getMelody() {
 		if (melodyNumber >= Melodies.values().length) {
 			melodyNumber = 0;
 		}
@@ -334,7 +334,7 @@ public class DanceGame extends Game {
 	 * 
 	 * @return a dance position or {@code null} if no suitable position
 	 */
-	protected DancePosition getPosition() {
+	private DancePosition getPosition() {
 		for (DancePosition position : positions) {
 			// if that position at the lower edge of the board
 			if (position != null && position.y <= DancerShape.height && position.y >= 0) {
@@ -362,7 +362,7 @@ public class DanceGame extends Game {
 	 * @param score
 	 *            points for adding
 	 */
-	protected void increaseScores(int score) {
+	private void increaseScores(int score) {
 		playEffect(Effects.turn);
 		
 		setScore(getScore() + score + bonus);
@@ -373,7 +373,7 @@ public class DanceGame extends Game {
 	/**
 	 * Moving of the dance positions
 	 */
-	protected void move() {
+	private void move() {
 		for (int i = 0; i < positions.length; i++) {
 			if (positions[i] == null) {
 				positions[i] = createPosition();
@@ -456,7 +456,7 @@ public class DanceGame extends Game {
 	 * Launching the game
 	 */
 	@Override
-	public void start() {
+	protected void start() {
 		super.start();
 		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
@@ -479,7 +479,6 @@ public class DanceGame extends Game {
 						melodyNumber++;
 					}
 				}
-				
 				// move positions
 				move();
 			}

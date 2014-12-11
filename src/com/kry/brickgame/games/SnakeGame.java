@@ -343,7 +343,7 @@ public class SnakeGame extends GameWithLives {
 	 * Launching the game
 	 */
 	@Override
-	public void start() {
+	protected void start() {
 		super.start();
 		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
 			int currentSpeed = getSpeed(true);
