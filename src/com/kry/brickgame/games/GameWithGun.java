@@ -28,7 +28,7 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * Array that stores the coordinates of the bullets
 	 */
-	protected volatile AtomicReferenceArray<AtomicIntegerArray> bullets;
+	protected final AtomicReferenceArray<AtomicIntegerArray> bullets;
 	// is equals int[][] but atomic
 	
 	private final int bulletsArrayWidth, bulletsArrayHeight;
@@ -225,9 +225,7 @@ public abstract class GameWithGun extends GameWithLives {
 	protected boolean moveGun(int x, int y) {
 		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight)) return true;
 		
-		// Create a temporary board, a copy of the basic board
 		Board board = getBoard();
-		
 		
 		// Erase the gun to not interfere with the checks
 		board = drawShape(board, curX, curY, gun, Cell.Empty);

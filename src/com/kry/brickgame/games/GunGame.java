@@ -128,7 +128,6 @@ public class GunGame extends GameWithGun {
 	private boolean droppingDown() {
 		Board board = getBoard();
 		
-		
 		// erase the gun to not interfere with the checks
 		board = drawShape(board, curX, curY, gun, Cell.Empty);
 		// add line
@@ -274,8 +273,6 @@ public class GunGame extends GameWithGun {
 	 */
 	private void shiftBoard() {
 		Board board = getBoard();
-		
-		
 		// erase the gun to not interfere
 		board = drawShape(board, curX, curY, gun, Cell.Empty);
 		// remove bullets from the board
