@@ -36,7 +36,12 @@ public class ScoresManager {
 	 */
 	public static ScoresManager getScoresManager() {
 		if (null == instance) {
-			instance = new ScoresManager();
+			// double-checked locking
+			synchronized (ScoresManager.class) {
+				if (null == instance) {
+					instance = new ScoresManager();
+				}
+			}
 		}
 		return instance;
 	}

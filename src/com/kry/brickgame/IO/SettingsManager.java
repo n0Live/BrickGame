@@ -78,7 +78,12 @@ public class SettingsManager {
 	 */
 	public static SettingsManager getSettingsManager() {
 		if (null == instance) {
-			instance = new SettingsManager();
+			// double-checked locking
+			synchronized (SettingsManager.class) {
+				if (null == instance) {
+					instance = new SettingsManager();
+				}
+			}
 		}
 		return instance;
 	}
