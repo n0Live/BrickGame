@@ -11,16 +11,16 @@ import javafx.scene.media.MediaException;
  * @author noLive
  */
 public class SoundBank implements Iterable<AudioClip> {
-	
+
 	private final Map<String, AudioClip> clips;
-	
+
 	/**
 	 * Create an empty SoundBank.
 	 */
 	public SoundBank() {
 		clips = new HashMap<>();
 	}
-	
+
 	/**
 	 * Creates an SoundBank and loads {@code files} to it.
 	 * 
@@ -31,7 +31,7 @@ public class SoundBank implements Iterable<AudioClip> {
 		this();
 		loadSounds(files);
 	}
-	
+
 	/**
 	 * Gets the {@code AudioClip}, depending of the specified file name.
 	 * 
@@ -39,18 +39,18 @@ public class SoundBank implements Iterable<AudioClip> {
 	 *            file name of sound file
 	 * @return {@code AudioClip}
 	 */
-	public synchronized AudioClip getClip(String file) {
+	public AudioClip getClip(String file) {
 		if (!clips.containsKey(file)) {
 			loadSound(file);
 		}
 		return clips.get(file);
 	}
-	
+
 	@Override
 	public Iterator<AudioClip> iterator() {
 		return clips.values().iterator();
 	}
-	
+
 	/**
 	 * Loads {@code file} to the {@code SoundBank}.
 	 * 
@@ -69,7 +69,7 @@ public class SoundBank implements Iterable<AudioClip> {
 			clips.put(file, clip);
 		}
 	}
-	
+
 	/**
 	 * Loads {@code files} to the {@code SoundBank}.
 	 * 
@@ -81,7 +81,7 @@ public class SoundBank implements Iterable<AudioClip> {
 			loadSound(file);
 		}
 	}
-	
+
 	/**
 	 * Stops playing for all sounds in the {@code SoundBank}.
 	 */
@@ -92,5 +92,5 @@ public class SoundBank implements Iterable<AudioClip> {
 			}
 		}
 	}
-	
+
 }
