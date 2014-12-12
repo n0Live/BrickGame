@@ -28,7 +28,7 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * Array that stores the coordinates of the bullets
 	 */
-	protected AtomicReferenceArray<AtomicIntegerArray> bullets;
+	protected volatile AtomicReferenceArray<AtomicIntegerArray> bullets;
 	// is equals int[][] but atomic
 	
 	private final int bulletsArrayWidth, bulletsArrayHeight;
@@ -207,6 +207,12 @@ public abstract class GameWithGun extends GameWithLives {
 		}
 	}
 	
+	@Override
+	protected void loss(int x, int y) {
+		clearBullets(getBoard());
+		super.loss(x, y);
+	}
+	
 	/**
 	 * Move the gun to a new location
 	 * 
@@ -220,7 +226,8 @@ public abstract class GameWithGun extends GameWithLives {
 		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight)) return true;
 		
 		// Create a temporary board, a copy of the basic board
-		Board board = getBoard().clone();
+		Board board = getBoard();
+		// .clone();
 		
 		// Erase the gun to not interfere with the checks
 		board = drawShape(board, curX, curY, gun, Cell.Empty);
@@ -295,6 +302,12 @@ public abstract class GameWithGun extends GameWithLives {
 			result = true;
 		}
 		return result;
+	}
+	
+	@Override
+	protected void win() {
+		clearBullets(getBoard());
+		super.win();
 	}
 	
 }
