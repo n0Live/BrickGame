@@ -1,5 +1,6 @@
 package com.kry.brickgame.sound;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -11,16 +12,16 @@ import javafx.scene.media.MediaException;
  * @author noLive
  */
 public class SoundBank implements Iterable<AudioClip> {
-
+	
 	private final Map<String, AudioClip> clips;
-
+	
 	/**
 	 * Create an empty SoundBank.
 	 */
 	public SoundBank() {
-		clips = new HashMap<>();
+		clips = Collections.synchronizedMap(new HashMap<String, AudioClip>());
 	}
-
+	
 	/**
 	 * Creates an SoundBank and loads {@code files} to it.
 	 * 
@@ -31,7 +32,7 @@ public class SoundBank implements Iterable<AudioClip> {
 		this();
 		loadSounds(files);
 	}
-
+	
 	/**
 	 * Gets the {@code AudioClip}, depending of the specified file name.
 	 * 
@@ -45,12 +46,19 @@ public class SoundBank implements Iterable<AudioClip> {
 		}
 		return clips.get(file);
 	}
-
+	
+	/**
+	 * Returns {@code true} if this {@code SoundBank} contains no clips.
+	 */
+	public boolean isEmpty() {
+		return clips.isEmpty();
+	}
+	
 	@Override
 	public Iterator<AudioClip> iterator() {
 		return clips.values().iterator();
 	}
-
+	
 	/**
 	 * Loads {@code file} to the {@code SoundBank}.
 	 * 
@@ -69,7 +77,7 @@ public class SoundBank implements Iterable<AudioClip> {
 			clips.put(file, clip);
 		}
 	}
-
+	
 	/**
 	 * Loads {@code files} to the {@code SoundBank}.
 	 * 
@@ -81,16 +89,16 @@ public class SoundBank implements Iterable<AudioClip> {
 			loadSound(file);
 		}
 	}
-
+	
 	/**
 	 * Stops playing for all sounds in the {@code SoundBank}.
 	 */
 	public void stopAll() {
 		for (AudioClip clip : clips.values()) {
-			if (clip != null && clip.isPlaying()) {
+			if (clip.isPlaying()) {
 				clip.stop();
 			}
 		}
 	}
-
+	
 }
