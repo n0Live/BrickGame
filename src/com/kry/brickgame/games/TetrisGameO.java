@@ -11,7 +11,7 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameO extends TetrisGameK {
 	private static final long serialVersionUID = 826647707906573426L;
-	
+
 	/**
 	 * The Tetris with the changing of the figures instead of rotating and the
 	 * shifting board content
@@ -21,15 +21,16 @@ public class TetrisGameO extends TetrisGameK {
 	public TetrisGameO(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-	
+
 	@Override
 	protected void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
-			Board board = getBoard().clone();
+			Board board = getBoard();
+			
 			board = boardHorizontalShift(board, 1);
 			setBoard(board);
 		}
 	}
-	
+
 }

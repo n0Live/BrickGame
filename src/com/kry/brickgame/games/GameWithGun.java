@@ -227,7 +227,7 @@ public abstract class GameWithGun extends GameWithLives {
 		
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard();
-		// .clone();
+		
 		
 		// Erase the gun to not interfere with the checks
 		board = drawShape(board, curX, curY, gun, Cell.Empty);

@@ -126,7 +126,8 @@ public class GunGame extends GameWithGun {
 	 *         {@code false}
 	 */
 	private boolean droppingDown() {
-		Board board = getBoard().clone();
+		Board board = getBoard();
+		
 		
 		// erase the gun to not interfere with the checks
 		board = drawShape(board, curX, curY, gun, Cell.Empty);
@@ -272,7 +273,8 @@ public class GunGame extends GameWithGun {
 	 * Shift the board horizontally on a random direction
 	 */
 	private void shiftBoard() {
-		Board board = getBoard().clone();
+		Board board = getBoard();
+		
 		
 		// erase the gun to not interfere
 		board = drawShape(board, curX, curY, gun, Cell.Empty);

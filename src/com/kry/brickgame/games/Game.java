@@ -209,7 +209,8 @@ public abstract class Game implements Runnable, Serializable {
 	 * @param type
 	 *            type of the game
 	 */
-	protected Game(int speed, int level, Board board, Board preview, Rotation rotation, int type) {
+	protected Game(int speed, int level, Board board, Board preview,
+			Rotation rotation, int type) {
 		this(speed, level, rotation, type);
 
 		setBoard(board);
@@ -399,9 +400,10 @@ public abstract class Game implements Runnable, Serializable {
 
 		Main.gameSelector.setSpeed(speed);
 		Main.gameSelector.setLevel(level);
-		
-		Main.gameSelector.setGameAndType(this.getClass().getCanonicalName(), getType());
-		
+
+		Main.gameSelector.setGameAndType(this.getClass().getCanonicalName(),
+				getType());
+
 		Thread.currentThread().interrupt();
 		Main.setGame(Main.gameSelector);
 	}
@@ -486,7 +488,8 @@ public abstract class Game implements Runnable, Serializable {
 	}
 
 	protected int getHiScore() {
-		return getScoresManager().getHiScore(this.getClass().getCanonicalName());
+		return getScoresManager()
+				.getHiScore(this.getClass().getCanonicalName());
 	}
 
 	/**
@@ -607,46 +610,46 @@ public abstract class Game implements Runnable, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-				// 0
-				{ F, F, F },//
-				{ F, E, F },//
-				{ F, F, F } }, {
+					// 0
+					{ F, F, F },//
+					{ F, E, F },//
+					{ F, F, F } }, {
 					// 1
 					{ F, F, F, F, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, E, E, E, F },//
 					{ F, F, F, F, F } }, {
-						// 2
-						{ F, E, F, E, F },//
-						{ E, E, E, E, E },//
-						{ F, E, E, E, F },//
-						{ E, E, E, E, E },//
-						{ F, E, F, E, F } }, {
-							// 3
-							{ F, E, F, E, F },//
-							{ E, F, F, F, E },//
-							{ F, F, E, F, F },//
-							{ E, F, F, F, E },//
-							{ F, E, F, E, F } }, {
-								// 4
-								{ E, E, E, E, E },//
-								{ E, F, F, F, E },//
-								{ E, F, E, F, E },//
-								{ E, F, F, F, E },//
-								{ E, E, E, E, E } }, {
-									// 5
-									{ E, E, E, E, E },//
-									{ E, E, E, E, E },//
-									{ E, E, F, E, E },//
-									{ E, E, E, E, E },//
-									{ E, E, E, E, E } }, {
-										// 6
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E },//
-										{ E, E, E, E, E } }
+					// 2
+					{ F, E, F, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, E, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, F, E, F } }, {
+					// 3
+					{ F, E, F, E, F },//
+					{ E, F, F, F, E },//
+					{ F, F, E, F, F },//
+					{ E, F, F, F, E },//
+					{ F, E, F, E, F } }, {
+					// 4
+					{ E, E, E, E, E },//
+					{ E, F, F, F, E },//
+					{ E, F, E, F, E },//
+					{ E, F, F, F, E },//
+					{ E, E, E, E, E } }, {
+					// 5
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }, {
+					// 6
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }
 
 			};
 
@@ -666,7 +669,8 @@ public abstract class Game implements Runnable, Serializable {
 				int lowerLeftX = x - (waves[wave][0].length / 2);
 				int lowerLeftY = y - (waves[wave].length / 2);
 
-				insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY);
+				insertCellsToBoard(getBoard(), waves[wave], lowerLeftX,
+						lowerLeftY);
 				fireBoardChanged(getBoard());
 
 				sleep(ANIMATION_DELAY * 2);
@@ -772,7 +776,8 @@ public abstract class Game implements Runnable, Serializable {
 	 * Processing of key presses
 	 */
 	protected void processKeys() {
-		if (getStatus() == Status.None) return;
+		if (getStatus() == Status.None)
+			return;
 
 		if (keys.contains(KeyPressed.KeyOnOff)) {
 			keys.remove(KeyPressed.KeyOnOff);
@@ -870,7 +875,8 @@ public abstract class Game implements Runnable, Serializable {
 	}
 
 	protected int setHiScore() {
-		return getScoresManager().setHiScore(this.getClass().getCanonicalName(), getScore());
+		return getScoresManager().setHiScore(
+				this.getClass().getCanonicalName(), getScore());
 	}
 
 	/**

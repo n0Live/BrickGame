@@ -1,5 +1,7 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.sound.SoundManager.enumToResourceArray;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -20,7 +22,7 @@ public final class GameUtils {
 	 * Sound effects
 	 */
 	protected enum Effects {
-		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, start_engine, engine;
+		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, engine;
 	}
 	
 	/**
@@ -38,8 +40,9 @@ public final class GameUtils {
 	}
 	
 	protected static final SoundBank effects = new SoundBank();
-	protected static final SoundBank music = new SoundBank();
 	protected static final SoundBank melodies = new SoundBank();
+	// load the sounds at initialization to reduce the delay in the first play
+	protected static final SoundBank music = new SoundBank(enumToResourceArray(Music.class));
 	
 	/**
 	 * Suspended keys
@@ -573,7 +576,15 @@ public final class GameUtils {
 	 */
 	protected static void playMusic(Music sound) {
 		if (!Game.isMuted()) {
-			stopAllSounds();
+			
+			// stopAllSounds(); // <-- too slow
+			// stop music only
+			music.stopAll();
+			// and effects in some cases
+			if (Music.win.equals(sound) || Music.game_over.equals(sound)) {
+				effects.stopAll();
+			}
+			
 			if (Music.start.equals(sound)) {
 				SoundManager.playAndWait(music, sound);
 			} else {
