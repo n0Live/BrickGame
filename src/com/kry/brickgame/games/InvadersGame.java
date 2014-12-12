@@ -46,11 +46,11 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * X-coordinate for insertion of the bricks wall
 	 */
-	private int bricksX;
+	private volatile int bricksX;
 	/**
 	 * Y-coordinate for insertion of the bricks wall
 	 */
-	private int bricksY;
+	private volatile int bricksY;
 	/**
 	 * The ball breaking bricks
 	 */
@@ -58,11 +58,11 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * X-coordinate position of the ball
 	 */
-	private int ballX;
+	private volatile int ballX;
 	/**
 	 * Y-coordinate position of the ball
 	 */
-	private int ballY;
+	private volatile int ballY;
 	/**
 	 * The vertical direction of the ball
 	 */
@@ -74,7 +74,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * Is the ball flies now?
 	 */
-	private boolean isFlyingBall;
+	private volatile boolean isFlyingBall;
 	/**
 	 * Number of barrels
 	 * <p>
@@ -453,7 +453,7 @@ public class InvadersGame extends GameWithGun {
 		newCoords = BallUtils
 				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
-		Board board = getBoard().clone();
+		Board board = getBoard();
 		
 		// check collision with the gun
 		if (newCoords.y <= curY + gun.maxY()) {
@@ -589,4 +589,12 @@ public class InvadersGame extends GameWithGun {
 		bulletSwarm.cancel();
 		invasionTimer.cancel();
 	}
+	
+	@Override
+	protected void win() {
+		// clear the ball from the board
+		initBall();
+		super.win();
+	}
+	
 }
