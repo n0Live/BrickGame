@@ -3,7 +3,6 @@ package com.kry.brickgame.sound;
 import java.net.URL;
 import java.util.EnumSet;
 
-
 import javafx.scene.media.AudioClip;
 
 public class SoundManager {
@@ -185,11 +184,8 @@ public class SoundManager {
 		clip.setCycleCount(1);
 		clip.play();
 		while (clip.isPlaying()) {
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException ex) {
-				// do nothing
-			}
+			Thread.yield();
+			// do nothing
 		}
 	}
 	
