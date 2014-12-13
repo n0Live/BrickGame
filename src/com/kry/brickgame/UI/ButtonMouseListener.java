@@ -43,13 +43,13 @@ class ButtonMouseListener extends MouseAdapter {
 	}
 
 	/**
-	 * Menu buttons (OnOff, Reset, Mute, Start)
+	 * Menu buttons (Shutdown, Reset, Mute, Start)
 	 */
 	private static final Set<KeyPressed> menuKeys;
 
 	static {
 		menuKeys = new HashSet<>(5, 1f);
-		menuKeys.add(KeyPressed.KeyOnOff);
+		menuKeys.add(KeyPressed.KeyShutdown);
 		menuKeys.add(KeyPressed.KeyReset);
 		menuKeys.add(KeyPressed.KeyMute);
 		menuKeys.add(KeyPressed.KeyStart);
@@ -76,8 +76,8 @@ class ButtonMouseListener extends MouseAdapter {
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 
 		if (menuKeys.contains(key)) {
-			// special behavior for KeyOnOff
-			if (key != KeyPressed.KeyOnOff) {
+			// special behavior for KeyShutdown
+			if (key != KeyPressed.KeyShutdown) {
 				Main.getGame().keyPressed(key);
 			}
 		} else {
@@ -96,9 +96,9 @@ class ButtonMouseListener extends MouseAdapter {
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
 
 		if (menuKeys.contains(key)) {
-			// special behavior for KeyOnOff (when mouse released upon the
-			// pressed KeyOnOff button)
-			if (key == KeyPressed.KeyOnOff && e.getComponent().contains(e.getPoint())) {
+			// special behavior for KeyShutdown (when mouse released upon the
+			// pressed KeyShutdown button)
+			if (key == KeyPressed.KeyShutdown && e.getComponent().contains(e.getPoint())) {
 				// send closing event to parent frame
 				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
 						e.getComponent());

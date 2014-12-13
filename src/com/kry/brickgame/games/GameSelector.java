@@ -345,7 +345,7 @@ public class GameSelector extends Game {
 			ss.setSpeed(getSpeed());
 			Main.setGame(ss);
 			break;
-		case KeyOnOff:
+		case KeyShutdown:
 			if (splashTimer != null) {
 				splashTimer.cancel();
 			}
