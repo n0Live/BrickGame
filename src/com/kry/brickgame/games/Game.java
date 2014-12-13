@@ -779,8 +779,8 @@ public abstract class Game implements Runnable, Serializable {
 		if (getStatus() == Status.None)
 			return;
 
-		if (keys.contains(KeyPressed.KeyOnOff)) {
-			keys.remove(KeyPressed.KeyOnOff);
+		if (keys.contains(KeyPressed.KeyShutdown)) {
+			keys.remove(KeyPressed.KeyShutdown);
 			quit();
 			return;
 		}

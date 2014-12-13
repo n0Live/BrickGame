@@ -55,7 +55,7 @@ public class Window extends JFrame {
 			try {
 				if (!getSettingsManager().getExitConfirmation()
 						|| CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
-					Main.getGame().keyPressed(KeyPressed.KeyOnOff);
+					Main.getGame().keyPressed(KeyPressed.KeyShutdown);
 				}
 			} catch (Exception exp) {
 				exp.printStackTrace();
@@ -179,7 +179,7 @@ public class Window extends JFrame {
 
 		/* Menu buttons */
 		drawPanel.add(
-				ButtonsFactory.getButton(KeyPressed.KeyOnOff),
+				ButtonsFactory.getButton(KeyPressed.KeyShutdown),
 				"cell 3 2, alignx center, aligny bottom, "
 						+ getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		drawPanel.add(

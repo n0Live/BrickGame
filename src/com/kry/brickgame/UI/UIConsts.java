@@ -96,7 +96,7 @@ public class UIConsts {
 	 */
 	static final int ROTATE_BTN_SIZE = 150;
 	/**
-	 * Menu buttons (OnOff, Reset, Mute) size
+	 * Menu buttons (Shutdown, Reset, Mute) size
 	 */
 	static final int MENU_BTN_SIZE = 55;
 	/**

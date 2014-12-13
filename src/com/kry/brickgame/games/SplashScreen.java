@@ -175,8 +175,8 @@ public class SplashScreen extends Game {
 		if (getStatus() == Status.None)
 			return;
 
-		if (containsKey(KeyPressed.KeyOnOff)) {
-			keys.remove(KeyPressed.KeyOnOff);
+		if (containsKey(KeyPressed.KeyShutdown)) {
+			keys.remove(KeyPressed.KeyShutdown);
 			quit();
 			return;
 		}
