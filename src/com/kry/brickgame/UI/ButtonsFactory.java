@@ -307,9 +307,9 @@ public class ButtonsFactory {
 		 *            action key
 		 */
 		public void setToolTipText(KeyPressed key) {
-			String toolTipText = key.toString();
-			if (toolTipText.contains("Key")) {
-				toolTipText = toolTipText.substring(3);
+			StringBuilder toolTipText = new StringBuilder(key.toString());
+			if (toolTipText.indexOf("Key") == 0) {
+				toolTipText.delete(0, 3);
 			}
 			
 			boolean isCompare = false;
@@ -320,23 +320,23 @@ public class ButtonsFactory {
 				if (entry.getValue() == key) {
 					isCompare = true;
 					if (firstCompare) {
-						toolTipText += " (";
+						toolTipText.append(" (");
 						firstCompare = false;
 					} else {
 						// separator between different keyboard shortcuts
-						toolTipText += " / ";
+						toolTipText.append(" / ");
 					}
-					toolTipText += KeyEvent.getKeyText(entry.getKey());
+					toolTipText.append(KeyEvent.getKeyText(entry.getKey()));
 				}
 			}
 			if (isCompare) {
-				toolTipText += ")";
+				toolTipText.append(")");
 			}
 			
 			// set text bold
-			toolTipText = "<html><b>" + toolTipText + "</b>";
+			toolTipText.insert(0, "<html><b>").append("</b>");
 			
-			setToolTipText(toolTipText);
+			setToolTipText(toolTipText.toString());
 		}
 	}
 	
