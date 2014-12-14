@@ -25,6 +25,10 @@ public class GameKeyAdapter extends KeyAdapter {
 		keycodeMap.put(KeyEvent.VK_P, KeyPressed.KeyStart);
 		keycodeMap.put(KeyEvent.VK_R, KeyPressed.KeyReset);
 		keycodeMap.put(KeyEvent.VK_M, KeyPressed.KeyMute);
+		keycodeMap.put(KeyEvent.VK_W, KeyPressed.KeyUp);
+		keycodeMap.put(KeyEvent.VK_A, KeyPressed.KeyLeft);
+		keycodeMap.put(KeyEvent.VK_S, KeyPressed.KeyDown);
+		keycodeMap.put(KeyEvent.VK_D, KeyPressed.KeyRight);
 	}
 	
 	@Override
