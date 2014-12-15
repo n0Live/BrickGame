@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
+import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.GunShape;
 
@@ -133,14 +134,14 @@ public abstract class GameWithGun extends GameWithLives {
 					// board
 					if (bullets.get(x).get(y) < boardHeight - 1) {
 						// if under the bullet is filled cell
-						if (board.getCell(x, bullets.get(x).get(y)) != Cell.Empty) {
+						if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
 							if (ofBullets) {// flightOfBullets
 								removeCell(board, x, bullets.get(x).get(y));
 							} else {// flightOfMud
 								// stop the bullet before the cell
-								addCell(board, x, bullets.get(x).get(y));
+								addCell(board, x, bullets.get(x).get(y) - 1);
 								// check for a filled lines
-								removeFullLines(bullets.get(x).get(y));
+								removeFullLines(bullets.get(x).get(y) - 1);
 							}
 							// remove the bullet
 							bullets.get(x).set(y, 0);
@@ -166,8 +167,8 @@ public abstract class GameWithGun extends GameWithLives {
 							addCell(board, x, bullets.get(x).get(y));
 							// check for a filled lines
 							removeFullLines(bullets.get(x).get(y));
-							// remove the bullet
 						}
+						// remove the bullet
 						bullets.get(x).set(y, 0);
 					}
 					fireBoardChanged(board);
@@ -275,9 +276,10 @@ public abstract class GameWithGun extends GameWithLives {
 			}
 		}
 		if (lineIsFull) {
+			setStatus(Status.DoSomeWork);
 			playEffect(Effects.remove_line);
 			
-			animatedClearLine(getBoard(), curX, y);
+			animatedClearLine(board, curX, y);
 			
 			// erase the gun from the board before dropping ups lines
 			board = drawShape(board, curX, curY, gun, Cell.Empty);
@@ -298,6 +300,7 @@ public abstract class GameWithGun extends GameWithLives {
 			
 			setBoard(board);
 			result = true;
+			setStatus(Status.Running);
 		}
 		return result;
 	}
