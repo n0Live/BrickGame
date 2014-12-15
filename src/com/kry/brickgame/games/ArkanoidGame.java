@@ -322,7 +322,7 @@ public class ArkanoidGame extends GameWithLives {
 	
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 80;
+		return 70;
 	}
 	
 	/**
