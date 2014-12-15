@@ -219,12 +219,12 @@ public class RacingGame extends GameWithLives {
 	
 	@Override
 	protected int getSpeedOfFirstLevel() {
-		return 400;
+		return 200;
 	}
 	
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 80;
+		return 50;
 	}
 	
 	/**
@@ -397,7 +397,10 @@ public class RacingGame extends GameWithLives {
 		
 		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
 			if (getStatus() != Status.Paused) {
-				int currentSpeed = (isThreelaneTraffic) ? getSpeed(true) / 2 : getSpeed(true) / 3;
+				int currentSpeed = getSpeed(true);
+				if (isThreelaneTraffic) {
+					currentSpeed *= 1.5f;
+				}
 				
 				// moving
 				if (elapsedTime(currentSpeed)) {
