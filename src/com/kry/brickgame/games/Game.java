@@ -836,7 +836,15 @@ public abstract class Game implements Runnable, Serializable {
 
 	@Override
 	public void run() {
-		start();
+		fireBoardChanged(board);
+		firePreviewChanged(preview);
+		fireSpeedChanged(speed);
+		fireLevelChanged(level);
+		fireRotationChanged(rotation);
+		fireMuteChanged(mute);
+		fireStatusChanged(status);
+		fireInfoChanged(String.valueOf(score));
+		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
 
 	/**
@@ -964,18 +972,6 @@ public abstract class Game implements Runnable, Serializable {
 	protected void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
-	}
-
-	protected void start() {
-		fireBoardChanged(board);
-		firePreviewChanged(preview);
-		fireSpeedChanged(speed);
-		fireLevelChanged(level);
-		fireRotationChanged(rotation);
-		fireMuteChanged(mute);
-		fireStatusChanged(status);
-		fireInfoChanged(String.valueOf(score));
-		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 	}
 
 }

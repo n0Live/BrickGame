@@ -64,7 +64,7 @@ public class GameSelector extends Game {
 		gamesList.put('Y', "com.kry.brickgame.games.???");
 		gamesList.put('Z', "com.kry.brickgame.games.???");
 	}
-	
+
 	/**
 	 * Letter - kind of game
 	 */
@@ -73,33 +73,33 @@ public class GameSelector extends Game {
 	 * Number - subtypes of game
 	 */
 	private int number;
-	
+
 	/**
 	 * Number of subtypes for the current game
 	 */
 	private int maxNumber;
-	
+
 	/**
 	 * Class of the current game
 	 */
 	private Class<Game> c;
-	
+
 	/**
 	 * Animated splash for a game
 	 */
 	Splash splash;
-	
+
 	/**
 	 * Timer for the splash screen of the game
 	 */
 	transient private Timer splashTimer;
-	
+
 	public GameSelector() {
 		super();
 		splash = null;
 		restart();
 	}
-	
+
 	/**
 	 * Launching a game depending on the chosen letters and numbers
 	 */
@@ -110,13 +110,15 @@ public class GameSelector extends Game {
 				Class[] paramTypes;
 				Constructor<Game> constructor;
 				Object[] args;
-				
+
 				try {
 					// gets constructor(speed, level, rotation, type)
-					paramTypes = new Class[] { int.class, int.class, Rotation.class, int.class };
+					paramTypes = new Class[] { int.class, int.class,
+							Rotation.class, int.class };
 					constructor = c.getConstructor(paramTypes);
 					// gets parameters
-					args = new Object[] { getSpeed(), getLevel(), getRotation(), number };
+					args = new Object[] { getSpeed(), getLevel(),
+							getRotation(), number };
 				} catch (NoSuchMethodException e) {
 					// if constructor with rotation is not exist,
 					// gets constructor(speed, level, type)
@@ -125,7 +127,7 @@ public class GameSelector extends Game {
 					// gets parameters without rotation
 					args = new Object[] { getSpeed(), getLevel(), number };
 				}
-				
+
 				// creates an instance of the game
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer
@@ -141,7 +143,7 @@ public class GameSelector extends Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
@@ -152,32 +154,32 @@ public class GameSelector extends Game {
 		if (splashTimer != null) {
 			splashTimer.cancel();
 		}
-		
+
 		drawLetter(letter);
-		
+
 		try {
 			c = (Class<Game>) Class.forName(gamesList.get(letter));
-			
+
 			// trying to get number of subtypes from the class of the game
 			try {
 				maxNumber = c.getField("subtypesNumber").getInt(c);
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-					| SecurityException e) {
+			} catch (IllegalArgumentException | IllegalAccessException
+					| NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
 				// if unable - sets 1
 				maxNumber = 1;
 			}
-			
+
 			// trying to get the splash screen instance from the class of
 			// the game
 			try {
 				splash = (Splash) c.getField("splash").get(c);
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-					| SecurityException e) {
+			} catch (IllegalArgumentException | IllegalAccessException
+					| NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
 				splash = null;
 			}
-			
+
 			if (splash != null) {
 				// starts the timer to show splash screen of the game
 				splashTimer = new Timer(splash.getClass().getName(), true);
@@ -196,26 +198,26 @@ public class GameSelector extends Game {
 				// if unable - clears the rectangle of the splash screen
 				drawGameSplash(null);
 			}
-			
+
 			// show high scores
 			fireInfoChanged(String.valueOf("HI"
 					+ getScoresManager().getHiScore(c.getCanonicalName())));
-			
+
 		} catch (ClassNotFoundException e) {
 			c = null;
 			maxNumber = 1;
 			drawGameSplash(null);
 		}
-		
+
 		// checks that the current number does not exceed the maximum number
 		if (number > maxNumber) {
 			number = 1;
 		}
 		drawNumber(number);
-		
+
 		return (c != null);
 	}
-	
+
 	/**
 	 * Displays one frame of the splash screen of the game
 	 * <p>
@@ -234,7 +236,7 @@ public class GameSelector extends Game {
 					BoardNumbers.height + 1);// y
 		}
 	}
-	
+
 	/**
 	 * Displays a letter at the top of the basic board
 	 */
@@ -244,14 +246,14 @@ public class GameSelector extends Game {
 		insertBoard(boardLetter, (boardWidth / 2 - BoardLetters.width / 2 - 1),// x
 				boardHeight - BoardLetters.height);// y
 	}
-	
+
 	/**
 	 * Displays a two numbers at the bottom of the basic board
 	 */
 	private void drawNumber(int number) {
 		int number_1;
 		int number_2;
-		
+
 		if (number < 10) {
 			number_1 = 0;
 			number_2 = number;
@@ -259,30 +261,30 @@ public class GameSelector extends Game {
 			number_1 = number / 10;
 			number_2 = number % 10;
 		}
-		
+
 		BoardNumbers boardNumber = new BoardNumbers();
-		
+
 		// 1st number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
 		insertBoard(boardNumber, (boardWidth / 2 - BoardNumbers.width - 1),// x
 				0);// y
-		
+
 		// 2nd number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
 		insertBoard(boardNumber, (boardWidth / 2),// x
 				0);// y
 	}
-	
+
 	@Override
 	protected int getSpeedOfFirstLevel() {
 		return 0;
 	}
-	
+
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 0;
 	}
-	
+
 	/**
 	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
 	 * {@code x, y}) is set a point, which gets the lower left corner of the
@@ -298,7 +300,7 @@ public class GameSelector extends Game {
 	private void insertBoard(Board boardToInsert, int x, int y) {
 		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
 	}
-	
+
 	@Override
 	public void keyPressed(KeyPressed key) {
 		switch (key) {
@@ -354,9 +356,9 @@ public class GameSelector extends Game {
 		default:
 			break;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Next allowable letter
 	 */
@@ -372,7 +374,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Next allowable number
 	 */
@@ -380,7 +382,7 @@ public class GameSelector extends Game {
 		number = (number < maxNumber) ? number + 1 : 1;
 		drawNumber(number);
 	}
-	
+
 	/**
 	 * Previous allowable letter
 	 */
@@ -396,7 +398,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Previous allowable number
 	 */
@@ -404,7 +406,7 @@ public class GameSelector extends Game {
 		number = (number > 1) ? number - 1 : maxNumber;
 		drawNumber(number);
 	}
-	
+
 	/**
 	 * Returns {@code GameSelector} with displayed first letter and number.
 	 * 
@@ -415,7 +417,22 @@ public class GameSelector extends Game {
 		number = 1;
 		return this;
 	}
-	
+
+	@Override
+	public void run() {
+		clearBoard();
+		clearPreview();
+
+		// show default rotation
+		fireRotationChanged(getRotation());
+
+		if (drawAll()) {
+			setStatus(Status.DoSomeWork);
+		} else {
+			setStatus(Status.ComingSoon);
+		}
+	}
+
 	/**
 	 * Sets displaying letter and number related to specified game class name
 	 * and game type.
@@ -434,24 +451,9 @@ public class GameSelector extends Game {
 			}
 		}
 	}
-	
+
 	@Override
 	public void setRotation(Rotation rotation) {
 		super.setRotation(rotation);
-	}
-	
-	@Override
-	protected void start() {
-		clearBoard();
-		clearPreview();
-		
-		// show default rotation
-		fireRotationChanged(getRotation());
-		
-		if (drawAll()) {
-			setStatus(Status.DoSomeWork);
-		} else {
-			setStatus(Status.ComingSoon);
-		}
 	}
 }

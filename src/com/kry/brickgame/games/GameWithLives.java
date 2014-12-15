@@ -121,6 +121,16 @@ public abstract class GameWithLives extends Game {
 		loadNewLevel();
 	}
 
+	@Override
+	public void run() {
+		super.run();
+		// play music only in first isStarted, not after deserialization
+		if (isStarted) {
+			isStarted = false;
+			playAndWaitMusic();
+		}
+	}
+
 	/**
 	 * Set lives
 	 * 
@@ -143,16 +153,6 @@ public abstract class GameWithLives extends Game {
 			}
 		}
 		firePreviewChanged(getPreview());
-	}
-
-	@Override
-	protected void start() {
-		super.start();
-		// play music only in first isStarted, not after deserialization
-		if (isStarted) {
-			isStarted = false;
-			playAndWaitMusic();
-		}
 	}
 
 	/**
