@@ -76,6 +76,22 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
+	 * Adding the cell to the board and increasing scores, after that removing
+	 * line if is filled.
+	 * 
+	 * @param board
+	 *            the board
+	 * @param x
+	 *            x-coordinate of the cell
+	 * @param y
+	 *            y-coordinate of the cell
+	 */
+	protected void addCellAndCheckLine(Board board, int x, int y) {
+		addCell(board, x, y);
+		removeFullLines(y);
+	}
+	
+	/**
 	 * Remove all bullets from the board
 	 * 
 	 * @param board
@@ -140,9 +156,7 @@ public abstract class GameWithGun extends GameWithLives {
 								removeCell(board, x, bullets.get(x).get(y));
 							} else {// flightOfMud
 								// stop the bullet before the cell
-								addCell(board, x, bullets.get(x).get(y) - 1);
-								// check for a filled lines
-								removeFullLines(bullets.get(x).get(y) - 1);
+								addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
 							}
 							// remove the bullet
 							bullets.get(x).set(y, 0);
@@ -163,11 +177,14 @@ public abstract class GameWithGun extends GameWithLives {
 							// remove the bullet
 							board.setCell(Cell.Empty, x, bullets.get(x).get(y));
 						} else {// flightOfMud
-							// stop the bullet on the border of the
-							// board
-							addCell(board, x, bullets.get(x).get(y));
-							// check for a filled lines
-							removeFullLines(bullets.get(x).get(y));
+							// if under the bullet is filled cell
+							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+								// stop the bullet before the cell
+								addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+							} else {
+								// stop the bullet on the border of the board
+								addCellAndCheckLine(board, x, bullets.get(x).get(y));
+							}
 						}
 						// remove the bullet
 						bullets.get(x).set(y, 0);
@@ -262,7 +279,7 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
-	 * Removal of a filled lines
+	 * Removing of a filled lines
 	 */
 	protected boolean removeFullLines(int y) {
 		boolean result = false;
