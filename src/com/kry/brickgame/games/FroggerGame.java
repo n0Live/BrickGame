@@ -42,6 +42,11 @@ public class FroggerGame extends GameWithLives {
 	private Board road;
 	
 	private Cell[][] tracts;
+	
+	/**
+	 * Frogs, who reached the other side of the road
+	 */
+	private final Cell[] frogs;
 	/**
 	 * Positions of the road's tract shift
 	 */
@@ -170,6 +175,9 @@ public class FroggerGame extends GameWithLives {
 		frog.setCoord(0, new int[] { 0, 0 });
 		frog.setFill(Cell.Blink);
 		
+		frogs = new Cell[boardWidth];
+		initFrogs();
+		
 		// ==define the parameters of the types of game==
 		// for every odd type of game
 		shiftRoadFromLeftToRigth = (getType() % 2 != 0);
@@ -192,8 +200,8 @@ public class FroggerGame extends GameWithLives {
 	private void checkForWin() {
 		boolean isVictory = true;
 		// victory when filled the entire upper row
-		for (int i = 0; i < boardWidth; i++) {
-			if (getBoard().getCell(i, boardHeight - 1) == Cell.Empty) {
+		for (Cell checkedFrog : frogs) {
+			if (checkedFrog == Cell.Empty) {
 				isVictory = false;
 				break;
 			}
@@ -205,6 +213,7 @@ public class FroggerGame extends GameWithLives {
 			animatedClearLine(getBoard(), curX, boardHeight - 1);
 			sleep(ANIMATION_DELAY);
 			
+			initFrogs();
 			win();
 		} else {
 			setFrog();
@@ -219,6 +228,15 @@ public class FroggerGame extends GameWithLives {
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 120;
+	}
+	
+	/**
+	 * Sets frogs to default values
+	 */
+	private void initFrogs() {
+		for (int i = 0; i < frogs.length; i++) {
+			frogs[i] = Cell.Empty;
+		}
 	}
 	
 	/**
@@ -245,8 +263,10 @@ public class FroggerGame extends GameWithLives {
 		
 		// draw the frog on the new place
 		if (y == boardHeight - 1) {
-			setBoard(drawShape(board, x, y, frog, Cell.Full));
+			frogs[x] = Cell.Full;
+			board.setRow(frogs, y);
 			
+			setBoard(board);
 			playEffect(Effects.add_cell);
 			
 			checkForWin();
@@ -262,17 +282,16 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Loading or reloading the specified level
 	 */
-	private void loadLevel() {
-		// create the road
-		road = loadRoad(usePreloadedTracts);
-		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
-		// initialize the frog
-		setFrog();
-	}
-	
 	@Override
 	protected void loadNewLevel() {
-		loadLevel();
+		// create the road
+		road = loadRoad(usePreloadedTracts);
+		// set road
+		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
+		// restores the frogs' row
+		getBoard().setRow(frogs, boardHeight - 1);
+		// initialize the frog
+		setFrog();
 		super.loadNewLevel();
 	}
 	
@@ -411,19 +430,6 @@ public class FroggerGame extends GameWithLives {
 	}
 	
 	/**
-	 * Drawing effect of the collisions and decreasing lives
-	 */
-	private void loss() {
-		// saves the upper row with the frogs, who went over the road
-		Cell[] frogs = getBoard().getRow(boardHeight - 1);
-		
-		super.loss(curX, curY);
-		
-		// restores the frogs' row
-		getBoard().setRow(frogs, boardHeight - 1);
-	}
-	
-	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -467,17 +473,11 @@ public class FroggerGame extends GameWithLives {
 				if (jumpFrog(newX, newY)) {
 					playEffect(Effects.move);
 				} else {
-					loss();
+					loss(curX, curY);
 				}
 			}
 			
 		}
-	}
-	
-	@Override
-	protected void reloadLevel() {
-		loadLevel();
-		setStatus(Status.Running);
 	}
 	
 	/**
@@ -576,7 +576,7 @@ public class FroggerGame extends GameWithLives {
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 		
 		if (isFrogMustDie) {
-			loss();
+			loss(curX, curY);
 		}
 	}
 	
