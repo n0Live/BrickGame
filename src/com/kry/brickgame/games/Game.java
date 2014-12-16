@@ -329,6 +329,7 @@ public abstract class Game implements Runnable, Serializable {
 			
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
+			if (Thread.currentThread().isInterrupted()) return;
 		}
 		
 		// restore previous status
