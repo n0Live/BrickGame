@@ -407,59 +407,75 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireBoardChanged(Board board) {
-		GameEvent event = new GameEvent(this,
-				(isInvertedBoard() ? getInvertedBoard(board) : board), false);
-		for (GameListener listener : listeners) {
-			listener.boardChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, (isInvertedBoard() ? getInvertedBoard(board)
+					: board), false);
+			for (GameListener listener : listeners) {
+				listener.boardChanged(event);
+			}
 		}
 	}
 	
 	protected void fireExit() {
-		GameEvent event = new GameEvent(this);
-		for (GameListener listener : listeners) {
-			listener.exit(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this);
+			for (GameListener listener : listeners) {
+				listener.exit(event);
+			}
 		}
 	}
 	
 	protected void fireInfoChanged(String info) {
-		GameEvent event = new GameEvent(this, info);
-		for (GameListener listener : listeners) {
-			listener.infoChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, info);
+			for (GameListener listener : listeners) {
+				listener.infoChanged(event);
+			}
 		}
 	}
 	
 	protected void fireLevelChanged(int level) {
-		GameEvent event = new GameEvent(this, level);
-		for (GameListener listener : listeners) {
-			listener.levelChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, level);
+			for (GameListener listener : listeners) {
+				listener.levelChanged(event);
+			}
 		}
 	}
 	
 	protected void firePreviewChanged(Board preview) {
-		GameEvent event = new GameEvent(this, preview, true);
-		for (GameListener listener : listeners) {
-			listener.previewChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, preview, true);
+			for (GameListener listener : listeners) {
+				listener.previewChanged(event);
+			}
 		}
 	}
 	
 	protected void fireRotationChanged(Rotation rotation) {
-		GameEvent event = new GameEvent(this, rotation);
-		for (GameListener listener : listeners) {
-			listener.rotationChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, rotation);
+			for (GameListener listener : listeners) {
+				listener.rotationChanged(event);
+			}
 		}
 	}
 	
 	protected void fireSpeedChanged(int speed) {
-		GameEvent event = new GameEvent(this, (float) speed);
-		for (GameListener listener : listeners) {
-			listener.speedChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, (float) speed);
+			for (GameListener listener : listeners) {
+				listener.speedChanged(event);
+			}
 		}
 	}
 	
 	protected void fireStatusChanged(Status status) {
-		GameEvent event = new GameEvent(this, status);
-		for (GameListener listener : listeners) {
-			listener.statusChanged(event);
+		if (!Thread.currentThread().isInterrupted()) {
+			GameEvent event = new GameEvent(this, status);
+			for (GameListener listener : listeners) {
+				listener.statusChanged(event);
+			}
 		}
 	}
 	
