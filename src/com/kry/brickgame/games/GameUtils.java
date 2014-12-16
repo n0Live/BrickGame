@@ -493,6 +493,26 @@ public final class GameUtils {
 	}
 	
 	/**
+	 * Verifies that the selected line consists only of a filled cells.
+	 * 
+	 * @param board
+	 *            board to check.
+	 * @param y
+	 *            number of the checked line.
+	 * @return {@code true} if the line is full; {@code false} - otherwise.
+	 */
+	protected static boolean isFullLine(Board board, int y) {
+		boolean result = true;
+		for (int x = 0; x < board.getWidth(); x++) {
+			if (board.getCell(x, y) == Cell.Empty) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Returns {@code true} if processing of the {@code key} is suspended.
 	 * 
 	 * @param key

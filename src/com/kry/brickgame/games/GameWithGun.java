@@ -3,6 +3,7 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
+import static com.kry.brickgame.games.GameUtils.isFullLine;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
@@ -268,15 +269,11 @@ public abstract class GameWithGun extends GameWithLives {
 		
 		Board board = getBoard();
 		
-		boolean lineIsFull = true;
-		for (int x = 0; x < boardWidth; x++) {
-			if (board.getCell(x, y) == Cell.Empty) {
-				lineIsFull = false;
-				break;
-			}
-		}
-		if (lineIsFull) {
+		if (isFullLine(board, y)) {
+			// change status for stopping other work
+			Status prevStatus = getStatus();
 			setStatus(Status.DoSomeWork);
+			
 			playEffect(Effects.remove_line);
 			
 			animatedClearLine(board, curX, y);
@@ -299,8 +296,11 @@ public abstract class GameWithGun extends GameWithLives {
 			initBullets(bullets);
 			
 			setBoard(board);
+			
+			// restore previous status
+			setStatus(prevStatus);
+			
 			result = true;
-			setStatus(Status.Running);
 		}
 		return result;
 	}
