@@ -286,7 +286,7 @@ public class ArkanoidGame extends GameWithLives {
 		if (bricks.breakBrick(givenX, givenY)) {
 			playEffect(Effects.hit_cell);
 			
-			insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
+			setBoard(insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY));
 			
 			// increase scores
 			setScore(getScore() + 1);
@@ -366,10 +366,13 @@ public class ArkanoidGame extends GameWithLives {
 					: (boardHeight - bricks.getHeight());
 		}
 		
-		insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
+		Board board = getBoard();
+		board = insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 		
 		// init ball
-		drawBall(getBoard(), ballX, ballY);
+		drawBall(board, ballX, ballY);
+		
+		setBoard(board);
 		
 		isStartOfLevel = true;
 		
@@ -617,7 +620,7 @@ public class ArkanoidGame extends GameWithLives {
 		// insert shifted bricks to the board
 		Board board = getBoard();
 		
-		insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
+		board = insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 		// re-drawing the ball
 		setBoard(drawBall(board, ballX, ballY));
 	}

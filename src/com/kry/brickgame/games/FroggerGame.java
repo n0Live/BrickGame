@@ -286,10 +286,12 @@ public class FroggerGame extends GameWithLives {
 	protected void loadNewLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
+		Board board = getBoard();
 		// set road
-		insertCellsToBoard(getBoard(), road.getBoard(), 0, 1);
+		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
 		// restores the frogs' row
-		getBoard().setRow(frogs, boardHeight - 1);
+		board.setRow(frogs, boardHeight - 1);
+		setBoard(board);
 		// initialize the frog
 		setFrog();
 		super.loadNewLevel();
@@ -558,7 +560,7 @@ public class FroggerGame extends GameWithLives {
 				road.setRow(tract, i);
 			}
 		}
-		insertCellsToBoard(board, road.getBoard(), 0, 1);
+		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
 		
 		// shifting the frog with the road
 		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {

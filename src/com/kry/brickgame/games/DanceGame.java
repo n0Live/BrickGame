@@ -200,8 +200,6 @@ public class DanceGame extends Game {
 
 		move();
 		setStatus(Status.Running);
-		// play the first melody
-		playMelody(getMelody(), rate);
 	}
 
 	/**
@@ -314,7 +312,7 @@ public class DanceGame extends Game {
 		// create a board of full size
 		Board mainBoard = new Board(boardWidth, boardHeight);
 		// insert drawBoard to mainBoard
-		insertCellsToBoard(mainBoard, drawBoard.getBoard(), 0, 0);
+		mainBoard = insertCellsToBoard(mainBoard, drawBoard.getBoard(), 0, 0);
 		setBoard(mainBoard);
 	}
 
@@ -456,6 +454,10 @@ public class DanceGame extends Game {
 	@Override
 	public void run() {
 		super.run();
+		if (getStatus() == Status.Running) {
+			// play the first melody
+			playMelody(getMelody(), rate);
+		}
 		while (!Thread.currentThread().isInterrupted()
 				&& (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {

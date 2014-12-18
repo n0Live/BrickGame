@@ -139,6 +139,7 @@ public class GameSelector extends Game {
 			} catch (RuntimeException e) {
 				throw e;
 			} catch (Exception e) {
+				e.printStackTrace();
 				setStatus(Status.ComingSoon);
 			}
 		}
@@ -298,7 +299,7 @@ public class GameSelector extends Game {
 	 *            y-coordinate for the insertion
 	 */
 	private void insertBoard(Board boardToInsert, int x, int y) {
-		insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y);
+		setBoard(insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y));
 	}
 
 	@Override
