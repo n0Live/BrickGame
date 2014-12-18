@@ -144,9 +144,7 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 */
 	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value) {
-		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(1);
-		clip.play();
+		play(soundBank, value, Thread.NORM_PRIORITY);
 	}
 	
 	/**
@@ -168,6 +166,25 @@ public class SoundManager {
 		clip.setCycleCount(1);
 		// Use default parameters except rate
 		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(), Thread.MAX_PRIORITY); // clip.getPriority());
+	}
+	
+	/**
+	 * Play the {@code AudioClip} at once in normal rate, depending of the
+	 * specified {@code enum} value, from the specified {@code soundBank}, with
+	 * specified {@code priority}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 * @param priority
+	 *            the new playback priority
+	 */
+	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, int priority) {
+		final AudioClip clip = getClip(soundBank, value);
+		clip.setPriority(priority);
+		clip.setCycleCount(1);
+		clip.play();
 	}
 	
 	/**
