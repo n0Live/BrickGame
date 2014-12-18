@@ -10,15 +10,14 @@ public class TankShape extends CoordinatedShape {
 	 * [type][point][coordinate:0-x,1-y]
 	 */
 	private static int[][][] charactersTable = new int[][][] {//
-		// 0 - tank
-		{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
-			{ 0, 1 } },
+	// 0 - tank
+			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
 			// 1 - enemy tank
 			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
 			// 2 - tank in box (for check)
-			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 },
-				{ -1, 1 }, { 0, 1 }, { 1, 1 } } }; //
-
+			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 },
+					{ 1, 1 } } }; //
+	
 	/**
 	 * Constructor for the Tank
 	 * 
@@ -29,7 +28,39 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(int type) {
 		super(type, charactersTable[type].length);
 	}
-
+	
+	/**
+	 * Constructor for the Tank
+	 * 
+	 * @param type
+	 *            0 - player's tank, 1 - enemy tank, 2 - tank in the box (for
+	 *            check)
+	 * @param x
+	 *            x-coordinate of the position
+	 * @param y
+	 *            y-coordinate of the position
+	 */
+	public TankShape(int type, int x, int y) {
+		super(type, charactersTable[type].length, x, y, RotationAngle.d0);
+	}
+	
+	/**
+	 * Constructor for the Tank
+	 * 
+	 * @param type
+	 *            0 - player's tank, 1 - enemy tank, 2 - tank in the box (for
+	 *            check)
+	 * @param x
+	 *            x-coordinate of the position
+	 * @param y
+	 *            y-coordinate of the position
+	 * @param direction
+	 *            direction of the movement
+	 */
+	public TankShape(int type, int x, int y, RotationAngle direction) {
+		super(type, charactersTable[type].length, x, y, direction);
+	}
+	
 	/**
 	 * Copy constructor of the tank
 	 * 
@@ -39,16 +70,15 @@ public class TankShape extends CoordinatedShape {
 	public TankShape(TankShape aTank) {
 		super(aTank);
 	}
-
+	
 	@Override
 	public TankShape clone() {
-		super.clone();
-		return new TankShape(this);
+		return (TankShape) super.clone();
 	}
-
+	
 	@Override
 	protected int[][][] getCharactersTable() {
 		return charactersTable;
 	}
-
+	
 }

@@ -11,11 +11,36 @@ public class Bullet extends CoordinatedShape {
 	 */
 	private static int[][][] charactersTable = new int[][][] { { { 0, 0 } } };
 	
+	/**
+	 * Copy constructor of the bullet
+	 * 
+	 * @param aTank
+	 *            a tank for copying
+	 */
+	public Bullet(Bullet aBullet) {
+		super(aBullet);
+	}
+	
+	/**
+	 * Constructor for the Bullet
+	 * 
+	 * @param x
+	 *            x-coordinate of the position
+	 * @param y
+	 *            y-coordinate of the position
+	 * @param direction
+	 *            direction of the movement
+	 */
 	public Bullet(int x, int y, RotationAngle direction) {
 		super(0, charactersTable[0].length, x, y, direction);
 		
 		this.x = x;
 		this.y = y;
+	}
+	
+	@Override
+	public Bullet clone() {
+		return (Bullet) super.clone();
 	}
 	
 	/**
