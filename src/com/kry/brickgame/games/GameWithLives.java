@@ -15,7 +15,7 @@ import com.kry.brickgame.games.GameUtils.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
-
+	
 	/**
 	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
 	 * seconds
@@ -27,16 +27,16 @@ public abstract class GameWithLives extends Game {
 			sleep(1500);
 		}
 	}
-
+	
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-
+	
 	protected boolean isStarted;
-
+	
 	/**
 	 * The Game with lives without rotation
 	 * 
@@ -50,7 +50,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
 	}
-
+	
 	/**
 	 * The Game with lives
 	 * <p>
@@ -67,11 +67,11 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-
+		
 		setLives(4);
 		isStarted = true;
 	}
-
+	
 	/**
 	 * Lives
 	 * 
@@ -80,7 +80,7 @@ public abstract class GameWithLives extends Game {
 	protected int getLives() {
 		return lives;
 	}
-
+	
 	/**
 	 * Loading the specified level
 	 */
@@ -91,7 +91,7 @@ public abstract class GameWithLives extends Game {
 		}
 		setStatus(Status.Running);
 	}
-
+	
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -102,25 +102,27 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void loss(int x, int y) {
 		setStatus(Status.DoSomeWork);
-
+		
 		// kaboom and decrease lives
 		kaboom(x, y);
 		setLives(getLives() - 1);
 		if (getLives() > 0) {
 			animatedClearBoard(CB_LOSE);
-			reloadLevel();
+			if (!Thread.currentThread().isInterrupted()) {
+				reloadLevel();
+			}
 		} else {
 			gameOver();
 		}
 	}
-
+	
 	/**
 	 * Reloading the specified level
 	 */
 	protected void reloadLevel() {
 		loadNewLevel();
 	}
-
+	
 	@Override
 	public void run() {
 		super.run();
@@ -130,7 +132,7 @@ public abstract class GameWithLives extends Game {
 			playAndWaitMusic();
 		}
 	}
-
+	
 	/**
 	 * Set lives
 	 * 
@@ -154,22 +156,24 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-
+	
 	/**
 	 * Increase the level and load it
 	 */
 	protected void win() {
 		setStatus(Status.DoSomeWork);
-
+		
 		playMusic(Music.win);
 		animatedClearBoard(CB_WIN);
-
+		
 		setLevel(getLevel() + 1);
 		if (getLevel() == 1) {
 			setSpeed(getSpeed() + 1);
 		}
-
-		loadNewLevel();
+		
+		if (!Thread.currentThread().isInterrupted()) {
+			loadNewLevel();
+		}
 	}
-
+	
 }

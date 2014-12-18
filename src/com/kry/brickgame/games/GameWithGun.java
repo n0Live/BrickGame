@@ -69,8 +69,10 @@ public abstract class GameWithGun extends GameWithLives {
 	 */
 	protected void addCell(Board board, int x, int y) {
 		playEffect(Effects.add_cell);
-		// remove the cell
-		board.setCell(Cell.Full, x, y);
+		synchronized (lock) {
+			// add the cell
+			board.setCell(Cell.Full, x, y);
+		}
 		// increase scores
 		setScore(getScore() + 1);
 	}
@@ -98,12 +100,14 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            the board, which is necessary to remove the bullets
 	 */
 	protected void clearBullets(Board board) {
-		for (int i = 0; i < boardWidth; i++) {
-			for (int j = 0; j < boardHeight; j++)
-				// bullets.get(y) is blink
-				if (board.getCell(i, j) == Cell.Blink) {
-					board.setCell(Cell.Empty, i, j);
-				}
+		synchronized (lock) {
+			for (int i = 0; i < boardWidth; i++) {
+				for (int j = 0; j < boardHeight; j++)
+					// bullets.get(y) is blink
+					if (board.getCell(i, j) == Cell.Blink) {
+						board.setCell(Cell.Empty, i, j);
+					}
+			}
 		}
 	}
 	
@@ -139,61 +143,62 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	private void flight(boolean ofBullets) {
-		Board board = getBoard();
-		
-		clearBullets(board);
-		
-		for (int x = 0; x < bullets.length(); x++) {
-			for (int y = 0; y < bullets.get(x).length(); y++) {
-				// if 0, than bullet is not exist
-				if (bullets.get(x).get(y) > 0) {
-					// if the bullet does not reach the border of the
-					// board
-					if (bullets.get(x).get(y) < boardHeight - 1) {
-						// if under the bullet is filled cell
-						if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-							if (ofBullets) {// flightOfBullets
-								removeCell(board, x, bullets.get(x).get(y));
+		synchronized (lock) {
+			Board board = getBoard();
+			clearBullets(board);
+			for (int x = 0; x < bullets.length(); x++) {
+				for (int y = 0; y < bullets.get(x).length(); y++) {
+					if (Thread.currentThread().isInterrupted()) return;
+					// if 0, than bullet is not exist
+					if (bullets.get(x).get(y) > 0) {
+						// if the bullet does not reach the border of the
+						// board
+						if (bullets.get(x).get(y) < boardHeight - 1) {
+							// if under the bullet is filled cell
+							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+								if (ofBullets) {// flightOfBullets
+									removeCell(board, x, bullets.get(x).get(y));
+								} else {// flightOfMud
+									// stop the bullet before the cell
+									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+								}
+								// remove the bullet
+								bullets.get(x).set(y, 0);
+							} else {
+								// otherwise, continues flying
+								board.setCell(Cell.Blink, x, bullets.get(x).getAndIncrement(y));
+							}
+						} else if (bullets.get(x).get(y) == boardHeight - 1) {
+							if (ofBullets) { // flightOfBullets
+								// if under the bullet is filled cell
+								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+									removeCell(board, x, bullets.get(x).get(y));
+								}
+								// show the bullet
+								board.setCell(Cell.Blink, x, bullets.get(x).get(y));
+								fireBoardChanged(board);
+								sleep(ANIMATION_DELAY / 2);
+								// remove the bullet
+								board.setCell(Cell.Empty, x, bullets.get(x).get(y));
 							} else {// flightOfMud
-								// stop the bullet before the cell
-								addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+								// if under the bullet is filled cell
+								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+									// stop the bullet before the cell
+									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+								} else {
+									// stop the bullet on the border of the
+									// board
+									addCellAndCheckLine(board, x, bullets.get(x).get(y));
+								}
 							}
 							// remove the bullet
 							bullets.get(x).set(y, 0);
-						} else {
-							// otherwise, continues flying
-							board.setCell(Cell.Blink, x, bullets.get(x).getAndIncrement(y));
 						}
-					} else if (bullets.get(x).get(y) == boardHeight - 1) {
-						if (ofBullets) { // flightOfBullets
-							// if under the bullet is filled cell
-							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-								removeCell(board, x, bullets.get(x).get(y));
-							}
-							// show the bullet
-							board.setCell(Cell.Blink, x, bullets.get(x).get(y));
-							fireBoardChanged(board);
-							sleep(ANIMATION_DELAY / 2);
-							// remove the bullet
-							board.setCell(Cell.Empty, x, bullets.get(x).get(y));
-						} else {// flightOfMud
-							// if under the bullet is filled cell
-							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-								// stop the bullet before the cell
-								addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
-							} else {
-								// stop the bullet on the border of the board
-								addCellAndCheckLine(board, x, bullets.get(x).get(y));
-							}
-						}
-						// remove the bullet
-						bullets.get(x).set(y, 0);
+						fireBoardChanged(board);
 					}
-					fireBoardChanged(board);
 				}
 			}
 		}
-		
 	}
 	
 	/**
@@ -244,18 +249,19 @@ public abstract class GameWithGun extends GameWithLives {
 	protected boolean moveGun(int x, int y) {
 		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight)) return true;
 		
-		Board board = getBoard();
-		
-		// Erase the gun to not interfere with the checks
-		board = drawShape(board, curX, curY, gun, Cell.Empty);
-		
-		if (checkCollision(board, gun, x, y)) return false;
-		
-		// draw the gun on the new place
-		setBoard(drawShape(board, x, y, gun, Cell.Full));
-		
-		curX = x;
-		curY = y;
+		synchronized (lock) {
+			Board board = getBoard();
+			// Erase the gun to not interfere with the checks
+			board = drawShape(board, curX, curY, gun, Cell.Empty);
+			
+			if (checkCollision(board, gun, x, y)) return false;
+			
+			// draw the gun on the new place
+			setBoard(drawShape(board, x, y, gun, Cell.Full));
+			
+			curX = x;
+			curY = y;
+		}
 		
 		return true;
 	}
@@ -272,8 +278,10 @@ public abstract class GameWithGun extends GameWithLives {
 	 */
 	protected void removeCell(Board board, int x, int y) {
 		playEffect(Effects.hit_cell);
-		// remove the cell
-		board.setCell(Cell.Empty, x, y);
+		synchronized (lock) {
+			// remove the cell
+			board.setCell(Cell.Empty, x, y);
+		}
 		// increase scores
 		setScore(getScore() + 1);
 	}
@@ -286,38 +294,40 @@ public abstract class GameWithGun extends GameWithLives {
 		
 		Board board = getBoard();
 		
-		if (isFullLine(board, y)) {
-			// change status for stopping other work
-			Status prevStatus = getStatus();
-			setStatus(Status.DoSomeWork);
-			
-			playEffect(Effects.remove_line);
-			
-			animatedClearLine(board, curX, y);
-			
-			// erase the gun from the board before dropping ups lines
-			board = drawShape(board, curX, curY, gun, Cell.Empty);
-			
-			// drop the lines up on the filled line
-			for (int i = y; i > 0; i--) {
-				for (int j = 0; j < boardWidth; j++) {
-					board.setCell(board.getCell(j, i - 1), j, i);
+		synchronized (lock) {
+			if (isFullLine(board, y)) {
+				// change status for stopping other work
+				Status prevStatus = getStatus();
+				setStatus(Status.DoSomeWork);
+				
+				playEffect(Effects.remove_line);
+				
+				animatedClearLine(board, curX, y);
+				
+				// erase the gun from the board before dropping ups lines
+				board = drawShape(board, curX, curY, gun, Cell.Empty);
+				
+				// drop the lines up on the filled line
+				for (int i = y; i > 0; i--) {
+					for (int j = 0; j < boardWidth; j++) {
+						board.setCell(board.getCell(j, i - 1), j, i);
+					}
 				}
+				
+				// restore the gun after dropping ups lines
+				board = drawShape(board, curX, curY, gun, Cell.Full);
+				
+				setBoard(board);
+				// increase scores
+				setScore(getScore() + 10);
+				// reset the bullets
+				initBullets(bullets);
+				
+				// restore previous status
+				setStatus(prevStatus);
+				
+				result = true;
 			}
-			
-			// restore the gun after dropping ups lines
-			board = drawShape(board, curX, curY, gun, Cell.Full);
-			// increase scores
-			setScore(getScore() + 10);
-			// reset the bullets
-			initBullets(bullets);
-			
-			setBoard(board);
-			
-			// restore previous status
-			setStatus(prevStatus);
-			
-			result = true;
 		}
 		return result;
 	}

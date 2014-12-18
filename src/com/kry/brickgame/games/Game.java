@@ -51,6 +51,8 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	private static boolean mute;
 	
+	transient static Object lock;
+	
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
@@ -165,6 +167,7 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	public Game() {
 		r = new Random();
+		lock = new Object();
 		
 		setStatus(Status.None);
 		
@@ -274,17 +277,17 @@ public abstract class Game implements Runnable, Serializable {
 	 *            duration of the animation in milliseconds
 	 */
 	protected void animatedClearBoard(int millis) {
-		setStatus(Status.DoSomeWork);
 		// delay between animation frames
 		int delay = millis / (boardHeight * 2);
 		
 		// the board is filled upwards
 		for (int y = 0; y < boardHeight; y++) {
+			processKeys();
+			if (Thread.currentThread().isInterrupted()) return;
 			for (int x = 0; x < boardWidth; x++) {
 				board.setCell(Cell.Full, x, y);
 			}
 			fireBoardChanged(board);
-			processKeys();
 			sleep(delay);
 		}
 		// and is cleaned downwards
@@ -562,8 +565,9 @@ public abstract class Game implements Runnable, Serializable {
 		if (genuine)
 		// getting a uniform distribution from FIRST_LEVEL_SPEED to
 		// TENTH_LEVEL_SPEED
-			return (getSpeedOfFirstLevel() - (getSpeedOfFirstLevel() - getSpeedOfTenthLevel())
-					/ (10 - 1) * (speed - 1));
+			return Math.round(getSpeedOfFirstLevel()
+					- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
+					* (speed - 1));
 		return speed;
 	}
 	
@@ -682,9 +686,7 @@ public abstract class Game implements Runnable, Serializable {
 				int lowerLeftX = x - (waves[wave][0].length / 2);
 				int lowerLeftY = y - (waves[wave].length / 2);
 				
-				insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY);
-				fireBoardChanged(getBoard());
-				
+				setBoard(insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY));
 				sleep(ANIMATION_DELAY * 2);
 			}
 		}
@@ -846,6 +848,9 @@ public abstract class Game implements Runnable, Serializable {
 	
 	@Override
 	public void run() {
+		if (null == lock) {
+			lock = new Object();
+		}
 		fireBoardChanged(board);
 		firePreviewChanged(preview);
 		fireSpeedChanged(speed);
