@@ -88,7 +88,7 @@ public abstract class Game implements Runnable, Serializable {
 	/**
 	 * Set of the pressed keys
 	 */
-	protected Set<KeyPressed> keys = new HashSet<KeyPressed>();
+	protected final Set<KeyPressed> keys = new HashSet<KeyPressed>();
 	/**
 	 * Speed
 	 */
@@ -130,12 +130,12 @@ public abstract class Game implements Runnable, Serializable {
 	/**
 	 * X-coordinate position on the board
 	 */
-	protected int curX;
+	protected volatile int curX;
 	
 	/**
 	 * Y-coordinate position on the board
 	 */
-	protected int curY;
+	protected volatile int curY;
 	
 	/**
 	 * Game status
