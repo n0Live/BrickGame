@@ -298,7 +298,6 @@ public class RacingGame extends GameWithLives {
 		setBoard(drawBorder(board, !isThreelaneTraffic));
 		// draw opponents
 		Iterator<int[]> it = opponents.iterator();
-
 		while (it.hasNext()) {
 			int[] opponent = it.next();
 			// erase the opponent from the board
@@ -387,10 +386,11 @@ public class RacingGame extends GameWithLives {
 
 		while (!Thread.currentThread().isInterrupted()
 				&& (getStatus() != Status.GameOver)) {
-			if (getStatus() != Status.Paused) {
+			if (getStatus() == Status.Running) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
-					currentSpeed *= 1.5f;
+					// slow down if isThreelaneTraffic
+					currentSpeed = Math.round(currentSpeed * 1.5f);
 				}
 
 				// moving

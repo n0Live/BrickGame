@@ -362,7 +362,7 @@ public class SnakeGame extends GameWithLives {
 			}
 
 			// moving of the snake
-			if ((getStatus() != Status.Paused) && (elapsedTime(currentSpeed))) {
+			if ((getStatus() == Status.Running) && (elapsedTime(currentSpeed))) {
 				if (!tryMove(snake.getDirection())) {
 					loss(curX, curY);
 				}
