@@ -51,7 +51,7 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	private static boolean mute;
 	
-	transient static Object lock;
+	transient final static Object lock = new Object();
 	
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
@@ -167,7 +167,6 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	public Game() {
 		r = new Random();
-		lock = new Object();
 		
 		setStatus(Status.None);
 		
@@ -848,9 +847,6 @@ public abstract class Game implements Runnable, Serializable {
 	
 	@Override
 	public void run() {
-		if (null == lock) {
-			lock = new Object();
-		}
 		fireBoardChanged(board);
 		firePreviewChanged(preview);
 		fireSpeedChanged(speed);

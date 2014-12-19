@@ -24,7 +24,7 @@ public final class Main {
 	/**
 	 * The current thread of the game
 	 */
-	private static ExecutorService gameThread;
+	private static volatile ExecutorService gameThread;
 	/**
 	 * The selection screen of a game
 	 */
