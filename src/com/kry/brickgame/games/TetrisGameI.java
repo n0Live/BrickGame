@@ -59,7 +59,7 @@ public class TetrisGameI extends Game {
 	 */
 	private static Board drawShape(Board board, int x, int y, TetrisShape piece, Cell fill) {
 		Cell[] boardFill = new Cell[piece.getLength()];
-		
+		Board resultBoard = board;
 		for (int i = 0; i < piece.getLength(); i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y + piece.y(i);
@@ -68,9 +68,9 @@ public class TetrisGameI extends Game {
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
 				// gets the fill type from the board cell
-				boardFill[i] = board.getCell(board_x, board_y);
+				boardFill[i] = resultBoard.getCell(board_x, board_y);
 				// draws the point of the figure on the board
-				drawPoint(board, board_x, board_y, fill);
+				resultBoard = drawPoint(resultBoard, board_x, board_y, fill);
 			} else {
 				// if the figure leaves off the board, then sets fill type to
 				// empty
@@ -78,8 +78,7 @@ public class TetrisGameI extends Game {
 			}
 		}
 		piece.setBoardFill(boardFill);
-		
-		return board;
+		return resultBoard;
 	}
 	
 	/**
@@ -98,7 +97,7 @@ public class TetrisGameI extends Game {
 	 */
 	private static Board eraseShape(Board board, int x, int y, TetrisShape piece) {
 		if (piece.getShape() == Figures.NoShape) return board;
-		
+		Board resultBoard = board;
 		for (int i = 0; i < piece.getLength(); i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y + piece.y(i);
@@ -107,10 +106,10 @@ public class TetrisGameI extends Game {
 			if (((board_y < board.getHeight()) && (board_y >= 0))
 					&& ((board_x < board.getWidth()) && (board_x >= 0))) {
 				// draws the original point on the board
-				drawPoint(board, board_x, board_y, piece.getBoardFill()[i]);
+				resultBoard = drawPoint(resultBoard, board_x, board_y, piece.getBoardFill()[i]);
 			}
 		}
-		return board;
+		return resultBoard;
 	}
 	
 	/**
@@ -467,45 +466,43 @@ public class TetrisGameI extends Game {
 	}
 	
 	private void flowDown(Board board, int x, int y, TetrisShape piece, boolean isAcid) {
-		
 		int[][] sortedPoints = new int[piece.getLength()][2];
 		int n = 0;
 		for (int j = piece.minY(); j <= piece.maxY(); j++) {
 			// check leaving from the board
-			if (j >= boardHeight) {
-				break;
-			}
-			
-			for (int i = piece.minX(); i <= piece.maxX(); i++) {
-				for (int k = 0; k < piece.getLength(); k++) {
-					if ((piece.x(k) == i) && (piece.y(k) == j)) {
-						sortedPoints[n++] = piece.getCoord(k);
-						break;
+			if (j < boardHeight) {
+				for (int i = piece.minX(); i <= piece.maxX(); i++) {
+					for (int k = 0; k < piece.getLength(); k++) {
+						if ((piece.x(k) == i) && (piece.y(k) == j)) {
+							sortedPoints[n++] = piece.getCoord(k);
+							break;
+						}
 					}
 				}
 			}
 		}
 		
+		Board resultBoard = board;
 		for (int[] sortedPoint : sortedPoints) {
 			int board_x = x + sortedPoint[0];
 			int board_y = y + sortedPoint[1];
 			
-			while ((board_y > 0) && (board.getCell(board_x, board_y - 1) == Cell.Empty)) {
-				drawPoint(board, board_x, board_y - 1, piece.getFill());
-				drawPoint(board, board_x, board_y, Cell.Empty);
+			while ((board_y > 0) && (resultBoard.getCell(board_x, board_y - 1) == Cell.Empty)) {
+				resultBoard = drawPoint(resultBoard, board_x, board_y - 1, piece.getFill());
+				resultBoard = drawPoint(resultBoard, board_x, board_y, Cell.Empty);
 				board_y--;
-				setBoard(board);
+				setBoard(resultBoard);
 				sleep(ANIMATION_DELAY * 2);
 			}
 			if (isAcid && (board_y > 0)) {
-				drawPoint(board, board_x, board_y - 1, piece.getFill());
-				drawPoint(board, board_x, board_y, Cell.Empty);
+				resultBoard = drawPoint(resultBoard, board_x, board_y - 1, piece.getFill());
+				resultBoard = drawPoint(resultBoard, board_x, board_y, Cell.Empty);
 				sleep(ANIMATION_DELAY * 2);
-				drawPoint(board, board_x, board_y - 1, Cell.Empty);
+				resultBoard = drawPoint(resultBoard, board_x, board_y - 1, Cell.Empty);
 			} else {
-				drawPoint(board, board_x, board_y, Cell.Full);
+				resultBoard = drawPoint(resultBoard, board_x, board_y, Cell.Full);
 			}
-			setBoard(board);
+			setBoard(resultBoard);
 		}
 	}
 	
@@ -900,7 +897,7 @@ public class TetrisGameI extends Game {
 	 */
 	protected boolean tryMove(TetrisShape newPiece, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
-		Board board = getBoard().clone();
+		Board board = getBoard();
 		
 		// Erase the current figure from the temporary board to not interfere
 		// with the checks
