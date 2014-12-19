@@ -41,7 +41,6 @@ public abstract class CoordinatedShape extends CharacterShape {
 	
 	@Override
 	public CoordinatedShape clone() {
-		super.clone();
 		CoordinatedShape newShape;
 		try {
 			newShape = getClass().getDeclaredConstructor(this.getClass()).newInstance(this);
@@ -49,7 +48,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
-			return null;
+			throw new AssertionError(e);
 		}
 	}
 	
