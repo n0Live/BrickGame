@@ -44,7 +44,7 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.SplashScreen;
 
 public class Window extends JFrame {
-
+	
 	transient WindowListener windowListener = new WindowAdapter() {
 		@Override
 		public void windowClosing(WindowEvent e) {
@@ -63,34 +63,37 @@ public class Window extends JFrame {
 				System.exit(0);
 			}
 		}
-
+		
 		@Override
 		public void windowIconified(WindowEvent e) {
+			// set game paused
+			Main.getGame().pause();
+			// and save state
 			Main.getGame().saveState();
 		}
 	};
-
+	
 	transient ComponentListener componentListener = new ComponentAdapter() {
 		@Override
 		public void componentResized(ComponentEvent e) {
 			Component c = e.getComponent();
-
+			
 			// get size in compliance with DEVICE_ASPECT_RATIO
 			Dimension size = UIUtils.getDimensionWithAspectRatio(c.getSize(), DEVICE_ASPECT_RATIO);
-
+			
 			// check the size not less than min values
 			int width = Math.max(size.width, MIN_WIDTH);
 			int height = Math.max(size.height, MIN_HEIGHT);
-
+			
 			// set new size if the current is not correct
 			if (width != c.getSize().width || height != c.getSize().height) {
 				setSize(width, height);
 			}
 		}
 	};
-
+	
 	private static final long serialVersionUID = 3466619047314091863L;
-
+	
 	/**
 	 * Create the application.
 	 */
@@ -105,42 +108,42 @@ public class Window extends JFrame {
 		getSettingsManager().loadProperties();
 		initialize();
 	}
-
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
+		
 		setUndecorated(true);
-
+		
 		// try to load saved window size
 		Dimension windowSize = getSettingsManager().getSize();
-
+		
 		if (windowSize == null) {
 			// set initial size of window as half of screen height
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
+			
 			int winHeight = screenSize.height / 2;
 			int winWidth = Math.round(winHeight * DEVICE_ASPECT_RATIO);
 			windowSize = new Dimension(winWidth, winHeight);
 		}
-
+		
 		setSize(UIUtils.getDimensionWithAspectRatio(windowSize, DEVICE_ASPECT_RATIO));
-
+		
 		// place window in the center of the screen
 		setLocationRelativeTo(null);
-
+		
 		getContentPane().setLayout(new BorderLayout(0, 0));
-
+		
 		addWindowListener(windowListener);
-
+		
 		final GameDrawPanel drawPanel = new GameDrawPanel();
-
+		
 		drawPanel.setLayout(new MigLayout(getInsetsInPercents(INSET_TOP, INSET_LEFT, INSET_BOTTOM,
 				INSET_RIGHT) + ", nocache", "[][][][grow][]", "[]["
-						+ getFormatedPercent(210, MIN_HEIGHT) + ":n,grow][][][][]"));
-
+				+ getFormatedPercent(210, MIN_HEIGHT) + ":n,grow][][][][]"));
+		
 		/* -- Window buttons -- */
 		if (getToolkit().isFrameStateSupported(ICONIFIED)) {
 			drawPanel.add(
@@ -151,7 +154,7 @@ public class Window extends JFrame {
 		drawPanel.add(ButtonsFactory.getCloseButton(), "cell 4 0, alignx right, aligny center, "
 				+ getDimensionInPercents(WINDOW_BTN_SIZE, WINDOW_BTN_SIZE));
 		/* ---- */
-
+		
 		/* -- Control buttons -- */
 		drawPanel.add(
 				ButtonsFactory.getButton(KeyPressed.KeyUp),
@@ -170,13 +173,13 @@ public class Window extends JFrame {
 				"cell 2 4, alignx center, aligny center, "
 						+ getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
 		/* ---- */
-
+		
 		/* Rotate button */
 		drawPanel.add(
 				ButtonsFactory.getButton(KeyPressed.KeyRotate),
 				"cell 4 3 1 3, alignx right, aligny center, "
 						+ getDimensionInPercents(ROTATE_BTN_SIZE, ROTATE_BTN_SIZE));
-
+		
 		/* Menu buttons */
 		drawPanel.add(
 				ButtonsFactory.getButton(KeyPressed.KeyShutdown),
@@ -191,22 +194,22 @@ public class Window extends JFrame {
 				"cell 3 2, alignx center, aligny bottom, "
 						+ getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		/* ---- */
-
+		
 		/* Start button */
 		drawPanel.add(
 				ButtonsFactory.getButton(KeyPressed.KeyStart),
 				"cell 3 3, alignx center, aligny bottom, "
 						+ getDimensionInPercents(START_BTN_SIZE, START_BTN_SIZE));
-
+		
 		setContentPane(drawPanel);
-
+		
 		addComponentListener(componentListener);
 		addKeyListener(Main.gameKeyAdapter);
 		Game.addGameListener(drawPanel);
-
+		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
 				new ButtonsFactory.ButtonsKeyEventDispatcher());
-
+		
 		setTitle("Brick Game");
 		Game game = GameLoader.loadGame();
 		if (game == null) {
@@ -215,7 +218,7 @@ public class Window extends JFrame {
 		// try to load saved properties
 		Game.setMuted(getSettingsManager().getMuted());
 		Main.gameSelector.setRotation(getSettingsManager().getRotation());
-
+		
 		Main.setGame(game);
 	}
 }

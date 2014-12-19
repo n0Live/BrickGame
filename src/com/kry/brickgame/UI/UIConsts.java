@@ -79,7 +79,7 @@ public class UIConsts {
 	protected final static int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
 	// Insets
 	static final int INSET_TOP = 25;
-	static final int INSET_LEFT = 30;
+	static final int INSET_LEFT = 25;
 	static final int INSET_BOTTOM = 50;
 	static final int INSET_RIGHT = 25;
 	// Buttons size
