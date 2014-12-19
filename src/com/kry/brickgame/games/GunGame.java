@@ -10,8 +10,9 @@ import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
@@ -35,7 +36,7 @@ public class GunGame extends GameWithGun {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 16;
-	
+
 	/**
 	 * Kind of game
 	 * <p>
@@ -43,19 +44,19 @@ public class GunGame extends GameWithGun {
 	 * destroys a cell
 	 */
 	final boolean isCreationMode;
-	
+
 	/**
 	 * Number of barrels
 	 * <p>
 	 * {@code true} - two barrels, {@code false} - one barrel
 	 */
 	private final boolean hasTwoSmokingBarrels;
-	
+
 	/**
 	 * Whether to shift the board?
 	 */
 	private final boolean isShiftingBoard;
-	
+
 	/**
 	 * The Gun Game
 	 * 
@@ -89,7 +90,7 @@ public class GunGame extends GameWithGun {
 	 */
 	public GunGame(int speed, int level, int type) {
 		super(speed, level, type);
-		
+
 		// ==define the parameters of the types of game==
 		// for types 5-8 and 13-16
 		isCreationMode = ((getType() >= 5) && (getType() <= 8))
@@ -100,10 +101,10 @@ public class GunGame extends GameWithGun {
 		isShiftingBoard = (getType() % 2 == 0);
 		// for types 8-16
 		setDrawInvertedBoard((getType() > 8));
-		
+
 		loadNewLevel();
 	}
-	
+
 	/**
 	 * Add randomly generated lines on the board
 	 * 
@@ -118,7 +119,7 @@ public class GunGame extends GameWithGun {
 		clearBullets(board);
 		return addLinesToBoard(board, boardHeight - 1, linesCount, false);
 	}
-	
+
 	/**
 	 * Drop down one row
 	 * 
@@ -126,43 +127,44 @@ public class GunGame extends GameWithGun {
 	 *         {@code false}
 	 */
 	private boolean droppingDown() {
-		Board board = getBoard();
-		
-		// erase the gun to not interfere with the checks
-		board = drawShape(board, curX, curY, gun, Cell.Empty);
-		// add line
-		board = addLines(board, 1);
-		// check whether the line is dropped to the gun
 		boolean result = true;
-		for (int i = 0; i < boardWidth; i++) {
-			if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
-				result = false;
-				break;
+		synchronized (lock) {
+			Board board = getBoard();
+			// erase the gun to not interfere with the checks
+			board = drawShape(board, curX, curY, gun, Cell.Empty);
+			// add line
+			board = addLines(board, 1);
+			// check whether the line is dropped to the gun
+			for (int i = 0; i < boardWidth; i++) {
+				if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
+					result = false;
+					break;
+				}
 			}
+			// return the gun to the board
+			board = drawShape(board, curX, curY, gun, Cell.Full);
+			setBoard(board);
 		}
-		// return the gun to the board
-		board = drawShape(board, curX, curY, gun, Cell.Full);
-		setBoard(board);
-		
+
 		// for even types of game, shifts the board
 		if (isShiftingBoard) {
 			sleep(ANIMATION_DELAY);
 			shiftBoard();
 		}
-		
+
 		return result;
 	}
-	
+
 	@Override
 	protected int getSpeedOfFirstLevel() {
 		return (isCreationMode) ? 4500 : 500;
 	}
-	
+
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return (isCreationMode) ? 2500 : 250;
 	}
-	
+
 	/**
 	 * Loading or reloading the specified level
 	 */
@@ -171,30 +173,33 @@ public class GunGame extends GameWithGun {
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
-		
+
 		// clear the bullets
 		initBullets(bullets);
-		
-		// draws a rows on the top of the border
-		setBoard(addLines(getBoard(), getLevel()));
-		// draws the gun
-		moveGun(curX, curY);
-		
+
+		synchronized (lock) {
+			// draws a rows on the top of the border
+			setBoard(addLines(getBoard(), getLevel()));
+			// draws the gun
+			moveGun(curX, curY);
+		}
+
 		super.loadNewLevel();
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None) return;
-		
+		if (getStatus() == Status.None)
+			return;
+
 		super.processKeys();
-		
+
 		if (getStatus() == Status.Running) {
 			int movementSpeed = Math.round(ANIMATION_DELAY * 1.5f);
-			
+
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveGun(curX - 1, curY)) {
 					playEffect(Effects.move);
@@ -228,14 +233,16 @@ public class GunGame extends GameWithGun {
 				if (isCreationMode) {
 					keys.remove(KeyPressed.KeyRotate);
 				} else {
-					// twice as slow if hasTwoSmokingBarrels
-					setKeyDelay(KeyPressed.KeyRotate,
-							(hasTwoSmokingBarrels ? (int) (movementSpeed * 1.65f) : movementSpeed));
+					// slow down if hasTwoSmokingBarrels
+					setKeyDelay(
+							KeyPressed.KeyRotate,
+							(hasTwoSmokingBarrels ? (int) (movementSpeed * 1.65f)
+									: movementSpeed));
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Launching the game
 	 */
@@ -243,11 +250,13 @@ public class GunGame extends GameWithGun {
 	public void run() {
 		super.run();
 		// create timer for bullets
-		Timer bulletSwarm = new Timer("BulletSwarm", true);
-		bulletSwarm.schedule(new TimerTask() {
+		ScheduledExecutorService bulletSwarm = Executors
+				.newSingleThreadScheduledExecutor();
+		bulletSwarm.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
-				if (getStatus() == Status.Running) {
+				if (!Thread.currentThread().isInterrupted()
+						&& getStatus() == Status.Running) {
 					if (isCreationMode) {
 						flightOfMud();
 					} else {
@@ -256,18 +265,18 @@ public class GunGame extends GameWithGun {
 				}
 			}
 			// twice as slow if hasTwoSmokingBarrels
-		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2));
-		
-		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2),
+				TimeUnit.MILLISECONDS);
+
+		while (!Thread.currentThread().isInterrupted()
+				&& (getStatus() != Status.GameOver)) {
 			if (getStatus() == Status.Running) {
-				
 				int currentSpeed = getSpeed(true);
-				
 				// increase game speed when hasTwoSmokingBarrels
 				if (hasTwoSmokingBarrels && !isCreationMode) {
 					currentSpeed -= ANIMATION_DELAY / 2;
 				}
-				
+
 				// moving
 				if (elapsedTime(currentSpeed)) {
 					// try drop down lines
@@ -279,61 +288,66 @@ public class GunGame extends GameWithGun {
 			// processing of key presses
 			processKeys();
 		}
-		
-		bulletSwarm.cancel();
+
+		bulletSwarm.shutdownNow();
 	}
-	
+
 	@Override
 	protected void setScore(int score) {
 		int oldThousands = getScore() / 1000;
-		
+
 		super.setScore(score);
-		
+
 		// when a sufficient number of points changes the speed and the level
 		if (getScore() / 1000 > oldThousands) {
 			setSpeed(getSpeed() + 1);
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
-				
+
 				setStatus(Status.DoSomeWork);
-				Board board = getBoard();
-				// delete flying bullets
-				initBullets(bullets);
-				clearBullets(board);
-				// erase the gun
-				board = drawShape(board, curX, curY, gun, Cell.Empty);
-				
-				playMusic(Music.win);
-				animatedClearBoard(CB_WIN);
-				
-				// add lines
-				for (int i = 0; i < getLevel(); i++) {
-					board = addLines(getBoard(), 1);
+				synchronized (lock) {
+					Board board = getBoard();
+					// delete flying bullets
+					initBullets(bullets);
+					clearBullets(board);
+					// erase the gun
+					board = drawShape(board, curX, curY, gun, Cell.Empty);
+
+					playMusic(Music.win);
+					animatedClearBoard(CB_WIN);
+
+					// add lines
+					for (int i = 0; i < getLevel(); i++) {
+						board = addLines(getBoard(), 1);
+						setBoard(board);
+						sleep(ANIMATION_DELAY * 3);
+					}
+
+					// return the gun
+					board = drawShape(board, curX, curY, gun, Cell.Full);
 					setBoard(board);
-					sleep(ANIMATION_DELAY * 3);
 				}
-				
-				// return the gun
-				board = drawShape(board, curX, curY, gun, Cell.Full);
 				setStatus(Status.Running);
 			}
 		}
 	}
-	
+
 	/**
 	 * Shift the board horizontally on a random direction
 	 */
 	private void shiftBoard() {
-		Board board = getBoard();
-		// erase the gun to not interfere
-		board = drawShape(board, curX, curY, gun, Cell.Empty);
-		// remove bullets from the board
-		clearBullets(board);
-		// shifts the board
-		board = boardHorizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
-		// return the gun to the board
-		board = drawShape(board, curX, curY, gun, Cell.Full);
-		setBoard(board);
+		synchronized (lock) {
+			Board board = getBoard();
+			// erase the gun to not interfere
+			board = drawShape(board, curX, curY, gun, Cell.Empty);
+			// remove bullets from the board
+			clearBullets(board);
+			// shifts the board
+			board = boardHorizontalShift(board, (r.nextBoolean()) ? (-1) : (1));
+			// return the gun to the board
+			board = drawShape(board, curX, curY, gun, Cell.Full);
+			setBoard(board);
+		}
 	}
-	
+
 }
