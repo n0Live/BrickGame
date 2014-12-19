@@ -7,6 +7,7 @@ import static com.kry.brickgame.games.GameUtils.isFullLine;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -224,9 +225,7 @@ public abstract class GameWithGun extends GameWithLives {
 	protected void initBullets(AtomicReferenceArray<AtomicIntegerArray> bullets) {
 		for (int i = 0; i < bullets.length(); i++) {
 			int[] array = new int[bulletsArrayHeight];
-			for (int j = 0; j < array.length; j++) {
-				array[j] = 0;
-			}
+			Arrays.fill(array, 0);
 			bullets.set(i, new AtomicIntegerArray(array));
 		}
 	}

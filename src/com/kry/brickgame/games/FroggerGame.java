@@ -8,6 +8,7 @@ import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -234,9 +235,7 @@ public class FroggerGame extends GameWithLives {
 	 * Sets frogs to default values
 	 */
 	private void initFrogs() {
-		for (int i = 0; i < frogs.length; i++) {
-			frogs[i] = Cell.Empty;
-		}
+		Arrays.fill(frogs, Cell.Empty);
 	}
 	
 	/**

@@ -301,10 +301,6 @@ public class InvadersGame extends GameWithGun {
 	 *         {@code false}
 	 */
 	private boolean droppingDown() {
-		// change status for stopping other work
-		// Status prevStatus = getStatus();
-		// setStatus(Status.DoSomeWork);
-		
 		int newBricksY = bricksY - 1;
 		if (newBricksY <= -bricks.getHeight()) {
 			win();
@@ -347,17 +343,11 @@ public class InvadersGame extends GameWithGun {
 		}
 		bricksY = newBricksY;
 		
-		// reset the bullets
-		// initBullets(bullets);
-		
 		// for even types of game, shifts the board
 		if (isShiftingBricks) {
 			sleep(ANIMATION_DELAY);
 			shiftBricks();
 		}
-		
-		// restore previous status
-		// setStatus(prevStatus);
 		
 		return result;
 	}
