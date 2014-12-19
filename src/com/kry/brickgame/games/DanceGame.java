@@ -396,6 +396,18 @@ public class DanceGame extends Game {
 	}
 
 	/**
+	 * Changes melody to a new one or increases playback speed
+	 */
+	private void playNewMelody() {
+		setSpeed(getSpeed() + 1);
+		if (getSpeed() == 1) {
+			melodyNumber++;
+		}
+		rate = calculateRate();
+		playMelody(getMelody(), rate);
+	}
+
+	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -461,15 +473,9 @@ public class DanceGame extends Game {
 		while (!Thread.currentThread().isInterrupted()
 				&& (getStatus() != Status.GameOver)) {
 			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
-
 				// change speed and melody after finished playing the melody
 				if (!isMuted() && !SoundManager.isPlaying(melodies)) {
-					setSpeed(getSpeed() + 1);
-					if (getSpeed() == 1) {
-						melodyNumber++;
-					}
-					rate = calculateRate();
-					playMelody(getMelody(), rate);
+					playNewMelody();
 					// if muted, then speed changes every 10 + getSpeed()
 					// positions
 				} else if (stepsGone >= 10 + getSpeed()) {
