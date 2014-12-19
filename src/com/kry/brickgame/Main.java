@@ -1,6 +1,8 @@
 package com.kry.brickgame;
 
 import java.awt.EventQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.kry.brickgame.UI.GameKeyAdapter;
 import com.kry.brickgame.UI.Window;
@@ -14,7 +16,7 @@ import com.kry.brickgame.games.GameSelector;
  * @since 01.08.2014
  */
 public final class Main {
-
+	
 	/**
 	 * The current game
 	 */
@@ -22,7 +24,7 @@ public final class Main {
 	/**
 	 * The current thread of the game
 	 */
-	private static Thread gameThread;
+	private static ExecutorService gameThread;
 	/**
 	 * The selection screen of a game
 	 */
@@ -31,11 +33,11 @@ public final class Main {
 	 * Observer to {@code KeyEvent}
 	 */
 	public static final GameKeyAdapter gameKeyAdapter = new GameKeyAdapter();
-
+	
 	public static Game getGame() {
 		return game;
 	}
-
+	
 	/**
 	 * Launch the application
 	 */
@@ -52,11 +54,13 @@ public final class Main {
 			}
 		});
 	}
-
+	
 	public static void setGame(Game game) {
 		Main.game = game;
-		gameThread = new Thread(game, "TGameThread");
-		gameThread.start();
+		if (null == gameThread) {
+			gameThread = Executors.newSingleThreadExecutor();
+		}
+		gameThread.execute(game);
 	}
-
+	
 }
