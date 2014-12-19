@@ -2,8 +2,9 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
@@ -13,11 +14,11 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameJ extends TetrisGameI {
 	private static final long serialVersionUID = 4703415063910078444L;
-
+	
 	private static final int TIME_BETWEEN_ADDING_LINE = 30;
 	private volatile int time;
 	volatile boolean isTimeToAddLine;
-
+	
 	/**
 	 * The Tetris with the addition of new lines every few seconds
 	 * 
@@ -28,7 +29,7 @@ public class TetrisGameJ extends TetrisGameI {
 		isTimeToAddLine = false;
 		time = TIME_BETWEEN_ADDING_LINE;
 	}
-
+	
 	@Override
 	protected void doRepetitiveWork() {
 		// if it's time to add a line, trying to add a line
@@ -39,21 +40,20 @@ public class TetrisGameJ extends TetrisGameI {
 			super.doRepetitiveWork();
 		}
 	}
-
+	
 	int getTime() {
 		return time;
 	}
-
+	
 	@Override
 	public void run() {
 		// create timer for addition of lines
-		Timer addLineTimer = new Timer("AddLineTicTac", true);
-		addLineTimer.scheduleAtFixedRate(new TimerTask() {
+		ScheduledExecutorService addLineTimer = Executors.newSingleThreadScheduledExecutor();
+		addLineTimer.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				if (getStatus() == Status.Running) {
-					fireInfoChanged("-" + String.format("%02d", getTime())
-							+ "-");
+					fireInfoChanged("-" + String.format("%02d", getTime()) + "-");
 					if (getTime() == 0) {
 						isTimeToAddLine = true;
 					} else {
@@ -61,25 +61,24 @@ public class TetrisGameJ extends TetrisGameI {
 					}
 				}
 			}
-		}, 0, 1000);
-
+		}, 0, 1, TimeUnit.SECONDS);
+		
 		super.run();
-
-		addLineTimer.cancel();
+		
+		addLineTimer.shutdownNow();
 	}
-
+	
 	void setTime(int time) {
 		this.time = time;
 	}
-
+	
 	private boolean tryAddLine() {
-		if ((!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true))
-				&& (addLines())) {
+		if ((!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true)) && (addLines())) {
 			// the current y-coordinate lifts by one cell upward
 			curY++;
 			return true;
 		}
 		return false;
 	}
-
+	
 }
