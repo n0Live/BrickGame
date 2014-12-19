@@ -130,12 +130,12 @@ public abstract class Game implements Runnable, Serializable {
 	/**
 	 * X-coordinate position on the board
 	 */
-	protected volatile int curX;
+	protected int curX;
 	
 	/**
 	 * Y-coordinate position on the board
 	 */
-	protected volatile int curY;
+	protected int curY;
 	
 	/**
 	 * Game status
