@@ -102,17 +102,18 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void loss(int x, int y) {
 		setStatus(Status.DoSomeWork);
-		
-		// kaboom and decrease lives
-		kaboom(x, y);
-		setLives(getLives() - 1);
-		if (getLives() > 0) {
-			animatedClearBoard(CB_LOSE);
-			if (!Thread.currentThread().isInterrupted()) {
-				reloadLevel();
+		synchronized (lock) {
+			// kaboom and decrease lives
+			kaboom(x, y);
+			setLives(getLives() - 1);
+			if (getLives() > 0) {
+				animatedClearBoard(CB_LOSE);
+				if (!Thread.currentThread().isInterrupted()) {
+					reloadLevel();
+				}
+			} else {
+				gameOver();
 			}
-		} else {
-			gameOver();
 		}
 	}
 	
@@ -162,17 +163,18 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void win() {
 		setStatus(Status.DoSomeWork);
-		
-		playMusic(Music.win);
-		animatedClearBoard(CB_WIN);
-		
-		setLevel(getLevel() + 1);
-		if (getLevel() == 1) {
-			setSpeed(getSpeed() + 1);
-		}
-		
-		if (!Thread.currentThread().isInterrupted()) {
-			loadNewLevel();
+		synchronized (lock) {
+			playMusic(Music.win);
+			animatedClearBoard(CB_WIN);
+			
+			setLevel(getLevel() + 1);
+			if (getLevel() == 1) {
+				setSpeed(getSpeed() + 1);
+			}
+			
+			if (!Thread.currentThread().isInterrupted()) {
+				loadNewLevel();
+			}
 		}
 	}
 	
