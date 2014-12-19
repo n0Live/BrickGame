@@ -8,8 +8,9 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.SwingUtilities;
 
@@ -92,7 +93,7 @@ public class GameSelector extends Game {
 	/**
 	 * Timer for the splash screen of the game
 	 */
-	transient private Timer splashTimer;
+	transient private ScheduledExecutorService splashTimer;
 
 	public GameSelector() {
 		super();
@@ -132,7 +133,7 @@ public class GameSelector extends Game {
 				Game game = constructor.newInstance(args);
 				// stop the splash animation timer
 				if (splashTimer != null) {
-					splashTimer.cancel();
+					splashTimer.shutdownNow();
 				}
 				// starts the selected game
 				Main.setGame(game);
@@ -153,7 +154,7 @@ public class GameSelector extends Game {
 	private boolean drawAll() {
 		// stop the splash animation timer
 		if (splashTimer != null) {
-			splashTimer.cancel();
+			splashTimer.shutdownNow();
 		}
 
 		drawLetter(letter);
@@ -183,8 +184,8 @@ public class GameSelector extends Game {
 
 			if (splash != null) {
 				// starts the timer to show splash screen of the game
-				splashTimer = new Timer(splash.getClass().getName(), true);
-				splashTimer.schedule(new TimerTask() {
+				splashTimer = Executors.newSingleThreadScheduledExecutor();
+				splashTimer.scheduleWithFixedDelay(new Runnable() {
 					@Override
 					public void run() {
 						SwingUtilities.invokeLater(new Runnable() {
@@ -194,7 +195,7 @@ public class GameSelector extends Game {
 							}
 						});
 					}
-				}, 0, 500);
+				}, 0, 500, TimeUnit.MILLISECONDS);
 			} else {
 				// if unable - clears the rectangle of the splash screen
 				drawGameSplash(null);
@@ -340,7 +341,7 @@ public class GameSelector extends Game {
 		case KeyReset:
 			// stop the splash animation timer
 			if (splashTimer != null) {
-				splashTimer.cancel();
+				splashTimer.shutdownNow();
 			}
 			SplashScreen ss = new SplashScreen();
 			// show actual speed and level
@@ -350,7 +351,7 @@ public class GameSelector extends Game {
 			break;
 		case KeyShutdown:
 			if (splashTimer != null) {
-				splashTimer.cancel();
+				splashTimer.shutdownNow();
 			}
 			quit();
 			break;
