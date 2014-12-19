@@ -112,7 +112,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * The flag is set at a loss and initiates a call loss()
 	 */
-	private boolean isDead;
+	private volatile boolean isDead;
 	
 	/**
 	 * The Invaders Game
@@ -260,7 +260,6 @@ public class InvadersGame extends GameWithGun {
 		// set the invasion speed
 		// slow down if invaders is more than 50
 		final int currentSpeed = getSpeed(true) + Math.max(bricks.getBricksCount() - 50, 0);
-		System.out.println(currentSpeed + ";" + bricks.getBricksCount());// TODO
 		
 		invasionTimer = Executors.newSingleThreadScheduledExecutor();
 		invasionHandler = invasionTimer.scheduleWithFixedDelay(new Runnable() {
