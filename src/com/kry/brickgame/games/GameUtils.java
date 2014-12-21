@@ -630,10 +630,10 @@ public final class GameUtils {
 			
 			// stopAllSounds(); // <-- too slow
 			// stop music only
-			music.stopAll();
+			SoundManager.stopAll(music);
 			// and effects in some cases
 			if (Music.win.equals(sound) || Music.game_over.equals(sound)) {
-				effects.stopAll();
+				SoundManager.stopAll(effects);
 			}
 			
 			if (Music.start.equals(sound)) {
@@ -672,12 +672,24 @@ public final class GameUtils {
 	}
 	
 	/**
+	 * Stop playing the {@code sound}, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param sound
+	 *            {@code enum} value, containing the name of the sound
+	 */
+	protected static <E extends Enum<E>> void stop(SoundBank soundBank, Enum<E> sound) {
+		SoundManager.stop(soundBank, sound);
+	}
+	
+	/**
 	 * Stops playing for all sounds
 	 */
 	protected static void stopAllSounds() {
-		effects.stopAll();
-		music.stopAll();
-		melodies.stopAll();
+		SoundManager.stopAll(effects);
+		SoundManager.stopAll(music);
+		SoundManager.stopAll(melodies);
 	}
 	
 }
