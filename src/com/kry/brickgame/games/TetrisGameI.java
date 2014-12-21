@@ -684,7 +684,7 @@ public class TetrisGameI extends Game {
 		super.processKeys();
 		
 		if ((getStatus() == Status.Running) && (!isFallingFinished)) {
-			int movementSpeed = (int) (ANIMATION_DELAY * 2.5f);
+			int movementSpeed = (int) (ANIMATION_DELAY * 3f);
 			
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (tryMove(curPiece, curX - 1, curY)) {
