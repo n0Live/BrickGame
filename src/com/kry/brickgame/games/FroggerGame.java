@@ -212,7 +212,8 @@ public class FroggerGame extends GameWithLives {
 		
 		if (isVictory) {
 			animatedClearLine(getBoard(), curX, boardHeight - 1);
-			sleep(ANIMATION_DELAY);
+			// wait while playing effect
+			sleep(ANIMATION_DELAY * 7);
 			
 			initFrogs();
 			win();

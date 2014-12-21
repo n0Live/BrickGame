@@ -45,7 +45,7 @@ public final class GameUtils {
 	protected static final Map<Effects, Integer> effectsPriority;
 	static {
 		effectsPriority = new HashMap<>(Effects.values().length);
-		effectsPriority.put(Effects.select, Thread.NORM_PRIORITY);
+		effectsPriority.put(Effects.select, Thread.MAX_PRIORITY);
 		effectsPriority.put(Effects.move, Thread.MIN_PRIORITY);
 		effectsPriority.put(Effects.turn, Thread.NORM_PRIORITY);
 		effectsPriority.put(Effects.hit_cell, Thread.MAX_PRIORITY);
@@ -57,9 +57,9 @@ public final class GameUtils {
 		effectsPriority.put(Effects.engine, Thread.MIN_PRIORITY);
 	}
 	
-	protected static final SoundBank effects = new SoundBank();
-	protected static final SoundBank melodies = new SoundBank();
 	// load the sounds at initialization to reduce the delay in the first play
+	protected static final SoundBank effects = new SoundBank(enumToResourceArray(Effects.class));
+	protected static final SoundBank melodies = new SoundBank(enumToResourceArray(Melodies.class));
 	protected static final SoundBank music = new SoundBank(enumToResourceArray(Music.class));
 	
 	/**

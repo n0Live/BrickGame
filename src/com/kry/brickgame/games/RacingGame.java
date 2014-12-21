@@ -34,6 +34,8 @@ public class RacingGame extends GameWithLives {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 4;
+	
+	private static final int LOOP_DELAY = ANIMATION_DELAY * 16;
 	/**
 	 * Racing car
 	 */
@@ -252,7 +254,7 @@ public class RacingGame extends GameWithLives {
 		super.loadNewLevel();
 		
 		if (!isStarted) {
-			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+			loop(effects, Effects.engine, LOOP_DELAY);
 		}
 	}
 	
@@ -382,7 +384,7 @@ public class RacingGame extends GameWithLives {
 		
 		// don't start playing sound after deserialization
 		if (getStatus() != Status.Paused) {
-			loop(effects, Effects.engine, ANIMATION_DELAY * 14);
+			loop(effects, Effects.engine, LOOP_DELAY);
 		}
 		
 		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {

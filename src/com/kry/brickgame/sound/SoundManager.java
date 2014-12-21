@@ -2,12 +2,17 @@ package com.kry.brickgame.sound;
 
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.media.AudioClip;
 
 public class SoundManager {
 	private final static String soundFolder = "/sounds/";
 	private final static String soundExtension = ".m4a";
+	
+	private static final int DELAY_BEFORE_PLAY_NEW_SOUND = 600;
+	private static final Map<String, Long> playedClips = new HashMap<>();
 	
 	/**
 	 * Play the {@code AudioClip} at once in normal rate, depending of the
@@ -21,11 +26,20 @@ public class SoundManager {
 	 */
 	public static <E extends Enum<E>> void breakingPlay(SoundBank soundBank, Enum<E> value) {
 		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(1);
 		if (clip.isPlaying()) {
 			clip.stop();
 		}
+		clip.setCycleCount(1);
 		clip.play();
+	}
+	
+	private static boolean canPlay(String clip, int delay) {
+		synchronized (playedClips) {
+			if (playedClips.containsKey(clip)
+					&& System.currentTimeMillis() < playedClips.get(clip) + delay) return false;
+			playedClips.put(clip, System.currentTimeMillis());
+			return true;
+		}
 	}
 	
 	/**
@@ -37,9 +51,9 @@ public class SoundManager {
 	 */
 	public static <E extends Enum<E>> String[] enumToResourceArray(Class<E> enumClass) {
 		EnumSet<E> values = EnumSet.allOf(enumClass);
-		int i = 0;
 		String[] result = new String[values.size()];
 		
+		int i = 0;
 		for (E value : values) {
 			result[i++] = getResourceFromName(value.toString());
 		}
@@ -127,11 +141,7 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 */
 	public static <E extends Enum<E>> void loop(SoundBank soundBank, Enum<E> value) {
-		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(AudioClip.INDEFINITE);
-		// Use default parameters except priority
-		clip.play(clip.getVolume(), clip.getBalance(), clip.getRate(), clip.getPan(),
-				Thread.MAX_PRIORITY);
+		play(soundBank, value, AudioClip.INDEFINITE, 1.0, Thread.MAX_PRIORITY);
 	}
 	
 	/**
@@ -162,10 +172,7 @@ public class SoundManager {
 	 *            speed) to 8.0 (8x speed).
 	 */
 	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, double rate) {
-		final AudioClip clip = getClip(soundBank, value);
-		clip.setCycleCount(1);
-		// Use default parameters except rate
-		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(), Thread.MAX_PRIORITY); // clip.getPriority());
+		play(soundBank, value, 1, rate, Thread.MAX_PRIORITY);
 	}
 	
 	/**
@@ -181,10 +188,35 @@ public class SoundManager {
 	 *            the new playback priority
 	 */
 	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, int priority) {
+		play(soundBank, value, 1, 1.0, priority);
+	}
+	
+	/**
+	 * Play the {@code AudioClip} in specified {@code cycleCount} , depending of
+	 * the
+	 * specified {@code enum} value, from the specified {@code soundBank}, with
+	 * specified {@code rate} and {@code priority}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 * @param cycleCount
+	 *            new cycle count for playing the {@code AudioClip}
+	 * @param rate
+	 *            playback rate multiplier: 1.0 will play at the normal rate,
+	 *            while 2.0 will double the rate. Valid range is 0.125 (1/8
+	 *            speed) to 8.0 (8x speed).
+	 * @param priority
+	 *            the new playback priority
+	 */
+	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, int cycleCount,
+			double rate, int priority) {
+		if (!canPlay(value.toString(), (DELAY_BEFORE_PLAY_NEW_SOUND - priority * 10))) return;
 		final AudioClip clip = getClip(soundBank, value);
-		clip.setPriority(priority);
-		clip.setCycleCount(1);
-		clip.play();
+		clip.setCycleCount(cycleCount);
+		// Use default parameters except priority
+		clip.play(clip.getVolume(), clip.getBalance(), rate, clip.getPan(), priority);
 	}
 	
 	/**
@@ -218,7 +250,6 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 */
 	public static <E extends Enum<E>> void prepare(SoundBank soundBank, Enum<E> value) {
-		
 		final AudioClip clip = getClip(soundBank, value);
 		clip.play(0); // silent play
 	}
@@ -246,7 +277,11 @@ public class SoundManager {
 	 *            specified SoundBank
 	 */
 	public static void stopAll(SoundBank soundBank) {
-		soundBank.stopAll();
+		for (AudioClip clip : soundBank) {
+			if (clip.isPlaying()) {
+				clip.stop();
+			}
+		}
 	}
 	
 }

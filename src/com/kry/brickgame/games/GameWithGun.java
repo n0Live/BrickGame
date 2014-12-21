@@ -140,7 +140,7 @@ public abstract class GameWithGun extends GameWithLives {
 				}
 			}
 		}
-		playEffect(Effects.turn);
+		// playEffect(Effects.turn); <= removed due occurring audio artifacts
 	}
 	
 	private void flight(boolean ofBullets) {

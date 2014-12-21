@@ -544,9 +544,9 @@ public class InvadersGame extends GameWithGun {
 			}
 			if (containsKey(KeyPressed.KeyRotate)) {
 				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
+				int fireSpeed = ANIMATION_DELAY * (hasTwoSmokingBarrels ? 6 : 3);
 				// slowing fire speed if hasTwoSmokingBarrels
-				setKeyDelay(KeyPressed.KeyRotate,
-						Math.round(movementSpeed * (hasTwoSmokingBarrels ? 3f : 1.5f)));
+				setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
 			}
 		}
 	}
@@ -563,6 +563,7 @@ public class InvadersGame extends GameWithGun {
 	protected void removeCell(Board board, int x, int y) {
 		synchronized (lock) {
 			if ((x == ballX) && (y == ballY)) {
+				playEffect(Effects.hit_cell);
 				removeBall();
 			} else {
 				breakBrick(board, x, y);

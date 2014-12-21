@@ -1,6 +1,5 @@
 package com.kry.brickgame.sound;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -16,20 +15,13 @@ public class SoundBank implements Iterable<AudioClip> {
 	private final Map<String, AudioClip> clips;
 	
 	/**
-	 * Create an empty SoundBank.
-	 */
-	public SoundBank() {
-		clips = Collections.synchronizedMap(new HashMap<String, AudioClip>());
-	}
-	
-	/**
 	 * Creates an SoundBank and loads {@code files} to it.
 	 * 
 	 * @param files
 	 *            array of file names to load
 	 */
 	public SoundBank(String[] files) {
-		this();
+		clips = new HashMap<>(files.length, 1f);
 		loadSounds(files);
 	}
 	
@@ -41,9 +33,6 @@ public class SoundBank implements Iterable<AudioClip> {
 	 * @return {@code AudioClip}
 	 */
 	public AudioClip getClip(String file) {
-		if (!clips.containsKey(file)) {
-			loadSound(file);
-		}
 		return clips.get(file);
 	}
 	
@@ -87,17 +76,6 @@ public class SoundBank implements Iterable<AudioClip> {
 	public void loadSounds(String[] files) {
 		for (String file : files) {
 			loadSound(file);
-		}
-	}
-	
-	/**
-	 * Stops playing for all sounds in the {@code SoundBank}.
-	 */
-	public void stopAll() {
-		for (AudioClip clip : clips.values()) {
-			if (clip.isPlaying()) {
-				clip.stop();
-			}
 		}
 	}
 	
