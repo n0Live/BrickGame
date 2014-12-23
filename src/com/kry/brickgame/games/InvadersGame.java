@@ -516,7 +516,7 @@ public class InvadersGame extends GameWithGun {
 		super.processKeys();
 		
 		if (getStatus() == Status.Running) {
-			int movementSpeed = Math.round(ANIMATION_DELAY * 1.5f);
+			int movementSpeed = (int) (ANIMATION_DELAY * 1.5f);
 			int newX = curX, newY = curY;
 			boolean move = false;
 			
