@@ -23,6 +23,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -92,7 +93,7 @@ public class ButtonsFactory {
 			// if mouse released upon the component
 			if (e.getComponent().contains(e.getPoint())) {
 				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
-						e.getComponent());
+				        e.getComponent());
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			}
 		}
@@ -134,7 +135,7 @@ public class ButtonsFactory {
 			// if mouse released upon the component
 			if (e.getComponent().contains(e.getPoint())) {
 				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
-						e.getComponent());
+				        e.getComponent());
 				frame.setState(Frame.ICONIFIED);
 			}
 		}
@@ -221,36 +222,43 @@ public class ButtonsFactory {
 	}
 	
 	public static class GameButton extends JButton {
-		private static final long serialVersionUID = 575073369779220772L;
-		/**
-		 * Action key, with which the button is associated (read only)
-		 */
-		public final KeyPressed mappedKey;
-		
-		/**
-		 * The button's default icon
-		 */
-		transient final BufferedImage normal;
-		/**
-		 * The button's rollover (hover) icon
-		 */
-		transient final BufferedImage hover;
-		/**
-		 * The button's pressed icon
-		 */
-		transient final BufferedImage pressed;
-		
-		/**
-		 * Changes icon size when changing the button size
-		 */
-		transient ComponentListener btnResizeListener = new ComponentAdapter() {
+		private class ResizeListener extends ComponentAdapter implements Serializable {
+			private static final long serialVersionUID = -7209852121965398768L;
+			
+			public ResizeListener() {
+			}
+			
 			@Override
 			public void componentResized(ComponentEvent e) {
 				setIcon(getScaledIcon(normal));
 				setRolloverIcon(getScaledIcon(hover));
 				setPressedIcon(getScaledIcon(pressed));
 			}
-		};
+		}
+		
+		private static final long serialVersionUID = 575073369779220772L;
+		
+		/**
+		 * Action key, with which the button is associated (read only)
+		 */
+		public KeyPressed mappedKey;
+		/**
+		 * The button's default icon
+		 */
+		transient BufferedImage normal;
+		/**
+		 * The button's rollover (hover) icon
+		 */
+		transient BufferedImage hover;
+		/**
+		 * The button's pressed icon
+		 */
+		transient BufferedImage pressed;
+		
+		/**
+		 * Changes icon size when changing the button size
+		 */
+		ComponentListener btnResizeListener = new ResizeListener();
 		
 		/**
 		 * Create button, assigned to the specified key
@@ -296,12 +304,12 @@ public class ButtonsFactory {
 		 */
 		ImageIcon getScaledIcon(BufferedImage image) {
 			return new ImageIcon(image.getScaledInstance(getWidth(), getHeight(),
-					Image.SCALE_SMOOTH));
+			        Image.SCALE_SMOOTH));
 		}
 		
 		/**
-		 * Registers the text to display in a tool tip.
-		 * Text contains the name of button and appropriating keyboard shortcut.
+		 * Registers the text to display in a tool tip. Text contains the name
+		 * of button and appropriating keyboard shortcut.
 		 * 
 		 * @param key
 		 *            action key
@@ -316,7 +324,7 @@ public class ButtonsFactory {
 			boolean firstCompare = true;
 			
 			// search in the map of keyboard shortcuts
-			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.keycodeMap.entrySet()) {
+			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.keycodeMap.entrySet()){
 				if (entry.getValue() == key) {
 					isCompare = true;
 					if (firstCompare) {
