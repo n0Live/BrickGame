@@ -468,6 +468,8 @@ public class InvadersGame extends GameWithGun {
 				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		synchronized (lock) {
+			// if ball was destroyed then return
+			if (ballX == -1 && ballY == -1) return;
 			Board board = getBoard();
 			// check collision with the gun
 			if (newCoords.y <= curY + gun.maxY()) {
@@ -509,7 +511,7 @@ public class InvadersGame extends GameWithGun {
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None) return;
+		if (getStatus() == Status.None || keys.isEmpty()) return;
 		
 		super.processKeys();
 		
