@@ -28,6 +28,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.Serializable;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -44,8 +45,30 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.SplashScreen;
 
 public class Window extends JFrame {
+	static final class ComponentEventListener extends ComponentAdapter implements Serializable {
+		private static final long serialVersionUID = 730763037448145667L;
+		
+		@Override
+		public void componentResized(ComponentEvent e) {
+			Component c = e.getComponent();
+			
+			// get size in compliance with DEVICE_ASPECT_RATIO
+			Dimension size = UIUtils.getDimensionWithAspectRatio(c.getSize(), DEVICE_ASPECT_RATIO);
+			
+			// check the size not less than min values
+			int width = Math.max(size.width, MIN_WIDTH);
+			int height = Math.max(size.height, MIN_HEIGHT);
+			
+			// set new size if the current is not correct
+			if (width != c.getSize().width || height != c.getSize().height) {
+				c.setSize(width, height);
+			}
+		}
+	}
 	
-	transient WindowListener windowListener = new WindowAdapter() {
+	static final class WindowEventListener extends WindowAdapter implements Serializable {
+		private static final long serialVersionUID = -8159433562933801036L;
+		
 		@Override
 		public void windowClosing(WindowEvent e) {
 			// save current window size
@@ -71,26 +94,10 @@ public class Window extends JFrame {
 			// and save state
 			Main.getGame().saveState();
 		}
-	};
+	}
 	
-	transient ComponentListener componentListener = new ComponentAdapter() {
-		@Override
-		public void componentResized(ComponentEvent e) {
-			Component c = e.getComponent();
-			
-			// get size in compliance with DEVICE_ASPECT_RATIO
-			Dimension size = UIUtils.getDimensionWithAspectRatio(c.getSize(), DEVICE_ASPECT_RATIO);
-			
-			// check the size not less than min values
-			int width = Math.max(size.width, MIN_WIDTH);
-			int height = Math.max(size.height, MIN_HEIGHT);
-			
-			// set new size if the current is not correct
-			if (width != c.getSize().width || height != c.getSize().height) {
-				setSize(width, height);
-			}
-		}
-	};
+	private final WindowListener windowListener = new WindowEventListener();
+	private final ComponentListener componentListener = new ComponentEventListener();
 	
 	private static final long serialVersionUID = 3466619047314091863L;
 	
