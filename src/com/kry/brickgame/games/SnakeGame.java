@@ -54,12 +54,12 @@ public class SnakeGame extends GameWithLives {
 	 * @return - the board with the snake
 	 */
 	private static Board drawSnake(Board board, SnakeShape snake, int x, int y) {
-		Board resultBoard = board.clone();
+		Board resultBoard = (Board) board.clone();
 		for (int i = 0; i < snake.getLength(); i++) {
 			// draws the snake on the board
 			// the head of the snake is blinking
 			resultBoard = drawPoint(resultBoard, x + snake.x(i), y + snake.y(i),
-					((i == 0) ? Cell.Blink : Cell.Full));
+			        i == 0 ? Cell.Blink : Cell.Full);
 		}
 		return resultBoard;
 	}
@@ -100,9 +100,9 @@ public class SnakeGame extends GameWithLives {
 		super(speed, level, rotation, type);
 		
 		// for every even type of game
-		isToroidalField = (getType() % 2 == 0);
+		isToroidalField = getType() % 2 == 0;
 		// for types 1-2
-		usePreloadedLevels = (getType() <= 2);
+		usePreloadedLevels = getType() <= 2;
 		
 		loadNewLevel();
 	}
@@ -134,7 +134,7 @@ public class SnakeGame extends GameWithLives {
 	 * @return array containing the coordinates of the gates
 	 */
 	private int[] generateGates(int gatesCount, boolean isVertical) {
-		int line = (isVertical) ? boardHeight : boardWidth;
+		int line = isVertical ? boardHeight : boardWidth;
 		int[] gates = new int[gatesCount];
 		
 		// calculates the coordinates for the symmetrical arrangement
@@ -162,7 +162,7 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-			return snake.x(snake.tail());
+		    return snake.x(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftX(direction);
 	}
@@ -178,46 +178,9 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-			return snake.y(snake.tail());
+		    return snake.y(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftY(direction);
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 400;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 150;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		snake = new SnakeShape((getRotation() == Rotation.Clockwise) ? RIGHT : LEFT);
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 + ((snake.getDirection() == RIGHT) ? -1 : 1);
-		
-		curY = (isToroidalField) ? 1 : 0;
-		
-		tryMove(snake.getDirection());
-		
-		if (isToroidalField) {
-			prepareBorders(!usePreloadedLevels);
-		}
-		
-		if (usePreloadedLevels) {
-			loadPreparedObstacle();
-		} else {
-			loadRandomObstacles();
-		}
-		addApple();
-		
-		super.loadNewLevel();
 	}
 	
 	/**
@@ -234,8 +197,8 @@ public class SnakeGame extends GameWithLives {
 	 */
 	private void loadRandomObstacles() {
 		if (getLevel() > 1) {
-			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0,
-					(isToroidalField ? 2 : 1), 0));
+			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0, isToroidalField ? 2 : 1,
+			        0));
 		}
 	}
 	
@@ -255,10 +218,10 @@ public class SnakeGame extends GameWithLives {
 		gates = generateGates(gatesCount, true);
 		// generates the vertical borders
 		for (int i = 0; i < boardHeight; i++) {
-			if (hasRandomGates && (gatesCount > 1)) {
-				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates && gatesCount > 1) {
+				fill = Arrays.binarySearch(gates, i) >= 0 ? Cell.Empty : Cell.Full;
 			} else {
-				fill = (i == boardHeight / 2) ? Cell.Empty : Cell.Full;
+				fill = i == boardHeight / 2 ? Cell.Empty : Cell.Full;
 			}
 			
 			getBoard().setCell(fill, 0, i);
@@ -277,15 +240,144 @@ public class SnakeGame extends GameWithLives {
 		
 		// generates the horizontal borders
 		for (int i = 0; i < boardWidth; i++) {
-			if (hasRandomGates && (gatesCount > 1)) {
-				fill = (Arrays.binarySearch(gates, i) >= 0) ? Cell.Empty : Cell.Full;
+			if (hasRandomGates && gatesCount > 1) {
+				fill = Arrays.binarySearch(gates, i) >= 0 ? Cell.Empty : Cell.Full;
 			} else {
-				fill = (i == boardWidth / 2) ? Cell.Empty : Cell.Full;
+				fill = i == boardWidth / 2 ? Cell.Empty : Cell.Full;
 			}
 			
 			getBoard().setCell(fill, i, 0);
 			getBoard().setCell(fill, i, boardHeight - 1);
 		}
+	}
+	
+	/**
+	 * Tries to move the snake
+	 * 
+	 * @param direction
+	 *            the direction of the movement of the snake
+	 * @return {@code true} if the movement succeeded otherwise {@code false}
+	 */
+	private boolean tryMove(RotationAngle direction) {
+		int newX;
+		int newY;
+		boolean isReversal = direction == snake.getDirection().getOpposite();
+		
+		Board board = getBoard();
+		
+		if (isReversal) {
+			newX = curX + snake.x(snake.tail());
+			newY = curY + snake.y(snake.tail());
+		} else {
+			newX = curX + getShiftX(direction);
+			newY = curY + getShiftY(direction);
+		}
+		
+		// gets the head of the snake
+		Shape headOfSnake = new Shape(1);
+		headOfSnake.setCoord(0, snake.getCoord(0));
+		
+		// check the out off the board
+		if (checkBoardCollision(board, headOfSnake, newX, newY)) {
+			if (isToroidalField) {
+				if (newX < 0) {
+					newX = boardWidth + newX;
+				} else if (newX >= boardWidth) {
+					newX = newX - boardWidth;
+				}
+				if (newY < 0) {
+					newY = boardHeight + newY;
+				} else if (newY >= boardHeight) {
+					newY = newY - boardHeight;
+				}
+				
+			} else return false;
+		}
+		
+		boolean isAppleAhead = board.getCell(newX, newY) == Cell.Blink;
+		
+		SnakeShape newSnake = snake.moveTo(direction, isAppleAhead);
+		
+		// if the reversal is not possible
+		if (isReversal && newSnake.equals(snake)) {
+			// returns the old values of the coordinates
+			newX = curX;
+			newY = curY;
+		}
+		
+		// cut off the tail of the old snake, because the snake should already
+		// move and the tail will interfere with checks
+		int board_x = curX + snake.x(snake.tail());
+		int board_y = curY + snake.y(snake.tail());
+		board = drawPoint(board, board_x, board_y, Cell.Empty);
+		
+		// if it was an apple in front then erase it
+		if (isAppleAhead) {
+			board.setCell(Cell.Empty, newX, newY);
+		}
+		
+		// check the collision with obstacles
+		if (checkCollision(board, headOfSnake, newX, newY)) return false;
+		
+		// draw the new snake on the board
+		setBoard(drawSnake(board, newSnake, newX, newY));
+		
+		if (isAppleAhead) {
+			playEffect(Effects.bonus);
+			// increases score
+			setScore(getScore() + 1);
+			// add a new apple
+			if (newSnake.getLength() < SnakeShape.getMaxLength()) {
+				addApple();
+			}
+		}
+		
+		// the old snake is replaced by the new snake
+		snake = (SnakeShape) newSnake.clone();
+		curX = newX;
+		curY = newY;
+		
+		// reset timer
+		elapsedTime(0);
+		
+		return true;
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 150;
+	}
+	
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		snake = new SnakeShape(getRotation() == Rotation.Clockwise ? RIGHT : LEFT);
+		// starting position - the middle of the bottom border of the board
+		curX = boardWidth / 2 + (snake.getDirection() == RIGHT ? -1 : 1);
+		
+		curY = isToroidalField ? 1 : 0;
+		
+		tryMove(snake.getDirection());
+		
+		if (isToroidalField) {
+			prepareBorders(!usePreloadedLevels);
+		}
+		
+		if (usePreloadedLevels) {
+			loadPreparedObstacle();
+		} else {
+			loadRandomObstacles();
+		}
+		addApple();
+		
+		super.loadNewLevel();
 	}
 	
 	/**
@@ -347,7 +439,7 @@ public class SnakeGame extends GameWithLives {
 	@Override
 	public void run() {
 		super.run();
-		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
+		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
 			int currentSpeed = getSpeed(true);
 			if (!usePreloadedLevels && getLevel() > 5) {
 				currentSpeed += ANIMATION_DELAY;
@@ -357,7 +449,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			
 			// moving of the snake
-			if ((getStatus() == Status.Running) && (elapsedTime(currentSpeed))) {
+			if (getStatus() == Status.Running && elapsedTime(currentSpeed)) {
 				if (!tryMove(snake.getDirection())) {
 					loss(curX, curY);
 				}
@@ -369,99 +461,6 @@ public class SnakeGame extends GameWithLives {
 			// processing of key presses
 			processKeys();
 		}
-	}
-	
-	/**
-	 * Tries to move the snake
-	 * 
-	 * @param direction
-	 *            the direction of the movement of the snake
-	 * @return {@code true} if the movement succeeded otherwise {@code false}
-	 */
-	private boolean tryMove(RotationAngle direction) {
-		int newX;
-		int newY;
-		boolean isReversal = (direction == snake.getDirection().getOpposite());
-		
-		Board board = getBoard();
-		
-		if (isReversal) {
-			newX = curX + snake.x(snake.tail());
-			newY = curY + snake.y(snake.tail());
-		} else {
-			newX = curX + getShiftX(direction);
-			newY = curY + getShiftY(direction);
-		}
-		
-		// gets the head of the snake
-		Shape headOfSnake = new Shape(1);
-		headOfSnake.setCoord(0, snake.getCoord(0));
-		
-		// check the out off the board
-		if (checkBoardCollision(board, headOfSnake, newX, newY)) {
-			if (isToroidalField) {
-				if (newX < 0) {
-					newX = boardWidth + newX;
-				} else if (newX >= boardWidth) {
-					newX = newX - boardWidth;
-				}
-				if (newY < 0) {
-					newY = boardHeight + newY;
-				} else if (newY >= boardHeight) {
-					newY = newY - boardHeight;
-				}
-				
-			} else
-				return false;
-		}
-		
-		boolean isAppleAhead = (board.getCell(newX, newY) == Cell.Blink);
-		
-		SnakeShape newSnake = snake.moveTo(direction, isAppleAhead);
-		
-		// if the reversal is not possible
-		if (isReversal && newSnake.equals(snake)) {
-			// returns the old values of the coordinates
-			newX = curX;
-			newY = curY;
-		}
-		
-		// cut off the tail of the old snake, because the snake should already
-		// move and the tail will interfere with checks
-		int board_x = curX + snake.x(snake.tail());
-		int board_y = curY + snake.y(snake.tail());
-		board = drawPoint(board, board_x, board_y, Cell.Empty);
-		
-		// if it was an apple in front then erase it
-		if (isAppleAhead) {
-			board.setCell(Cell.Empty, newX, newY);
-		}
-		
-		// check the collision with obstacles
-		if (checkCollision(board, headOfSnake, newX, newY)) return false;
-		
-		// draw the new snake on the board
-		setBoard(drawSnake(board, newSnake, newX, newY));
-		
-		if (isAppleAhead) {
-			playEffect(Effects.bonus);
-			// increases score
-			setScore(getScore() + 1);
-			// add a new apple
-			if (newSnake.getLength() < SnakeShape.getMaxLength()) {
-				addApple();
-			}
-		}
-		
-		// the old snake is replaced by the new snake
-		snake = newSnake.clone();
-		curX = newX;
-		curY = newY;
-		
-		// reset timer
-		elapsedTime(0);
-		
-		return true;
 	}
 	
 }

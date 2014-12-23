@@ -23,7 +23,7 @@ public class Board implements Cloneable, Serializable {
 	private final int width;
 	private final int height;
 	
-	private final Cell[][] board;
+	private Cell[][] board;
 	
 	/**
 	 * The copy constructor of a Board
@@ -67,14 +67,19 @@ public class Board implements Cloneable, Serializable {
 	}
 	
 	@Override
-	public Board clone() {
+	public Object clone() {
+		Board cloned;
 		try {
-			super.clone();
+			cloned = (Board) super.clone();
+			cloned.board = board.clone();
+			for (int i = 0; i < width; i++) {
+				cloned.board[i] = board[i].clone();
+			}
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
+			cloned = new Board(this);
 		}
-		Board newBoard = new Board(this);
-		return newBoard;
+		return cloned;
 	}
 	
 	@Override

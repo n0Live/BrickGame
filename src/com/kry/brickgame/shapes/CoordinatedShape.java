@@ -1,7 +1,6 @@
 package com.kry.brickgame.shapes;
 
 import java.awt.Point;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author noLive
@@ -40,16 +39,9 @@ public abstract class CoordinatedShape extends CharacterShape {
 	}
 	
 	@Override
-	public CoordinatedShape clone() {
-		CoordinatedShape newShape;
-		try {
-			newShape = getClass().getDeclaredConstructor(this.getClass()).newInstance(this);
-			return newShape;
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			throw new AssertionError(e);
-		}
+	public Object clone() {
+		CoordinatedShape cloned = (CoordinatedShape) super.clone();
+		return cloned;
 	}
 	
 	/**

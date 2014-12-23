@@ -29,33 +29,33 @@ public class Shape implements Cloneable, Serializable {
 		 * West/Left
 		 */
 		d270;
-
+		
 		/**
 		 * The next counterclockwise rotation angle
 		 */
 		public RotationAngle getLeft() {
 			return ordinal() > 0 ? RotationAngle.values()[ordinal() - 1]
-					: RotationAngle.values()[RotationAngle.values().length - 1];
+			        : RotationAngle.values()[RotationAngle.values().length - 1];
 		}
-
+		
 		/**
 		 * The direction opposite to the current direction
 		 */
 		public RotationAngle getOpposite() {
 			return getRight().getRight();
 		}
-
+		
 		/**
 		 * The next clockwise rotation angle
 		 */
 		public RotationAngle getRight() {
-			return ordinal() < RotationAngle.values().length - 1 ? RotationAngle
-					.values()[ordinal() + 1] : RotationAngle.values()[0];
+			return ordinal() < RotationAngle.values().length - 1 ? RotationAngle.values()[ordinal() + 1]
+			        : RotationAngle.values()[0];
 		}
 	}
-
+	
 	private static final long serialVersionUID = 842374378117995961L;
-
+	
 	/**
 	 * Rotation angle of the figure
 	 */
@@ -64,13 +64,13 @@ public class Shape implements Cloneable, Serializable {
 	 * Type of fill of the figure
 	 */
 	private Cell fill;
-
+	
 	/**
 	 * A set of coordinates of a points of a figures:
 	 * [index][coordinate:0-x,1-y]
 	 */
-	private final int[][] coords;
-
+	private int[][] coords;
+	
 	/**
 	 * Constructor of the shape
 	 * 
@@ -80,7 +80,7 @@ public class Shape implements Cloneable, Serializable {
 	public Shape(int length) {
 		this(length, RotationAngle.d0, Cell.Empty);
 	}
-
+	
 	/**
 	 * Constructor of the shape
 	 * 
@@ -96,7 +96,7 @@ public class Shape implements Cloneable, Serializable {
 		this.rotationAngle = rotationAngle;
 		this.fill = fill;
 	}
-
+	
 	/**
 	 * Copy constructor of the shape
 	 * 
@@ -107,192 +107,13 @@ public class Shape implements Cloneable, Serializable {
 		super();
 		rotationAngle = aShape.rotationAngle;
 		fill = aShape.fill;
-
+		
 		coords = new int[aShape.coords.length][aShape.coords[0].length];
 		for (int i = 0; i < aShape.coords.length; i++) {
 			coords[i] = aShape.coords[i].clone();
 		}
 	}
-
-	@Override
-	public Shape clone() {
-		try {
-			super.clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-		return new Shape(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Shape other = (Shape) obj;
-		if (!Arrays.deepEquals(coords, other.coords))
-			return false;
-		return true;
-	}
-
-	/**
-	 * Get the coordinates of the single point
-	 * 
-	 * @param i
-	 *            index of a point
-	 * @return coordinate value
-	 */
-	public int[] getCoord(int i) {
-		return coords[i];
-	}
-
-	public int[][] getCoords() {
-		int[][] newCoords = coords.clone();
-		for (int i = 0; i < coords.length; i++) {
-			newCoords[i] = coords[i].clone();
-		}
-		return newCoords;
-	}
-
-	public Cell getFill() {
-		return fill;
-	}
-
-	/**
-	 * @return the height of the figure
-	 */
-	public int getHeight() {
-		return maxY() - minY() + 1;
-	}
-
-	/**
-	 * Getting points number of the current figure
-	 */
-	public int getLength() {
-		return coords.length;
-	}
-
-	/**
-	 * @return rotation angle of the figure
-	 */
-	public RotationAngle getRotationAngle() {
-		return rotationAngle;
-	}
-
-	/**
-	 * @return the width of the figure
-	 */
-	public int getWidth() {
-		return maxX() - minX() + 1;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Arrays.hashCode(coords);
-		return result;
-	}
-
-	/**
-	 * @return The maximum value of the x-coordinates of all points of the
-	 *         figure
-	 */
-	public int maxX() {
-		int result = x(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.max(result, x(i));
-		}
-		return result;
-	}
-
-	/**
-	 * @return The maximum value of the y-coordinates of all points of the
-	 *         figure
-	 */
-	public int maxY() {
-		int result = y(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.max(result, y(i));
-		}
-		return result;
-	}
-
-	/**
-	 * @return The minimum value of the x-coordinates of all points of the
-	 *         figure
-	 */
-	public int minX() {
-		int result = x(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.min(result, x(i));
-		}
-		return result;
-	}
-
-	/**
-	 * @return The minimum value of the y-coordinates of all points of the
-	 *         figure
-	 */
-	public int minY() {
-		int result = y(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.min(result, y(i));
-		}
-		return result;
-	}
-
-	/**
-	 * Counterclockwise rotation of the figure
-	 * 
-	 * @return the figure after rotation
-	 */
-	public Shape rotateLeft() {
-		Shape originalShape = new Shape(this);
-
-		for (int i = 0; i < getLength(); i++) {
-			setX(i, -originalShape.y(i));
-			setY(i, originalShape.x(i));
-		}
-		rotationAngle = rotationAngle.getLeft();
-		return this;
-	}
-
-	/**
-	 * Clockwise rotation of the figure
-	 * 
-	 * @return the figure after rotation
-	 */
-	public Shape rotateRight() {
-		Shape originalShape = new Shape(this);
-
-		for (int i = 0; i < getLength(); i++) {
-			setX(i, originalShape.y(i));
-			setY(i, -originalShape.x(i));
-		}
-		rotationAngle = rotationAngle.getRight();
-		return this;
-	}
-
-	/**
-	 * Set the coordinates of the single point
-	 * 
-	 * @param i
-	 *            index of a point
-	 * @param value
-	 *            coordinate value
-	 */
-	public void setCoord(int i, int[] value) {
-		coords[i] = value.clone();
-	}
-
-	public void setFill(Cell fill) {
-		this.fill = fill;
-	}
-
+	
 	/**
 	 * Sets rotation angle of the figure
 	 * 
@@ -304,7 +125,7 @@ public class Shape implements Cloneable, Serializable {
 		this.rotationAngle = rotationAngle;
 		return this;
 	}
-
+	
 	/**
 	 * Setting the value of the x-coordinate of a points of the figure
 	 * 
@@ -316,7 +137,7 @@ public class Shape implements Cloneable, Serializable {
 	protected void setX(int index, int x) {
 		coords[index][0] = x;
 	}
-
+	
 	/**
 	 * Setting the value of the y-coordinate of a points of the figure
 	 * 
@@ -328,7 +149,188 @@ public class Shape implements Cloneable, Serializable {
 	protected void setY(int index, int y) {
 		coords[index][1] = y;
 	}
-
+	
+	@Override
+	public Object clone() {
+		Shape cloned;
+		try {
+			cloned = (Shape) super.clone();
+			cloned.coords = coords.clone();
+			for (int i = 0; i < coords.length; i++) {
+				cloned.coords[i] = coords[i].clone();
+			}
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			cloned = new Shape(this);
+		}
+		return cloned;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		Shape other = (Shape) obj;
+		if (!Arrays.deepEquals(coords, other.coords)) return false;
+		return true;
+	}
+	
+	/**
+	 * Get the coordinates of the single point
+	 * 
+	 * @param i
+	 *            index of a point
+	 * @return coordinate value
+	 */
+	public int[] getCoord(int i) {
+		return coords[i];
+	}
+	
+	public int[][] getCoords() {
+		int[][] newCoords = coords.clone();
+		for (int i = 0; i < coords.length; i++) {
+			newCoords[i] = coords[i].clone();
+		}
+		return newCoords;
+	}
+	
+	public Cell getFill() {
+		return fill;
+	}
+	
+	/**
+	 * @return the height of the figure
+	 */
+	public int getHeight() {
+		return maxY() - minY() + 1;
+	}
+	
+	/**
+	 * Getting points number of the current figure
+	 */
+	public int getLength() {
+		return coords.length;
+	}
+	
+	/**
+	 * @return rotation angle of the figure
+	 */
+	public RotationAngle getRotationAngle() {
+		return rotationAngle;
+	}
+	
+	/**
+	 * @return the width of the figure
+	 */
+	public int getWidth() {
+		return maxX() - minX() + 1;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(coords);
+		return result;
+	}
+	
+	/**
+	 * @return The maximum value of the x-coordinates of all points of the
+	 *         figure
+	 */
+	public int maxX() {
+		int result = x(0);
+		for (int i = 1; i < getLength(); i++) {
+			result = Math.max(result, x(i));
+		}
+		return result;
+	}
+	
+	/**
+	 * @return The maximum value of the y-coordinates of all points of the
+	 *         figure
+	 */
+	public int maxY() {
+		int result = y(0);
+		for (int i = 1; i < getLength(); i++) {
+			result = Math.max(result, y(i));
+		}
+		return result;
+	}
+	
+	/**
+	 * @return The minimum value of the x-coordinates of all points of the
+	 *         figure
+	 */
+	public int minX() {
+		int result = x(0);
+		for (int i = 1; i < getLength(); i++) {
+			result = Math.min(result, x(i));
+		}
+		return result;
+	}
+	
+	/**
+	 * @return The minimum value of the y-coordinates of all points of the
+	 *         figure
+	 */
+	public int minY() {
+		int result = y(0);
+		for (int i = 1; i < getLength(); i++) {
+			result = Math.min(result, y(i));
+		}
+		return result;
+	}
+	
+	/**
+	 * Counterclockwise rotation of the figure
+	 * 
+	 * @return the figure after rotation
+	 */
+	public Shape rotateLeft() {
+		Shape originalShape = new Shape(this);
+		
+		for (int i = 0; i < getLength(); i++) {
+			setX(i, -originalShape.y(i));
+			setY(i, originalShape.x(i));
+		}
+		rotationAngle = rotationAngle.getLeft();
+		return this;
+	}
+	
+	/**
+	 * Clockwise rotation of the figure
+	 * 
+	 * @return the figure after rotation
+	 */
+	public Shape rotateRight() {
+		Shape originalShape = new Shape(this);
+		
+		for (int i = 0; i < getLength(); i++) {
+			setX(i, originalShape.y(i));
+			setY(i, -originalShape.x(i));
+		}
+		rotationAngle = rotationAngle.getRight();
+		return this;
+	}
+	
+	/**
+	 * Set the coordinates of the single point
+	 * 
+	 * @param i
+	 *            index of a point
+	 * @param value
+	 *            coordinate value
+	 */
+	public void setCoord(int i, int[] value) {
+		coords[i] = value.clone();
+	}
+	
+	public void setFill(Cell fill) {
+		this.fill = fill;
+	}
+	
 	/**
 	 * Loop through the value of {@code maxY()} to {@code minY()} (downwards)
 	 * and from {@code minX()} to {@code maxX()} (left to right), if the value
@@ -338,26 +340,25 @@ public class Shape implements Cloneable, Serializable {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-
+		
 		result.append("Shape\n");
-
+		
 		int min_x = minX();
 		int max_x = maxX();
 		int min_y = minY();
 		int max_y = maxY();
-
+		
 		for (int y = max_y; y >= min_y; y--) {
-			char line[] = new char[(max_x - min_x) + 1];
-
+			char line[] = new char[max_x - min_x + 1];
+			
 			for (int x = min_x; x <= max_x; x++) {
 				// [x + (0 - min_x)]: because x can be less than 0, then x is
 				// shifted to 0
-				line[x + (0 - min_x)] = ' ';
+				line[x + 0 - min_x] = ' ';
 				for (int k = 0; k < getLength(); k++) {
-					if ((x(k) == x) && (y(k) == y)) {
+					if (x(k) == x && y(k) == y) {
 						// see previous comment
-						line[x + (0 - min_x)] = (getFill() == Cell.Blink) ? '*'
-								: '0';
+						line[x + 0 - min_x] = getFill() == Cell.Blink ? '*' : '0';
 						break;
 					}
 				}
@@ -369,7 +370,7 @@ public class Shape implements Cloneable, Serializable {
 		// _0_ | 0__ | 00
 		// 000 | 000 | 00
 	}
-
+	
 	/**
 	 * Turn the figure to the opposite direction
 	 * 
@@ -377,7 +378,7 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	public Shape turnAround() {
 		Shape originalShape = new Shape(this);
-
+		
 		for (int i = 0; i < getLength(); i++) {
 			setX(i, -originalShape.x(i));
 			setY(i, -originalShape.y(i));
@@ -385,13 +386,13 @@ public class Shape implements Cloneable, Serializable {
 		rotationAngle = rotationAngle.getOpposite();
 		return this;
 	}
-
+	
 	public int x(int index) {
 		return getCoords()[index][0];
 	}
-
+	
 	public int y(int index) {
 		return getCoords()[index][1];
 	}
-
+	
 }

@@ -11,12 +11,12 @@ public class TankShape extends CoordinatedShape {
 	 */
 	private static int[][][] charactersTable = new int[][][] {//
 	// 0 - tank
-			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
-			// 1 - enemy tank
-			{ { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
-			// 2 - tank in box (for check)
-			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 },
-					{ 1, 1 } } }; //
+	        { { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
+	        // 1 - enemy tank
+	        { { -1, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },
+	        // 2 - tank in box (for check)
+	        { { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 0, 0 }, { 1, 0 }, { -1, 1 }, { 0, 1 },
+	                { 1, 1 } } }; //
 	
 	/**
 	 * Constructor for the Tank
@@ -72,13 +72,14 @@ public class TankShape extends CoordinatedShape {
 	}
 	
 	@Override
-	public TankShape clone() {
-		return (TankShape) super.clone();
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
 	}
 	
 	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
+	public Object clone() {
+		TankShape cloned = (TankShape) super.clone();
+		return cloned;
 	}
 	
 }

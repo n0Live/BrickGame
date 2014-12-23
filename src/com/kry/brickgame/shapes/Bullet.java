@@ -39,8 +39,14 @@ public class Bullet extends CoordinatedShape {
 	}
 	
 	@Override
-	public Bullet clone() {
-		return (Bullet) super.clone();
+	protected int[][][] getCharactersTable() {
+		return charactersTable;
+	}
+	
+	@Override
+	public Object clone() {
+		Bullet cloned = (Bullet) super.clone();
+		return cloned;
 	}
 	
 	/**
@@ -52,11 +58,6 @@ public class Bullet extends CoordinatedShape {
 	public Bullet flight() {
 		move(getDirection());
 		return this;
-	}
-	
-	@Override
-	protected int[][][] getCharactersTable() {
-		return charactersTable;
 	}
 	
 }

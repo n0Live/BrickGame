@@ -42,42 +42,41 @@ public class TetrisShape extends Shape {
 	 * [shapeIndex][pointIndex][coordinate:0-x,1-y]
 	 */
 	private final static int[][][] coordsTable = new int[][][] { { { 0, 0 } }, // NoShape
-			// Trominoes
-			{ { -1, -1 }, { 0, 0 }, { 1, 1 } }, // TroLineShape
-			{ { 0, 1 }, { 0, 0 }, { 1, 0 } }, // CornerShape
-			// Tetraminoes
-			{ { -1, 1 }, { -1, 0 }, { 0, 0 }, { 0, -1 } }, // ZShape
-			{ { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, 1 } }, // SShape
-			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, // LineShape
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // TShape
-			{ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // SquareShape
-			{ { 0, -1 }, { 1, 0 }, { 1, -1 }, { 1, 1 } }, // LShape
-			{ { 0, -1 }, { 1, -1 }, { 0, 0 }, { 0, 1 } }, // MirroredLShape
-			// Pentominoes
-			{ { 0, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // PentoPShape
-			{ { 1, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoPShape
-			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 2 } }, // PentoQShape
-			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } }, // MirroredPentoQShape
-			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 0 }, { 2, 1 } }, // PentoRShape
-			{ { 1, -1 }, { 1, 0 }, { 1, 1 }, { 2, 0 }, { 0, 1 } }, // MirroredPentoRShape
-			{ { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // PentoSShape
-			{ { -1, 1 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoSShape
-			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { -1, 1 }, { 1, 1 } }, // PentoTShape
-			{ { -1, 0 }, { -1, 1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, // PentoUShape
-			{ { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 }, { 2, 0 } }, // PentoVShape
-			{ { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoWShape
-			{ { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } }, // PentoXShape
-			{ { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 } }, // PentoYShape
-			{ { -1, 0 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoYShape
-			{ { -1, 1 }, { 0, 1 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoZShape
-			{ { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoZShape
-			// SuperFigures
-			{ { 0, 0 } }, // SuperPoint
-			{ { 0, 0 }, { 0, 1 } }, // SuperGun
-			{ { 0, 0 }, { 0, 1 }, { 0, 2 } }, // SuperMudGun
-			{ { 0, 0 }, { 0, 2 }, { 1, 1 }, { 2, 0 }, { 2, 2 } } // SuperBomb
+	        // Trominoes
+	        { { -1, -1 }, { 0, 0 }, { 1, 1 } }, // TroLineShape
+	        { { 0, 1 }, { 0, 0 }, { 1, 0 } }, // CornerShape
+	        // Tetraminoes
+	        { { -1, 1 }, { -1, 0 }, { 0, 0 }, { 0, -1 } }, // ZShape
+	        { { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, 1 } }, // SShape
+	        { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, // LineShape
+	        { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } }, // TShape
+	        { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // SquareShape
+	        { { 0, -1 }, { 1, 0 }, { 1, -1 }, { 1, 1 } }, // LShape
+	        { { 0, -1 }, { 1, -1 }, { 0, 0 }, { 0, 1 } }, // MirroredLShape
+	        // Pentominoes
+	        { { 0, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // PentoPShape
+	        { { 1, -1 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoPShape
+	        { { 1, -1 }, { 1, 0 }, { 1, 1 }, { 1, 2 }, { 0, 2 } }, // PentoQShape
+	        { { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 2 } }, // MirroredPentoQShape
+	        { { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 0 }, { 2, 1 } }, // PentoRShape
+	        { { 1, -1 }, { 1, 0 }, { 1, 1 }, { 2, 0 }, { 0, 1 } }, // MirroredPentoRShape
+	        { { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // PentoSShape
+	        { { -1, 1 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoSShape
+	        { { 0, -1 }, { 0, 0 }, { 0, 1 }, { -1, 1 }, { 1, 1 } }, // PentoTShape
+	        { { -1, 0 }, { -1, 1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, // PentoUShape
+	        { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 }, { 2, 0 } }, // PentoVShape
+	        { { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoWShape
+	        { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } }, // PentoXShape
+	        { { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 } }, // PentoYShape
+	        { { -1, 0 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoYShape
+	        { { -1, 1 }, { 0, 1 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoZShape
+	        { { -1, -1 }, { 0, -1 }, { 0, 0 }, { 0, 1 }, { 1, 1 } }, // MirroredPentoZShape
+	        // SuperFigures
+	        { { 0, 0 } }, // SuperPoint
+	        { { 0, 0 }, { 0, 1 } }, // SuperGun
+	        { { 0, 0 }, { 0, 1 }, { 0, 2 } }, // SuperMudGun
+	        { { 0, 0 }, { 0, 2 }, { 1, 1 }, { 2, 0 }, { 2, 2 } } // SuperBomb
 	};
-	
 	
 	/**
 	 * Getting points number of the specified figure
@@ -105,8 +104,8 @@ public class TetrisShape extends Shape {
 		Figures shape;
 		RotationAngle rotationAngle;
 		
-		int lastItem = (includingSuperShapes) ? Figures.values().length
-				: Figures.REF_TO_FIRST_SUPER_SHAPE;
+		int lastItem = includingSuperShapes ? Figures.values().length
+		        : Figures.REF_TO_FIRST_SUPER_SHAPE;
 		
 		if (aTetrisShape.getShape().ordinal() < lastItem - 1) {
 			shape = Figures.values()[aTetrisShape.getShape().ordinal() + 1];
@@ -134,8 +133,8 @@ public class TetrisShape extends Shape {
 		RotationAngle rotationAngle;
 		
 		int itemPosition = aTetrisShape.getShape().ordinal();
-		if ((itemPosition < Figures.REF_TO_FIRST_TETRAMINOES)
-				|| (itemPosition >= Figures.REF_TO_FIRST_PENTOMINOES)) {
+		if (itemPosition < Figures.REF_TO_FIRST_TETRAMINOES
+		        || itemPosition >= Figures.REF_TO_FIRST_PENTOMINOES) {
 			itemPosition = Figures.REF_TO_FIRST_TETRAMINOES;
 		}
 		
@@ -168,8 +167,8 @@ public class TetrisShape extends Shape {
 		Figures shape;
 		RotationAngle rotationAngle;
 		
-		int lastItem = (includingSuperShapes) ? Figures.values().length
-				: Figures.REF_TO_FIRST_SUPER_SHAPE;
+		int lastItem = includingSuperShapes ? Figures.values().length
+		        : Figures.REF_TO_FIRST_SUPER_SHAPE;
 		
 		if (aTetrisShape.getShape().ordinal() > 1) {
 			shape = Figures.values()[aTetrisShape.getShape().ordinal() - 1];
@@ -197,8 +196,8 @@ public class TetrisShape extends Shape {
 		RotationAngle rotationAngle;
 		
 		int itemPosition = aTetrisShape.getShape().ordinal();
-		if ((itemPosition < Figures.REF_TO_FIRST_TETRAMINOES)
-				|| (itemPosition >= Figures.REF_TO_FIRST_PENTOMINOES)) {
+		if (itemPosition < Figures.REF_TO_FIRST_TETRAMINOES
+		        || itemPosition >= Figures.REF_TO_FIRST_PENTOMINOES) {
 			itemPosition = Figures.REF_TO_FIRST_TETRAMINOES;
 		}
 		
@@ -228,32 +227,32 @@ public class TetrisShape extends Shape {
 	 * @return instance of a random figure
 	 */
 	public static TetrisShape getRandomPolyominoesAndSuper(Set<Polyominoes> polyominoes,
-			int[] superShapes) {
+	        int[] superShapes) {
 		final int TrominoesCount = Figures.REF_TO_FIRST_TETRAMINOES
-				- Figures.REF_TO_FIRST_TROMINOES;
+		        - Figures.REF_TO_FIRST_TROMINOES;
 		final int TetraminoesCount = Figures.REF_TO_FIRST_PENTOMINOES
-				- Figures.REF_TO_FIRST_TETRAMINOES;
+		        - Figures.REF_TO_FIRST_TETRAMINOES;
 		final int PentominoesCount = Figures.REF_TO_FIRST_SUPER_SHAPE
-				- Figures.REF_TO_FIRST_PENTOMINOES;
+		        - Figures.REF_TO_FIRST_PENTOMINOES;
 		final boolean withTrominoes = polyominoes.contains(Polyominoes.Trominoes);
 		final boolean withTetraminoes = polyominoes.contains(Polyominoes.Tetraminoes);
 		final boolean withPentominoes = polyominoes.contains(Polyominoes.Pentominoes);
-		final boolean withSuperShapes = (superShapes != null && superShapes.length > 0);
+		final boolean withSuperShapes = superShapes != null && superShapes.length > 0;
 		
-		if ((!polyominoes.contains(Polyominoes.Trominoes))
-				&& (!polyominoes.contains(Polyominoes.Tetraminoes))
-				&& (!polyominoes.contains(Polyominoes.Pentominoes)))
-			return getRandomShapeOfSpecified(superShapes);
+		if (!polyominoes.contains(Polyominoes.Trominoes)
+		        && !polyominoes.contains(Polyominoes.Tetraminoes)
+		        && !polyominoes.contains(Polyominoes.Pentominoes))
+		    return getRandomShapeOfSpecified(superShapes);
 		
 		int[] shapes = new int[
 		// length of Trominoes
 		(withTrominoes ? TrominoesCount : 0)
 		// length of Tetraminoes
-				+ (withTetraminoes ? TetraminoesCount : 0)
-				// length of Pentominoes
-				+ (withPentominoes ? PentominoesCount : 0)
-				// length of SuperFigures
-				+ (withSuperShapes ? superShapes.length : 0)];
+		        + (withTetraminoes ? TetraminoesCount : 0)
+		        // length of Pentominoes
+		        + (withPentominoes ? PentominoesCount : 0)
+		        // length of SuperFigures
+		        + (withSuperShapes ? superShapes.length : 0)];
 		
 		int i = 0;
 		while (i < shapes.length) {
@@ -279,7 +278,7 @@ public class TetrisShape extends Shape {
 			if (withSuperShapes) {
 				for (int superShape : superShapes) {
 					shapes[i++] = Figures.values()[Figures.REF_TO_FIRST_SUPER_SHAPE + superShape]
-							.ordinal();
+					        .ordinal();
 				}
 			}
 		}
@@ -333,7 +332,7 @@ public class TetrisShape extends Shape {
 		Random r = new Random();
 		int x = shapes[r.nextInt(shapes.length)];
 		
-		if ((x < 0) || (x >= Figures.values().length)) {
+		if (x < 0 || x >= Figures.values().length) {
 			x = 0;
 		}
 		
@@ -429,10 +428,67 @@ public class TetrisShape extends Shape {
 		}
 	}
 	
+	/**
+	 * Selection of the figure
+	 * 
+	 * @param shape
+	 *            the figure
+	 * @param rotationAngle
+	 *            rotation angle of the figure
+	 * @param fill
+	 *            type of fill of the figure
+	 */
+	private TetrisShape setShape(Figures shape, RotationAngle rotationAngle, Cell fill) {
+		for (int i = 0; i < getLength(shape); i++) {
+			switch (rotationAngle) {
+			case d0:
+				setX(i, coordsTable[shape.ordinal()][i][0]);
+				setY(i, coordsTable[shape.ordinal()][i][1]);
+				break;
+			case d90:
+				setX(i, coordsTable[shape.ordinal()][i][1]);
+				setY(i, -coordsTable[shape.ordinal()][i][0]);
+				break;
+			case d180:
+				setX(i, -coordsTable[shape.ordinal()][i][0]);
+				setY(i, -coordsTable[shape.ordinal()][i][1]);
+				break;
+			case d270:
+				setX(i, -coordsTable[shape.ordinal()][i][1]);
+				setY(i, coordsTable[shape.ordinal()][i][0]);
+				break;
+			}
+		}
+		
+		// not for super shape
+		if (shape.ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE) {
+			// Center the figures, which were shifted to aside after
+			// rotation
+			if (shape != Figures.LineShape // except LineShape
+			        && (minX() < -1 || maxX() <= 0)) {
+				for (int i = 0; i < getLength(shape); i++) {
+					setX(i, x(i) + 1);
+				}
+			}
+			if (minY() < 0 || maxY() <= 0) {
+				for (int i = 0; i < getLength(shape); i++) {
+					setY(i, y(i) + 1);
+				}
+			}
+		}
+		
+		this.shape = shape;
+		setRotationAngle(rotationAngle);
+		setFill(fill);
+		
+		return this;
+	}
+	
 	@Override
-	public TetrisShape clone() {
-		super.clone();
-		return new TetrisShape(this);
+	public Object clone() {
+		TetrisShape cloned = (TetrisShape) super.clone();
+		cloned.boardFill = boardFill.clone();
+		return cloned;
 	}
 	
 	/**
@@ -474,7 +530,7 @@ public class TetrisShape extends Shape {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + Arrays.hashCode(boardFill);
-		result = prime * result + ((shape == null) ? 0 : shape.hashCode());
+		result = prime * result + (shape == null ? 0 : shape.hashCode());
 		return result;
 	}
 	
@@ -491,7 +547,7 @@ public class TetrisShape extends Shape {
 	@Override
 	public TetrisShape rotateLeft() {
 		if (getShape() != Figures.SquareShape && getShape() != Figures.PentoXShape
-				&& !isSuperShape()) {
+		        && !isSuperShape()) {
 			setShape(getShape(), getRotationAngle().getLeft(), getFill());
 			clearBoardFill();
 		}
@@ -504,7 +560,7 @@ public class TetrisShape extends Shape {
 	@Override
 	public TetrisShape rotateRight() {
 		if (getShape() != Figures.SquareShape && getShape() != Figures.PentoXShape
-				&& !isSuperShape()) {
+		        && !isSuperShape()) {
 			setShape(getShape(), getRotationAngle().getRight(), getFill());
 			clearBoardFill();
 		}
@@ -528,68 +584,12 @@ public class TetrisShape extends Shape {
 		return setShape(getShape(), values[x], getFill());
 	}
 	
-	/**
-	 * Selection of the figure
-	 * 
-	 * @param shape
-	 *            the figure
-	 * @param rotationAngle
-	 *            rotation angle of the figure
-	 * @param fill
-	 *            type of fill of the figure
-	 */
-	private TetrisShape setShape(Figures shape, RotationAngle rotationAngle, Cell fill) {
-		for (int i = 0; i < getLength(shape); i++) {
-			switch (rotationAngle) {
-			case d0:
-				setX(i, coordsTable[shape.ordinal()][i][0]);
-				setY(i, coordsTable[shape.ordinal()][i][1]);
-				break;
-			case d90:
-				setX(i, coordsTable[shape.ordinal()][i][1]);
-				setY(i, -coordsTable[shape.ordinal()][i][0]);
-				break;
-			case d180:
-				setX(i, -coordsTable[shape.ordinal()][i][0]);
-				setY(i, -coordsTable[shape.ordinal()][i][1]);
-				break;
-			case d270:
-				setX(i, -coordsTable[shape.ordinal()][i][1]);
-				setY(i, coordsTable[shape.ordinal()][i][0]);
-				break;
-			}
-		}
-		
-		// not for super shape
-		if (shape.ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE) {
-			// Center the figures, which were shifted to aside after
-			// rotation
-			if (shape != Figures.LineShape // except LineShape
-					&& (minX() < -1 || maxX() <= 0)) {
-				for (int i = 0; i < getLength(shape); i++) {
-					setX(i, x(i) + 1);
-				}
-			}
-			if (minY() < 0 || maxY() <= 0) {
-				for (int i = 0; i < getLength(shape); i++) {
-					setY(i, y(i) + 1);
-				}
-			}
-		}
-		
-		this.shape = shape;
-		setRotationAngle(rotationAngle);
-		setFill(fill);
-		
-		return this;
-	}
-	
 	@Override
 	public String toString() {
 		// the figure and its rotation angle
 		return "TetrisShape [" + getShape() + ", " + getRotationAngle()
 		// the lower left corner
-				+ ", [" + minX() + ";" + minY() + "]]\n" + super.toString();
+		        + ", [" + minX() + ";" + minY() + "]]\n" + super.toString();
 	}
 	
 }
