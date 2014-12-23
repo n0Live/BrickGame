@@ -151,7 +151,7 @@ public class TetrisGameI extends Game {
 				}
 			}
 			return !isNotCollision;
-		} catch (Exception e) {
+		} catch (RuntimeException e) {
 			return false;
 		}
 	}
