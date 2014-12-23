@@ -42,7 +42,7 @@ public final class GameUtils {
 	/**
 	 * Map of the priority of the sound effects
 	 */
-	protected static final Map<Effects, Integer> effectsPriority;
+	static final Map<Effects, Integer> effectsPriority;
 	static {
 		effectsPriority = new HashMap<>(Effects.values().length);
 		effectsPriority.put(Effects.select, Thread.MAX_PRIORITY);
@@ -58,9 +58,9 @@ public final class GameUtils {
 	}
 	
 	// load the sounds at initialization to reduce the delay in the first play
-	protected static final SoundBank effects = new SoundBank(enumToResourceArray(Effects.class));
-	protected static final SoundBank melodies = new SoundBank(enumToResourceArray(Melodies.class));
-	protected static final SoundBank music = new SoundBank(enumToResourceArray(Music.class));
+	static final SoundBank effects = new SoundBank(enumToResourceArray(Effects.class));
+	static final SoundBank melodies = new SoundBank(enumToResourceArray(Melodies.class));
+	static final SoundBank music = new SoundBank(enumToResourceArray(Music.class));
 	
 	/**
 	 * Suspended keys
@@ -68,8 +68,7 @@ public final class GameUtils {
 	 * {@code Long} <b>value</b> - time to which the processing of a key is
 	 * suspended.
 	 */
-	protected static final Map<KeyPressed, Long> suspendedKeys = new HashMap<>(
-			KeyPressed.values().length);
+	static final Map<KeyPressed, Long> suspendedKeys = new HashMap<>(KeyPressed.values().length);
 	
 	/**
 	 * Add randomly generated lines on the board
