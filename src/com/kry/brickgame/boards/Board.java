@@ -83,9 +83,9 @@ public class Board implements Cloneable, Serializable {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Board other = (Board) obj;
-		if (!Arrays.deepEquals(board, other.board)) return false;
 		if (height != other.height) return false;
 		if (width != other.width) return false;
+		if (!Arrays.deepEquals(board, other.board)) return false;
 		return true;
 	}
 	
