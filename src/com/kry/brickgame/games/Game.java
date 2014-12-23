@@ -39,11 +39,6 @@ import com.kry.brickgame.games.GameUtils.Music;
 public abstract class Game implements Runnable, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 	
-	/**
-	 * Number of subtypes
-	 */
-	public static int subtypesNumber;
-	
 	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
 	
 	/**
