@@ -138,10 +138,8 @@ public final class ObstacleUtils {
 	private static Board generateObstacle(Board board, int type, int leftBorderSpace,
 			int rightBorderSpace, int bottomBorderSpace, int topBorderSpace) {
 		int x, y;
-		
-		Obstacle obstacle = new Obstacle(type);
-		
 		Random r = new Random();
+		Obstacle obstacle = new Obstacle(type);
 		
 		// finds empty cells
 		int k = 10; // maximum of attempts
@@ -203,7 +201,6 @@ public final class ObstacleUtils {
 	protected static Board getRandomObstacles(Board board, int count, int leftBorderSpace,
 			int rightBorderSpace, int bottomBorderSpace, int topBorderSpace) {
 		Random r = new Random();
-		
 		Board result = board.clone();
 		
 		// plus one random obstacle

@@ -10,7 +10,6 @@ import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import com.kry.brickgame.boards.Board;
@@ -345,7 +344,6 @@ public class FroggerGame extends GameWithLives {
 		
 		// generated random tracts
 		if (!usePreloaded) {
-			Random r = new Random();
 			int emptySpanLength, fullSpanLength;
 			int k;
 			

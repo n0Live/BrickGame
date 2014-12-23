@@ -73,7 +73,7 @@ public class TetrisGameJ extends TetrisGameI {
 	}
 	
 	private boolean tryAddLine() {
-		if ((!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true)) && (addLines())) {
+		if (!checkBoardCollisionVertical(getBoard(), curPiece, curY + 1, true) && addLines()) {
 			// the current y-coordinate lifts by one cell upward
 			curY++;
 			return true;

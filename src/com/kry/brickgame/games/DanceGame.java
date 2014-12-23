@@ -12,7 +12,6 @@ import static com.kry.brickgame.games.GameUtils.playMelody;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
@@ -189,7 +188,7 @@ public class DanceGame extends Game {
 		bonus = -1; // will change to 0 at first caught
 		stepsGone = 0;
 		// set random first melody
-		melodyNumber = new Random().nextInt(Melodies.values().length);
+		melodyNumber = r.nextInt(Melodies.values().length);
 		rate = calculateRate();
 		
 		// for type 1 - draw inverted board

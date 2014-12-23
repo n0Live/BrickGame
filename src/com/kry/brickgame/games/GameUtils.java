@@ -510,7 +510,7 @@ public final class GameUtils {
 		int toY = (y + cells[0].length >= board.getHeight()) ? board.getHeight() - y
 				: cells[0].length;
 		
-		Board resultBoard = board;// .clone();
+		Board resultBoard = board;
 		for (int i = fromX; i < toX; i++) {
 			for (int j = fromY; j < toY; j++) {
 				resultBoard.setCell(cells[i][j], x + i, y + j);

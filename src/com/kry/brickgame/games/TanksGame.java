@@ -18,7 +18,6 @@ import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getTanksObstacles;
 
 import java.awt.Point;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -945,7 +944,7 @@ public class TanksGame extends GameWithLives {
 		// trying to create a tank on one of the spawn points
 		int tryCount = 3;
 		do {
-			spawnPoint = new Random().nextInt(spawnPoints.length);
+			spawnPoint = r.nextInt(spawnPoints.length);
 			newX = spawnPoints[spawnPoint][0];
 			newY = spawnPoints[spawnPoint][1];
 			
