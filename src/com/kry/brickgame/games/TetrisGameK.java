@@ -7,9 +7,8 @@ import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameUtils.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
-import com.kry.brickgame.shapes.TetrisShape.Figures;
 
-/**
+/** 
  * @author noLive
  */
 public class TetrisGameK extends TetrisGameI {
@@ -24,35 +23,24 @@ public class TetrisGameK extends TetrisGameI {
 		super(speed, level, rotation, type);
 	}
 	
+	/**
+	 * Processing of key presses
+	 */
 	@Override
-	public void keyPressed(KeyPressed key) {
-		// alternative processing of the KeyRotate
-		if ((key == KeyPressed.KeyRotate) && (getStatus() == Status.Running)
-				&& (!isFallingFinished)) {
-			// if we have the super gun
-			if (curPiece.getShape() == Figures.SuperGun) {
-				playEffect(Effects.hit_cell);
-				// than shoot of it
-				shoot(curX, curY + curPiece.minY());
-			} else if (curPiece.getShape() == Figures.SuperMudGun) {
-				playEffect(Effects.add_cell);
-				mudShoot(curX, curY + curPiece.minY());
-				// if the super point, than do nothing
-			} else if (curPiece.getShape() != Figures.SuperPoint) {
-				TetrisShape rotatedPiece;
-				if (getRotation() == Rotation.Counterclockwise) {
-					rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
-				} else {
-					rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
-				}
-				
-				if (tryMove(rotatedPiece, curX, curY)) {
-					playEffect(Effects.turn);
-				}
-			}
-		} else {
-			super.keyPressed(key);
-		}
+	protected void processKeys() {
+		if (getStatus() == Status.None || keys.isEmpty()) return;
+		if (getStatus() == Status.Running && !isFallingFinished
+		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
+			TetrisShape rotatedPiece;
+			if (getRotation() == Rotation.Counterclockwise)
+				rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
+			else
+				rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
+			
+			if (tryMove(rotatedPiece, curX, curY)) playEffect(Effects.turn);
+			keys.remove(KeyPressed.KeyRotate);
+		} else
+			super.processKeys();
 	}
 	
 }
