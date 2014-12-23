@@ -107,7 +107,7 @@ public final class GameUtils {
 		
 		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
 		
-		Board resultBoard = new Board(board.getWidth(), board.getHeight());// board.clone();
+		Board resultBoard = new Board(board.getWidth(), board.getHeight());
 		
 		// picks up or downs the lines of the board
 		if (isUpwardDirection) {
@@ -121,9 +121,8 @@ public final class GameUtils {
 		}
 		
 		// generates a new lines
+		Random r = new Random();
 		for (int line = 0; line < linesCount; line++) {
-			Random r = new Random();
-			
 			boolean hasEmpty = false;
 			boolean hasFull = false;
 			
