@@ -1,5 +1,7 @@
 package com.kry.brickgame.boards;
 
+import java.util.Locale;
+
 /**
  * @author noLive
  */
@@ -20,10 +22,9 @@ public class BoardLetters extends Board {
 	 *            - character like 'A', 'B', 'C', ...
 	 */
 	public static Letters charToLetters(char ch) {
-		Letters result = Letters.None;
-		
+		Letters result;
 		try {
-			result = Letters.valueOf(String.valueOf(ch).toUpperCase());
+			result = Letters.valueOf(String.valueOf(ch).toUpperCase(Locale.ENGLISH));
 		} catch (IllegalArgumentException e) {
 			result = Letters.None;
 		}
@@ -38,10 +39,9 @@ public class BoardLetters extends Board {
 	 *            - string like "A", "B", "C", ...
 	 */
 	protected static Letters stringToLetters(String str) {
-		Letters result = Letters.None;
-		
+		Letters result;
 		try {
-			result = Letters.valueOf(str.toUpperCase());
+			result = Letters.valueOf(str.toUpperCase(Locale.ENGLISH));
 		} catch (IllegalArgumentException e) {
 			result = Letters.None;
 		}

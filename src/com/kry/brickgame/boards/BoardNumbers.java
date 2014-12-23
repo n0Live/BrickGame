@@ -30,8 +30,7 @@ public class BoardNumbers extends Board {
 	 *            - string like "0" .. "9"
 	 */
 	protected static Numbers stringToNumbers(String str) {
-		Numbers result = Numbers.None;
-		
+		Numbers result;
 		try {
 			result = Numbers.valueOf("n" + str);
 		} catch (IllegalArgumentException e) {
