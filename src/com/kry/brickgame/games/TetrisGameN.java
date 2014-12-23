@@ -11,7 +11,7 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameN extends TetrisGameJ {
 	private static final long serialVersionUID = -5071920013183520180L;
-
+	
 	/**
 	 * The Tetris with the addition of new lines every few seconds and the
 	 * shifting board content
@@ -21,16 +21,15 @@ public class TetrisGameN extends TetrisGameJ {
 	public TetrisGameN(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-
+	
 	@Override
 	protected void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
-			Board board = getBoard();
-			
-			board = boardHorizontalShift(board, 1);
+			int dX = (getRotation() == Rotation.Clockwise ? 1 : -1);
+			Board board = boardHorizontalShift(getBoard(), dX);
 			setBoard(board);
 		}
 	}
-
+	
 }
