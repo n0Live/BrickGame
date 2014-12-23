@@ -619,7 +619,7 @@ public abstract class Game implements Runnable, Serializable {
 		/**
 		 * Nested (inner) class to draw an explosion
 		 */
-		class Kaboom {
+		final class Kaboom {
 			final Cell E = Cell.Empty;
 			final Cell F = Cell.Full;
 			/**
@@ -714,8 +714,7 @@ public abstract class Game implements Runnable, Serializable {
 		}
 		
 		playMusic(Music.kaboom);
-		
-		Kaboom kaboom = new Kaboom();
+		final Kaboom kaboom = new Kaboom();
 		
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
 			// draw the blast waves
