@@ -3,6 +3,7 @@ package com.kry.brickgame.UI;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,53 +29,46 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * @author noLive
  */
 class ButtonMouseListener extends MouseAdapter {
-
+	
 	private static class Repeater implements Runnable {
 		private final KeyPressed key;
-
+		
 		public Repeater(KeyPressed key) {
 			this.key = key;
 		}
-
+		
 		@Override
 		public void run() {
 			Main.getGame().keyPressed(key);
 		}
 	}
-
+	
 	/**
 	 * Menu buttons (Shutdown, Reset, Mute, Start)
 	 */
-	private static final Set<KeyPressed> menuKeys;
-
-	static {
-		menuKeys = new HashSet<>(5, 1f);
-		menuKeys.add(KeyPressed.KeyShutdown);
-		menuKeys.add(KeyPressed.KeyReset);
-		menuKeys.add(KeyPressed.KeyMute);
-		menuKeys.add(KeyPressed.KeyStart);
-	}
-
+	private static final Set<KeyPressed> menuKeys = new HashSet<>(Arrays.asList(
+			KeyPressed.KeyShutdown, KeyPressed.KeyReset, KeyPressed.KeyMute, KeyPressed.KeyStart));
+	
 	/**
 	 * Threads for processing of pressed keys
 	 */
 	private final ScheduledExecutorService scheduledThreadPool = Executors
 			.newScheduledThreadPool(5);
-
+	
 	/**
 	 * Pressed keys
 	 */
 	private final Map<KeyPressed, ScheduledFuture<?>> pressedKeys;
-
+	
 	public ButtonMouseListener() {
 		pressedKeys = new HashMap<>();
 	}
-
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		final JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
-
+		
 		if (menuKeys.contains(key)) {
 			// special behavior for KeyShutdown
 			if (key != KeyPressed.KeyShutdown) {
@@ -85,16 +79,16 @@ class ButtonMouseListener extends MouseAdapter {
 			ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(
 					key), 300, 40, TimeUnit.MILLISECONDS);
 			pressedKeys.put(key, pressedKey);
-
+			
 			Main.getGame().keyPressed(key);
 		}
 	}
-
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		JButton btn = (JButton) e.getSource();
 		KeyPressed key = KeyPressed.valueOf(btn.getActionCommand());
-
+		
 		if (menuKeys.contains(key)) {
 			// special behavior for KeyShutdown (when mouse released upon the
 			// pressed KeyShutdown button)
@@ -109,7 +103,7 @@ class ButtonMouseListener extends MouseAdapter {
 		} else {
 			pressedKeys.get(key).cancel(true);
 			pressedKeys.remove(key);
-
+			
 			Main.getGame().keyReleased(key);
 		}
 	}
