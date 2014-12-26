@@ -2,6 +2,7 @@ package com.kry.brickgame.UI;
 
 import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.Drawer.getDrawer;
+import static com.kry.brickgame.UI.UIConsts.TYPICAL_DEVICE_WIDTH;
 import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
@@ -135,53 +136,81 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		// if the main canvas is not created or the size changed
+		final float outBorderSpaceFactor = (float) 1 / 12;
+		final float inBorderHorSpaceFactor = (float) 1 / 18;
+		final float inBorderVertSpaceFactor = (float) 1 / 18;
+		boolean needForUpdate = false;
 		size = getSize();
-		if ((null == canvas) || (canvas.getWidth() != size.width)
-				|| (canvas.getHeight() != size.height)) {
+		
+		// prepare the gamefield
+		int outBorderSpace = Math.round(size.width * outBorderSpaceFactor);
+		int inBorderHorSpace = Math.round(size.width * inBorderHorSpaceFactor);
+		int inBorderVertSpace = Math.round(size.width * inBorderVertSpaceFactor);
+		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace) * 2;
+		int gameFieldHeight = Math.round(gameFieldWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
+		int gameFieldX = outBorderSpace + inBorderHorSpace;
+		int gameFieldY = outBorderSpace + inBorderVertSpace;
+		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldWidth, gameFieldHeight,
+		        properties);
+		
+		// if the main canvas is not created or the size changed
+		if (null == canvas || canvas.getWidth() != size.width || canvas.getHeight() != size.height) {
 			// create the new main canvas
 			canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+			needForUpdate = true;
 		}
 		
 		/* Canvas graphics */
 		Graphics2D g2d = (Graphics2D) canvas.getGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
-		// fill the background
-		g2d.setBackground(deviceBgColor);
-		g2d.clearRect(0, 0, size.width, size.height);
-		
-		int outBorderSpace = Math.round((float) size.width / 12);
-		int inBorderHorSpace = Math.round((float) size.width / 24) - 3;
-		int inBorderVertSpace = Math.round((float) size.width / 18) - 4;
-		
-		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace) * 2;
-		int gameFieldHeight = Math.round(gameFieldWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
+		if (needForUpdate) {
+			// fill the background
+			g2d.setBackground(deviceBgColor);
+			g2d.clearRect(0, 0, size.width, size.height);
+		}
 		
 		// draw gamefield
-		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldWidth, gameFieldHeight,
-				properties);
-		g2d.drawImage(gameField, outBorderSpace + inBorderHorSpace, outBorderSpace
-				+ inBorderVertSpace, gameField.getWidth(), gameField.getHeight(), this);
+		g2d.drawImage(gameField, gameFieldX, gameFieldY, gameField.getWidth(),
+		        gameField.getHeight(), this);
 		
 		// draw device
 		if (backgroundImage != null) {
-			g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, this);
+			if (needForUpdate) {
+				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, this);
+			} else {
+				int overlayOutBorderSpace = Math.round(TYPICAL_DEVICE_WIDTH * outBorderSpaceFactor);
+				int overlayInBorderHorSpace = Math.round(TYPICAL_DEVICE_WIDTH
+				        * inBorderHorSpaceFactor);
+				int overlayInBorderVertSpace = Math.round(TYPICAL_DEVICE_WIDTH
+				        * inBorderVertSpaceFactor);
+				int overlayX = overlayOutBorderSpace + overlayInBorderHorSpace;
+				int overlayY = overlayOutBorderSpace + overlayInBorderVertSpace;
+				int overlayWidth = TYPICAL_DEVICE_WIDTH
+				        - (overlayOutBorderSpace + overlayInBorderHorSpace) * 2;
+				int overlayHeight = Math.round(overlayWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
+				
+				BufferedImage overlay = backgroundImage.getSubimage(overlayX, overlayY,
+				        overlayWidth, overlayHeight);
+				g2d.drawImage(overlay, gameFieldX, gameFieldY, gameField.getWidth(),
+				        gameField.getHeight(), this);
+			}
 		}
 		
 		g2d.dispose();
 		
 		/* Component graphics */
+		super.paintComponent(g);
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		        RenderingHints.VALUE_ANTIALIAS_ON);
 		((Graphics2D) g).drawRenderedImage(canvas, null);
 	}
 	
 	@Override
 	public void previewChanged(GameEvent event) {
 		properties.preview = event.getPreview();
-		getDrawer().showLives = (event.getSource() instanceof GameWithLives);
-		getDrawer().showNext = (event.getSource() instanceof TetrisGameI);
+		getDrawer().showLives = event.getSource() instanceof GameWithLives;
+		getDrawer().showNext = event.getSource() instanceof TetrisGameI;
 	}
 	
 	@Override
@@ -197,6 +226,6 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void statusChanged(GameEvent event) {
 		properties.status = event.getStatus();
-		getDrawer().showHiScores = (event.getSource() instanceof GameSelector);
+		getDrawer().showHiScores = event.getSource() instanceof GameSelector;
 	}
 }

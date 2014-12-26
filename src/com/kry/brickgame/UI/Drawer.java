@@ -125,7 +125,7 @@ public final class Drawer {
 			try {
 				// trying to get the font from a resource file
 				digitalFont = Font.createFont(Font.TRUETYPE_FONT,
-						Drawer.class.getResourceAsStream("/fonts/Segment7Standard.otf"));
+				        Drawer.class.getResourceAsStream("/fonts/Segment7Standard.otf"));
 				
 			} catch (FontFormatException | IOException e) {
 				e.printStackTrace();
@@ -137,7 +137,7 @@ public final class Drawer {
 			/* iconFont */
 			try {
 				iconFont = Font.createFont(Font.TRUETYPE_FONT,
-						Drawer.class.getResourceAsStream("/fonts/icomoon.ttf"));
+				        Drawer.class.getResourceAsStream("/fonts/icomoon.ttf"));
 				
 			} catch (FontFormatException | IOException e) {
 				e.printStackTrace();
@@ -161,7 +161,7 @@ public final class Drawer {
 		 */
 		protected void setOptimalDigitalFont(Graphics g, String text, int maxWidth) {
 			digitalFont = digitalFont
-					.deriveFont(calcOptimumFontSize(g, digitalFont, text, maxWidth));
+			        .deriveFont(calcOptimumFontSize(g, digitalFont, text, maxWidth));
 		}
 		
 		/**
@@ -216,8 +216,8 @@ public final class Drawer {
 	 *            y-coordinate of upper left corner of the image to be added
 	 */
 	private static void appendCanvas(BufferedImage targetCanvas, BufferedImage sourceCanvas, int x,
-			int y) {
-		if ((targetCanvas == null) || (sourceCanvas == null)) return;
+	        int y) {
+		if (targetCanvas == null || sourceCanvas == null) return;
 		
 		Graphics2D g2d = targetCanvas.createGraphics();
 		
@@ -326,7 +326,7 @@ public final class Drawer {
 	 *            y-coordinate of lower left corner of the text to be drawn
 	 */
 	private static void drawTextOnCanvas(BufferedImage canvas, String backgroundText,
-			String foregroundText, Font font, int x, int y) {
+	        String foregroundText, Font font, int x, int y) {
 		drawTextOnCanvas(canvas, backgroundText, foregroundText, font, x, y, true);
 	}
 	
@@ -354,7 +354,7 @@ public final class Drawer {
 	 *            whether to clear the substrate background below the text?
 	 */
 	private static void drawTextOnCanvas(BufferedImage canvas, String backgroundText,
-			String foregroundText, Font font, int x, int y, boolean clearBackground) {
+	        String foregroundText, Font font, int x, int y, boolean clearBackground) {
 		if (canvas == null) return;
 		
 		Graphics2D g2d = canvas.createGraphics();
@@ -376,7 +376,7 @@ public final class Drawer {
 		// like "%5.5s"
 		// http://download.oracle.com/javase/7/docs/api/java/util/Formatter.html#syntax
 		StringBuilder formatString = new StringBuilder("%").append(backgroundText.length())
-				.append(".").append(backgroundText.length()).append("s");
+		        .append(".").append(backgroundText.length()).append("s");
 		
 		// draws the backgroundText
 		g2d.setColor(emptyColor);
@@ -385,21 +385,9 @@ public final class Drawer {
 		// draws the foregroundText
 		g2d.setColor(fullColor);
 		g2d.drawString(String.format(formatString.toString(),
-				(foregroundText != null ? foregroundText : "")), x, y);
+		        foregroundText != null ? foregroundText : ""), x, y);
 		
 		g2d.dispose();
-	}
-	
-	/**
-	 * Gets instance of the Drawer
-	 * 
-	 * @return instance of the Drawer
-	 */
-	public static Drawer getDrawer() {
-		if (null == drawer) {
-			drawer = new Drawer();
-		}
-		return drawer;
 	}
 	
 	/**
@@ -423,7 +411,7 @@ public final class Drawer {
 		// increasing the width and height of the canvas by the thickness of the
 		// border line on each side
 		return initCanvas(boardWidthInPixels(board, squareSideLength) + border * 2,
-				boardHeightInPixels(board, squareSideLength) + border * 2);
+		        boardHeightInPixels(board, squareSideLength) + border * 2);
 	}
 	
 	/**
@@ -439,6 +427,18 @@ public final class Drawer {
 		clearCanvas(result, bgColor);
 		
 		return result;
+	}
+	
+	/**
+	 * Gets instance of the Drawer
+	 * 
+	 * @return instance of the Drawer
+	 */
+	public static Drawer getDrawer() {
+		if (null == drawer) {
+			drawer = new Drawer();
+		}
+		return drawer;
 	}
 	
 	/* For events feedback */
@@ -534,24 +534,39 @@ public final class Drawer {
 	 *            line width for the border line
 	 */
 	private void drawBoardOnCanvas(BufferedImage canvas, Board board, float borderLineWidth) {
-		if ((canvas == null) || (board == null)) return;
+		if (canvas == null || board == null) return;
 		
 		int boardWidth = board.getWidth();
 		int boardHeight = board.getHeight();
 		
+		// shift from the beginning of the canvas to avoid the border
+		int shift = Math.round(borderLineWidth);
+		
+		BufferedImage fullSquare = drawSquare(Cell.Full, borderLineWidth / 2);
+		BufferedImage emptySquare = drawSquare(Cell.Empty, borderLineWidth / 2);
+		BufferedImage blinkSquare = drawSquare(Cell.Blink, borderLineWidth / 2);
+		
 		Graphics2D g2d = canvas.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		// shift from the beginning of the canvas to avoid the border
-		int shift = (int) (borderLineWidth / 2);
 		
 		// draw squares of the board
 		for (int i = 0; i < boardHeight; i++) {
 			for (int j = 0; j < boardWidth; j++) {
 				// "boardHeight - i - 1" - the board reads from the bottom up
 				Cell fill = board.getCell(j, boardHeight - i - 1);
-				drawSquare(g2d, shift + j * squareSideLength, shift + i * squareSideLength, fill,
-						borderLineWidth / 2);
+				int x = shift + j * squareSideLength;
+				int y = shift + i * squareSideLength;
+				switch (fill) {
+				case Full:
+					g2d.drawImage(fullSquare, x, y, null);
+					break;
+				case Empty:
+					g2d.drawImage(emptySquare, x, y, null);
+					break;
+				case Blink:
+					g2d.drawImage(blinkSquare, x, y, null);
+					break;
+				}
 			}
 		}
 		
@@ -579,7 +594,7 @@ public final class Drawer {
 		
 		// set on center of the canvas
 		x = squareSideLength / 2;
-		y = (canvas.getHeight() / 2 - fontManager.digitalFont.getSize() / 2);
+		y = canvas.getHeight() / 2 - fontManager.digitalFont.getSize() / 2;
 		drawTextOnCanvas(canvas, COMING, COMING, fontManager.digitalFont, x, y, false);
 		
 		fm = g.getFontMetrics(fontManager.digitalFont);
@@ -628,12 +643,12 @@ public final class Drawer {
 		x = fm.stringWidth("  ");
 		// max height of a two squares or height of the scores and scores label
 		y = Math.max(2 * squareSideLength, fontManager.digitalFont.getSize())
-				+ fontManager.textFont.getSize();
+		        + fontManager.textFont.getSize();
 		
-		drawTextOnCanvas(canvas, HI, (showHiScores && scoresInfo != null ? HI : ""),
-				fontManager.textFont.deriveFont(Font.PLAIN), x, y);
-		drawTextOnCanvas(canvas, SCORE, (scoresInfo != null ? SCORE : ""),
-				fontManager.textFont.deriveFont(Font.PLAIN), x + fm.stringWidth(HI), y);
+		drawTextOnCanvas(canvas, HI, showHiScores && scoresInfo != null ? HI : "",
+		        fontManager.textFont.deriveFont(Font.PLAIN), x, y);
+		drawTextOnCanvas(canvas, SCORE, scoresInfo != null ? SCORE : "",
+		        fontManager.textFont.deriveFont(Font.PLAIN), x + fm.stringWidth(HI), y);
 		/* --- */
 		
 		/* Music icon */
@@ -645,10 +660,10 @@ public final class Drawer {
 			x = canvas.getWidth() - (fm.stringWidth(ICON_MUSIC) + squareSideLength / 4);
 			// max height of a 2 squares or height of the scores and music icon
 			y = Math.max(2 * squareSideLength, fontManager.digitalFont.getSize())
-					+ fontManager.iconFont.getSize();
+			        + fontManager.iconFont.getSize();
 			
-			drawTextOnCanvas(canvas, ICON_MUSIC, ((!properties.mute) ? ICON_MUSIC : ""),
-					fontManager.iconFont, x, y);
+			drawTextOnCanvas(canvas, ICON_MUSIC, !properties.mute ? ICON_MUSIC : "",
+			        fontManager.iconFont, x, y);
 		}
 		/* --- */
 		
@@ -658,14 +673,14 @@ public final class Drawer {
 		
 		x = squareSideLength / 2;
 		// height is 4.75 of a squares
-		y = (5 * squareSideLength - squareSideLength / 4);
+		y = 5 * squareSideLength - squareSideLength / 4;
 		
-		drawTextOnCanvas(canvas, NEXT, (showNext ? NEXT : ""), fontManager.textFont, x, y);
+		drawTextOnCanvas(canvas, NEXT, showNext ? NEXT : "", fontManager.textFont, x, y);
 		
 		fm = g.getFontMetrics(fontManager.textFont);
 		// set position on the right side of the canvas
-		drawTextOnCanvas(canvas, LIVES, (showLives ? LIVES : ""), fontManager.textFont,
-				canvas.getWidth() - fm.stringWidth(LIVES) - squareSideLength / 2, y);
+		drawTextOnCanvas(canvas, LIVES, showLives ? LIVES : "", fontManager.textFont,
+		        canvas.getWidth() - fm.stringWidth(LIVES) - squareSideLength / 2, y);
 		/* --- */
 		
 		/* Speed and Level */
@@ -673,13 +688,13 @@ public final class Drawer {
 		// set the same distance to the labels from both sides
 		x = (canvas.getWidth() - fm.stringWidth(NUMBER_SUBSTRATE + " " + NUMBER_SUBSTRATE)) / 2;
 		// height is 9.5 of a squares
-		y = (9 * squareSideLength + squareSideLength / 2) + fontManager.digitalFont.getSize();
+		y = 9 * squareSideLength + squareSideLength / 2 + fontManager.digitalFont.getSize();
 		
 		drawTextOnCanvas(canvas, NUMBER_SUBSTRATE, String.valueOf(properties.speed),
-				fontManager.digitalFont, x, y);
+		        fontManager.digitalFont, x, y);
 		drawTextOnCanvas(canvas, NUMBER_SUBSTRATE, String.valueOf(properties.level),
-				fontManager.digitalFont,
-				x + squareSideLength / 2 + fm.stringWidth(NUMBER_SUBSTRATE), y);
+		        fontManager.digitalFont,
+		        x + squareSideLength / 2 + fm.stringWidth(NUMBER_SUBSTRATE), y);
 		/* --- */
 		
 		/* Speed and Level labels */
@@ -687,18 +702,18 @@ public final class Drawer {
 		fontManager.setOptimalTextFont(g, SPEED + LEVEL, maxWidth);
 		
 		x = squareSideLength / 2;
-		y = (10 * squareSideLength) // 10 of a squares
-				// and max from height of speed/level
-				+ Math.max(fontManager.digitalFont.getSize(),
-				// or 2 of a squares
-						squareSideLength * 2) + fontManager.textFont.getSize();
+		y = 10 * squareSideLength // 10 of a squares
+		        // and max from height of speed/level
+		        + Math.max(fontManager.digitalFont.getSize(),
+		        // or 2 of a squares
+		                squareSideLength * 2) + fontManager.textFont.getSize();
 		
 		drawTextOnCanvas(canvas, SPEED, SPEED, fontManager.textFont, x, y);
 		
 		fm = g.getFontMetrics(fontManager.textFont);
 		// set position on the right side of the canvas
 		drawTextOnCanvas(canvas, LEVEL, LEVEL, fontManager.textFont,
-				canvas.getWidth() - fm.stringWidth(LEVEL) - squareSideLength / 4, y);
+		        canvas.getWidth() - fm.stringWidth(LEVEL) - squareSideLength / 4, y);
 		/* --- */
 		
 		/* Rotate label */
@@ -708,10 +723,10 @@ public final class Drawer {
 		
 		x = squareSideLength / 4;
 		// height is 13.5 of a squares
-		y = (13 * squareSideLength + squareSideLength / 2) + fontManager.textFont.getSize();
+		y = 13 * squareSideLength + squareSideLength / 2 + fontManager.textFont.getSize();
 		
-		drawTextOnCanvas(canvas, ROTATE, ((properties.rotation != Rotation.None) ? ROTATE : ""),
-				fontManager.textFont, x, y);
+		drawTextOnCanvas(canvas, ROTATE, properties.rotation != Rotation.None ? ROTATE : "",
+		        fontManager.textFont, x, y);
 		/* --- */
 		
 		/* Rotate icons (left/right) */
@@ -720,16 +735,16 @@ public final class Drawer {
 			// squareSideLength);
 			
 			fm = g.getFontMetrics(fontManager.iconFont);
-			x = canvas.getWidth() - fm.stringWidth(ICON_ROTATE_RIGHT) - (squareSideLength * 3 / 4);
+			x = canvas.getWidth() - fm.stringWidth(ICON_ROTATE_RIGHT) - squareSideLength * 3 / 4;
 			
 			drawTextOnCanvas(canvas, ICON_ROTATE_RIGHT,
-					((properties.rotation == Rotation.Clockwise) ? ICON_ROTATE_RIGHT : ""),
-					fontManager.iconFont, x, y - squareSideLength / 4);
+			        properties.rotation == Rotation.Clockwise ? ICON_ROTATE_RIGHT : "",
+			        fontManager.iconFont, x, y - squareSideLength / 4);
 			
 			int space = squareSideLength / 2;
 			drawTextOnCanvas(canvas, ICON_ROTATE_LEFT,
-					((properties.rotation == Rotation.Counterclockwise) ? ICON_ROTATE_LEFT : ""),
-					fontManager.iconFont, x + space, y + squareSideLength / 2);
+			        properties.rotation == Rotation.Counterclockwise ? ICON_ROTATE_LEFT : "",
+			        fontManager.iconFont, x + space, y + squareSideLength / 2);
 		}
 		/* --- */
 		
@@ -739,10 +754,10 @@ public final class Drawer {
 		
 		x = squareSideLength / 4;
 		// height is 15.5 of a squares
-		y = (15 * squareSideLength + squareSideLength / 2) + fontManager.textFont.getSize();
+		y = 15 * squareSideLength + squareSideLength / 2 + fontManager.textFont.getSize();
 		
-		drawTextOnCanvas(canvas, PAUSE, ((properties.status == Status.Paused) ? PAUSE : ""),
-				fontManager.textFont, x, y);
+		drawTextOnCanvas(canvas, PAUSE, properties.status == Status.Paused ? PAUSE : "",
+		        fontManager.textFont, x, y);
 		/* --- */
 		
 		/* Pause icon */
@@ -752,11 +767,11 @@ public final class Drawer {
 			fm = g.getFontMetrics(fontManager.textFont);
 			x = squareSideLength / 4 + fm.stringWidth(PAUSE);
 			// height is 15.5 of a squares and height of the pause label
-			y = (15 * squareSideLength + squareSideLength / 2) + fontManager.textFont.getSize()
-					+ fontManager.iconFont.getSize();
+			y = 15 * squareSideLength + squareSideLength / 2 + fontManager.textFont.getSize()
+			        + fontManager.iconFont.getSize();
 			
-			drawTextOnCanvas(canvas, ICON_PAUSE, ((showPauseIcon) ? ICON_PAUSE : ""),
-					fontManager.iconFont, x, y);
+			drawTextOnCanvas(canvas, ICON_PAUSE, showPauseIcon ? ICON_PAUSE : "",
+			        fontManager.iconFont, x, y);
 		}
 		/* --- */
 		
@@ -766,49 +781,69 @@ public final class Drawer {
 		
 		x = squareSideLength / 4;
 		// height is 19.75 of a squares
-		y = (20 * squareSideLength - squareSideLength / 4);
+		y = 20 * squareSideLength - squareSideLength / 4;
 		
-		drawTextOnCanvas(canvas, GAME_OVER, ((properties.status == Status.GameOver) ? GAME_OVER
-				: ""), fontManager.textFont, x, y);
+		drawTextOnCanvas(canvas, GAME_OVER, properties.status == Status.GameOver ? GAME_OVER : "",
+		        fontManager.textFont, x, y);
 		/* --- */
 	}
 	
 	/**
-	 * Draws one square from a board
+	 * Draws one square for the insertion to the main canvas
 	 * 
-	 * @param g2d
-	 *            {@code Graphics2D} object, which used to draw on it
-	 * @param x
-	 *            x-coordinate of upper left corner of the square to be drawn
-	 * @param y
-	 *            y-coordinate of upper left corner of the square to be drawn
 	 * @param fill
 	 *            fill type: {@code Full}, {@code Empty} or {@code Blink}
 	 * @param lineWidth
 	 *            line width for a square border line
+	 * @return {@code BufferedImage} for the insertion to the main canvas
 	 */
-	private void drawSquare(Graphics2D g2d, int x, int y, Cell fill, float lineWidth) {
+	private BufferedImage drawSquare(Cell fill, float lineWidth) {
+		BufferedImage image = new BufferedImage(squareSideLength, squareSideLength,
+		        BufferedImage.TYPE_INT_RGB);
 		Color colors[] = { emptyColor, fullColor, blinkColor };
-		
 		Color color = colors[fill.ordinal()];
-		g2d.setColor(color);
 		
+		Graphics2D g2d = image.createGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+		clearCanvas(image, bgColor);
+		
+		g2d.setColor(color);
 		// set thickness of the line
 		g2d.setStroke(new BasicStroke(lineWidth));
 		
 		// separate the distances between a squares
 		int separator = Math.round(lineWidth * 1.75f);
-		
 		// draw the frame
-		g2d.drawRect(x + separator, y + separator, squareSideLength - separator, squareSideLength
-				- separator);
+		g2d.drawRect(separator / 2, separator / 2, squareSideLength - separator, squareSideLength
+		        - separator);
 		
 		// draw the inner square
 		int innerStart = Math.max(Math.round((squareSideLength - separator) * 0.25f),
-				Math.round(lineWidth + 1));
-		int innerSquareSideLenght = (squareSideLength - separator) - innerStart * 2 + 1;//
-		g2d.fillRect(x + separator + innerStart, y + separator + innerStart, innerSquareSideLenght,
-				innerSquareSideLenght);
+		        Math.round(lineWidth + 1));
+		int innerSquareSideLenght = squareSideLength - separator - innerStart * 2 + 1;//
+		g2d.fillRect(separator / 2 + innerStart, separator / 2 + innerStart, innerSquareSideLenght,
+		        innerSquareSideLenght);
+		
+		g2d.dispose();
+		
+		return image;
+	}
+	
+	/**
+	 * Draws on the canvas the contents of the board
+	 * 
+	 * @param canvas
+	 *            the target canvas
+	 * @param board
+	 *            the board whose contents need to be drawn
+	 * @param borderLineWidth
+	 *            line width for the border line
+	 */
+	private void updateCanvas(BufferedImage canvas, Board board, float borderLineWidth) {
+		if (canvas == null) return;
+		
+		drawBoardOnCanvas(canvas, board, borderLineWidth);
 	}
 	
 	/**
@@ -825,7 +860,7 @@ public final class Drawer {
 	public BufferedImage getDrawnGameField(int width, int height, GameProperties properties) {
 		// set the size of the canvas based on GAME_FIELD_ASPECT_RATIO
 		Dimension d = UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
-				GAME_FIELD_ASPECT_RATIO);
+		        GAME_FIELD_ASPECT_RATIO);
 		
 		// calculate size of a one square
 		squareSideLength = d.height / (properties.board.getHeight() + 1);
@@ -846,7 +881,7 @@ public final class Drawer {
 			
 			int space = squareSideLength / 2;
 			labelsCanvas = initCanvas(d.width - (boardCanvas.getWidth() + space),
-					boardCanvas.getHeight());
+			        boardCanvas.getHeight());
 			// append labels and icons
 			drawLabelsAndIcons(labelsCanvas, properties);
 			
@@ -863,28 +898,12 @@ public final class Drawer {
 			// add preview canvas
 			int previewX = labelX
 			// center of the label canvas
-					+ (labelsCanvas.getWidth() - previewCanvas.getWidth()) / 2;
-			int previewY = labelY + (5 * squareSideLength);
+			        + (labelsCanvas.getWidth() - previewCanvas.getWidth()) / 2;
+			int previewY = labelY + 5 * squareSideLength;
 			appendCanvas(canvas, previewCanvas, previewX, previewY);
 		}
 		
 		return canvas;
-	}
-	
-	/**
-	 * Draws on the canvas the contents of the board
-	 * 
-	 * @param canvas
-	 *            the target canvas
-	 * @param board
-	 *            the board whose contents need to be drawn
-	 * @param borderLineWidth
-	 *            line width for the border line
-	 */
-	private void updateCanvas(BufferedImage canvas, Board board, float borderLineWidth) {
-		if (canvas == null) return;
-		
-		drawBoardOnCanvas(canvas, board, borderLineWidth);
 	}
 	
 }
