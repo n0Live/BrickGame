@@ -237,7 +237,7 @@ public class TetrisShape extends Shape {
 		final boolean withTrominoes = polyominoes.contains(Polyominoes.Trominoes);
 		final boolean withTetraminoes = polyominoes.contains(Polyominoes.Tetraminoes);
 		final boolean withPentominoes = polyominoes.contains(Polyominoes.Pentominoes);
-		final boolean withSuperShapes = superShapes != null && superShapes.length > 0;
+		final boolean withSuperShapes = superShapes.length > 0;
 		
 		if (!polyominoes.contains(Polyominoes.Trominoes)
 		        && !polyominoes.contains(Polyominoes.Tetraminoes)
