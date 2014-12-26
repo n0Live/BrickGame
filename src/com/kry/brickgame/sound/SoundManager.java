@@ -14,6 +14,29 @@ public class SoundManager {
 	private static final int DELAY_BEFORE_PLAY_NEW_SOUND = 600;
 	private static final Map<String, Long> playedClips = new HashMap<>();
 	
+	private static boolean canPlay(String clip, int delay) {
+		synchronized (playedClips) {
+			if (playedClips.containsKey(clip)
+			        && System.currentTimeMillis() < playedClips.get(clip) + delay) return false;
+			playedClips.put(clip, System.currentTimeMillis());
+			return true;
+		}
+	}
+	
+	/**
+	 * Gets the {@code AudioClip}, depending of the specified {@code enum}
+	 * value, from the specified {@code soundBank}.
+	 * 
+	 * @param soundBank
+	 *            specified SoundBank
+	 * @param value
+	 *            {@code enum} value, containing the name of the sound
+	 * @return {@code AudioClip}
+	 */
+	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank, Enum<E> value) {
+		return soundBank.getClip(getResourceFromName(value.toString()));
+	}
+	
 	/**
 	 * Play the {@code AudioClip} at once in normal rate, depending of the
 	 * specified {@code enum} value, from the specified {@code soundBank}. If
@@ -33,15 +56,6 @@ public class SoundManager {
 		clip.play();
 	}
 	
-	private static boolean canPlay(String clip, int delay) {
-		synchronized (playedClips) {
-			if (playedClips.containsKey(clip)
-					&& System.currentTimeMillis() < playedClips.get(clip) + delay) return false;
-			playedClips.put(clip, System.currentTimeMillis());
-			return true;
-		}
-	}
-	
 	/**
 	 * Gets the string array of resources from the {@code enum} values.
 	 * 
@@ -58,20 +72,6 @@ public class SoundManager {
 			result[i++] = getResourceFromName(value.toString());
 		}
 		return result;
-	}
-	
-	/**
-	 * Gets the {@code AudioClip}, depending of the specified {@code enum}
-	 * value, from the specified {@code soundBank}.
-	 * 
-	 * @param soundBank
-	 *            specified SoundBank
-	 * @param value
-	 *            {@code enum} value, containing the name of the sound
-	 * @return {@code AudioClip}
-	 */
-	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank, Enum<E> value) {
-		return soundBank.getClip(getResourceFromName(value.toString()));
 	}
 	
 	/**
@@ -141,7 +141,14 @@ public class SoundManager {
 	 *            {@code enum} value, containing the name of the sound
 	 */
 	public static <E extends Enum<E>> void loop(SoundBank soundBank, Enum<E> value) {
-		play(soundBank, value, AudioClip.INDEFINITE, 1.0, Thread.MAX_PRIORITY);
+		// play(soundBank, value, AudioClip.INDEFINITE, 1.0,
+		// Thread.MAX_PRIORITY); <== don't use for loops
+		
+		final AudioClip clip = getClip(soundBank, value);
+		clip.setCycleCount(AudioClip.INDEFINITE);
+		// Use default parameters except priority
+		clip.play(clip.getVolume(), clip.getBalance(), 1.0, clip.getPan(), Thread.MAX_PRIORITY);
+		
 	}
 	
 	/**
@@ -193,9 +200,8 @@ public class SoundManager {
 	
 	/**
 	 * Play the {@code AudioClip} in specified {@code cycleCount} , depending of
-	 * the
-	 * specified {@code enum} value, from the specified {@code soundBank}, with
-	 * specified {@code rate} and {@code priority}.
+	 * the specified {@code enum} value, from the specified {@code soundBank},
+	 * with specified {@code rate} and {@code priority}.
 	 * 
 	 * @param soundBank
 	 *            specified SoundBank
@@ -211,8 +217,8 @@ public class SoundManager {
 	 *            the new playback priority
 	 */
 	public static <E extends Enum<E>> void play(SoundBank soundBank, Enum<E> value, int cycleCount,
-			double rate, int priority) {
-		if (!canPlay(value.toString(), (DELAY_BEFORE_PLAY_NEW_SOUND - priority * 10))) return;
+	        double rate, int priority) {
+		if (!canPlay(value.toString(), DELAY_BEFORE_PLAY_NEW_SOUND - priority * 10)) return;
 		final AudioClip clip = getClip(soundBank, value);
 		clip.setCycleCount(cycleCount);
 		// Use default parameters except priority
