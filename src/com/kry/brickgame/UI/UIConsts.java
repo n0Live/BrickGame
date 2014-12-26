@@ -2,6 +2,7 @@ package com.kry.brickgame.UI;
 
 import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.UIUtils.getBWInverted;
+import static com.kry.brickgame.UI.UIUtils.getEnhanced;
 import static com.kry.brickgame.UI.UIUtils.getReduced;
 import static com.kry.brickgame.UI.UIUtils.isDarkColor;
 
@@ -67,7 +68,8 @@ public class UIConsts {
 	// white if dark device color or same as device color otherwise
 	protected static final Color resizerNormalColor = isDarkColor(deviceBgColor) ? Color.white
 	        : deviceBgColor;
-	protected static final Color resizerOverColor = getReduced(resizerNormalColor);
+	protected static final Color resizerOverColor = isDarkColor(deviceBgColor) ? getReduced(resizerNormalColor)
+	        : getEnhanced(resizerNormalColor);
 	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
