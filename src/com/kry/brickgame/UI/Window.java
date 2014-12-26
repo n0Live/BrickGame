@@ -45,7 +45,8 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.SplashScreen;
 
 public class Window extends JFrame {
-	private static final class ComponentEventListener extends ComponentAdapter implements Serializable {
+	private static final class ComponentEventListener extends ComponentAdapter implements
+	        Serializable {
 		private static final long serialVersionUID = 730763037448145667L;
 		
 		public ComponentEventListener() {
@@ -196,15 +197,15 @@ public class Window extends JFrame {
 		/* Menu buttons */
 		drawPanel.add(
 		        ButtonsFactory.getButton(KeyPressed.KeyShutdown),
-		        "cell 3 2, alignx center, aligny bottom, "
+		        "cell 3 2, alignx center, aligny top, "
 		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		drawPanel.add(
 		        ButtonsFactory.getButton(KeyPressed.KeyReset),
-		        "cell 3 2, alignx center, aligny bottom, "
+		        "cell 3 2, alignx center, aligny top, "
 		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		drawPanel.add(
 		        ButtonsFactory.getButton(KeyPressed.KeyMute),
-		        "cell 3 2, alignx center, aligny bottom, "
+		        "cell 3 2, alignx center, aligny top, "
 		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		/* ---- */
 		

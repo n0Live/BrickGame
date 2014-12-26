@@ -65,42 +65,42 @@ public class UIConsts {
 	protected static final Color lineOverColor = getReduced(lineNormalColor);
 	
 	// white if dark device color or same as device color otherwise
-	protected static final Color resizerNormalColor = (isDarkColor(deviceBgColor) ? Color.white
-			: deviceBgColor);
+	protected static final Color resizerNormalColor = isDarkColor(deviceBgColor) ? Color.white
+	        : deviceBgColor;
 	protected static final Color resizerOverColor = getReduced(resizerNormalColor);
 	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
 	
-	protected static final int TYPICAL_DEVICE_WIDTH = 720;
+	protected static final int TYPICAL_DEVICE_WIDTH = 1080;
 	protected static final int TYPICAL_DEVICE_HEIGHT = (int) (TYPICAL_DEVICE_WIDTH * DEVICE_ASPECT_RATIO);
 	
 	protected final static int MIN_WIDTH = 187;
 	protected final static int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
 	// Insets
-	static final int INSET_TOP = 25;
-	static final int INSET_LEFT = 25;
-	static final int INSET_BOTTOM = 50;
-	static final int INSET_RIGHT = 25;
+	static final int INSET_TOP = 5;
+	static final int INSET_LEFT = 45;
+	static final int INSET_BOTTOM = 100;
+	static final int INSET_RIGHT = 45;
 	// Buttons size
 	/**
 	 * Window buttons (minimize, close) size
 	 */
-	static final int WINDOW_BTN_SIZE = 30;
+	static final int WINDOW_BTN_SIZE = 45;
 	/**
 	 * Control buttons size
 	 */
-	static final int CONTROL_BTN_SIZE = 85;
+	static final int CONTROL_BTN_SIZE = 125;
 	/**
 	 * Rotate button size
 	 */
-	static final int ROTATE_BTN_SIZE = 150;
+	static final int ROTATE_BTN_SIZE = 225;
 	/**
 	 * Menu buttons (Shutdown, Reset, Mute) size
 	 */
-	static final int MENU_BTN_SIZE = 55;
+	static final int MENU_BTN_SIZE = 85;
 	/**
 	 * Start button size
 	 */
-	static final int START_BTN_SIZE = 80;
+	static final int START_BTN_SIZE = 120;
 }
