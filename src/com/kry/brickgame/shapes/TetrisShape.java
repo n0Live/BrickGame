@@ -318,7 +318,7 @@ public class TetrisShape extends Shape {
 		polyominoes.add(Polyominoes.Tetraminoes);
 		polyominoes.add(Polyominoes.Pentominoes);
 		
-		return getRandomPolyominoesAndSuper(polyominoes, null);
+		return getRandomPolyominoesAndSuper(polyominoes, new int[0]);
 	}
 	
 	/**
@@ -371,7 +371,7 @@ public class TetrisShape extends Shape {
 		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
 		polyominoes.add(Polyominoes.Tetraminoes);
 		
-		return getRandomPolyominoesAndSuper(polyominoes, null);
+		return getRandomPolyominoesAndSuper(polyominoes, new int[0]);
 	}
 	
 	/**
