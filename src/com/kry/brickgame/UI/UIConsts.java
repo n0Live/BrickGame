@@ -75,10 +75,11 @@ public class UIConsts {
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
 	
 	protected static final int TYPICAL_DEVICE_WIDTH = 1080;
-	protected static final int TYPICAL_DEVICE_HEIGHT = (int) (TYPICAL_DEVICE_WIDTH * DEVICE_ASPECT_RATIO);
+	protected static final int TYPICAL_DEVICE_HEIGHT = (int) Math.ceil(TYPICAL_DEVICE_WIDTH
+	        * DEVICE_ASPECT_RATIO);
 	
-	protected static final int MIN_WIDTH = 187;
-	protected static final int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
+	protected static final int MIN_WIDTH = 190;
+	protected static final int MIN_HEIGHT = (int) Math.ceil(MIN_WIDTH * DEVICE_ASPECT_RATIO);
 	// Insets
 	static final int INSET_TOP = 5;
 	static final int INSET_LEFT = 45;
