@@ -6,11 +6,13 @@ import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
 
+import java.awt.AlphaComposite;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
@@ -87,14 +89,16 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		if (null == backgroundImage) return overlay = null;
 		// update overlay only if necessary
 		if (null == overlay || overlay.getWidth() != width || overlay.getHeight() != height) {
-			overlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			overlay = UIUtils.getCompatibleImage(width, height, Transparency.TRANSLUCENT);
 			// calculating the overlay position on the backgroundImage
 			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
 			        backgroundImage.getHeight());
 			
 			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+			        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			// get overlay from the backgroundImage
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
 			        overlayRect.width, overlayRect.height), 0, 0, width, height, null);
 			g2d.dispose();
@@ -110,7 +114,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		if (properties.status == Status.Paused) {
 			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
 			getDrawer().showHiScores = getDrawer().showPauseIcon;
-			repaint();
+			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		} else {
 			getDrawer().showPauseIcon = false;
 		}
@@ -126,14 +130,14 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		} else {
 			getDrawer().blinkColor = fullColor;
 		}
-		repaint();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	/* Events */
 	@Override
 	public void boardChanged(GameEvent event) {
 		properties.board = event.getBoard();
-		repaint();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override
@@ -171,7 +175,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		// if the main canvas is not created or the size changed
 		if (null == canvas || canvas.getWidth() != size.width || canvas.getHeight() != size.height) {
 			// create the new main canvas
-			canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+			canvas = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_RGB);
 			needForUpdate = true;
 		}
 		
@@ -191,11 +195,15 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		        gameFieldRect.height, properties);
 		
 		// draw the gamefield
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 		g2d.drawImage(gameField, gameFieldRect.x, gameFieldRect.y, null);
 		
 		// draw the device background
 		if (backgroundImage != null) {
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 			if (needForUpdate) {
+				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+				        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
 			} else {
 				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
@@ -208,7 +216,6 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		/* Component graphics */
 		super.paintComponent(g);
 		g2d = (Graphics2D) g.create();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.drawRenderedImage(canvas, null);
 		g2d.dispose();
 	}

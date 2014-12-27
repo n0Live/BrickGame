@@ -22,6 +22,7 @@ import static com.kry.brickgame.UI.UIConsts.bgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -31,6 +32,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -220,12 +222,9 @@ public final class Drawer {
 		if (targetCanvas == null || sourceCanvas == null) return;
 		
 		Graphics2D g2d = targetCanvas.createGraphics();
+		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 		
-		// no more than the size of the target canvas
-		int width = Math.min(sourceCanvas.getWidth(), targetCanvas.getWidth());
-		int height = Math.min(sourceCanvas.getHeight(), targetCanvas.getHeight());
-		
-		g2d.drawImage(sourceCanvas, x, y, width, height, null);
+		g2d.drawImage(sourceCanvas, x, y, null);
 		
 		g2d.dispose();
 	}
@@ -292,7 +291,6 @@ public final class Drawer {
 	 */
 	private static void clearCanvas(BufferedImage canvas, Color bgColor) {
 		if (canvas == null) return;
-		
 		Graphics2D g2d = canvas.createGraphics();
 		
 		g2d.setBackground(bgColor);
@@ -403,14 +401,15 @@ public final class Drawer {
 	 * @return {@code null} if the board is not defined, otherwise - the new
 	 *         canvas
 	 */
-	private static BufferedImage initCanvas(Board board, int squareSideLength, float borderLineWidth) {
+	private static BufferedImage initCanvas(BufferedImage canvas, Board board,
+	        int squareSideLength, float borderLineWidth) {
 		if (board == null) return null;
 		
 		int border = (int) borderLineWidth;
 		
 		// increasing the width and height of the canvas by the thickness of the
 		// border line on each side
-		return initCanvas(boardWidthInPixels(board, squareSideLength) + border * 2,
+		return initCanvas(canvas, boardWidthInPixels(board, squareSideLength) + border * 2,
 		        boardHeightInPixels(board, squareSideLength) + border * 2);
 	}
 	
@@ -422,8 +421,13 @@ public final class Drawer {
 	 * @param height
 	 *            height of the created canvas
 	 */
-	private static BufferedImage initCanvas(int width, int height) {
-		BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+	private static BufferedImage initCanvas(BufferedImage canvas, int width, int height) {
+		BufferedImage result;
+		if (null == canvas || canvas.getWidth() != width || canvas.getHeight() != height) {
+			result = UIUtils.getCompatibleImage(width, height, Transparency.OPAQUE);
+		} else {
+			result = canvas;
+		}
 		clearCanvas(result, bgColor);
 		
 		return result;
@@ -519,7 +523,7 @@ public final class Drawer {
 	 * @return line width for a border line
 	 */
 	private float calcBorderLineWidth() {
-		// return squareSideLength/4 if then less than 4 or 4 otherwise
+		// return squareSideLength/4 if then less than 8 or 8 otherwise
 		return Math.min(squareSideLength / 4, 4);
 	}
 	
@@ -542,9 +546,9 @@ public final class Drawer {
 		// shift from the beginning of the canvas to avoid the border
 		int shift = Math.round(borderLineWidth);
 		
-		BufferedImage fullSquare = drawSquare(Cell.Full, borderLineWidth / 2);
-		BufferedImage emptySquare = drawSquare(Cell.Empty, borderLineWidth / 2);
-		BufferedImage blinkSquare = drawSquare(Cell.Blink, borderLineWidth / 2);
+		BufferedImage fullSquare = drawSquare(Cell.Full, borderLineWidth * 0.75f);
+		BufferedImage emptySquare = drawSquare(Cell.Empty, borderLineWidth * 0.75f);
+		BufferedImage blinkSquare = drawSquare(Cell.Blink, borderLineWidth * 0.75f);
 		
 		Graphics2D g2d = canvas.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -842,7 +846,6 @@ public final class Drawer {
 	 */
 	private void updateCanvas(BufferedImage canvas, Board board, float borderLineWidth) {
 		if (canvas == null) return;
-		
 		drawBoardOnCanvas(canvas, board, borderLineWidth);
 	}
 	
@@ -865,11 +868,12 @@ public final class Drawer {
 		// calculate size of a one square
 		squareSideLength = d.height / (properties.board.getHeight() + 1);
 		
-		canvas = initCanvas(d.width, d.height);
+		canvas = initCanvas(canvas, d.width, d.height);
 		
 		float borderLineWidth = calcBorderLineWidth();
-		boardCanvas = initCanvas(properties.board, squareSideLength, borderLineWidth);
-		previewCanvas = initCanvas(properties.preview, squareSideLength, borderLineWidth);
+		boardCanvas = initCanvas(boardCanvas, properties.board, squareSideLength, borderLineWidth);
+		previewCanvas = initCanvas(previewCanvas, properties.preview, squareSideLength,
+		        borderLineWidth);
 		
 		if (boardCanvas != null && previewCanvas != null) {
 			// draw the board and the preview
@@ -880,7 +884,7 @@ public final class Drawer {
 			drawComingSoonStatus(boardCanvas, properties.status);
 			
 			int space = squareSideLength / 2;
-			labelsCanvas = initCanvas(d.width - (boardCanvas.getWidth() + space),
+			labelsCanvas = initCanvas(labelsCanvas, d.width - (boardCanvas.getWidth() + space),
 			        boardCanvas.getHeight());
 			// append labels and icons
 			drawLabelsAndIcons(labelsCanvas, properties);
