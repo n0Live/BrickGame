@@ -103,7 +103,7 @@ public class SplashScreen extends Game {
 			year = Integer.parseInt(dateFormat.format(calendar.getTime())) + 1;
 		} else if (calendar.get(Calendar.MONTH) == Calendar.JANUARY
 		        && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
-			year = Integer.valueOf(dateFormat.format(calendar.getTime()));
+			year = Integer.parseInt(dateFormat.format(calendar.getTime()));
 		}
 		
 		char[] numbers;
