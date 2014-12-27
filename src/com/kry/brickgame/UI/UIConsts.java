@@ -77,8 +77,8 @@ public class UIConsts {
 	protected static final int TYPICAL_DEVICE_WIDTH = 1080;
 	protected static final int TYPICAL_DEVICE_HEIGHT = (int) (TYPICAL_DEVICE_WIDTH * DEVICE_ASPECT_RATIO);
 	
-	protected final static int MIN_WIDTH = 187;
-	protected final static int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
+	protected static final int MIN_WIDTH = 187;
+	protected static final int MIN_HEIGHT = (int) (MIN_WIDTH * DEVICE_ASPECT_RATIO);
 	// Insets
 	static final int INSET_TOP = 5;
 	static final int INSET_LEFT = 45;
@@ -105,4 +105,19 @@ public class UIConsts {
 	 * Start button size
 	 */
 	static final int START_BTN_SIZE = 120;
+	/**
+	 * The ratio of the width of the outer device's frame to the whole width of
+	 * the device
+	 */
+	static final float outBorderSpaceRatio = (float) 1 / 12;
+	/**
+	 * The ratio of the width of the side inner (gamefield) device's frame to
+	 * the whole width of the device
+	 */
+	static final float inBorderHorSpaceRatio = (float) 1 / 18;
+	/**
+	 * The ratio of the width of the top inner (gamefield) device's frame to the
+	 * whole width of the device
+	 */
+	static final float inBorderVertSpaceRatio = (float) 1 / 18;
 }

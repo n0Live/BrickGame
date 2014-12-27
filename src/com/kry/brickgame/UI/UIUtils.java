@@ -3,6 +3,7 @@ package com.kry.brickgame.UI;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URI;
@@ -21,7 +22,7 @@ public class UIUtils {
 	 * @return inverted black&white color
 	 */
 	protected static Color getBWInverted(Color c) {
-		return (isDarkColor(c) ? Color.white : Color.black);
+		return isDarkColor(c) ? Color.white : Color.black;
 	}
 	
 	/**
@@ -55,10 +56,10 @@ public class UIUtils {
 		float originalAspectRatio = (float) d.height / d.width;
 		
 		// rounding to the nearest highest integer
-		int calcWidth = (originalAspectRatio >= aspectRatio) ? d.width : (int) Math.ceil(d.height
-				/ aspectRatio);
-		int calcHeight = (originalAspectRatio <= aspectRatio) ? d.height : (int) Math.ceil(d.width
-				* aspectRatio);
+		int calcWidth = originalAspectRatio >= aspectRatio ? d.width : (int) Math.ceil(d.height
+		        / aspectRatio);
+		int calcHeight = originalAspectRatio <= aspectRatio ? d.height : (int) Math.ceil(d.width
+		        * aspectRatio);
 		
 		return new Dimension(calcWidth, calcHeight);
 	}
@@ -71,7 +72,7 @@ public class UIUtils {
 	 * @return enhanced color
 	 */
 	protected static Color getEnhanced(Color c) {
-		return (isDarkColor(c)) ? c.darker() : c.brighter();
+		return isDarkColor(c) ? c.darker() : c.brighter();
 	}
 	
 	/**
@@ -85,6 +86,41 @@ public class UIUtils {
 	 */
 	protected static String getFormatedPercent(int value, int whole) {
 		return String.format(Locale.ENGLISH, "%f%%", getPercent(value, whole));
+	}
+	
+	/**
+	 * Returns a rectangle indicating the position of the gamefield on the main
+	 * canvas
+	 * 
+	 * @param canvasSize
+	 *            size of the main canvas
+	 * @return a rectangle indicating the position of the gamefield
+	 */
+	protected static Rectangle getGameFieldRectangle(Dimension canvasSize) {
+		int outBorderSpace = Math.round(canvasSize.width * UIConsts.outBorderSpaceRatio);
+		int inBorderHorSpace = Math.round(canvasSize.width * UIConsts.inBorderHorSpaceRatio);
+		int inBorderVertSpace = Math.round(canvasSize.width * UIConsts.inBorderVertSpaceRatio);
+		
+		int x = outBorderSpace + inBorderHorSpace;
+		int y = outBorderSpace + inBorderVertSpace;
+		int width = canvasSize.width - (outBorderSpace + inBorderHorSpace) * 2;
+		int height = Math.round(width * UIConsts.GAME_FIELD_ASPECT_RATIO);
+		
+		return new Rectangle(x, y, width, height);
+	}
+	
+	/**
+	 * Returns a rectangle indicating the position of the gamefield on the main
+	 * canvas
+	 * 
+	 * @param width
+	 *            width of the main canvas
+	 * @param height
+	 *            height of the main canvas
+	 * @return a rectangle indicating the position of the gamefield
+	 */
+	protected static Rectangle getGameFieldRectangle(int width, int height) {
+		return getGameFieldRectangle(new Dimension(width, height));
 	}
 	
 	/**
@@ -125,7 +161,7 @@ public class UIUtils {
 		float pRight = getPercent(right, UIConsts.TYPICAL_DEVICE_WIDTH);
 		
 		return String.format(Locale.ENGLISH, "insets %f%% %f%% %f%% %f%%", pTop, pLeft, pBottom,
-				pRight);
+		        pRight);
 	}
 	
 	/**
@@ -154,7 +190,7 @@ public class UIUtils {
 	 * @return percent of the {@code value} in the {@code whole}
 	 */
 	protected static float getPercent(int value, int whole) {
-		return ((float) value * 100 / whole);
+		return (float) value * 100 / whole;
 	}
 	
 	/**
@@ -165,7 +201,7 @@ public class UIUtils {
 	 * @return reduced color
 	 */
 	protected static Color getReduced(Color c) {
-		return (isDarkColor(c)) ? c.brighter() : c.darker();
+		return isDarkColor(c) ? c.brighter() : c.darker();
 	}
 	
 	/**
@@ -182,7 +218,7 @@ public class UIUtils {
 		
 		// if brightness of all color components less then half of max
 		// brightness
-		return (r + g + b) < (255 * 3) / 2;
+		return r + g + b < 255 * 3 / 2;
 	}
 	
 	/**

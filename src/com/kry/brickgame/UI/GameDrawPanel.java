@@ -2,7 +2,6 @@ package com.kry.brickgame.UI;
 
 import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.Drawer.getDrawer;
-import static com.kry.brickgame.UI.UIConsts.TYPICAL_DEVICE_WIDTH;
 import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
@@ -10,13 +9,15 @@ import static com.kry.brickgame.UI.UIConsts.fullColor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputListener;
 
 import com.kry.brickgame.games.GameConsts.Status;
@@ -28,9 +29,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	private static final long serialVersionUID = 1007369595836803061L;
 	
 	private final GameProperties properties;
-	
 	transient private BufferedImage canvas;
+	
 	transient private final BufferedImage backgroundImage;
+	
+	transient private BufferedImage overlay;
 	
 	private Dimension size;
 	
@@ -48,30 +51,55 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		
 		backgroundImage = UIUtils.getImage("/images/background.png");
 		
-		new Timer("BlinkingSquares", true).schedule(new TimerTask() {
+		// BlinkingSquares and BlinkingPause
+		new Timer(50, new ActionListener() {
+			final int tikToBlinkPause = 10;
+			int blinkCount = 0;
+			
 			@Override
-			public void run() {
+			public void actionPerformed(ActionEvent e) {
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						blinkingSquares();
+						if (blinkCount >= tikToBlinkPause) {
+							blinkCount = 0;
+							blinkingPauseIcon();
+						} else {
+							blinkCount++;
+						}
 					}
 				});
 			}
-		}, 0, 10);
-		
-		new Timer("BlinkingPause", true).schedule(new TimerTask() {
-			@Override
-			public void run() {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						blinkingPauseIcon();
-					}
-				});
-			}
-		}, 0, 500);
-		
+		}).start();
+	}
+	
+	/**
+	 * Returns the overlay image for drawing it above the gamefield
+	 * 
+	 * @param width
+	 *            width of the overlay
+	 * @param height
+	 *            height of the overlay
+	 * @return the overlay image
+	 */
+	private BufferedImage getOverlayImage(int width, int height) {
+		if (null == backgroundImage) return overlay = null;
+		// update overlay only if necessary
+		if (null == overlay || overlay.getWidth() != width || overlay.getHeight() != height) {
+			overlay = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			// calculating the overlay position on the backgroundImage
+			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
+			        backgroundImage.getHeight());
+			
+			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			// get overlay from the backgroundImage
+			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
+			        overlayRect.width, overlayRect.height), 0, 0, width, height, null);
+			g2d.dispose();
+		}
+		return overlay;
 	}
 	
 	/**
@@ -82,10 +110,10 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		if (properties.status == Status.Paused) {
 			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
 			getDrawer().showHiScores = getDrawer().showPauseIcon;
+			repaint();
 		} else {
 			getDrawer().showPauseIcon = false;
 		}
-		repaint();
 	}
 	
 	/**
@@ -105,6 +133,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void boardChanged(GameEvent event) {
 		properties.board = event.getBoard();
+		repaint();
 	}
 	
 	@Override
@@ -136,22 +165,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void paintComponent(Graphics g) {
-		final float outBorderSpaceFactor = (float) 1 / 12;
-		final float inBorderHorSpaceFactor = (float) 1 / 18;
-		final float inBorderVertSpaceFactor = (float) 1 / 18;
 		boolean needForUpdate = false;
 		size = getSize();
-		
-		// prepare the gamefield
-		int outBorderSpace = Math.round(size.width * outBorderSpaceFactor);
-		int inBorderHorSpace = Math.round(size.width * inBorderHorSpaceFactor);
-		int inBorderVertSpace = Math.round(size.width * inBorderVertSpaceFactor);
-		int gameFieldWidth = size.width - (outBorderSpace + inBorderHorSpace) * 2;
-		int gameFieldHeight = Math.round(gameFieldWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
-		int gameFieldX = outBorderSpace + inBorderHorSpace;
-		int gameFieldY = outBorderSpace + inBorderVertSpace;
-		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldWidth, gameFieldHeight,
-		        properties);
 		
 		// if the main canvas is not created or the size changed
 		if (null == canvas || canvas.getWidth() != size.width || canvas.getHeight() != size.height) {
@@ -170,30 +185,21 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			g2d.clearRect(0, 0, size.width, size.height);
 		}
 		
-		// draw gamefield
-		g2d.drawImage(gameField, gameFieldX, gameFieldY, gameField.getWidth(),
-		        gameField.getHeight(), this);
+		// prepare the gamefield
+		Rectangle gameFieldRect = UIUtils.getGameFieldRectangle(size);
+		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldRect.width,
+		        gameFieldRect.height, properties);
 		
-		// draw device
+		// draw the gamefield
+		g2d.drawImage(gameField, gameFieldRect.x, gameFieldRect.y, null);
+		
+		// draw the device background
 		if (backgroundImage != null) {
 			if (needForUpdate) {
-				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, this);
+				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
 			} else {
-				int overlayOutBorderSpace = Math.round(TYPICAL_DEVICE_WIDTH * outBorderSpaceFactor);
-				int overlayInBorderHorSpace = Math.round(TYPICAL_DEVICE_WIDTH
-				        * inBorderHorSpaceFactor);
-				int overlayInBorderVertSpace = Math.round(TYPICAL_DEVICE_WIDTH
-				        * inBorderVertSpaceFactor);
-				int overlayX = overlayOutBorderSpace + overlayInBorderHorSpace;
-				int overlayY = overlayOutBorderSpace + overlayInBorderVertSpace;
-				int overlayWidth = TYPICAL_DEVICE_WIDTH
-				        - (overlayOutBorderSpace + overlayInBorderHorSpace) * 2;
-				int overlayHeight = Math.round(overlayWidth * UIConsts.GAME_FIELD_ASPECT_RATIO);
-				
-				BufferedImage overlay = backgroundImage.getSubimage(overlayX, overlayY,
-				        overlayWidth, overlayHeight);
-				g2d.drawImage(overlay, gameFieldX, gameFieldY, gameField.getWidth(),
-				        gameField.getHeight(), this);
+				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
+				        gameFieldRect.x, gameFieldRect.y, null);
 			}
 		}
 		
@@ -201,9 +207,10 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		
 		/* Component graphics */
 		super.paintComponent(g);
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		        RenderingHints.VALUE_ANTIALIAS_ON);
-		((Graphics2D) g).drawRenderedImage(canvas, null);
+		g2d = (Graphics2D) g.create();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.drawRenderedImage(canvas, null);
+		g2d.dispose();
 	}
 	
 	@Override
