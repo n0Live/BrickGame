@@ -12,9 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
-import java.awt.Paint;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -100,12 +98,9 @@ public class ButtonsFactory {
 		
 		@Override
 		protected void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D) g;
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g.create();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
 			
 			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
 			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
@@ -115,10 +110,7 @@ public class ButtonsFactory {
 			g2d.drawLine(GAP, GAP, sideLength - GAP, sideLength - GAP);
 			g2d.drawLine(GAP, sideLength - GAP, sideLength - GAP, GAP);
 			
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-			super.paintComponent(g2d);
+			g2d.dispose();
 		}
 		
 	}
@@ -142,12 +134,9 @@ public class ButtonsFactory {
 		
 		@Override
 		protected void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D) g;
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g.create();
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			
-			// save previous graphical properties for the further restore
-			Stroke oldStroke = g2d.getStroke();
-			Paint oldPaint = g2d.getPaint();
 			
 			g2d.setColor(isMouseOver ? lineOverColor : lineNormalColor);
 			g2d.setStroke(isMouseOver ? lineOverStroke : lineNormaStroke);
@@ -156,10 +145,7 @@ public class ButtonsFactory {
 			
 			g2d.drawLine(GAP, sideLength - GAP, sideLength - GAP, sideLength - GAP);
 			
-			// restore properties from the backup
-			g2d.setStroke(oldStroke);
-			g2d.setPaint(oldPaint);
-			super.paintComponent(g2d);
+			g2d.dispose();
 		}
 	}
 	
@@ -324,7 +310,7 @@ public class ButtonsFactory {
 			boolean firstCompare = true;
 			
 			// search in the map of keyboard shortcuts
-			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.keycodeMap.entrySet()){
+			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.keycodeMap.entrySet()) {
 				if (entry.getValue() == key) {
 					isCompare = true;
 					if (firstCompare) {

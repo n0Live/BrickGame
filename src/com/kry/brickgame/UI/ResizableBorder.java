@@ -10,10 +10,8 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 import javax.swing.border.Border;
@@ -65,26 +63,20 @@ public class ResizableBorder implements Border {
 	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 		// calculate the resize triangle size
-		triangleSize = (width / 20);
+		triangleSize = width / 20;
 		
-		Graphics2D g2d = (Graphics2D) g;
+		Graphics2D g2d = (Graphics2D) g.create();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		
-		// save previous graphical properties for the further restore
-		Stroke oldStroke = g2d.getStroke();
-		Paint oldPaint = g2d.getPaint();
 		
 		g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
 		g2d.setPaint(mouseOver ? resizerOverColor : resizerNormalColor);
 		
 		// drawing three lines (or two lines and dot?)
 		g2d.drawLine(width - triangleSize, height, width, height - triangleSize);
-		g2d.drawLine(width - (triangleSize * 2 / 3), height, width, height - (triangleSize * 2 / 3));
-		g2d.drawLine(width - (triangleSize / 3), height, width, height - (triangleSize / 3));
+		g2d.drawLine(width - triangleSize * 2 / 3, height, width, height - triangleSize * 2 / 3);
+		g2d.drawLine(width - triangleSize / 3, height, width, height - triangleSize / 3);
 		
-		// restore properties from the backup
-		g2d.setStroke(oldStroke);
-		g2d.setPaint(oldPaint);
+		g2d.dispose();
 	}
 	
 }
