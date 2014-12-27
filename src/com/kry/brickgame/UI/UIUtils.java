@@ -3,9 +3,14 @@ package com.kry.brickgame.UI;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -23,6 +28,40 @@ public class UIUtils {
 	 */
 	protected static Color getBWInverted(Color c) {
 		return isDarkColor(c) ? Color.white : Color.black;
+	}
+	
+	/**
+	 * Returns a {@code BufferedImage} that supports the specified transparency
+	 * and has a data layout and color model compatible with default
+	 * {@code GraphicsConfiguration}.
+	 * 
+	 * @param width
+	 *            the width of the returned BufferedImage
+	 * @param height
+	 *            the height of the returned BufferedImage
+	 * @param transparency
+	 *            the specified transparency mode.<br>
+	 *            {@code transparency = 0} for the completely opaque image.
+	 * @return a <code>BufferedImage</code> whose data layout and color model is
+	 *         compatible with this <code>GraphicsConfiguration</code> and also
+	 *         supports the specified transparency.
+	 * @throws IllegalArgumentException
+	 *             if the transparency is not a valid value
+	 * @see Transparency#OPAQUE
+	 * @see Transparency#BITMASK
+	 * @see Transparency#TRANSLUCENT
+	 */
+	protected static BufferedImage getCompatibleImage(int width, int height, int transparency) {
+		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device = env.getDefaultScreenDevice();
+		GraphicsConfiguration config = device.getDefaultConfiguration();
+		BufferedImage result;
+		if (transparency != 0) {
+			result = config.createCompatibleImage(width, height, transparency);
+		} else {
+			result = config.createCompatibleImage(width, height);
+		}
+		return result;
 	}
 	
 	/**
@@ -133,8 +172,8 @@ public class UIUtils {
 	 *         source, or null.
 	 */
 	protected static BufferedImage getImage(String source) {
-		try {
-			return ImageIO.read(UIConsts.class.getResourceAsStream(source));
+		try (InputStream inputStream = UIUtils.class.getResourceAsStream(source)) {
+			return ImageIO.read(inputStream);
 		} catch (IOException | IllegalArgumentException e) {
 			e.printStackTrace();
 			return null;
