@@ -48,10 +48,6 @@ public abstract class Game implements Runnable, Serializable {
 	
 	transient final static Object lock = new Object();
 	
-	public static synchronized void addGameListener(GameListener listener) {
-		listeners.add(listener);
-	}
-	
 	protected static void fireMuteChanged(boolean mute) {
 		GameEvent event = new GameEvent(Game.class, mute);
 		for (GameListener listener : listeners) {
@@ -59,12 +55,16 @@ public abstract class Game implements Runnable, Serializable {
 		}
 	}
 	
-	public static synchronized GameListener[] getGameListeners() {
-		return listeners.toArray(new GameListener[listeners.size()]);
-	}
-	
 	protected static boolean isMuted() {
 		return mute;
+	}
+	
+	public static synchronized void addGameListener(GameListener listener) {
+		listeners.add(listener);
+	}
+	
+	public static synchronized GameListener[] getGameListeners() {
+		return listeners.toArray(new GameListener[listeners.size()]);
 	}
 	
 	public static synchronized void removeGameListener(GameListener listener) {
@@ -88,6 +88,12 @@ public abstract class Game implements Runnable, Serializable {
 	 * Speed
 	 */
 	private int speed;
+	/**
+	 * Cached value of the genuine speed.
+	 * <p>
+	 * If it's equals to {@code -1} that means not cached values yet.
+	 */
+	private int cachedGenuineSpeed;
 	/**
 	 * Level
 	 */
@@ -159,6 +165,37 @@ public abstract class Game implements Runnable, Serializable {
 	
 	/**
 	 * The Game
+	 * 
+	 * @param speed
+	 *            initial value of the speed
+	 * @param level
+	 *            initial value of the level
+	 * @param board
+	 *            main board
+	 * @param preview
+	 *            preview board
+	 * @param rotation
+	 *            direction of rotation
+	 * @param type
+	 *            type of the game
+	 */
+	protected Game(int speed, int level, Board board, Board preview, Rotation rotation, int type) {
+		this(speed, level, rotation, type);
+		
+		setBoard(board);
+		setPreview(preview);
+		
+		boardWidth = board.getWidth();
+		boardHeight = board.getHeight();
+		previewWidth = preview.getWidth();
+		previewHeight = preview.getHeight();
+		
+		clearBoard();
+		clearPreview();
+	}
+	
+	/**
+	 * The Game
 	 */
 	public Game() {
 		r = new Random();
@@ -180,37 +217,6 @@ public abstract class Game implements Runnable, Serializable {
 		curY = 0;
 		
 		timePoint = System.currentTimeMillis();
-		
-		boardWidth = board.getWidth();
-		boardHeight = board.getHeight();
-		previewWidth = preview.getWidth();
-		previewHeight = preview.getHeight();
-		
-		clearBoard();
-		clearPreview();
-	}
-	
-	/**
-	 * The Game
-	 * 
-	 * @param speed
-	 *            initial value of the speed
-	 * @param level
-	 *            initial value of the level
-	 * @param board
-	 *            main board
-	 * @param preview
-	 *            preview board
-	 * @param rotation
-	 *            direction of rotation
-	 * @param type
-	 *            type of the game
-	 */
-	protected Game(int speed, int level, Board board, Board preview, Rotation rotation, int type) {
-		this(speed, level, rotation, type);
-		
-		setBoard(board);
-		setPreview(preview);
 		
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
@@ -316,7 +322,7 @@ public abstract class Game implements Runnable, Serializable {
 		
 		playEffect(Effects.remove_line);
 		
-		while ((x1 >= 0) || (x2 < board.getWidth())) {
+		while (x1 >= 0 || x2 < board.getWidth()) {
 			if (x1 >= 0) {
 				board.setCell(Cell.Empty, x1--, y);
 			}
@@ -379,7 +385,7 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected boolean elapsedTime(int millis) {
 		long nowTime = System.currentTimeMillis();
-		boolean result = ((nowTime - timePoint) >= millis);
+		boolean result = nowTime - timePoint >= millis;
 		if (result) {
 			timePoint = nowTime;
 		}
@@ -405,8 +411,8 @@ public abstract class Game implements Runnable, Serializable {
 	
 	protected void fireBoardChanged(Board board) {
 		if (!Thread.currentThread().isInterrupted()) {
-			GameEvent event = new GameEvent(this, (isInvertedBoard() ? getInvertedBoard(board)
-					: board), false);
+			GameEvent event = new GameEvent(this, isInvertedBoard() ? getInvertedBoard(board)
+			        : board, false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
 			}
@@ -544,7 +550,7 @@ public abstract class Game implements Runnable, Serializable {
 	 * @return speed level 1-10
 	 */
 	protected int getSpeed() {
-		return getSpeed(false);
+		return speed;
 	}
 	
 	/**
@@ -556,12 +562,16 @@ public abstract class Game implements Runnable, Serializable {
 	 *         speed level 1-10
 	 */
 	protected int getSpeed(boolean genuine) {
-		if (genuine)
-		// getting a uniform distribution from FIRST_LEVEL_SPEED to
-		// TENTH_LEVEL_SPEED
-			return Math.round(getSpeedOfFirstLevel()
-					- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
-					* (speed - 1));
+		if (genuine) {
+			// getting a uniform distribution from FIRST_LEVEL_SPEED to
+			// TENTH_LEVEL_SPEED
+			if (cachedGenuineSpeed < 0) {
+				cachedGenuineSpeed = Math.round(getSpeedOfFirstLevel()
+				        - (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
+				        * (speed - 1));
+			}
+			return cachedGenuineSpeed;
+		}
 		return speed;
 	}
 	
@@ -621,46 +631,46 @@ public abstract class Game implements Runnable, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-					// 0
-					{ F, F, F },//
-					{ F, E, F },//
-					{ F, F, F } }, {
-					// 1
-					{ F, F, F, F, F },//
-					{ F, E, E, E, F },//
-					{ F, E, E, E, F },//
-					{ F, E, E, E, F },//
-					{ F, F, F, F, F } }, {
-					// 2
-					{ F, E, F, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, E, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, F, E, F } }, {
-					// 3
-					{ F, E, F, E, F },//
-					{ E, F, F, F, E },//
-					{ F, F, E, F, F },//
-					{ E, F, F, F, E },//
-					{ F, E, F, E, F } }, {
-					// 4
-					{ E, E, E, E, E },//
-					{ E, F, F, F, E },//
-					{ E, F, E, F, E },//
-					{ E, F, F, F, E },//
-					{ E, E, E, E, E } }, {
-					// 5
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, F, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }, {
-					// 6
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }
+			        // 0
+			        { F, F, F },//
+			        { F, E, F },//
+			        { F, F, F } }, {
+			        // 1
+			        { F, F, F, F, F },//
+			        { F, E, E, E, F },//
+			        { F, E, E, E, F },//
+			        { F, E, E, E, F },//
+			        { F, F, F, F, F } }, {
+			        // 2
+			        { F, E, F, E, F },//
+			        { E, E, E, E, E },//
+			        { F, E, E, E, F },//
+			        { E, E, E, E, E },//
+			        { F, E, F, E, F } }, {
+			        // 3
+			        { F, E, F, E, F },//
+			        { E, F, F, F, E },//
+			        { F, F, E, F, F },//
+			        { E, F, F, F, E },//
+			        { F, E, F, E, F } }, {
+			        // 4
+			        { E, E, E, E, E },//
+			        { E, F, F, F, E },//
+			        { E, F, E, F, E },//
+			        { E, F, F, F, E },//
+			        { E, E, E, E, E } }, {
+			        // 5
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, F, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E } }, {
+			        // 6
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E } }
 			
 			};
 			
@@ -677,8 +687,8 @@ public abstract class Game implements Runnable, Serializable {
 			void blast(int x, int y, int wave) {
 				// converts the coordinates of the epicenter to the coordinates
 				// of the lower left corner
-				int lowerLeftX = x - (waves[wave][0].length / 2);
-				int lowerLeftY = y - (waves[wave].length / 2);
+				int lowerLeftX = x - waves[wave][0].length / 2;
+				int lowerLeftY = y - waves[wave].length / 2;
 				
 				setBoard(insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY));
 				sleep(ANIMATION_DELAY * 2);
@@ -695,16 +705,16 @@ public abstract class Game implements Runnable, Serializable {
 		int newY = y;
 		
 		// if the explosion leave off the board, move the epicenter point
-		while ((newX - EXPLODE_SIZE / 2) < 0) {
+		while (newX - EXPLODE_SIZE / 2 < 0) {
 			newX++;
 		}
-		while ((newX - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardWidth) {
+		while (newX - EXPLODE_SIZE / 2 + EXPLODE_SIZE > boardWidth) {
 			newX--;
 		}
-		while ((newY - EXPLODE_SIZE / 2) < 0) {
+		while (newY - EXPLODE_SIZE / 2 < 0) {
 			newY++;
 		}
-		while ((newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE) > boardHeight) {
+		while (newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE > boardHeight) {
 			newY--;
 		}
 		
@@ -718,63 +728,6 @@ public abstract class Game implements Runnable, Serializable {
 				processKeys();
 				if (Thread.currentThread().isInterrupted()) return;
 			}
-		}
-	}
-	
-	/**
-	 * Processing key pressing
-	 * 
-	 * @param key
-	 *            keyCode associated with the pressed key
-	 */
-	public void keyPressed(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown) {
-				keys.add(KeyPressed.KeyUp);
-				return;
-			}
-			if (key == KeyPressed.KeyUp) {
-				keys.add(KeyPressed.KeyDown);
-				return;
-			}
-		}
-		keys.add(key);
-	}
-	
-	/**
-	 * Processing key releasing
-	 * 
-	 * @param key
-	 *            keyCode associated with the released key
-	 */
-	public void keyReleased(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown) {
-				keys.remove(KeyPressed.KeyUp);
-			} else if (key == KeyPressed.KeyUp) {
-				keys.remove(KeyPressed.KeyDown);
-			} else {
-				keys.remove(key);
-			}
-		} else {
-			keys.remove(key);
-		}
-	}
-	
-	/**
-	 * Pause
-	 */
-	public void pause() {
-		if (getStatus() == Status.Running) {
-			// send score
-			fireInfoChanged(String.valueOf(score));
-			// send high score
-			fireInfoChanged(String.valueOf("HI" + setHiScore()));
-			
-			setStatus(Status.Paused);
-			stopAllSounds();
 		}
 	}
 	
@@ -828,42 +781,6 @@ public abstract class Game implements Runnable, Serializable {
 			GameLoader.deleteSavedGame();
 		}
 		fireExit();
-	}
-	
-	/**
-	 * Resume
-	 */
-	public void resume() {
-		if (getStatus() == Status.Paused) {
-			setStatus(Status.Running);
-		}
-	}
-	
-	@Override
-	public void run() {
-		fireBoardChanged(board);
-		firePreviewChanged(preview);
-		fireSpeedChanged(speed);
-		fireLevelChanged(level);
-		fireRotationChanged(rotation);
-		fireMuteChanged(mute);
-		fireStatusChanged(status);
-		fireInfoChanged(String.valueOf(score));
-		fireInfoChanged(String.valueOf("HI" + getHiScore()));
-	}
-	
-	/**
-	 * Save state of the current game
-	 * 
-	 * @return {@code true} - when success, {@code false} - otherwise
-	 */
-	public boolean saveState() {
-		if (!(this instanceof GameSelector || this instanceof SplashScreen)
-				&& (getStatus() == Status.Running || getStatus() == Status.Paused)) {
-			setStatus(Status.Paused);
-			return GameLoader.saveGame(this);
-		}
-		return false;
 	}
 	
 	/**
@@ -963,6 +880,7 @@ public abstract class Game implements Runnable, Serializable {
 		} else {
 			this.speed = speed;
 		}
+		cachedGenuineSpeed = -1;
 		fireSpeedChanged(this.speed);
 	}
 	
@@ -976,6 +894,99 @@ public abstract class Game implements Runnable, Serializable {
 	protected void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
+	}
+	
+	/**
+	 * Processing key pressing
+	 * 
+	 * @param key
+	 *            keyCode associated with the pressed key
+	 */
+	public void keyPressed(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.add(KeyPressed.KeyUp);
+				return;
+			}
+			if (key == KeyPressed.KeyUp) {
+				keys.add(KeyPressed.KeyDown);
+				return;
+			}
+		}
+		keys.add(key);
+	}
+	
+	/**
+	 * Processing key releasing
+	 * 
+	 * @param key
+	 *            keyCode associated with the released key
+	 */
+	public void keyReleased(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.remove(KeyPressed.KeyUp);
+			} else if (key == KeyPressed.KeyUp) {
+				keys.remove(KeyPressed.KeyDown);
+			} else {
+				keys.remove(key);
+			}
+		} else {
+			keys.remove(key);
+		}
+	}
+	
+	/**
+	 * Pause
+	 */
+	public void pause() {
+		if (getStatus() == Status.Running) {
+			// send score
+			fireInfoChanged(String.valueOf(score));
+			// send high score
+			fireInfoChanged(String.valueOf("HI" + setHiScore()));
+			
+			setStatus(Status.Paused);
+			stopAllSounds();
+		}
+	}
+	
+	/**
+	 * Resume
+	 */
+	public void resume() {
+		if (getStatus() == Status.Paused) {
+			setStatus(Status.Running);
+		}
+	}
+	
+	@Override
+	public void run() {
+		fireBoardChanged(board);
+		firePreviewChanged(preview);
+		fireSpeedChanged(speed);
+		fireLevelChanged(level);
+		fireRotationChanged(rotation);
+		fireMuteChanged(mute);
+		fireStatusChanged(status);
+		fireInfoChanged(String.valueOf(score));
+		fireInfoChanged(String.valueOf("HI" + getHiScore()));
+	}
+	
+	/**
+	 * Save state of the current game
+	 * 
+	 * @return {@code true} - when success, {@code false} - otherwise
+	 */
+	public boolean saveState() {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)
+		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
+			setStatus(Status.Paused);
+			return GameLoader.saveGame(this);
+		}
+		return false;
 	}
 	
 }

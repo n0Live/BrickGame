@@ -71,6 +71,13 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	private int[][] coords;
 	
+	private Integer minX;
+	private Integer maxX;
+	private Integer minY;
+	private Integer maxY;
+	private Integer width;
+	private Integer height;
+	
 	/**
 	 * Constructor of the shape
 	 * 
@@ -95,6 +102,7 @@ public class Shape implements Cloneable, Serializable {
 		coords = new int[length][2];
 		this.rotationAngle = rotationAngle;
 		this.fill = fill;
+		resetCachedValues();
 	}
 	
 	/**
@@ -112,6 +120,19 @@ public class Shape implements Cloneable, Serializable {
 		for (int i = 0; i < aShape.coords.length; i++) {
 			coords[i] = aShape.coords[i].clone();
 		}
+		resetCachedValues();
+	}
+	
+	/**
+	 * Sets the cached values, like minX, maxX, width etc., to {@code null}
+	 */
+	private void resetCachedValues() {
+		minX = null;
+		maxX = null;
+		minY = null;
+		maxY = null;
+		width = null;
+		height = null;
 	}
 	
 	/**
@@ -136,6 +157,7 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	protected void setX(int index, int x) {
 		coords[index][0] = x;
+		resetCachedValues();
 	}
 	
 	/**
@@ -148,6 +170,7 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	protected void setY(int index, int y) {
 		coords[index][1] = y;
+		resetCachedValues();
 	}
 	
 	@Override
@@ -203,7 +226,10 @@ public class Shape implements Cloneable, Serializable {
 	 * @return the height of the figure
 	 */
 	public int getHeight() {
-		return maxY() - minY() + 1;
+		if (null == height) {
+			height = maxY() - minY() + 1;
+		}
+		return height;
 	}
 	
 	/**
@@ -224,7 +250,10 @@ public class Shape implements Cloneable, Serializable {
 	 * @return the width of the figure
 	 */
 	public int getWidth() {
-		return maxX() - minX() + 1;
+		if (null == width) {
+			width = maxX() - minX() + 1;
+		}
+		return width;
 	}
 	
 	@Override
@@ -240,11 +269,13 @@ public class Shape implements Cloneable, Serializable {
 	 *         figure
 	 */
 	public int maxX() {
-		int result = x(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.max(result, x(i));
+		if (null == maxX) {
+			maxX = x(0);
+			for (int i = 1; i < getLength(); i++) {
+				maxX = Math.max(maxX, x(i));
+			}
 		}
-		return result;
+		return maxX;
 	}
 	
 	/**
@@ -252,11 +283,13 @@ public class Shape implements Cloneable, Serializable {
 	 *         figure
 	 */
 	public int maxY() {
-		int result = y(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.max(result, y(i));
+		if (null == maxY) {
+			maxY = y(0);
+			for (int i = 1; i < getLength(); i++) {
+				maxY = Math.max(maxY, y(i));
+			}
 		}
-		return result;
+		return maxY;
 	}
 	
 	/**
@@ -264,11 +297,13 @@ public class Shape implements Cloneable, Serializable {
 	 *         figure
 	 */
 	public int minX() {
-		int result = x(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.min(result, x(i));
+		if (null == minX) {
+			minX = x(0);
+			for (int i = 1; i < getLength(); i++) {
+				minX = Math.min(minX, x(i));
+			}
 		}
-		return result;
+		return minX;
 	}
 	
 	/**
@@ -276,11 +311,13 @@ public class Shape implements Cloneable, Serializable {
 	 *         figure
 	 */
 	public int minY() {
-		int result = y(0);
-		for (int i = 1; i < getLength(); i++) {
-			result = Math.min(result, y(i));
+		if (null == minY) {
+			minY = y(0);
+			for (int i = 1; i < getLength(); i++) {
+				minY = Math.min(minY, y(i));
+			}
 		}
-		return result;
+		return minY;
 	}
 	
 	/**
@@ -325,6 +362,7 @@ public class Shape implements Cloneable, Serializable {
 	 */
 	public void setCoord(int i, int[] value) {
 		coords[i] = value.clone();
+		resetCachedValues();
 	}
 	
 	public void setFill(Cell fill) {
