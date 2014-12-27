@@ -1,5 +1,6 @@
 package com.kry.brickgame.boards;
 
+
 /**
  * @author noLive
  */
@@ -14,14 +15,75 @@ public class BoardNumbers extends Board {
 	public final static int height = 5;
 	
 	/**
-	 * Convert an integer to a Numbers object
-	 * 
-	 * @param i
-	 *            - integer from 0 to 9
+	 * Table numbers to draw them on the board 5x5: [index][y][x]
 	 */
-	public static Numbers intToNumbers(int i) {
-		return stringToNumbers(String.valueOf(i));
-	}
+	private final static Cell[][][] numbersTable = new Cell[][][] { {
+	        // None
+	        { E, E, E },//
+	        { E, E, E },//
+	        { E, E, E },//
+	        { E, E, E },//
+	        { E, E, E } }, {
+	        // 0
+	        { F, F, F },//
+	        { F, E, F },//
+	        { F, E, F },//
+	        { F, E, F },//
+	        { F, F, F } }, {
+	        // 1
+	        { E, F, E },//
+	        { F, F, E },//
+	        { E, F, E },//
+	        { E, F, E },//
+	        { F, F, F } }, {
+	        // 2
+	        { F, F, F },//
+	        { E, E, F },//
+	        { F, F, F },//
+	        { F, E, E },//
+	        { F, F, F } }, {
+	        // 3
+	        { F, F, F },//
+	        { E, E, F },//
+	        { F, F, F },//
+	        { E, E, F },//
+	        { F, F, F } }, {
+	        // 4
+	        { E, E, F },//
+	        { E, F, F },//
+	        { F, E, F },//
+	        { F, F, F },//
+	        { E, E, F } }, {
+	        // 5
+	        { F, F, F },//
+	        { F, E, E },//
+	        { F, F, F },//
+	        { E, E, F },//
+	        { F, F, F } }, {
+	        // 6
+	        { F, F, F },//
+	        { F, E, E },//
+	        { F, F, F },//
+	        { F, E, F },//
+	        { F, F, F } }, {
+	        // 7
+	        { F, F, F },//
+	        { E, E, F },//
+	        { E, F, E },//
+	        { E, F, E },//
+	        { E, F, E } }, {
+	        // 8
+	        { F, F, F },//
+	        { F, E, F },//
+	        { F, F, F },//
+	        { F, E, F },//
+	        { F, F, F } }, {
+	        // 9
+	        { F, F, F },//
+	        { F, E, F },//
+	        { F, F, F },//
+	        { E, E, F },//
+	        { F, F, F } } };
 	
 	/**
 	 * Convert a string to a Numbers object
@@ -40,82 +102,42 @@ public class BoardNumbers extends Board {
 		return result;
 	}
 	
-	private Numbers number;
+	/**
+	 * Convert a character to a Numbers object
+	 * 
+	 * @param ch
+	 *            - character like '0' .. '9'
+	 */
+	public static Numbers charToNumbers(char ch) {
+		Numbers result;
+		try {
+			result = Numbers.valueOf("n" + String.valueOf(ch));
+		} catch (IllegalArgumentException e) {
+			result = Numbers.None;
+		}
+		
+		return result;
+	}
 	
 	/**
-	 * Table numbers to draw them on the board 5x5: [index][y][x]
+	 * Convert an integer to a Numbers object
+	 * 
+	 * @param i
+	 *            - integer from 0 to 9
 	 */
-	private final static Cell[][][] numbersTable = new Cell[][][] { {
-			// None
-			{ E, E, E },//
-			{ E, E, E },//
-			{ E, E, E },//
-			{ E, E, E },//
-			{ E, E, E } }, {
-			// 0
-			{ F, F, F },//
-			{ F, E, F },//
-			{ F, E, F },//
-			{ F, E, F },//
-			{ F, F, F } }, {
-			// 1
-			{ E, F, E },//
-			{ F, F, E },//
-			{ E, F, E },//
-			{ E, F, E },//
-			{ F, F, F } }, {
-			// 2
-			{ F, F, F },//
-			{ E, E, F },//
-			{ F, F, F },//
-			{ F, E, E },//
-			{ F, F, F } }, {
-			// 3
-			{ F, F, F },//
-			{ E, E, F },//
-			{ F, F, F },//
-			{ E, E, F },//
-			{ F, F, F } }, {
-			// 4
-			{ E, E, F },//
-			{ E, F, F },//
-			{ F, E, F },//
-			{ F, F, F },//
-			{ E, E, F } }, {
-			// 5
-			{ F, F, F },//
-			{ F, E, E },//
-			{ F, F, F },//
-			{ E, E, F },//
-			{ F, F, F } }, {
-			// 6
-			{ F, F, F },//
-			{ F, E, E },//
-			{ F, F, F },//
-			{ F, E, F },//
-			{ F, F, F } }, {
-			// 7
-			{ F, F, F },//
-			{ E, E, F },//
-			{ E, F, E },//
-			{ E, F, E },//
-			{ E, F, E } }, {
-			// 8
-			{ F, F, F },//
-			{ F, E, F },//
-			{ F, F, F },//
-			{ F, E, F },//
-			{ F, F, F } }, {
-			// 9
-			{ F, F, F },//
-			{ F, E, F },//
-			{ F, F, F },//
-			{ E, E, F },//
-			{ F, F, F } } };
+	public static Numbers intToNumbers(int i) {
+		return stringToNumbers(String.valueOf(i));
+	}
+	
+	private Numbers number;
 	
 	public BoardNumbers() {
 		super(width, height);
 		setNumber(Numbers.None);
+	}
+	
+	protected Numbers getLetter() {
+		return number;
 	}
 	
 	@Override
@@ -128,15 +150,11 @@ public class BoardNumbers extends Board {
 		return true;
 	}
 	
-	protected Numbers getLetter() {
-		return number;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((number == null) ? 0 : number.hashCode());
+		result = prime * result + (number == null ? 0 : number.hashCode());
 		return result;
 	}
 	

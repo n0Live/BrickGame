@@ -7,6 +7,9 @@ import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.sleep;
 import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +43,145 @@ public class SplashScreen extends Game {
 	}
 	
 	/**
+	 * Animated horizontal moving and inverting cells
+	 * 
+	 * @param fromX
+	 *            the starting x-coordinate
+	 * @param toX
+	 *            the finishing x-coordinate
+	 * @param y
+	 *            the y-coordinate
+	 * @return {@code false} if the current thread was interrupted, otherwise -
+	 *         {@code true}
+	 */
+	private boolean horizontalMove(int fromX, int toX, int y) {
+		Board board = getBoard();
+		// define the direction by coordinates
+		boolean isRightDirection = toX >= fromX;
+		
+		// left to right
+		if (isRightDirection) {
+			for (int i = fromX; i <= toX; i++) {
+				if (Thread.currentThread().isInterrupted()) return false;
+				
+				// invert cells
+				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+			}
+			// right to left
+		} else {
+			for (int i = fromX; i >= toX; i--) {
+				if (Thread.currentThread().isInterrupted()) return false;
+				
+				// invert cells
+				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Draws a "9999" on the main board
+	 */
+	private void insertNumbers() {
+		Board board = getBoard();
+		
+		BoardNumbers[] boardNumbers = new BoardNumbers[4];
+		for (int i = 0; i < boardNumbers.length; i++) {
+			boardNumbers[i] = new BoardNumbers();
+		}
+		
+		/* Easter (New Year) egg */
+		int year = 0;
+		DateFormat dateFormat = new SimpleDateFormat("yyyy");
+		Calendar calendar = Calendar.getInstance();
+		if (calendar.get(Calendar.MONTH) == Calendar.DECEMBER
+		        && calendar.get(Calendar.DAY_OF_MONTH) == 31) {
+			year = Integer.valueOf(dateFormat.format(calendar.getTime())) + 1;
+		} else if (calendar.get(Calendar.MONTH) == Calendar.JANUARY
+		        && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+			year = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		}
+		
+		char[] numbers;
+		if (year != 0) {
+			numbers = Integer.toString(year).toCharArray();
+		} else {
+			numbers = "9999".toCharArray();
+		}
+		for (int i = 0; i < boardNumbers.length; i++) {
+			boardNumbers[i].setNumber(BoardNumbers.charToNumbers(numbers[i]));
+		}
+		
+		int k;
+		// upper left
+		k = 0;
+		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1, board.getHeight()
+		        - boardNumbers[k].getHeight() - 1);
+		// upper right
+		k = 1;
+		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
+		        - boardNumbers[k].getWidth() - 1, board.getHeight() - boardNumbers[k].getHeight()
+		        * 2);
+		// lower left
+		k = 2;
+		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1,
+		        boardNumbers[k].getHeight());
+		// lower right
+		k = 3;
+		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
+		        - boardNumbers[k].getWidth() - 1, 1);
+		
+		if (!Thread.currentThread().isInterrupted()) {
+			setBoard(board);
+		}
+	}
+	
+	/**
+	 * Animated vertical moving and inverting cells
+	 * 
+	 * @param fromY
+	 *            the starting y-coordinate
+	 * @param toY
+	 *            the finishing y-coordinate
+	 * @param x
+	 *            the x-coordinate
+	 * @return {@code false} if the current thread was interrupted, otherwise -
+	 *         {@code true}
+	 */
+	private boolean verticalMove(int fromY, int toY, int x) {
+		Board board = getBoard();
+		// define the direction by coordinates
+		boolean isUpDirection = toY >= fromY;
+		
+		// bottom to top
+		if (isUpDirection) {
+			for (int i = fromY; i <= toY; i++) {
+				if (Thread.currentThread().isInterrupted()) return false;
+				
+				// invert cells
+				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+			}
+			// top to bottom
+		} else {
+			for (int i = fromY; i >= toY; i--) {
+				if (Thread.currentThread().isInterrupted()) return false;
+				
+				// invert cells
+				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY);
+			}
+		}
+		return true;
+	}
+	
+	/**
 	 * Animated walking in a spiral with inverting cells on the main board
 	 */
 	void animatedInvertBoard() {
@@ -55,8 +197,8 @@ public class SplashScreen extends Game {
 		while (fromX != board.getWidth() / 2) {
 			// spiral motion with a gradually narrowing
 			if (!horizontalMove(fromX, toX, fromY--) || !verticalMove(fromY, toY, toX--)
-					|| !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
-				return;
+			        || !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
+			    return;
 		}
 		sleep(ANIMATION_DELAY * 2);
 	}
@@ -88,75 +230,6 @@ public class SplashScreen extends Game {
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 0;
-	}
-	
-	/**
-	 * Animated horizontal moving and inverting cells
-	 * 
-	 * @param fromX
-	 *            the starting x-coordinate
-	 * @param toX
-	 *            the finishing x-coordinate
-	 * @param y
-	 *            the y-coordinate
-	 * @return {@code false} if the current thread was interrupted, otherwise -
-	 *         {@code true}
-	 */
-	private boolean horizontalMove(int fromX, int toX, int y) {
-		Board board = getBoard();
-		// define the direction by coordinates
-		boolean isRightDirection = (toX >= fromX);
-		
-		// left to right
-		if (isRightDirection) {
-			for (int i = fromX; i <= toX; i++) {
-				if (Thread.currentThread().isInterrupted()) return false;
-				
-				// invert cells
-				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
-			}
-			// right to left
-		} else {
-			for (int i = fromX; i >= toX; i--) {
-				if (Thread.currentThread().isInterrupted()) return false;
-				
-				// invert cells
-				board.setCell(((board.getCell(i, y) == Cell.Empty) ? Cell.Full : Cell.Empty), i, y);
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
-			}
-		}
-		return true;
-	}
-	
-	/**
-	 * Draws a "9999" on the main board
-	 */
-	private void insertNumbers() {
-		Board board = getBoard();
-		
-		BoardNumbers boardNumber = new BoardNumbers();
-		
-		boardNumber.setNumber(BoardNumbers.intToNumbers(9));
-		
-		// upper left
-		board = insertCellsToBoard(board, boardNumber.getBoard(), 1, board.getHeight()
-				- boardNumber.getHeight() - 1);
-		// lower left
-		board = insertCellsToBoard(board, boardNumber.getBoard(), 1, boardNumber.getHeight());
-		// upper right
-		board = insertCellsToBoard(board, boardNumber.getBoard(),
-				board.getWidth() - boardNumber.getWidth() - 1,
-				board.getHeight() - boardNumber.getHeight() * 2);
-		// lower right
-		board = insertCellsToBoard(board, boardNumber.getBoard(),
-				board.getWidth() - boardNumber.getWidth() - 1, 1);
-		
-		if (!Thread.currentThread().isInterrupted()) {
-			setBoard(board);
-		}
 	}
 	
 	/**
@@ -233,47 +306,6 @@ public class SplashScreen extends Game {
 		} else {
 			Main.setGame(Main.gameSelector.restart());
 		}
-	}
-	
-	/**
-	 * Animated vertical moving and inverting cells
-	 * 
-	 * @param fromY
-	 *            the starting y-coordinate
-	 * @param toY
-	 *            the finishing y-coordinate
-	 * @param x
-	 *            the x-coordinate
-	 * @return {@code false} if the current thread was interrupted, otherwise -
-	 *         {@code true}
-	 */
-	private boolean verticalMove(int fromY, int toY, int x) {
-		Board board = getBoard();
-		// define the direction by coordinates
-		boolean isUpDirection = (toY >= fromY);
-		
-		// bottom to top
-		if (isUpDirection) {
-			for (int i = fromY; i <= toY; i++) {
-				if (Thread.currentThread().isInterrupted()) return false;
-				
-				// invert cells
-				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
-			}
-			// top to bottom
-		} else {
-			for (int i = fromY; i >= toY; i--) {
-				if (Thread.currentThread().isInterrupted()) return false;
-				
-				// invert cells
-				board.setCell(((board.getCell(x, i) == Cell.Empty) ? Cell.Full : Cell.Empty), x, i);
-				fireBoardChanged(board);
-				sleep(ANIMATION_DELAY);
-			}
-		}
-		return true;
 	}
 	
 }
