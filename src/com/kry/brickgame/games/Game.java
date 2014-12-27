@@ -782,7 +782,7 @@ public abstract class Game implements Runnable, Serializable {
 	 * Processing of key presses
 	 */
 	protected void processKeys() {
-		if (getStatus() == Status.None || keys.isEmpty()) return;
+		if (keys.isEmpty() || getStatus() == Status.None) return;
 		
 		if (keys.contains(KeyPressed.KeyShutdown)) {
 			keys.remove(KeyPressed.KeyShutdown);

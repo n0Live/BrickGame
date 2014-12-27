@@ -29,7 +29,7 @@ public class TetrisGameL extends TetrisGameJ {
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None || keys.isEmpty()) return;
+		if (keys.isEmpty() || getStatus() == Status.None) return;
 		if (getStatus() == Status.Running && !isFallingFinished
 		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
 			TetrisShape rotatedPiece;

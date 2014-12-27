@@ -339,7 +339,7 @@ public class RacingGame extends GameWithLives {
 	 */
 	@Override
 	protected void processKeys() {
-		if (getStatus() == Status.None || keys.isEmpty()) return;
+		if (keys.isEmpty() || getStatus() == Status.None) return;
 		
 		super.processKeys();
 		
