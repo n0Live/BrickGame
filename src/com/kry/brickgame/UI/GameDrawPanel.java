@@ -53,7 +53,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		
 		// BlinkingSquares and BlinkingPause
 		new Timer(50, new ActionListener() {
-			final int tikToBlinkPause = 10;
+			static final int tikToBlinkPause = 10;
 			int blinkCount = 0;
 			
 			@Override
