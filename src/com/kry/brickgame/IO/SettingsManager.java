@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+import java.util.Random;
 
 import com.kry.brickgame.games.GameConsts.Rotation;
 
@@ -25,7 +26,8 @@ public class SettingsManager {
 		defaults = new Properties();
 		defaults.put("muted", Boolean.FALSE.toString());
 		defaults.put("rotation", Rotation.Clockwise.toString());
-		defaults.put("color", colorToHexString(Color.gray));
+		// random color by default
+		defaults.put("color", colorToHexString(new Color(new Random().nextInt(0xFFFFFF))));
 		defaults.put("exit_confirmation", Boolean.TRUE.toString());
 	}
 	
@@ -37,7 +39,7 @@ public class SettingsManager {
 	 * @return HexString
 	 */
 	private static String colorToHexString(Color c) {
-		return String.format("#%06X", (0xFFFFFF & c.getRGB()));
+		return String.format("#%06X", 0xFFFFFF & c.getRGB());
 	}
 	
 	/**
