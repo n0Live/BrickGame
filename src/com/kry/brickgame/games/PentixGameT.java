@@ -28,6 +28,16 @@ public class PentixGameT extends TetrisGameL {
 	}
 	
 	@Override
+	protected TetrisShape getNextFigure(TetrisShape aTetrisShape) {
+		return TetrisShape.getNextShape(aTetrisShape, false);
+	}
+	
+	@Override
+	protected TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
+		return TetrisShape.getPrevShape(aTetrisShape, false);
+	}
+	
+	@Override
 	protected TetrisShape getRandomShape() {
 		return TetrisShape.getRandomShapeAndRotate();
 	}

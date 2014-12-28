@@ -5,6 +5,7 @@ import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
+import com.kry.brickgame.shapes.TetrisShape.Figures;
 
 /**
  * @author noLive
@@ -22,6 +23,34 @@ public class TetrisGameK extends TetrisGameI {
 	}
 	
 	/**
+	 * Get instance of next shape in {@link Figures}. If the
+	 * {@code aTetrisShape} is the last item in Figures, then returns the first
+	 * item with the next rotation angle.
+	 * 
+	 * @param aTetrisShape
+	 *            the figure for which get the next
+	 * @return the next figure from {@code aTetrisShape}
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getNextFigure(TetrisShape aTetrisShape) {
+		return TetrisShape.getNextTetraminoes(aTetrisShape);
+	}
+	
+	/**
+	 * Get instance of previous shape in {@link Figures}. If the
+	 * {@code aTetrisShape} is the first item in Figures, then returns the last
+	 * item with the previous rotation angle.
+	 * 
+	 * @param aTetrisShape
+	 *            the figure for which get the previous
+	 * @return the previous figure from {@code aTetrisShape}
+	 */
+	@SuppressWarnings("static-method")
+	protected TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
+		return TetrisShape.getPrevTetraminoes(aTetrisShape);
+	}
+	
+	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -31,9 +60,9 @@ public class TetrisGameK extends TetrisGameI {
 		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
 			TetrisShape rotatedPiece;
 			if (getRotation() == Rotation.Counterclockwise) {
-				rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
+				rotatedPiece = getPrevFigure(curPiece);
 			} else {
-				rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
+				rotatedPiece = getNextFigure(curPiece);
 			}
 			
 			if (tryMove(rotatedPiece, curX, curY)) {
