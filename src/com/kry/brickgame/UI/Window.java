@@ -135,10 +135,9 @@ public class Window extends JFrame {
 		Dimension windowSize = getSettingsManager().getSize();
 		
 		if (windowSize == null) {
-			// set initial size of window as half of screen height
+			// set initial size of window as two-thirds of the screen height
 			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			
-			int winHeight = screenSize.height / 2;
+			int winHeight = screenSize.height * 2 / 3;
 			int winWidth = Math.round(winHeight * DEVICE_ASPECT_RATIO);
 			windowSize = new Dimension(winWidth, winHeight);
 		}
