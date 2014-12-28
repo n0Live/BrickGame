@@ -47,6 +47,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		size = null;
 		
 		setBorder(new ResizableBorder());
+		setBackground(deviceBgColor);
 		
 		addMouseListener(resizeListener);
 		addMouseMotionListener(resizeListener);
