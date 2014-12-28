@@ -91,7 +91,7 @@ public abstract class Game implements Runnable, Serializable {
 	/**
 	 * Cached value of the genuine speed.
 	 * <p>
-	 * If it's equals to {@code -1} that means not cached values yet.
+	 * A zero or negative value indicates that not cached values yet.
 	 */
 	private int cachedGenuineSpeed;
 	/**
@@ -565,7 +565,7 @@ public abstract class Game implements Runnable, Serializable {
 		if (genuine) {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
-			if (cachedGenuineSpeed < 0) {
+			if (cachedGenuineSpeed <= 0) {
 				cachedGenuineSpeed = Math.round(getSpeedOfFirstLevel()
 				        - (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
 				        * (speed - 1));
