@@ -8,7 +8,6 @@ import static com.kry.brickgame.games.GameConsts.UP;
 import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
-import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
@@ -21,7 +20,7 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.SnakeShape;
@@ -323,7 +322,7 @@ public class SnakeGame extends GameWithLives {
 		setBoard(drawSnake(board, newSnake, newX, newY));
 		
 		if (isAppleAhead) {
-			playEffect(Effects.bonus);
+			GameSound.playEffect(Effects.bonus);
 			// increases score
 			setScore(getScore() + 1);
 			// add a new apple
@@ -392,7 +391,7 @@ public class SnakeGame extends GameWithLives {
 		if (getStatus() == Status.Running) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (tryMove(LEFT)) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 					setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
 				} else {
 					loss(curX, curY);
@@ -400,7 +399,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			if (containsKey(KeyPressed.KeyRight)) {
 				if (tryMove(RIGHT)) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 					setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
 				} else {
 					loss(curX, curY);
@@ -408,7 +407,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			if (containsKey(KeyPressed.KeyDown)) {
 				if (tryMove(DOWN)) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 					setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
 				} else {
 					loss(curX, curY);
@@ -416,7 +415,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			if (containsKey(KeyPressed.KeyUp)) {
 				if (tryMove(UP)) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 					setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
 				} else {
 					loss(curX, curY);
@@ -424,7 +423,7 @@ public class SnakeGame extends GameWithLives {
 			}
 			if (containsKey(KeyPressed.KeyRotate)) {
 				if (tryMove(snake.getDirection())) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 					setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
 				} else {
 					loss(curX, curY);

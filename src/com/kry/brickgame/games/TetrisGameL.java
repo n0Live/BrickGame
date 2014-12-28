@@ -1,11 +1,9 @@
 package com.kry.brickgame.games;
 
-import static com.kry.brickgame.games.GameUtils.playEffect;
-
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
 
 /**
@@ -33,15 +31,19 @@ public class TetrisGameL extends TetrisGameJ {
 		if (getStatus() == Status.Running && !isFallingFinished
 		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
 			TetrisShape rotatedPiece;
-			if (getRotation() == Rotation.Counterclockwise)
+			if (getRotation() == Rotation.Counterclockwise) {
 				rotatedPiece = TetrisShape.getPrevTetraminoes(curPiece);
-			else
+			} else {
 				rotatedPiece = TetrisShape.getNextTetraminoes(curPiece);
+			}
 			
-			if (tryMove(rotatedPiece, curX, curY)) playEffect(Effects.turn);
+			if (tryMove(rotatedPiece, curX, curY)) {
+				GameSound.playEffect(Effects.turn);
+			}
 			keys.remove(KeyPressed.KeyRotate);
-		} else
+		} else {
 			super.processKeys();
+		}
 	}
 	
 }

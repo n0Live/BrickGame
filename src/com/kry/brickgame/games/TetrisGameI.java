@@ -8,8 +8,6 @@ import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawPoint;
 import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.isFullLine;
-import static com.kry.brickgame.games.GameUtils.playEffect;
-import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
@@ -18,8 +16,8 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
-import com.kry.brickgame.games.GameUtils.Music;
+import com.kry.brickgame.games.GameSound.Effects;
+import com.kry.brickgame.games.GameSound.Music;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 import com.kry.brickgame.splashes.Splash;
@@ -376,7 +374,7 @@ public class TetrisGameI extends Game {
 		nextPiece = getRandomShape();
 		newPiece();
 		
-		playMusic(Music.tetris);
+		GameSound.playMusic(Music.tetris);
 		
 		setStatus(Status.Running);
 	}
@@ -739,7 +737,7 @@ public class TetrisGameI extends Game {
 		isFallingFinished = true;
 		if (curPiece.getShape() == Figures.SuperGun// guns
 		        || curPiece.getShape() == Figures.SuperMudGun) {
-			playEffect(Effects.fall_super);
+			GameSound.playEffect(Effects.fall_super);
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
 			curPiece = new TetrisShape(Figures.NoShape);
 		} else if (curPiece.getShape() == Figures.SuperBomb) {// bomb
@@ -747,14 +745,14 @@ public class TetrisGameI extends Game {
 		} else { // figures which remain on the board
 			if (hasLiquidFigures // liquid figure
 			        && curPiece.getFill() == Cell.Blink) {
-				playEffect(Effects.fall_super);
+				GameSound.playEffect(Effects.fall_super);
 				flowDown(getBoard(), curX, curY, curPiece, false);
 			} else if (hasAcidFigures // acid figure
 			        && curPiece.getFill() == Cell.Blink) {
-				playEffect(Effects.fall_super);
+				GameSound.playEffect(Effects.fall_super);
 				flowDown(getBoard(), curX, curY, curPiece, true);
 			} else { // ordinal figure and SuperPoint
-				playEffect(Effects.fall);
+				GameSound.playEffect(Effects.fall);
 				setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 			}
 			// check for filled lines
@@ -779,21 +777,21 @@ public class TetrisGameI extends Game {
 			int movementSpeed = (int) (ANIMATION_DELAY * 3f);
 			
 			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(curPiece, curX - 1, curY)) {
-				playEffect(Effects.move);
+				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyLeft, movementSpeed);
 			}
 			if (containsKey(KeyPressed.KeyRight)) if (tryMove(curPiece, curX + 1, curY)) {
-				playEffect(Effects.move);
+				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyRight, movementSpeed);
 			}
 			if (containsKey(KeyPressed.KeyRotate)) {
 				// if we have the super gun
 				if (curPiece.getShape() == Figures.SuperGun) {
-					playEffect(Effects.hit_cell);
+					GameSound.playEffect(Effects.hit_cell);
 					// than shoot of it
 					shoot(curX, curY + curPiece.minY());
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
-					playEffect(Effects.add_cell);
+					GameSound.playEffect(Effects.add_cell);
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
 				} else if (curPiece.getShape() != Figures.SuperPoint) {
@@ -804,7 +802,7 @@ public class TetrisGameI extends Game {
 						rotatedPiece = ((TetrisShape) curPiece.clone()).rotateRight();
 					}
 					if (tryMove(rotatedPiece, curX, curY)) {
-						playEffect(Effects.turn);
+						GameSound.playEffect(Effects.turn);
 					}
 				}
 				keys.remove(KeyPressed.KeyRotate);

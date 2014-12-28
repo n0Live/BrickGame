@@ -7,7 +7,6 @@ import static com.kry.brickgame.games.GameConsts.RIGHT;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
-import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
@@ -22,7 +21,7 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.boards.BricksWall;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.splashes.InvadersSplash;
@@ -195,7 +194,7 @@ public class InvadersGame extends GameWithGun {
 		int givenY = y - bricksY;
 		
 		if (bricks.breakBrick(givenX, givenY)) {
-			playEffect(Effects.hit_cell);
+			GameSound.playEffect(Effects.hit_cell);
 			
 			synchronized (lock) {
 				setBoard(insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY));
@@ -242,7 +241,7 @@ public class InvadersGame extends GameWithGun {
 					
 					isFlyingBall = true;
 					
-					playEffect(Effects.turn);
+					GameSound.playEffect(Effects.turn);
 					
 					return;
 				}
@@ -405,7 +404,7 @@ public class InvadersGame extends GameWithGun {
 		}
 		
 		if (bounce) {
-			playEffect(Effects.turn);
+			GameSound.playEffect(Effects.turn);
 		}
 	}
 	
@@ -553,7 +552,7 @@ public class InvadersGame extends GameWithGun {
 			
 			if (move && getStatus() == Status.Running) {
 				if (moveGun(newX, newY)) {
-					playEffect(Effects.move);
+					GameSound.playEffect(Effects.move);
 				} else {
 					isDead = true;
 					return;
@@ -577,7 +576,7 @@ public class InvadersGame extends GameWithGun {
 	protected void removeCell(Board board, int x, int y) {
 		synchronized (lock) {
 			if (x == ballX && y == ballY) {
-				playEffect(Effects.hit_cell);
+				GameSound.playEffect(Effects.hit_cell);
 				removeBall();
 			} else {
 				breakBrick(board, x, y);

@@ -6,8 +6,6 @@ import static com.kry.brickgame.games.GameConsts.RIGHT;
 import static com.kry.brickgame.games.GameConsts.UP;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
-import static com.kry.brickgame.games.GameUtils.melodies;
-import static com.kry.brickgame.games.GameUtils.playMelody;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -17,7 +15,7 @@ import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Melodies;
+import com.kry.brickgame.games.GameSound.Melodies;
 import com.kry.brickgame.shapes.DancerShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.sound.SoundManager;
@@ -76,10 +74,10 @@ public class DanceGame extends Game {
 			caught = false;
 			
 			this.y = y;
-			leftShape = (left) ? new DancerShape(LEFT) : null;
-			upShape = (up) ? new DancerShape(UP) : null;
-			downShape = (down) ? new DancerShape(DOWN) : null;
-			rightShape = (right) ? new DancerShape(RIGHT) : null;
+			leftShape = left ? new DancerShape(LEFT) : null;
+			upShape = up ? new DancerShape(UP) : null;
+			downShape = down ? new DancerShape(DOWN) : null;
+			rightShape = right ? new DancerShape(RIGHT) : null;
 		}
 		
 		/**
@@ -184,7 +182,7 @@ public class DanceGame extends Game {
 	public DanceGame(int speed, int level, int type) {
 		super(speed, level, type);
 		
-		positions = new DancePosition[(boardHeight / DancerShape.height)];
+		positions = new DancePosition[boardHeight / DancerShape.height];
 		bonus = -1; // will change to 0 at first caught
 		stepsGone = 0;
 		// set random first melody
@@ -204,7 +202,7 @@ public class DanceGame extends Game {
 	 * @return playback rate
 	 */
 	private double calculateRate() {
-		return (1 + (double) getSpeed() / 10);
+		return 1 + (double) getSpeed() / 10;
 	}
 	
 	/**
@@ -228,7 +226,7 @@ public class DanceGame extends Game {
 	 */
 	private DancePosition createPosition() {
 		// interval between positions from 3 to 1
-		int interval = (3 - getSpeed() / 3);
+		int interval = 3 - getSpeed() / 3;
 		if (interval <= 0) {
 			interval = 1;
 		}
@@ -270,10 +268,10 @@ public class DanceGame extends Game {
 		int newY = prevY + interval;
 		
 		return new DancePosition(newY,//
-				(pos & 8) == 8,// 1000
-				(pos & 4) == 4,// 0100
-				(pos & 2) == 2,// 0010
-				(pos & 1) == 1);// 0001
+		        (pos & 8) == 8,// 1000
+		        (pos & 4) == 4,// 0100
+		        (pos & 2) == 2,// 0010
+		        (pos & 1) == 1);// 0001
 	}
 	
 	/**
@@ -288,19 +286,19 @@ public class DanceGame extends Game {
 				int y = position.y;
 				if (position.leftShape != null) {
 					drawBoard = drawShape(drawBoard, columns[0], y, position.leftShape,
-							position.leftShape.getFill());
+					        position.leftShape.getFill());
 				}
 				if (position.upShape != null) {
 					drawBoard = drawShape(drawBoard, columns[1], y, position.upShape,
-							position.upShape.getFill());
+					        position.upShape.getFill());
 				}
 				if (position.downShape != null) {
 					drawBoard = drawShape(drawBoard, columns[2], y, position.downShape,
-							position.downShape.getFill());
+					        position.downShape.getFill());
 				}
 				if (position.rightShape != null) {
 					drawBoard = drawShape(drawBoard, columns[3], y, position.rightShape,
-							position.rightShape.getFill());
+					        position.rightShape.getFill());
 				}
 			}
 		}
@@ -339,16 +337,6 @@ public class DanceGame extends Game {
 			}
 		}
 		return null;
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 300;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 80;
 	}
 	
 	/**
@@ -395,7 +383,17 @@ public class DanceGame extends Game {
 			melodyNumber++;
 		}
 		rate = calculateRate();
-		playMelody(getMelody(), rate);
+		GameSound.playMelody(getMelody(), rate);
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 300;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 80;
 	}
 	
 	/**
@@ -413,8 +411,8 @@ public class DanceGame extends Game {
 				// checking the coincidence of the all DancerShape in the
 				// position and pressing keys
 				if (!checkDanceStep(position.leftShape) || !checkDanceStep(position.upShape)
-						|| !checkDanceStep(position.downShape)
-						|| !checkDanceStep(position.rightShape)) return;
+				        || !checkDanceStep(position.downShape)
+				        || !checkDanceStep(position.rightShape)) return;
 				int score = 0;
 				position.setCaught(true);
 				
@@ -441,9 +439,18 @@ public class DanceGame extends Game {
 	}
 	
 	@Override
+	protected void setSpeed(int speed) {
+		super.setSpeed(speed);
+		
+		if (getSpeed() == 1) {
+			setLevel(getLevel() + 1);
+		}
+	}
+	
+	@Override
 	public void resume() {
 		if (getStatus() == Status.Paused) {
-			playMelody(getMelody(), rate);
+			GameSound.playMelody(getMelody(), rate);
 		}
 		super.resume();
 	}
@@ -456,12 +463,12 @@ public class DanceGame extends Game {
 		super.run();
 		if (getStatus() == Status.Running) {
 			// play the first melody
-			playMelody(getMelody(), rate);
+			GameSound.playMelody(getMelody(), rate);
 		}
-		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
-			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true)))) {
+		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
+			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true))) {
 				// change speed and melody after finished playing the melody
-				if (!isMuted() && !SoundManager.isPlaying(melodies)) {
+				if (!isMuted() && !SoundManager.isPlaying(GameSound.melodies)) {
 					playNewMelody();
 					// if muted, then speed changes every 10 + getSpeed()
 					// positions
@@ -478,15 +485,6 @@ public class DanceGame extends Game {
 			}
 			// processing of key presses
 			processKeys();
-		}
-	}
-	
-	@Override
-	protected void setSpeed(int speed) {
-		super.setSpeed(speed);
-		
-		if (getSpeed() == 1) {
-			setLevel(getLevel() + 1);
 		}
 	}
 	

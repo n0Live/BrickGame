@@ -11,7 +11,6 @@ import static com.kry.brickgame.games.GameUtils.checkBoardCollision;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.checkTwoShapeCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
-import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 import static com.kry.brickgame.games.ObstacleUtils.getPreparedObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
@@ -27,7 +26,7 @@ import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Bullet;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
@@ -434,7 +433,7 @@ public class TanksGame extends GameWithLives {
 	 *            number of the removed tank
 	 */
 	private void destroyEnemyTank(int tankNumber) {
-		playEffect(Effects.hit_cell);
+		GameSound.playEffect(Effects.hit_cell);
 		
 		if (enemyTanks[tankNumber] != null) {
 			enemyTanks[tankNumber] = null;
@@ -514,7 +513,7 @@ public class TanksGame extends GameWithLives {
 				} else {
 					// if the bullet hit something
 					if (board.getCell(result.x(), result.y()) != Cell.Empty) {
-						playEffect(Effects.hit_cell);
+						GameSound.playEffect(Effects.hit_cell);
 						// bullet hit a simple obstacle?
 						boolean isObstacle = true;
 						// collision check with one of another bullets
@@ -966,7 +965,7 @@ public class TanksGame extends GameWithLives {
 				keys.remove(KeyPressed.KeyUp);
 			}
 			if (containsKey(KeyPressed.KeyRotate)) {
-				playEffect(Effects.move);
+				GameSound.playEffect(Effects.move);
 				fire(playerTank);
 				keys.remove(KeyPressed.KeyRotate);
 			}

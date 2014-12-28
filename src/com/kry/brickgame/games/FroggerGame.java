@@ -5,7 +5,6 @@ import static com.kry.brickgame.games.GameUtils.checkBoardCollisionHorizontal;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
-import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.util.Arrays;
@@ -16,7 +15,7 @@ import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.splashes.FroggerSplash;
 import com.kry.brickgame.splashes.Splash;
@@ -180,16 +179,16 @@ public class FroggerGame extends GameWithLives {
 		
 		// ==define the parameters of the types of game==
 		// for every odd type of game
-		shiftRoadFromLeftToRigth = (getType() % 2 != 0);
+		shiftRoadFromLeftToRigth = getType() % 2 != 0;
 		// for every 1st and 2nd type of game
-		shiftRoadWithFrog = ((getType() % 4 == 1) || (getType() % 4 == 2));
+		shiftRoadWithFrog = getType() % 4 == 1 || getType() % 4 == 2;
 		// for every 4-8 type of game
-		isRoadWithOncomingTraffic = ((getType() % 8 == 5) || (getType() % 8 == 6)
-				|| (getType() % 8 == 7) || (getType() % 8 == 0));
+		isRoadWithOncomingTraffic = getType() % 8 == 5 || getType() % 8 == 6 || getType() % 8 == 7
+		        || getType() % 8 == 0;
 		// for types 1-8 and 16-24
-		usePreloadedTracts = ((getType() <= 8) || ((getType() >= 16) && (getType() <= 24)));
+		usePreloadedTracts = getType() <= 8 || getType() >= 16 && getType() <= 24;
 		// for types 16-32
-		setDrawInvertedBoard((getType() > 16));
+		setDrawInvertedBoard(getType() > 16);
 		
 		loadNewLevel();
 	}
@@ -221,16 +220,6 @@ public class FroggerGame extends GameWithLives {
 		}
 	}
 	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 450;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 120;
-	}
-	
 	/**
 	 * Sets frogs to default values
 	 */
@@ -248,9 +237,9 @@ public class FroggerGame extends GameWithLives {
 	 * @return {@code true} if the movement succeeded, otherwise {@code false}
 	 */
 	private boolean jumpFrog(int x, int y) {
-		if ((y < 0) || (y >= boardHeight)) return true;
+		if (y < 0 || y >= boardHeight) return true;
 		
-		if ((x < 0) || (x >= boardWidth)) return false;
+		if (x < 0 || x >= boardWidth) return false;
 		
 		Board board = getBoard();
 		
@@ -266,7 +255,7 @@ public class FroggerGame extends GameWithLives {
 			board.setRow(frogs, y);
 			
 			setBoard(board);
-			playEffect(Effects.add_cell);
+			GameSound.playEffect(Effects.add_cell);
 			
 			checkForWin();
 		} else {
@@ -276,24 +265,6 @@ public class FroggerGame extends GameWithLives {
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// create the road
-		road = loadRoad(usePreloadedTracts);
-		Board board = getBoard();
-		// set road
-		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
-		// restores the frogs' row
-		board.setRow(frogs, boardHeight - 1);
-		setBoard(board);
-		// initialize the frog
-		setFrog();
-		super.loadNewLevel();
 	}
 	
 	/**
@@ -309,15 +280,15 @@ public class FroggerGame extends GameWithLives {
 		final Cell E = Cell.Empty;
 		// preloaded tracks
 		tracts = new Cell[][] {
-				//
-				{ E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
-				{ E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
-				{ F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
-				{ E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
-				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-				{ F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
-				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-				{ F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
+		        //
+		        { E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
+		        { E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
+		        { F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
+		        { E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
+		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+		        { F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
+		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+		        { F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
 		
 		// initial position changes from level
 		roadPositions = new int[tracts.length];
@@ -356,7 +327,7 @@ public class FroggerGame extends GameWithLives {
 					// start point
 					k = r.nextInt(tracts[i].length);
 					// checking if under the start point has an empty cell
-				} while ((i > 1) && (tracts[i - 1][k] != E));
+				} while (i > 1 && tracts[i - 1][k] != E);
 				
 				for (int j = 0; j < tracts[i].length; j++) {
 					// in first, create the empty span
@@ -370,7 +341,7 @@ public class FroggerGame extends GameWithLives {
 						fullSpanLength--;
 					}
 					
-					if ((emptySpanLength == 0) && (fullSpanLength == 0)) {
+					if (emptySpanLength == 0 && fullSpanLength == 0) {
 						// when created both, regenerating their length
 						emptySpanLength = r.nextInt(2) + 3;
 						
@@ -388,7 +359,7 @@ public class FroggerGame extends GameWithLives {
 						}
 					}
 					// if "k + j" out of bounds, set "k" such that "k + j = 0"
-					if ((k + j + 1) >= tracts[i].length) {
+					if (k + j + 1 >= tracts[i].length) {
 						k = -(j + 1);
 					}
 				}
@@ -414,7 +385,7 @@ public class FroggerGame extends GameWithLives {
 				// if the remainder is less than the width of the tract, copies
 				// only the remainder at first
 				if (tractLength - roadPositions[i / 2] < width) {
-					length = (tractLength - roadPositions[i / 2]);
+					length = tractLength - roadPositions[i / 2];
 				}
 				
 				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0, length);
@@ -427,72 +398,6 @@ public class FroggerGame extends GameWithLives {
 			board.setRow(tract, i);
 		}
 		return board;
-	}
-	
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
-		super.processKeys();
-		
-		if (getStatus() == Status.Running) {
-			int newX = curX, newY = curY;
-			boolean move = false;
-			
-			if (containsKey(KeyPressed.KeyLeft)) {
-				newX = newX - 1;
-				move = true;
-				keys.remove(KeyPressed.KeyLeft);
-			}
-			if (containsKey(KeyPressed.KeyRight)) {
-				newX = newX + 1;
-				move = true;
-				keys.remove(KeyPressed.KeyRight);
-			}
-			
-			if (containsKey(KeyPressed.KeyDown)) {
-				newY = newY - 2;
-				move = true;
-				keys.remove(KeyPressed.KeyDown);
-			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				newY = newY + ((curY < boardHeight - 2) ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyUp);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				newY = newY + ((curY < boardHeight - 2) ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyRotate);
-			}
-			
-			if (move) {
-				if (jumpFrog(newX, newY)) {
-					playEffect(Effects.move);
-				} else {
-					loss(curX, curY);
-				}
-			}
-			
-		}
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		while (!Thread.currentThread().isInterrupted() && (getStatus() != Status.GameOver)) {
-			if ((getStatus() != Status.Paused) && (elapsedTime(getSpeed(true) * 3))) {
-				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
-			}
-			// processing of key presses
-			processKeys();
-		}
 	}
 	
 	/**
@@ -527,10 +432,10 @@ public class FroggerGame extends GameWithLives {
 		for (int i = 0; i < roadPositions.length; i++) {
 			if (isRoadWithOncomingTraffic && oncomingTraffic.contains(i)) {
 				// for oncoming traffic
-				roadPositions[i] += (isLeftToRight) ? 1 : -1;
+				roadPositions[i] += isLeftToRight ? 1 : -1;
 			} else {
 				// for direct traffic
-				roadPositions[i] += (isLeftToRight) ? -1 : 1;
+				roadPositions[i] += isLeftToRight ? -1 : 1;
 			}
 			
 			if (roadPositions[i] < 0) {
@@ -546,7 +451,7 @@ public class FroggerGame extends GameWithLives {
 				// if the remainder is less than the width of the tract, copies
 				// only the remainder at first
 				if (tractLength - roadPositions[i / 2] < boardWidth) {
-					length = (tractLength - roadPositions[i / 2]);
+					length = tractLength - roadPositions[i / 2];
 				}
 				
 				System.arraycopy(tracts[i / 2], roadPositions[i / 2], tract, 0, length);
@@ -561,22 +466,116 @@ public class FroggerGame extends GameWithLives {
 		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
 		
 		// shifting the frog with the road
-		if (withFrog && ((curY > 0) && (curY < boardHeight - 1))) {
+		if (withFrog && curY > 0 && curY < boardHeight - 1) {
 			if (isRoadWithOncomingTraffic && oncomingTraffic.contains((curY - 1) / 2)) {
-				curX = (isLeftToRight) ? curX - 1 : curX + 1;
+				curX = isLeftToRight ? curX - 1 : curX + 1;
 			} else {
-				curX = (isLeftToRight) ? curX + 1 : curX - 1;
+				curX = isLeftToRight ? curX + 1 : curX - 1;
 			}
 		}
 		
 		// checks for collision with the frog and an obstacles
-		boolean isFrogMustDie = (checkBoardCollisionHorizontal(board, frog, curX) || checkCollision(
-				board, frog, curX, curY));
+		boolean isFrogMustDie = checkBoardCollisionHorizontal(board, frog, curX)
+		        || checkCollision(board, frog, curX, curY);
 		
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 		
 		if (isFrogMustDie) {
 			loss(curX, curY);
+		}
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 450;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 120;
+	}
+	
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// create the road
+		road = loadRoad(usePreloadedTracts);
+		Board board = getBoard();
+		// set road
+		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
+		// restores the frogs' row
+		board.setRow(frogs, boardHeight - 1);
+		setBoard(board);
+		// initialize the frog
+		setFrog();
+		super.loadNewLevel();
+	}
+	
+	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (keys.isEmpty() || getStatus() == Status.None) return;
+		
+		super.processKeys();
+		
+		if (getStatus() == Status.Running) {
+			int newX = curX, newY = curY;
+			boolean move = false;
+			
+			if (containsKey(KeyPressed.KeyLeft)) {
+				newX = newX - 1;
+				move = true;
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (containsKey(KeyPressed.KeyRight)) {
+				newX = newX + 1;
+				move = true;
+				keys.remove(KeyPressed.KeyRight);
+			}
+			
+			if (containsKey(KeyPressed.KeyDown)) {
+				newY = newY - 2;
+				move = true;
+				keys.remove(KeyPressed.KeyDown);
+			}
+			if (containsKey(KeyPressed.KeyUp)) {
+				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+				move = true;
+				keys.remove(KeyPressed.KeyUp);
+			}
+			if (containsKey(KeyPressed.KeyRotate)) {
+				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+				move = true;
+				keys.remove(KeyPressed.KeyRotate);
+			}
+			
+			if (move) {
+				if (jumpFrog(newX, newY)) {
+					GameSound.playEffect(Effects.move);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			
+		}
+	}
+	
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public void run() {
+		super.run();
+		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
+			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true) * 3)) {
+				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+			}
+			// processing of key presses
+			processKeys();
 		}
 	}
 	

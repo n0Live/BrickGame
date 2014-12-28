@@ -2,13 +2,12 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
-import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Music;
+import com.kry.brickgame.games.GameSound.Music;
 
 /**
  * @author noLive
@@ -22,7 +21,7 @@ public abstract class GameWithLives extends Game {
 	 */
 	private static void playAndWaitMusic() {
 		if (!isMuted()) {
-			playMusic(Music.start);
+			GameSound.playMusic(Music.start);
 		} else {
 			sleep(1500);
 		}
@@ -124,16 +123,6 @@ public abstract class GameWithLives extends Game {
 		loadNewLevel();
 	}
 	
-	@Override
-	public void run() {
-		super.run();
-		// play music only in first isStarted, not after deserialization
-		if (isStarted) {
-			isStarted = false;
-			playAndWaitMusic();
-		}
-	}
-	
 	/**
 	 * Set lives
 	 * 
@@ -164,7 +153,7 @@ public abstract class GameWithLives extends Game {
 	protected void win() {
 		setStatus(Status.DoSomeWork);
 		synchronized (lock) {
-			playMusic(Music.win);
+			GameSound.playMusic(Music.win);
 			animatedClearBoard(CB_WIN);
 			
 			setLevel(getLevel() + 1);
@@ -175,6 +164,16 @@ public abstract class GameWithLives extends Game {
 			if (!Thread.currentThread().isInterrupted()) {
 				loadNewLevel();
 			}
+		}
+	}
+	
+	@Override
+	public void run() {
+		super.run();
+		// play music only in first isStarted, not after deserialization
+		if (isStarted) {
+			isStarted = false;
+			playAndWaitMusic();
 		}
 	}
 	

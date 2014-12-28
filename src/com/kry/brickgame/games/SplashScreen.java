@@ -2,10 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
-import static com.kry.brickgame.games.GameUtils.music;
-import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.sleep;
-import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,7 +17,7 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.boards.BoardNumbers;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Music;
+import com.kry.brickgame.games.GameSound.Music;
 import com.kry.brickgame.sound.SoundManager;
 
 /**
@@ -38,7 +35,7 @@ public class SplashScreen extends Game {
 	
 	public SplashScreen() {
 		super();
-		SoundManager.prepare(music, welcome);
+		SoundManager.prepare(GameSound.music, welcome);
 		resetFlag = false;
 	}
 	
@@ -265,7 +262,7 @@ public class SplashScreen extends Game {
 	public void run() {
 		setStatus(Status.DoSomeWork);
 		
-		playMusic(welcome);
+		GameSound.playMusic(welcome);
 		sleep(ANIMATION_DELAY);
 		
 		insertNumbers();
@@ -287,7 +284,7 @@ public class SplashScreen extends Game {
 			processKeys();
 		}
 		
-		stopAllSounds();
+		GameSound.stopAllSounds();
 		
 		splashScreenThread.shutdownNow();
 		// Waits for end of interrupting splashScreenThread

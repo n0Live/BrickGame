@@ -4,7 +4,6 @@ import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.isFullLine;
-import static com.kry.brickgame.games.GameUtils.playEffect;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.util.Arrays;
@@ -14,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
+import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.GunShape;
 
 /**
@@ -56,91 +55,6 @@ public abstract class GameWithGun extends GameWithLives {
 		
 		bullets = new AtomicReferenceArray<>(new AtomicIntegerArray[bulletsArrayWidth]);
 		initBullets(bullets);
-	}
-	
-	/**
-	 * Adding the cell to the board and increasing scores
-	 * 
-	 * @param board
-	 *            the board
-	 * @param x
-	 *            x-coordinate of the cell
-	 * @param y
-	 *            y-coordinate of the cell
-	 */
-	protected void addCell(Board board, int x, int y) {
-		playEffect(Effects.add_cell);
-		synchronized (lock) {
-			// add the cell
-			board.setCell(Cell.Full, x, y);
-		}
-		// increase scores
-		setScore(getScore() + 1);
-	}
-	
-	/**
-	 * Adding the cell to the board and increasing scores, after that removing
-	 * line if is filled.
-	 * 
-	 * @param board
-	 *            the board
-	 * @param x
-	 *            x-coordinate of the cell
-	 * @param y
-	 *            y-coordinate of the cell
-	 */
-	protected void addCellAndCheckLine(Board board, int x, int y) {
-		addCell(board, x, y);
-		removeFullLines(y);
-	}
-	
-	/**
-	 * Remove all bullets from the board
-	 * 
-	 * @param board
-	 *            the board, which is necessary to remove the bullets
-	 */
-	protected void clearBullets(Board board) {
-		synchronized (lock) {
-			for (int i = 0; i < boardWidth; i++) {
-				for (int j = 0; j < boardHeight; j++)
-					// bullets.get(y) is blink
-					if (board.getCell(i, j) == Cell.Blink) {
-						board.setCell(Cell.Empty, i, j);
-					}
-			}
-		}
-	}
-	
-	/**
-	 * Destroying (setting {@code Cell.Empty}) a single cell on the row above
-	 * the specified coordinates {@code [x, y]}
-	 * 
-	 * @param x
-	 *            x-coordinate of the cell from where shot will be made
-	 * @param y
-	 *            y-coordinate of the cell from where shot will be made
-	 * @param hasTwoSmokingBarrels
-	 *            if {@code true},then shot is made with two guns on the sides,
-	 *            otherwise shot is made with one gun on the center
-	 */
-	protected void fire(int x, int y, boolean hasTwoSmokingBarrels) {
-		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight)) return;
-		
-		for (int i = x - 1; i <= x + 1; i++) {
-			if (((hasTwoSmokingBarrels) && (i == x)) || ((!hasTwoSmokingBarrels) && (i != x))) {
-				continue;
-			}
-			if ((i >= 0) && (i < boardWidth)) {
-				for (int j = 0; j < bullets.get(i).length(); j++) {
-					if (bullets.get(i).get(j) == 0) {
-						bullets.get(i).set(j, y);
-						break;
-					}
-				}
-			}
-		}
-		// playEffect(Effects.turn); <= removed due occurring audio artifacts
 	}
 	
 	private void flight(boolean ofBullets) {
@@ -203,6 +117,91 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
+	 * Adding the cell to the board and increasing scores
+	 * 
+	 * @param board
+	 *            the board
+	 * @param x
+	 *            x-coordinate of the cell
+	 * @param y
+	 *            y-coordinate of the cell
+	 */
+	protected void addCell(Board board, int x, int y) {
+		GameSound.playEffect(Effects.add_cell);
+		synchronized (lock) {
+			// add the cell
+			board.setCell(Cell.Full, x, y);
+		}
+		// increase scores
+		setScore(getScore() + 1);
+	}
+	
+	/**
+	 * Adding the cell to the board and increasing scores, after that removing
+	 * line if is filled.
+	 * 
+	 * @param board
+	 *            the board
+	 * @param x
+	 *            x-coordinate of the cell
+	 * @param y
+	 *            y-coordinate of the cell
+	 */
+	protected void addCellAndCheckLine(Board board, int x, int y) {
+		addCell(board, x, y);
+		removeFullLines(y);
+	}
+	
+	/**
+	 * Remove all bullets from the board
+	 * 
+	 * @param board
+	 *            the board, which is necessary to remove the bullets
+	 */
+	protected void clearBullets(Board board) {
+		synchronized (lock) {
+			for (int i = 0; i < boardWidth; i++) {
+				for (int j = 0; j < boardHeight; j++)
+					// bullets.get(y) is blink
+					if (board.getCell(i, j) == Cell.Blink) {
+						board.setCell(Cell.Empty, i, j);
+					}
+			}
+		}
+	}
+	
+	/**
+	 * Destroying (setting {@code Cell.Empty}) a single cell on the row above
+	 * the specified coordinates {@code [x, y]}
+	 * 
+	 * @param x
+	 *            x-coordinate of the cell from where shot will be made
+	 * @param y
+	 *            y-coordinate of the cell from where shot will be made
+	 * @param hasTwoSmokingBarrels
+	 *            if {@code true},then shot is made with two guns on the sides,
+	 *            otherwise shot is made with one gun on the center
+	 */
+	protected void fire(int x, int y, boolean hasTwoSmokingBarrels) {
+		if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) return;
+		
+		for (int i = x - 1; i <= x + 1; i++) {
+			if (hasTwoSmokingBarrels && i == x || !hasTwoSmokingBarrels && i != x) {
+				continue;
+			}
+			if (i >= 0 && i < boardWidth) {
+				for (int j = 0; j < bullets.get(i).length(); j++) {
+					if (bullets.get(i).get(j) == 0) {
+						bullets.get(i).set(j, y);
+						break;
+					}
+				}
+			}
+		}
+		// playEffect(Effects.turn); <= removed due occurring audio artifacts
+	}
+	
+	/**
 	 * Processing the flight of bullets (destruction mode)
 	 */
 	protected void flightOfBullets() {
@@ -246,7 +245,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @return {@code false} if there was a collision, otherwise {@code true}
 	 */
 	protected boolean moveGun(int x, int y) {
-		if ((x < 0) || (x >= boardWidth) || (y < 0) || (y >= boardHeight)) return true;
+		if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) return true;
 		
 		synchronized (lock) {
 			Board board = getBoard();
@@ -276,7 +275,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            y-coordinate of the cell
 	 */
 	protected void removeCell(Board board, int x, int y) {
-		playEffect(Effects.hit_cell);
+		GameSound.playEffect(Effects.hit_cell);
 		synchronized (lock) {
 			// remove the cell
 			board.setCell(Cell.Empty, x, y);
@@ -299,7 +298,7 @@ public abstract class GameWithGun extends GameWithLives {
 				Status prevStatus = getStatus();
 				setStatus(Status.DoSomeWork);
 				
-				playEffect(Effects.remove_line);
+				GameSound.playEffect(Effects.remove_line);
 				
 				animatedClearLine(board, curX, y);
 				

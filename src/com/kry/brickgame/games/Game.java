@@ -10,10 +10,7 @@ import static com.kry.brickgame.games.GameConsts.PREVIEW_WIDTH;
 import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.isKeySuspended;
-import static com.kry.brickgame.games.GameUtils.playEffect;
-import static com.kry.brickgame.games.GameUtils.playMusic;
 import static com.kry.brickgame.games.GameUtils.sleep;
-import static com.kry.brickgame.games.GameUtils.stopAllSounds;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,8 +27,8 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameUtils.Effects;
-import com.kry.brickgame.games.GameUtils.Music;
+import com.kry.brickgame.games.GameSound.Effects;
+import com.kry.brickgame.games.GameSound.Music;
 
 /**
  * @author noLive
@@ -74,7 +71,7 @@ public abstract class Game implements Runnable, Serializable {
 	public static void setMuted(boolean mute) {
 		Game.mute = mute;
 		if (mute) {
-			stopAllSounds();
+			GameSound.stopAllSounds();
 		}
 		fireMuteChanged(mute);
 	}
@@ -202,7 +199,7 @@ public abstract class Game implements Runnable, Serializable {
 		
 		setStatus(Status.None);
 		
-		stopAllSounds();
+		GameSound.stopAllSounds();
 		
 		setSpeed(1);
 		setLevel(1);
@@ -320,7 +317,7 @@ public abstract class Game implements Runnable, Serializable {
 		Status prevStatus = getStatus();
 		setStatus(Status.DoSomeWork);
 		
-		playEffect(Effects.remove_line);
+		GameSound.playEffect(Effects.remove_line);
 		
 		while (x1 >= 0 || x2 < board.getWidth()) {
 			if (x1 >= 0) {
@@ -396,7 +393,7 @@ public abstract class Game implements Runnable, Serializable {
 	 * Exit to Main menu
 	 */
 	protected void exitToMainMenu() {
-		stopAllSounds();
+		GameSound.stopAllSounds();
 		
 		setHiScore();
 		
@@ -488,7 +485,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected void gameOver() {
 		setStatus(Status.GameOver);
 		
-		playMusic(Music.game_over);
+		GameSound.playMusic(Music.game_over);
 		
 		animatedClearBoard();
 		
@@ -718,7 +715,7 @@ public abstract class Game implements Runnable, Serializable {
 			newY--;
 		}
 		
-		playMusic(Music.kaboom);
+		GameSound.playMusic(Music.kaboom);
 		final Kaboom kaboom = new Kaboom();
 		
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
@@ -949,7 +946,7 @@ public abstract class Game implements Runnable, Serializable {
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
 			
 			setStatus(Status.Paused);
-			stopAllSounds();
+			GameSound.stopAllSounds();
 		}
 	}
 	
