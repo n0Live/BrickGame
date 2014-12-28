@@ -546,9 +546,10 @@ public final class Drawer {
 		// shift from the beginning of the canvas to avoid the border
 		int shift = Math.round(borderLineWidth);
 		
-		BufferedImage fullSquare = drawSquare(Cell.Full, borderLineWidth * 0.75f);
-		BufferedImage emptySquare = drawSquare(Cell.Empty, borderLineWidth * 0.75f);
-		BufferedImage blinkSquare = drawSquare(Cell.Blink, borderLineWidth * 0.75f);
+		float squareBorderWidth = borderLineWidth * 0.7f;
+		BufferedImage fullSquare = drawSquare(Cell.Full, squareBorderWidth);
+		BufferedImage emptySquare = drawSquare(Cell.Empty, squareBorderWidth);
+		BufferedImage blinkSquare = drawSquare(Cell.Blink, squareBorderWidth);
 		
 		Graphics2D g2d = canvas.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
