@@ -126,8 +126,7 @@ public class GameSound {
 	 *            {@code Music} value, containing the name of the sound
 	 */
 	protected static void playMusic(Music sound) {
-		if (!Game.isMuted()) {
-			
+		if (!Game.isMuted() && !SoundManager.isPlaying(music, Music.tetris)) {
 			// stopAllSounds(); // <-- too slow
 			// stop music only
 			SoundManager.stopAll(GameSound.music);
