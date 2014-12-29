@@ -28,22 +28,23 @@ public class GameMouseListener extends MouseInputAdapter {
 	private Point startPos = null;
 	private int initWidth = 0;
 	private int initHeight = 0;
-
+	private boolean onBorder = false;
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (startPos != null) {
 			// get parent frame
 			Component c = e.getComponent();
 			Container frame = SwingUtilities.getAncestorOfClass(JFrame.class, c);
-
+			
 			int dx = e.getX() - startPos.x;
 			int dy = e.getY() - startPos.y;
-
+			
 			if (cursor == Cursor.SE_RESIZE_CURSOR) {
 				// resizing frame
 				int width = Math.max(initWidth + dx, MIN_WIDTH);
 				int height = Math.max(initHeight + dy, MIN_HEIGHT);
-
+				
 				// in compliance with DEVICE_ASPECT_RATIO
 				frame.setSize(UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
 						DEVICE_ASPECT_RATIO));
@@ -53,35 +54,45 @@ public class GameMouseListener extends MouseInputAdapter {
 			}
 		}
 	}
-
+	
 	@Override
 	public void mouseExited(MouseEvent e) {
 		mouseMoved(e);
 	}
-
+	
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		JPanel c = (JPanel) e.getComponent();
 		ResizableBorder border = (ResizableBorder) c.getBorder();
 		// change cursor when mouse moved over ResizableBorder resize triangle
-		c.setCursor(Cursor.getPredefinedCursor(border.getCursor(e)));
+		int cursor = border.getCursor(e);
+		c.setCursor(Cursor.getPredefinedCursor(cursor));
+		// update the component only if mouse entered or exited from the resize
+		// triangle
+		if (!onBorder && cursor == Cursor.SE_RESIZE_CURSOR) {
+			onBorder = true;
+			c.repaint();
+		} else if (onBorder && cursor != Cursor.SE_RESIZE_CURSOR) {
+			onBorder = false;
+			c.repaint();
+		}
 	}
-
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		startPos = e.getPoint();
-
+		
 		JPanel c = (JPanel) e.getComponent();
 		ResizableBorder border = (ResizableBorder) c.getBorder();
 		cursor = border.getCursor(e);
-
+		
 		if (cursor == Cursor.SE_RESIZE_CURSOR) {
 			// for resizing frame
 			initWidth = c.getWidth();
 			initHeight = c.getHeight();
 		}
 	}
-
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		startPos = null;
