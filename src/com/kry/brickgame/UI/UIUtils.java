@@ -96,9 +96,9 @@ public class UIUtils {
 		
 		// rounding to the nearest highest integer
 		int calcWidth = originalAspectRatio >= aspectRatio ? d.width : (int) Math.ceil(d.height
-		        / aspectRatio);
+				/ aspectRatio);
 		int calcHeight = originalAspectRatio <= aspectRatio ? d.height : (int) Math.ceil(d.width
-		        * aspectRatio);
+				* aspectRatio);
 		
 		return new Dimension(calcWidth, calcHeight);
 	}
@@ -200,7 +200,7 @@ public class UIUtils {
 		float pRight = getPercent(right, UIConsts.TYPICAL_DEVICE_WIDTH);
 		
 		return String.format(Locale.ENGLISH, "insets %f%% %f%% %f%% %f%%", pTop, pLeft, pBottom,
-		        pRight);
+				pRight);
 	}
 	
 	/**
@@ -251,13 +251,11 @@ public class UIUtils {
 	 * @return {@code true} if that color is dark; {@code false} otherwise
 	 */
 	protected static boolean isDarkColor(Color c) {
-		int r = c.getRed();
-		int g = c.getGreen();
-		int b = c.getBlue();
-		
-		// if brightness of all color components less then half of max
-		// brightness
-		return r + g + b < 255 * 3 / 2;
+		// determines the darkness level from 0 (lightest) to 3 (darkest)
+		int darknessLevel = ((0xFF & c.getRed()) < 0x7f ? 1 : 0) // red
+				+ ((0xFF & c.getGreen()) < 0x7f ? 1 : 0) // green
+				+ ((0xFF & c.getBlue()) < 0x7f ? 1 : 0);// blue
+		return darknessLevel >= 2;
 	}
 	
 	/**
