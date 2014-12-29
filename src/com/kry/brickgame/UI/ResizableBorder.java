@@ -9,27 +9,22 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 
-import javax.swing.border.Border;
+import javax.swing.border.AbstractBorder;
 
 /**
  * Border with resize triangle in lower-left corner
  * 
  * @author noLive
  */
-public class ResizableBorder implements Border {
+public class ResizableBorder extends AbstractBorder {
+	private static final long serialVersionUID = 3299590802539449546L;
+	
 	private int triangleSize;
-	
 	private boolean mouseOver = false;
-	
-	@Override
-	public Insets getBorderInsets(Component c) {
-		return new Insets(0, 0, 0, 0);
-	}
 	
 	/**
 	 * Returns resize cursor when mouse move over resize triangle
@@ -56,12 +51,8 @@ public class ResizableBorder implements Border {
 	}
 	
 	@Override
-	public boolean isBorderOpaque() {
-		return false;
-	}
-	
-	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+		super.paintBorder(c, g, x, y, width, height);
 		// calculate the resize triangle size
 		triangleSize = width / 20;
 		
@@ -71,7 +62,7 @@ public class ResizableBorder implements Border {
 		g2d.setStroke(mouseOver ? lineOverStroke : lineNormaStroke);
 		g2d.setPaint(mouseOver ? resizerOverColor : resizerNormalColor);
 		
-		// drawing three lines (or two lines and dot?)
+		// drawing three lines
 		g2d.drawLine(width - triangleSize, height, width, height - triangleSize);
 		g2d.drawLine(width - triangleSize * 2 / 3, height, width, height - triangleSize * 2 / 3);
 		g2d.drawLine(width - triangleSize / 3, height, width, height - triangleSize / 3);
