@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="BrickGame" default="jar">
+
+	<property name="src" value="./src" />
+	<property name="dest" value="./bin" />
+	<property name="miglayout" value="./ext-lib/miglayout15-swing.jar" />
+  
+	<target name="init">
+		<mkdir dir="${dest}"/>
+		<copy todir="${dest}">
+			<fileset dir="${src}">
+				<include name="fonts/**" />
+				<include name="images/**" />
+				<include name="sounds/**" />
+			</fileset>
+		</copy>
+	</target>
+  
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${dest}" includeantruntime="false">
+			<classpath>
+				<pathelement path="."/>
+				<pathelement location="${miglayout}"/>
+				<pathelement path="${java.home}/lib/jfxrt.jar"/>
+			</classpath>
+		</javac>
+	</target>
+  
+	<target name="jar" depends="compile">
+		<jar destfile="BrickGame.jar" basedir="." includes="**/*.class" filesetmanifest="mergewithoutmain">
+			<manifest>
+				<attribute name="Main-Class" value="com.kry.brickgame.Main"/>
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+			<fileset dir="${dest}"/>
+			<zipfileset excludes="META-INF/*.SF" src="${miglayout}"/>
+		</jar>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${dist}"/>
+	</target>
+</project>
