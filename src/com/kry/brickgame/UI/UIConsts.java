@@ -36,6 +36,8 @@ public class UIConsts {
 	protected static final String ICON_ROTATE_LEFT = "\ue601";
 	protected static final String ICON_PAUSE = "\ue603";
 	
+	protected static final String KEY_PREFFIX = "Key";
+	
 	/**
 	 * Aspect ratio of the game field (4/3)
 	 */

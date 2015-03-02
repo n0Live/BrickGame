@@ -1,5 +1,6 @@
 package com.kry.brickgame.UI;
 
+import static com.kry.brickgame.UI.UIConsts.KEY_PREFFIX;
 import static com.kry.brickgame.UI.UIConsts.lineNormaStroke;
 import static com.kry.brickgame.UI.UIConsts.lineNormalColor;
 import static com.kry.brickgame.UI.UIConsts.lineOverColor;
@@ -302,8 +303,8 @@ public class ButtonsFactory {
 		 */
 		public void setToolTipText(KeyPressed key) {
 			StringBuilder toolTipText = new StringBuilder(key.toString());
-			if (toolTipText.indexOf("Key") == 0) {
-				toolTipText.delete(0, 3);
+			if (toolTipText.indexOf(KEY_PREFFIX) == 0) {
+				toolTipText.delete(0, KEY_PREFFIX.length());
 			}
 			
 			boolean isCompare = false;
