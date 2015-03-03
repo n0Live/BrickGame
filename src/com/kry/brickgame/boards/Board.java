@@ -2,6 +2,8 @@ package com.kry.brickgame.boards;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author noLive
@@ -13,6 +15,8 @@ public class Board implements Cloneable, Serializable {
 	public static enum Cell {
 		Empty, Full, Blink
 	}
+	
+	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	
 	private static final long serialVersionUID = -2792579857001935997L;
 	
@@ -33,9 +37,8 @@ public class Board implements Cloneable, Serializable {
 	 */
 	public Board(Board aBoard) {
 		this(aBoard.width, aBoard.height);
-		for (int i = 0; i < aBoard.width; i++) {
+		for (int i = 0; i < aBoard.width; i++)
 			board[i] = aBoard.board[i].clone();
-		}
 	}
 	
 	/**
@@ -58,11 +61,14 @@ public class Board implements Cloneable, Serializable {
 	/**
 	 * Clears the cells of the board
 	 */
-	public synchronized void clearBoard() {
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				board[i][j] = E;
-			}
+	public void clearBoard() {
+		lock.writeLock().lock();
+		try {
+			for (int i = 0; i < width; i++)
+				for (int j = 0; j < height; j++)
+					board[i][j] = E;
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
@@ -72,9 +78,8 @@ public class Board implements Cloneable, Serializable {
 		try {
 			cloned = (Board) super.clone();
 			cloned.board = board.clone();
-			for (int i = 0; i < width; i++) {
+			for (int i = 0; i < width; i++)
 				cloned.board[i] = board[i].clone();
-			}
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			cloned = new Board(this);
@@ -94,40 +99,57 @@ public class Board implements Cloneable, Serializable {
 		return true;
 	}
 	
-	public synchronized Cell[][] getBoard() {
-		Cell[][] newBoard = board.clone();
-		for (int i = 0; i < board.length; i++) {
-			newBoard[i] = board[i].clone();
+	public Cell[][] getBoard() {
+		lock.readLock().lock();
+		try {
+			Cell[][] newBoard = board.clone();
+			for (int i = 0; i < board.length; i++)
+				newBoard[i] = board[i].clone();
+			return newBoard;
+		} finally {
+			lock.readLock().unlock();
 		}
-		return newBoard;
 	}
 	
-	public synchronized Cell getCell(int x, int y) {
-		return board[x][y];
+	public Cell getCell(int x, int y) {
+		lock.readLock().lock();
+		try {
+			return board[x][y];
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 	
-	public synchronized Cell[] getColumn(int x) {
-		Cell column[] = new Cell[getHeight()];
-		
-		for (int i = 0; i < column.length; i++) {
-			column[i] = board[x][i];
+	public Cell[] getColumn(int x) {
+		lock.readLock().lock();
+		try {
+			Cell column[] = new Cell[getHeight()];
+			
+			for (int i = 0; i < column.length; i++)
+				column[i] = board[x][i];
+			
+			return column;
+		} finally {
+			lock.readLock().unlock();
 		}
-		
-		return column;
 	}
 	
 	public int getHeight() {
 		return height;
 	}
 	
-	public synchronized Cell[] getRow(int y) {
-		Cell row[] = new Cell[getWidth()];
-		
-		for (int i = 0; i < row.length; i++) {
-			row[i] = board[i][y];
+	public Cell[] getRow(int y) {
+		lock.readLock().lock();
+		try {
+			Cell row[] = new Cell[getWidth()];
+			
+			for (int i = 0; i < row.length; i++)
+				row[i] = board[i][y];
+			
+			return row;
+		} finally {
+			lock.readLock().unlock();
 		}
-		
-		return row;
 	}
 	
 	public int getWidth() {
@@ -144,8 +166,13 @@ public class Board implements Cloneable, Serializable {
 		return result;
 	}
 	
-	public synchronized void setCell(Cell cell, int x, int y) {
-		board[x][y] = cell;
+	public void setCell(Cell cell, int x, int y) {
+		lock.writeLock().lock();
+		try {
+			board[x][y] = cell;
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 	
 	/**
@@ -156,13 +183,17 @@ public class Board implements Cloneable, Serializable {
 	 * @param x
 	 *            x-coordinate of the column
 	 */
-	public synchronized void setColumn(Cell[] column, int x) {
-		for (int i = 0; i < column.length; i++) {
-			try {
-				board[x][i] = column[i];
-			} catch (IndexOutOfBoundsException e) {
-				continue;
-			}
+	public void setColumn(Cell[] column, int x) {
+		lock.writeLock().lock();
+		try {
+			for (int i = 0; i < column.length; i++)
+				try {
+					board[x][i] = column[i];
+				} catch (IndexOutOfBoundsException e) {
+					continue;
+				}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
@@ -174,13 +205,17 @@ public class Board implements Cloneable, Serializable {
 	 * @param y
 	 *            y-coordinate of the row
 	 */
-	public synchronized void setRow(Cell[] row, int y) {
-		for (int i = 0; i < row.length; i++) {
-			try {
-				board[i][y] = row[i];
-			} catch (IndexOutOfBoundsException e) {
-				continue;
-			}
+	public void setRow(Cell[] row, int y) {
+		lock.writeLock().lock();
+		try {
+			for (int i = 0; i < row.length; i++)
+				try {
+					board[i][y] = row[i];
+				} catch (IndexOutOfBoundsException e) {
+					continue;
+				}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
@@ -192,7 +227,7 @@ public class Board implements Cloneable, Serializable {
 		// Going through the board (the board is filled from the bottom up)
 		for (int i = height - 1; i >= 0; i--) {
 			char line[] = new char[width];
-			for (int j = 0; j < width; j++) {
+			for (int j = 0; j < width; j++)
 				switch (board[j][i]) {
 				case Full:
 					line[j] = '0';
@@ -204,7 +239,6 @@ public class Board implements Cloneable, Serializable {
 					line[j] = '.';
 					break;
 				}
-			}
 			result.append(line).append("\n");
 		}
 		return result.toString();
