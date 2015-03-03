@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Transparency;
@@ -17,8 +16,13 @@ import java.util.Locale;
 
 import javax.imageio.ImageIO;
 
-public class UIUtils {
-	
+public final class UIUtils {
+	/**
+	 * The default {@code GraphicsConfiguration}.
+	 */
+	private static final GraphicsConfiguration config = GraphicsEnvironment
+			.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
 	/**
 	 * Returns the black or white color is inverted to a given.
 	 * 
@@ -52,15 +56,9 @@ public class UIUtils {
 	 * @see Transparency#TRANSLUCENT
 	 */
 	protected static BufferedImage getCompatibleImage(int width, int height, int transparency) {
-		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice device = env.getDefaultScreenDevice();
-		GraphicsConfiguration config = device.getDefaultConfiguration();
 		BufferedImage result;
-		if (transparency != 0) {
-			result = config.createCompatibleImage(width, height, transparency);
-		} else {
-			result = config.createCompatibleImage(width, height);
-		}
+		if (transparency != 0) result = config.createCompatibleImage(width, height, transparency);
+		else result = config.createCompatibleImage(width, height);
 		return result;
 	}
 	
