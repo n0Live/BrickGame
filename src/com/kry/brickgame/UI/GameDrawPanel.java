@@ -31,6 +31,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	private static final long serialVersionUID = 1007369595836803061L;
 	
 	private final GameProperties properties;
+	
 	transient private BufferedImage canvas;
 	
 	transient private final BufferedImage backgroundImage;
@@ -39,7 +40,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	private Dimension size;
 	
-	transient MouseInputListener resizeListener = new GameMouseListener();
+	transient private final MouseInputListener resizeListener = new GameMouseListener();
 	
 	public GameDrawPanel() {
 		super(null, true);
@@ -57,8 +58,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		backgroundImage = UIUtils.getImage("/images/background.png");
 		
 		// BlinkingSquares and BlinkingPause
-		new Timer(50, new ActionListener() {
-			static final int tikToBlinkPause = 10;
+		new Timer(100, new ActionListener() {
+			static final int tikToBlinkPause = 5;
 			int blinkCount = 0;
 			
 			@Override
@@ -70,52 +71,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 						if (blinkCount >= tikToBlinkPause) {
 							blinkCount = 0;
 							blinkingPauseIcon();
-						} else {
-							blinkCount++;
-						}
+						} else blinkCount++;
 					}
 				});
 			}
 		}).start();
-	}
-	
-	/**
-	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
-	 * and vice versa, for blinking "Pause" icon
-	 */
-	public void blinkingPauseIcon() {
-		if (properties.status == Status.Paused) {
-			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
-			getDrawer().showHiScores = getDrawer().showPauseIcon;
-			repaint(UIUtils.getGameFieldRectangle(getSize()));
-		} else {
-			getDrawer().showPauseIcon = false;
-		}
-	}
-	
-	/**
-	 * Changes the {@code blinkColor} color from {@code fullColor} to
-	 * {@code emptyColor} and vice versa
-	 */
-	public void blinkingSquares() {
-		if (getDrawer().blinkColor.equals(fullColor)) {
-			getDrawer().blinkColor = emptyColor;
-		} else {
-			getDrawer().blinkColor = fullColor;
-		}
-		repaint(UIUtils.getGameFieldRectangle(getSize()));
-	}
-	
-	/* Events */
-	@Override
-	public void boardChanged(GameEvent event) {
-		properties.board = event.getBoard();
-		repaint(UIUtils.getGameFieldRectangle(getSize()));
-	}
-	
-	@Override
-	public void exit(GameEvent event) {
-		System.exit(0);
 	}
 	
 	/**
@@ -148,14 +108,47 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		return overlay;
 	}
 	
+	/**
+	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
+	 * and vice versa, for blinking "Pause" icon
+	 */
+	public void blinkingPauseIcon() {
+		if (properties.status == Status.Paused) {
+			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
+			getDrawer().showHiScores = getDrawer().showPauseIcon;
+			repaint(UIUtils.getGameFieldRectangle(getSize()));
+		} else getDrawer().showPauseIcon = false;
+	}
+	
+	/**
+	 * Changes the {@code blinkColor} color from {@code fullColor} to
+	 * {@code emptyColor} and vice versa
+	 */
+	public void blinkingSquares() {
+		if (properties.board != null && properties.board.hasBlinkedCell()) {
+			getDrawer().blinkColor = getDrawer().blinkColor.equals(fullColor) ? emptyColor : fullColor;
+			repaint(UIUtils.getGameFieldRectangle(getSize()));
+		}
+	}
+	
+	/* Events */
+	@Override
+	public void boardChanged(GameEvent event) {
+		if (properties.board == null || !properties.board.equals(event.getBoard())) {
+			properties.board = event.getBoard();
+			repaint(UIUtils.getGameFieldRectangle(getSize()));
+		}
+	}
+	
+	@Override
+	public void exit(GameEvent event) {
+		System.exit(0);
+	}
+	
 	@Override
 	public void infoChanged(GameEvent event) {
-		if (event.getInfo() != null) {
-			properties.info = event.getInfo();
-		}
-		if (event.gethiScores() != null) {
-			properties.hiScores = event.gethiScores();
-		}
+		if (event.getInfo() != null) properties.info = event.getInfo();
+		if (event.gethiScores() != null) properties.hiScores = event.gethiScores();
 	}
 	
 	@Override
@@ -208,10 +201,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 						RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
-			} else {
-				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
-						gameFieldRect.x, gameFieldRect.y, null);
-			}
+			} else g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
+					gameFieldRect.x, gameFieldRect.y, null);
 		}
 		
 		g2d.dispose();
@@ -219,7 +210,6 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		/* Component graphics */
 		g2d = (Graphics2D) g.create();
 		g2d.drawRenderedImage(canvas, null);
-		g2d.dispose();
 	}
 	
 	@Override

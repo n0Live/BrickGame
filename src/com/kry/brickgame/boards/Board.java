@@ -134,6 +134,18 @@ public class Board implements Cloneable, Serializable {
 		}
 	}
 	
+	public boolean hasBlinkedCell() {
+		lock.readLock().lock();
+		try {
+			for (Cell[] column : board)
+				for (int i = 0; i < column.length; i++)
+					if (column[i] == Cell.Blink) return true;
+			return false;
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
 	public int getHeight() {
 		return height;
 	}
