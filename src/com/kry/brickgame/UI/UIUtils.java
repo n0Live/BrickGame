@@ -22,7 +22,10 @@ public final class UIUtils {
 	 */
 	private static final GraphicsConfiguration config = GraphicsEnvironment
 			.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-
+	
+	private static Rectangle cachedRectangle = null;
+	private static BufferedImage cachedCompatibleImage = null;
+	
 	/**
 	 * Returns the black or white color is inverted to a given.
 	 * 
@@ -57,8 +60,13 @@ public final class UIUtils {
 	 */
 	protected static BufferedImage getCompatibleImage(int width, int height, int transparency) {
 		BufferedImage result;
-		if (transparency != 0) result = config.createCompatibleImage(width, height, transparency);
-		else result = config.createCompatibleImage(width, height);
+		if (cachedCompatibleImage != null
+				&& cachedCompatibleImage.getHeight() == height
+				&& cachedCompatibleImage.getWidth() == width
+				&& cachedCompatibleImage.getColorModel().getTransparency() == transparency)
+			result = cachedCompatibleImage;
+		else cachedCompatibleImage = result = transparency != 0 ? config.createCompatibleImage(
+		        width, height, transparency) : config.createCompatibleImage(width, height);
 		return result;
 	}
 	
@@ -134,6 +142,10 @@ public final class UIUtils {
 	 * @return a rectangle indicating the position of the gamefield
 	 */
 	protected static Rectangle getGameFieldRectangle(Dimension canvasSize) {
+		// try to use cache
+		if (cachedRectangle != null && cachedRectangle.height == canvasSize.height)
+			return cachedRectangle;
+		
 		int outBorderSpace = Math.round(canvasSize.width * UIConsts.outBorderSpaceRatio);
 		int inBorderHorSpace = Math.round(canvasSize.width * UIConsts.inBorderHorSpaceRatio);
 		int inBorderVertSpace = Math.round(canvasSize.width * UIConsts.inBorderVertSpaceRatio);
@@ -143,7 +155,7 @@ public final class UIUtils {
 		int width = canvasSize.width - (outBorderSpace + inBorderHorSpace) * 2;
 		int height = Math.round(width * UIConsts.GAME_FIELD_ASPECT_RATIO);
 		
-		return new Rectangle(x, y, width, height);
+		return cachedRectangle = new Rectangle(x, y, width, height);
 	}
 	
 	/**
