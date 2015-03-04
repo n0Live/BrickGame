@@ -1,7 +1,5 @@
 package com.kry.brickgame.games;
 
-import static com.kry.brickgame.sound.SoundManager.enumToResourceArray;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +29,9 @@ public class GameSound {
 	}
 	
 	// load the sounds at initialization to reduce the delay in the first play
-	static final SoundBank effects = new SoundBank(enumToResourceArray(Effects.class));
-	static final SoundBank melodies = new SoundBank(enumToResourceArray(Melodies.class));
-	static final SoundBank music = new SoundBank(enumToResourceArray(Music.class));
+	static final SoundBank effects = new SoundBank();
+	static final SoundBank melodies = new SoundBank();
+	static final SoundBank music = new SoundBank();
 	
 	/**
 	 * Map of the priority of the sound effects

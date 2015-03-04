@@ -7,20 +7,20 @@ import java.util.Map;
 
 import javafx.scene.media.AudioClip;
 
-public class SoundManager {
+public final class SoundManager {
 	private final static String soundFolder = "/sounds/";
 	private final static String soundExtension = ".m4a";
 	
-	private static final int DELAY_BEFORE_PLAY_NEW_SOUND = 600;
+	private static final int DELAY_BEFORE_PLAY_NEW_SOUND = 500;
+	
 	private static final Map<String, Long> playedClips = new HashMap<>();
+	private static final Map<String, String> nameToResource = new HashMap<>();
 	
 	private static boolean canPlay(String clip, int delay) {
-		synchronized (playedClips) {
-			if (playedClips.containsKey(clip)
-			        && System.currentTimeMillis() < playedClips.get(clip) + delay) return false;
-			playedClips.put(clip, System.currentTimeMillis());
-			return true;
-		}
+		long now = System.currentTimeMillis();
+		if (playedClips.containsKey(clip) && now < playedClips.get(clip) + delay) return false;
+		playedClips.put(clip, now);
+		return true;
 	}
 	
 	/**
@@ -34,7 +34,13 @@ public class SoundManager {
 	 * @return {@code AudioClip}
 	 */
 	private static <E extends Enum<E>> AudioClip getClip(SoundBank soundBank, Enum<E> value) {
-		return soundBank.getClip(getResourceFromName(value.toString()));
+		String key = value.toString();
+		String fileName = nameToResource.get(key);
+		if (fileName == null) {
+			fileName = getResourceFromName(key);
+			nameToResource.put(key, fileName);
+		}
+		return soundBank.getClip(fileName);
 	}
 	
 	/**

@@ -15,14 +15,21 @@ public class SoundBank implements Iterable<AudioClip> {
 	private final Map<String, AudioClip> clips;
 	
 	/**
-	 * Creates an SoundBank and loads {@code files} to it.
+	 * Creates a {@code SoundBank} and loads {@code files} to it.
 	 * 
 	 * @param files
 	 *            array of file names to load
 	 */
 	public SoundBank(String[] files) {
-		clips = new HashMap<>(files.length, 1f);
+		clips = new HashMap<>(files.length);
 		loadSounds(files);
+	}
+	
+	/**
+	 * Creates an empty {@code SoundBank}.
+	 */
+	public SoundBank() {
+		clips = new HashMap<>();
 	}
 	
 	/**
@@ -33,6 +40,7 @@ public class SoundBank implements Iterable<AudioClip> {
 	 * @return {@code AudioClip}
 	 */
 	public AudioClip getClip(String file) {
+		loadSound(file);
 		return clips.get(file);
 	}
 	
