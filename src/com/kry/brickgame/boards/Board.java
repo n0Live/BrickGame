@@ -37,8 +37,9 @@ public class Board implements Cloneable, Serializable {
 	 */
 	public Board(Board aBoard) {
 		this(aBoard.width, aBoard.height);
-		for (int i = 0; i < aBoard.width; i++)
+		for (int i = 0; i < aBoard.width; i++) {
 			board[i] = aBoard.board[i].clone();
+		}
 	}
 	
 	/**
@@ -64,22 +65,25 @@ public class Board implements Cloneable, Serializable {
 	public void clearBoard() {
 		lock.writeLock().lock();
 		try {
-			for (int i = 0; i < width; i++)
-				for (int j = 0; j < height; j++)
+			for (int i = 0; i < width; i++) {
+				for (int j = 0; j < height; j++) {
 					board[i][j] = E;
+				}
+			}
 		} finally {
 			lock.writeLock().unlock();
 		}
 	}
 	
 	@Override
-	public Object clone() {
+	public Board clone() {
 		Board cloned;
 		try {
 			cloned = (Board) super.clone();
 			cloned.board = board.clone();
-			for (int i = 0; i < width; i++)
+			for (int i = 0; i < width; i++) {
 				cloned.board[i] = board[i].clone();
+			}
 		} catch (CloneNotSupportedException e) {
 			e.printStackTrace();
 			cloned = new Board(this);
@@ -103,8 +107,9 @@ public class Board implements Cloneable, Serializable {
 		lock.readLock().lock();
 		try {
 			Cell[][] newBoard = board.clone();
-			for (int i = 0; i < board.length; i++)
+			for (int i = 0; i < board.length; i++) {
 				newBoard[i] = board[i].clone();
+			}
 			return newBoard;
 		} finally {
 			lock.readLock().unlock();
@@ -125,8 +130,9 @@ public class Board implements Cloneable, Serializable {
 		try {
 			Cell column[] = new Cell[getHeight()];
 			
-			for (int i = 0; i < column.length; i++)
+			for (int i = 0; i < column.length; i++) {
 				column[i] = board[x][i];
+			}
 			
 			return column;
 		} finally {
@@ -137,15 +143,16 @@ public class Board implements Cloneable, Serializable {
 	public boolean hasBlinkedCell() {
 		lock.readLock().lock();
 		try {
-			for (Cell[] column : board)
-				for (int i = 0; i < column.length; i++)
-					if (column[i] == Cell.Blink) return true;
+			for (Cell[] column : board) {
+				for (Cell element : column)
+					if (element == Cell.Blink) return true;
+			}
 			return false;
 		} finally {
 			lock.readLock().unlock();
 		}
 	}
-
+	
 	public int getHeight() {
 		return height;
 	}
@@ -155,8 +162,9 @@ public class Board implements Cloneable, Serializable {
 		try {
 			Cell row[] = new Cell[getWidth()];
 			
-			for (int i = 0; i < row.length; i++)
+			for (int i = 0; i < row.length; i++) {
 				row[i] = board[i][y];
+			}
 			
 			return row;
 		} finally {
@@ -198,12 +206,13 @@ public class Board implements Cloneable, Serializable {
 	public void setColumn(Cell[] column, int x) {
 		lock.writeLock().lock();
 		try {
-			for (int i = 0; i < column.length; i++)
+			for (int i = 0; i < column.length; i++) {
 				try {
 					board[x][i] = column[i];
 				} catch (IndexOutOfBoundsException e) {
 					continue;
 				}
+			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -220,12 +229,13 @@ public class Board implements Cloneable, Serializable {
 	public void setRow(Cell[] row, int y) {
 		lock.writeLock().lock();
 		try {
-			for (int i = 0; i < row.length; i++)
+			for (int i = 0; i < row.length; i++) {
 				try {
 					board[i][y] = row[i];
 				} catch (IndexOutOfBoundsException e) {
 					continue;
 				}
+			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -239,7 +249,7 @@ public class Board implements Cloneable, Serializable {
 		// Going through the board (the board is filled from the bottom up)
 		for (int i = height - 1; i >= 0; i--) {
 			char line[] = new char[width];
-			for (int j = 0; j < width; j++)
+			for (int j = 0; j < width; j++) {
 				switch (board[j][i]) {
 				case Full:
 					line[j] = '0';
@@ -251,6 +261,7 @@ public class Board implements Cloneable, Serializable {
 					line[j] = '.';
 					break;
 				}
+			}
 			result.append(line).append("\n");
 		}
 		return result.toString();

@@ -43,7 +43,7 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	private static boolean mute;
 	
-	transient final static Object lock = new Object();
+	protected final static Object lock = new Object();
 	
 	protected static void fireMuteChanged(boolean mute) {
 		GameEvent event = new GameEvent(Game.class, mute);
@@ -76,7 +76,7 @@ public abstract class Game implements Runnable, Serializable {
 		fireMuteChanged(mute);
 	}
 	
-	final Random r;
+	static final Random r = new Random();
 	/**
 	 * Set of the pressed keys
 	 */
@@ -195,8 +195,6 @@ public abstract class Game implements Runnable, Serializable {
 	 * The Game
 	 */
 	public Game() {
-		r = new Random();
-		
 		setStatus(Status.None);
 		
 		GameSound.stopAllSounds();
@@ -409,7 +407,7 @@ public abstract class Game implements Runnable, Serializable {
 	protected void fireBoardChanged(Board board) {
 		if (!Thread.currentThread().isInterrupted()) {
 			GameEvent event = new GameEvent(this, isInvertedBoard() ? getInvertedBoard(board)
-			        : board, false);
+			        : board.clone(), false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
 			}
@@ -762,11 +760,9 @@ public abstract class Game implements Runnable, Serializable {
 			return;
 		}
 		
-		if (getStatus() == Status.Paused) {
-			if (keys.contains(KeyPressed.KeyRotate)) {
-				keys.remove(KeyPressed.KeyRotate);
-				changeRotation();
-			}
+		if (getStatus() == Status.Paused) if (keys.contains(KeyPressed.KeyRotate)) {
+			keys.remove(KeyPressed.KeyRotate);
+			changeRotation();
 		}
 	}
 	

@@ -174,7 +174,7 @@ public class Shape implements Cloneable, Serializable {
 	}
 	
 	@Override
-	public Object clone() {
+	public Shape clone() {
 		Shape cloned;
 		try {
 			cloned = (Shape) super.clone();

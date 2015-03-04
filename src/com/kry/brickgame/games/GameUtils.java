@@ -208,7 +208,7 @@ public final class GameUtils {
 	protected static boolean checkCollision(Board board, Shape piece, int x, int y,
 	        boolean withBorder) {
 		int board_x, board_y;
-		Board checkBoard = (Board) board.clone();
+		Board checkBoard = board.clone();
 		if (withBorder) {
 			for (int k = 0; k < piece.getLength(); k++) {
 				// include in the check collision the area around the point
@@ -254,8 +254,8 @@ public final class GameUtils {
 	protected static boolean checkTwoShapeCollision(CoordinatedShape first, CoordinatedShape second) {
 		if (first == null || second == null) return false;
 		
-		CoordinatedShape checkedFirst = (CoordinatedShape) first.clone();
-		CoordinatedShape checkedSecond = (CoordinatedShape) second.clone();
+		CoordinatedShape checkedFirst = first.clone();
+		CoordinatedShape checkedSecond = second.clone();
 		// when the figures are placed too far apart, returns false
 		if (Math.abs(checkedFirst.y() + checkedFirst.minY() - checkedSecond.y()
 		        + checkedSecond.minY()) > Math.max(checkedFirst.getHeight(),
@@ -312,7 +312,7 @@ public final class GameUtils {
 			board_y = board_y - board.getHeight();
 		}
 		
-		Board resultBoard = (Board) board.clone();
+		Board resultBoard = board.clone();
 		resultBoard.setCell(fill, board_x, board_y);
 		
 		return resultBoard;
@@ -353,7 +353,7 @@ public final class GameUtils {
 	protected static Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
 		if (shape == null || board == null) return board;
 		
-		Board resultBoard = (Board) board.clone();
+		Board resultBoard = board.clone();
 		for (int i = 0; i < shape.getLength(); i++) {
 			int board_x = x + shape.x(i);
 			int board_y = y + shape.y(i);
@@ -378,7 +378,7 @@ public final class GameUtils {
 	protected static Board getInvertedBoard(Board board) {
 		if (board == null) return board;
 		
-		Board resultBoard = (Board) board.clone();
+		Board resultBoard = board.clone();
 		for (int i = 0; i < resultBoard.getHeight(); i++) {
 			resultBoard.setRow(board.getRow(i), resultBoard.getHeight() - i - 1);
 		}
@@ -500,7 +500,7 @@ public final class GameUtils {
 		
 		if (reducedDX == 0) return board;
 		
-		Board resultBoard = (Board) board.clone();
+		Board resultBoard = board.clone();
 		
 		for (int i = 0; i < Math.abs(reducedDX); i++) {
 			// if shift to the right, then get the first column as temporary,

@@ -727,7 +727,7 @@ public class TanksGame extends GameWithLives {
 	private boolean isPossibleMove(TankShape tank, Point newPlace, RotationAngle direction) {
 		Board board = getBoard();
 		
-		TankShape checkingTank = (TankShape) tank.clone();
+		TankShape checkingTank = tank.clone();
 		
 		// Erase the tank to not interfere with the checks
 		board = eraseTank(board, tank);
@@ -782,7 +782,7 @@ public class TanksGame extends GameWithLives {
 	private TankShape moveTank(TankShape tank, RotationAngle direction, boolean rotationOnly) {
 		if (tank == null) return null;
 		
-		TankShape newTank = (TankShape) tank.clone();
+		TankShape newTank = tank.clone();
 		synchronized (lock) {
 			Board board = getBoard();
 			

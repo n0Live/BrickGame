@@ -216,7 +216,7 @@ public class BricksWall extends Board {
 	}
 	
 	@Override
-	public Object clone() {
+	public BricksWall clone() {
 		BricksWall cloned = (BricksWall) super.clone();
 		return cloned;
 	}

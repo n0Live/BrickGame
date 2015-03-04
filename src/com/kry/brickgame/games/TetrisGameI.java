@@ -797,9 +797,9 @@ public class TetrisGameI extends Game {
 				} else if (curPiece.getShape() != Figures.SuperPoint) {
 					TetrisShape rotatedPiece;
 					if (getRotation() == Rotation.Counterclockwise) {
-						rotatedPiece = ((TetrisShape) curPiece.clone()).rotateLeft();
+						rotatedPiece = curPiece.clone().rotateLeft();
 					} else {
-						rotatedPiece = ((TetrisShape) curPiece.clone()).rotateRight();
+						rotatedPiece = curPiece.clone().rotateRight();
 					}
 					if (tryMove(rotatedPiece, curX, curY)) {
 						GameSound.playEffect(Effects.turn);
@@ -905,7 +905,7 @@ public class TetrisGameI extends Game {
 		setBoard(drawShape(board, prepX, newY, newPiece, newPiece.getFill()));
 		
 		// The current figure is replaced by the new
-		curPiece = (TetrisShape) newPiece.clone();
+		curPiece = newPiece.clone();
 		curX = prepX;
 		curY = newY;
 		

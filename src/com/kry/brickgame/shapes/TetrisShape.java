@@ -485,7 +485,7 @@ public class TetrisShape extends Shape {
 	}
 	
 	@Override
-	public Object clone() {
+	public TetrisShape clone() {
 		TetrisShape cloned = (TetrisShape) super.clone();
 		cloned.boardFill = boardFill.clone();
 		return cloned;

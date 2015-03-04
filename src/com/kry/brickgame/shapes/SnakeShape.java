@@ -168,7 +168,7 @@ public class SnakeShape extends Shape {
 	}
 	
 	@Override
-	public Object clone() {
+	public SnakeShape clone() {
 		SnakeShape cloned = (SnakeShape) super.clone();
 		return cloned;
 	}

@@ -448,7 +448,7 @@ public class InvadersGame extends GameWithGun {
 	
 	@Override
 	protected void fireBoardChanged(Board board) {
-		Board newBoard = (Board) board.clone();
+		Board newBoard = board.clone();
 		
 		// the X-Dimension has its own laws
 		if (theXDimension) {

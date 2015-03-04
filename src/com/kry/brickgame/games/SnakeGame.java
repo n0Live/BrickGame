@@ -53,14 +53,14 @@ public class SnakeGame extends GameWithLives {
 	 * @return - the board with the snake
 	 */
 	private static Board drawSnake(Board board, SnakeShape snake, int x, int y) {
-		Board resultBoard = (Board) board.clone();
+		Board result = board;
 		for (int i = 0; i < snake.getLength(); i++) {
 			// draws the snake on the board
 			// the head of the snake is blinking
-			resultBoard = drawPoint(resultBoard, x + snake.x(i), y + snake.y(i),
-			        i == 0 ? Cell.Blink : Cell.Full);
+			result = drawPoint(result, x + snake.x(i), y + snake.y(i), i == 0 ? Cell.Blink
+			        : Cell.Full);
 		}
-		return resultBoard;
+		return result;
 	}
 	
 	/**
@@ -277,21 +277,19 @@ public class SnakeGame extends GameWithLives {
 		headOfSnake.setCoord(0, snake.getCoord(0));
 		
 		// check the out off the board
-		if (checkBoardCollision(board, headOfSnake, newX, newY)) {
-			if (isToroidalField) {
-				if (newX < 0) {
-					newX = boardWidth + newX;
-				} else if (newX >= boardWidth) {
-					newX = newX - boardWidth;
-				}
-				if (newY < 0) {
-					newY = boardHeight + newY;
-				} else if (newY >= boardHeight) {
-					newY = newY - boardHeight;
-				}
-				
-			} else return false;
-		}
+		if (checkBoardCollision(board, headOfSnake, newX, newY)) if (isToroidalField) {
+			if (newX < 0) {
+				newX = boardWidth + newX;
+			} else if (newX >= boardWidth) {
+				newX = newX - boardWidth;
+			}
+			if (newY < 0) {
+				newY = boardHeight + newY;
+			} else if (newY >= boardHeight) {
+				newY = newY - boardHeight;
+			}
+			
+		} else return false;
 		
 		boolean isAppleAhead = board.getCell(newX, newY) == Cell.Blink;
 		
@@ -332,7 +330,7 @@ public class SnakeGame extends GameWithLives {
 		}
 		
 		// the old snake is replaced by the new snake
-		snake = (SnakeShape) newSnake.clone();
+		snake = newSnake.clone();
 		curX = newX;
 		curY = newY;
 		
@@ -389,45 +387,35 @@ public class SnakeGame extends GameWithLives {
 		super.processKeys();
 		
 		if (getStatus() == Status.Running) {
-			if (containsKey(KeyPressed.KeyLeft)) {
-				if (tryMove(LEFT)) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
-				} else {
-					loss(curX, curY);
-				}
+			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(LEFT)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyRight)) {
-				if (tryMove(RIGHT)) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
-				} else {
-					loss(curX, curY);
-				}
+			if (containsKey(KeyPressed.KeyRight)) if (tryMove(RIGHT)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyDown)) {
-				if (tryMove(DOWN)) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
-				} else {
-					loss(curX, curY);
-				}
+			if (containsKey(KeyPressed.KeyDown)) if (tryMove(DOWN)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				if (tryMove(UP)) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
-				} else {
-					loss(curX, curY);
-				}
+			if (containsKey(KeyPressed.KeyUp)) if (tryMove(UP)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				if (tryMove(snake.getDirection())) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
-				} else {
-					loss(curX, curY);
-				}
+			if (containsKey(KeyPressed.KeyRotate)) if (tryMove(snake.getDirection())) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
+			} else {
+				loss(curX, curY);
 			}
 		}
 	}
@@ -448,11 +436,10 @@ public class SnakeGame extends GameWithLives {
 			}
 			
 			// moving of the snake
-			if (getStatus() == Status.Running && elapsedTime(currentSpeed)) {
-				if (!tryMove(snake.getDirection())) {
-					loss(curX, curY);
-				}
-			}
+			if (getStatus() == Status.Running && elapsedTime(currentSpeed))
+			    if (!tryMove(snake.getDirection())) {
+				    loss(curX, curY);
+			    }
 			// when the snake has reached the maximum length
 			if (snake.getLength() >= SnakeShape.getMaxLength()) {
 				win();

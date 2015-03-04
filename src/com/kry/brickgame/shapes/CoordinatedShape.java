@@ -39,7 +39,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 	}
 	
 	@Override
-	public Object clone() {
+	public CoordinatedShape clone() {
 		CoordinatedShape cloned = (CoordinatedShape) super.clone();
 		return cloned;
 	}

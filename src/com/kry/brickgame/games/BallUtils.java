@@ -33,7 +33,7 @@ public final class BallUtils {
 	 */
 	protected static Board drawBall(Board board, Shape ball, int oldX, int oldY, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
-		Board newBoard = (Board) board.clone();
+		Board newBoard = board.clone();
 		
 		// Erase the ball and draw on the new place
 		newBoard = drawShape(newBoard, oldX, oldY, ball, Cell.Empty);

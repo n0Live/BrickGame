@@ -44,7 +44,7 @@ public class Bullet extends CoordinatedShape {
 	}
 	
 	@Override
-	public Object clone() {
+	public Bullet clone() {
 		Bullet cloned = (Bullet) super.clone();
 		return cloned;
 	}
