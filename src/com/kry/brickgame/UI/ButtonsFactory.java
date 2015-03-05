@@ -338,12 +338,12 @@ public class ButtonsFactory {
 	/**
 	 * Mouse listener for the buttons
 	 */
-	static ButtonMouseListener btnMouseListener = null;
+	static ButtonMouseListener btnMouseListener = new ButtonMouseListener();;
 	
 	/**
 	 * Map of the added buttons, assigned to the keys
 	 */
-	static Map<KeyPressed, GameButton> buttons = null;
+	static Map<KeyPressed, GameButton> buttons = new HashMap<>();;
 	
 	/**
 	 * Returns button, assigned to the specified key
@@ -353,14 +353,6 @@ public class ButtonsFactory {
 	 * @return button, assigned to the specified key
 	 */
 	public static GameButton getButton(KeyPressed key) {
-		// creating only in first call
-		if (null == btnMouseListener) {
-			btnMouseListener = new ButtonMouseListener();
-		}
-		if (null == buttons) {
-			buttons = new HashMap<>();
-		}
-		
 		GameButton button = buttons.get(key);
 		// if button not created yet
 		if (null == button) {
