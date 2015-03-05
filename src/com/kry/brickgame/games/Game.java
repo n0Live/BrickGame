@@ -732,6 +732,9 @@ public abstract class Game implements Runnable, Serializable {
 	protected void processKeys() {
 		if (keys.isEmpty() || getStatus() == Status.None) return;
 		
+		// decrease CPU loading
+		sleep(10);
+		
 		if (keys.contains(KeyPressed.KeyShutdown)) {
 			keys.remove(KeyPressed.KeyShutdown);
 			quit();

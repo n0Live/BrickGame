@@ -449,9 +449,11 @@ public final class GameUtils {
 	 *            specified key
 	 */
 	protected static boolean isKeySuspended(KeyPressed key) {
-		if (!suspendedKeys.containsKey(key)) return false;
-		if (suspendedKeys.get(key) > System.currentTimeMillis()) return true;
-		suspendedKeys.remove(key);
+		Long value = suspendedKeys.get(key);
+		if (value != null) {
+			if (value > System.currentTimeMillis()) return true;
+			suspendedKeys.remove(key);
+		}
 		return false;
 	}
 	
