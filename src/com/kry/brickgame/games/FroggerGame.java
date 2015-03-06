@@ -17,8 +17,6 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Shape;
-import com.kry.brickgame.splashes.FroggerSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -28,7 +26,7 @@ public class FroggerGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new FroggerSplash();
+	public static final String splash = "com.kry.brickgame.splashes.FroggerSplash";
 	/**
 	 * Number of subtypes
 	 */

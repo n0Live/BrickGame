@@ -18,8 +18,6 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.games.GameSound.Music;
-import com.kry.brickgame.splashes.GunSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -29,7 +27,7 @@ public class GunGame extends GameWithGun {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new GunSplash();
+	public static final String splash = "com.kry.brickgame.splashes.GunSplash";
 	/**
 	 * Number of subtypes
 	 */

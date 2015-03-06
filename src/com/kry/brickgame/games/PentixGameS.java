@@ -2,8 +2,6 @@ package com.kry.brickgame.games;
 
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.shapes.TetrisShape;
-import com.kry.brickgame.splashes.PentixSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -13,7 +11,7 @@ public class PentixGameS extends TetrisGameK {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new PentixSplash();
+	public static final String splash = "com.kry.brickgame.splashes.PentixSplash";
 	
 	/**
 	 * The Tetris with the Pentominoes figures

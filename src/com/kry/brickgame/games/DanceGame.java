@@ -19,8 +19,6 @@ import com.kry.brickgame.games.GameSound.Melodies;
 import com.kry.brickgame.shapes.DancerShape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.sound.SoundManager;
-import com.kry.brickgame.splashes.DanceSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -120,7 +118,7 @@ public class DanceGame extends Game {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new DanceSplash();
+	public static final String splash = "com.kry.brickgame.splashes.DanceSplash";
 	
 	/**
 	 * Number of subtypes

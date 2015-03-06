@@ -14,8 +14,6 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.CarShape;
-import com.kry.brickgame.splashes.RaceSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -25,7 +23,7 @@ public class RacingGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new RaceSplash();
+	public static final String splash = "com.kry.brickgame.splashes.RaceSplash";
 	/**
 	 * Number of subtypes
 	 */

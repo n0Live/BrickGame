@@ -24,8 +24,6 @@ import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
-import com.kry.brickgame.splashes.InvadersSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -35,7 +33,7 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new InvadersSplash();
+	public static final String splash = "com.kry.brickgame.splashes.InvadersSplash";
 	/**
 	 * Number of subtypes
 	 */

@@ -20,8 +20,6 @@ import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.games.GameSound.Music;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
-import com.kry.brickgame.splashes.Splash;
-import com.kry.brickgame.splashes.TetrisSplash;
 
 /**
  * @author noLive
@@ -31,7 +29,7 @@ public class TetrisGameI extends Game {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new TetrisSplash();
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplash";
 	/**
 	 * Number of subtypes
 	 */

@@ -30,8 +30,6 @@ import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.Bullet;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
 import com.kry.brickgame.shapes.TankShape;
-import com.kry.brickgame.splashes.Splash;
-import com.kry.brickgame.splashes.TanksSplash;
 
 /**
  * @author noLive
@@ -41,7 +39,7 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new TanksSplash();
+	public static final String splash = "com.kry.brickgame.splashes.TanksSplash";
 	/**
 	 * Number of subtypes
 	 */

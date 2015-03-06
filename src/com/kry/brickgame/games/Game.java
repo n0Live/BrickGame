@@ -36,7 +36,7 @@ import com.kry.brickgame.games.GameSound.Music;
 public abstract class Game implements Runnable, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 	
-	private static ArrayList<GameListener> listeners = new ArrayList<GameListener>();
+	private static ArrayList<GameListener> listeners = new ArrayList<>();
 	
 	/**
 	 * Is the sound turned off?

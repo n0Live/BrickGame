@@ -24,8 +24,6 @@ import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.ArkanoidPlatformShape;
 import com.kry.brickgame.shapes.Shape;
 import com.kry.brickgame.shapes.Shape.RotationAngle;
-import com.kry.brickgame.splashes.ArkanoidSplash;
-import com.kry.brickgame.splashes.Splash;
 
 /**
  * @author noLive
@@ -35,7 +33,7 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
-	public static final Splash splash = new ArkanoidSplash();
+	public static final String splash = "com.kry.brickgame.splashes.ArkanoidSplash";
 	/**
 	 * Number of subtypes
 	 */

@@ -172,9 +172,11 @@ public class GameSelector extends Game {
 			// trying to get the splash screen instance from the class of
 			// the game
 			try {
-				splash = (Splash) c.getField("splash").get(c);
+				String splashClassName = (String) c.getField("splash").get(c);
+				Class<Splash> splashClass = (Class<Splash>) Class.forName(splashClassName);
+				splash = splashClass.newInstance();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-			        | SecurityException e) {
+			        | SecurityException | InstantiationException e) {
 				e.printStackTrace();
 				splash = null;
 			}
