@@ -21,7 +21,7 @@ public final class UIUtils {
 	 * The default {@code GraphicsConfiguration}.
 	 */
 	private static final GraphicsConfiguration config = GraphicsEnvironment
-			.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+	        .getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 	
 	private static Rectangle cachedRectangle = null;
 	private static BufferedImage cachedCompatibleImage = null;
@@ -60,13 +60,14 @@ public final class UIUtils {
 	 */
 	protected static BufferedImage getCompatibleImage(int width, int height, int transparency) {
 		BufferedImage result;
-		if (cachedCompatibleImage != null
-				&& cachedCompatibleImage.getHeight() == height
-				&& cachedCompatibleImage.getWidth() == width
-				&& cachedCompatibleImage.getColorModel().getTransparency() == transparency)
+		if (cachedCompatibleImage != null && cachedCompatibleImage.getHeight() == height
+		        && cachedCompatibleImage.getWidth() == width
+		        && cachedCompatibleImage.getColorModel().getTransparency() == transparency) {
 			result = cachedCompatibleImage;
-		else cachedCompatibleImage = result = transparency != 0 ? config.createCompatibleImage(
-		        width, height, transparency) : config.createCompatibleImage(width, height);
+		} else {
+			cachedCompatibleImage = result = transparency != 0 ? config.createCompatibleImage(
+			        width, height, transparency) : config.createCompatibleImage(width, height);
+		}
 		return result;
 	}
 	
@@ -101,10 +102,10 @@ public final class UIUtils {
 		float originalAspectRatio = (float) d.height / d.width;
 		
 		// rounding to the nearest highest integer
-		int calcWidth = originalAspectRatio >= aspectRatio ? d.width : (int) Math.ceil(d.height
-				/ aspectRatio);
-		int calcHeight = originalAspectRatio <= aspectRatio ? d.height : (int) Math.ceil(d.width
-				* aspectRatio);
+		int calcWidth = originalAspectRatio >= aspectRatio ? d.width : Math.round(d.height
+		        / aspectRatio);
+		int calcHeight = originalAspectRatio <= aspectRatio ? d.height : Math.round(d.width
+		        * aspectRatio);
 		
 		return new Dimension(calcWidth, calcHeight);
 	}
@@ -144,7 +145,7 @@ public final class UIUtils {
 	protected static Rectangle getGameFieldRectangle(Dimension canvasSize) {
 		// try to use cache
 		if (cachedRectangle != null && cachedRectangle.height == canvasSize.height)
-			return cachedRectangle;
+		    return cachedRectangle;
 		
 		int outBorderSpace = Math.round(canvasSize.width * UIConsts.outBorderSpaceRatio);
 		int inBorderHorSpace = Math.round(canvasSize.width * UIConsts.inBorderHorSpaceRatio);
@@ -210,7 +211,7 @@ public final class UIUtils {
 		float pRight = getPercent(right, UIConsts.TYPICAL_DEVICE_WIDTH);
 		
 		return String.format(Locale.ENGLISH, "insets %f%% %f%% %f%% %f%%", pTop, pLeft, pBottom,
-				pRight);
+		        pRight);
 	}
 	
 	/**
@@ -263,8 +264,8 @@ public final class UIUtils {
 	protected static boolean isDarkColor(Color c) {
 		// determines the darkness level from 0 (lightest) to 3 (darkest)
 		int darknessLevel = ((0xFF & c.getRed()) < 0x7f ? 1 : 0) // red
-				+ ((0xFF & c.getGreen()) < 0x7f ? 1 : 0) // green
-				+ ((0xFF & c.getBlue()) < 0x7f ? 1 : 0);// blue
+		        + ((0xFF & c.getGreen()) < 0x7f ? 1 : 0) // green
+		        + ((0xFF & c.getBlue()) < 0x7f ? 1 : 0);// blue
 		return darknessLevel >= 2;
 	}
 	

@@ -41,13 +41,18 @@ public class GameMouseListener extends MouseInputAdapter {
 			int dy = e.getY() - startPos.y;
 			
 			if (cursor == Cursor.SE_RESIZE_CURSOR) {
-				// resizing frame
 				int width = Math.max(initWidth + dx, MIN_WIDTH);
 				int height = Math.max(initHeight + dy, MIN_HEIGHT);
 				
-				// in compliance with DEVICE_ASPECT_RATIO
-				frame.setSize(UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
-						DEVICE_ASPECT_RATIO));
+				Dimension size = UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
+				        DEVICE_ASPECT_RATIO);
+				
+				// should remain at least 10 visible pixels on the screen
+				if (frame.getY() + size.height > 10 && frame.getX() + size.width > 10) {
+					// resizing frame in compliance with DEVICE_ASPECT_RATIO
+					frame.setSize(UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
+					        DEVICE_ASPECT_RATIO));
+				}
 			} else {
 				// moving frame
 				frame.setLocation(frame.getX() + dx, frame.getY() + dy);

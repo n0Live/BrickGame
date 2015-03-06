@@ -57,6 +57,8 @@ public final class Main {
 	
 	public static void setGame(Game game) {
 		Main.game = game;
+		// force GC
+		System.gc();
 		if (null == gameThread) {
 			gameThread = Executors.newSingleThreadExecutor();
 		}
