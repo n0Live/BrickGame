@@ -71,7 +71,9 @@ public class GameDrawPanel extends JPanel implements GameListener {
 						if (blinkCount >= tikToBlinkPause) {
 							blinkCount = 0;
 							blinkingPauseIcon();
-						} else blinkCount++;
+						} else {
+							blinkCount++;
+						} 
 					}
 				});
 			}
@@ -94,15 +96,15 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			overlay = UIUtils.getCompatibleImage(width, height, Transparency.TRANSLUCENT);
 			// calculating the overlay position on the backgroundImage
 			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
-					backgroundImage.getHeight());
+			        backgroundImage.getHeight());
 			
 			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			// get overlay from the backgroundImage
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
-					overlayRect.width, overlayRect.height), 0, 0, width, height, null);
+			        overlayRect.width, overlayRect.height), 0, 0, width, height, null);
 			g2d.dispose();
 		}
 		return overlay;
@@ -117,7 +119,9 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
 			getDrawer().showHiScores = getDrawer().showPauseIcon;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
-		} else getDrawer().showPauseIcon = false;
+		} else {
+			getDrawer().showPauseIcon = false;
+		}
 	}
 	
 	/**
@@ -126,7 +130,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 */
 	public void blinkingSquares() {
 		if (properties.board != null && properties.board.hasBlinkedCell()) {
-			getDrawer().blinkColor = getDrawer().blinkColor.equals(fullColor) ? emptyColor : fullColor;
+			getDrawer().blinkColor = getDrawer().blinkColor.equals(fullColor) ? emptyColor
+			        : fullColor;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		}
 	}
@@ -147,13 +152,18 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void infoChanged(GameEvent event) {
-		if (event.getInfo() != null) properties.info = event.getInfo();
-		if (event.gethiScores() != null) properties.hiScores = event.gethiScores();
+		if (event.getInfo() != null) {
+			properties.info = event.getInfo();
+		}
+		if (event.gethiScores() != null) {
+			properties.hiScores = event.gethiScores();
+		}
 	}
 	
 	@Override
 	public void levelChanged(GameEvent event) {
 		properties.level = event.getLevel();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override
@@ -188,7 +198,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		// prepare the gamefield
 		Rectangle gameFieldRect = UIUtils.getGameFieldRectangle(size);
 		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldRect.width,
-				gameFieldRect.height, properties);
+		        gameFieldRect.height, properties);
 		
 		// draw the gamefield
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -199,10 +209,12 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 			if (needForUpdate) {
 				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-						RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+				        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
-			} else g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
-					gameFieldRect.x, gameFieldRect.y, null);
+			} else {
+				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
+				        gameFieldRect.x, gameFieldRect.y, null);
+			}
 		}
 		
 		g2d.dispose();
@@ -222,16 +234,19 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void rotationChanged(GameEvent event) {
 		properties.rotation = event.getRotation();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override
 	public void speedChanged(GameEvent event) {
 		properties.speed = event.getSpeed();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override
 	public void statusChanged(GameEvent event) {
 		properties.status = event.getStatus();
 		getDrawer().showHiScores = event.getSource() instanceof GameSelector;
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 }
