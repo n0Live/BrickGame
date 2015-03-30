@@ -73,7 +73,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 							blinkingPauseIcon();
 						} else {
 							blinkCount++;
-						} 
+						}
 					}
 				});
 			}
@@ -116,11 +116,10 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 */
 	public void blinkingPauseIcon() {
 		if (properties.status == Status.Paused) {
-			getDrawer().showPauseIcon = !getDrawer().showPauseIcon;
-			getDrawer().showHiScores = getDrawer().showPauseIcon;
+			properties.showPauseIcon = properties.showHiScores = !properties.showPauseIcon;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		} else {
-			getDrawer().showPauseIcon = false;
+			properties.showPauseIcon = false;
 		}
 	}
 	
@@ -130,7 +129,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 */
 	public void blinkingSquares() {
 		if (properties.board != null && properties.board.hasBlinkedCell()) {
-			getDrawer().blinkColor = getDrawer().blinkColor.equals(fullColor) ? emptyColor
+			properties.blinkColor = properties.blinkColor.equals(fullColor) ? emptyColor
 			        : fullColor;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		}
@@ -227,8 +226,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void previewChanged(GameEvent event) {
 		properties.preview = event.getPreview();
-		getDrawer().showLives = event.getSource() instanceof GameWithLives;
-		getDrawer().showNext = event.getSource() instanceof TetrisGameI;
+		properties.showLives = event.getSource() instanceof GameWithLives;
+		properties.showNext = event.getSource() instanceof TetrisGameI;
 	}
 	
 	@Override
@@ -246,7 +245,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	@Override
 	public void statusChanged(GameEvent event) {
 		properties.status = event.getStatus();
-		getDrawer().showHiScores = event.getSource() instanceof GameSelector;
+		properties.showHiScores = event.getSource() instanceof GameSelector;
 		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 }

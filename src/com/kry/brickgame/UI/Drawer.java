@@ -364,7 +364,8 @@ public final class Drawer {
 			
 			// clear the text area
 			g2d.setBackground(bgColor);
-			g2d.clearRect(x, y - font.getSize(), fm.stringWidth(backgroundText), font.getSize());
+			g2d.clearRect(x, y - font.getSize(), fm.stringWidth(backgroundText) + 1,
+			        font.getSize() + 2);
 		}
 		
 		// forming a string for text formatting, based on backgroundText
@@ -419,13 +420,30 @@ public final class Drawer {
 	 *            height of the created canvas
 	 */
 	private static BufferedImage initCanvas(BufferedImage canvas, int width, int height) {
+		return initCanvas(canvas, width, height, true);
+	}
+	
+	/**
+	 * Creating the canvas specified width and height
+	 * 
+	 * @param width
+	 *            width of the created canvas
+	 * @param height
+	 *            height of the created canvas
+	 * @param clear
+	 *            whether or not to clear the canvas
+	 */
+	private static BufferedImage initCanvas(BufferedImage canvas, int width, int height,
+	        boolean clear) {
 		BufferedImage result;
 		if (null == canvas || canvas.getWidth() != width || canvas.getHeight() != height) {
 			result = UIUtils.getCompatibleImage(width, height, Transparency.OPAQUE);
 		} else {
 			result = canvas;
 		}
-		clearCanvas(result, bgColor);
+		if (clear) {
+			clearCanvas(result, bgColor);
+		}
 		
 		return result;
 	}
@@ -439,31 +457,34 @@ public final class Drawer {
 		return drawer;
 	}
 	
+	private GameProperties prevProperties = null;
+	private int prevWidth, prevHeight;
+	
 	/* For events feedback */
 	/**
 	 * Color of elements that change their state from active to inactive
 	 */
-	public Color blinkColor;
+	private Color blinkColor;
 	
 	/**
 	 * Flag for blinking "Pause" icon
 	 */
-	public boolean showPauseIcon;
+	private boolean showPauseIcon;
 	
 	/**
 	 * Flag for show high scores
 	 */
-	public boolean showHiScores;
+	private boolean showHiScores;
 	
 	/**
 	 * Flag for show "lives" label
 	 */
-	public boolean showLives;
+	private boolean showLives;
 	
 	/**
 	 * Flag for show "next" label
 	 */
-	public boolean showNext;
+	private boolean showNext;
 	
 	/* --- */
 	/**
@@ -497,11 +518,6 @@ public final class Drawer {
 	private final FontManager fontManager;
 	
 	private Drawer() {
-		blinkColor = fullColor;
-		showPauseIcon = false;
-		showHiScores = false;
-		showLives = false;
-		showNext = false;
 		canvas = null;
 		boardCanvas = null;
 		previewCanvas = null;
@@ -856,6 +872,12 @@ public final class Drawer {
 	 * @return canvas, containing the rendered game field
 	 */
 	public BufferedImage getDrawnGameField(int width, int height, GameProperties properties) {
+		blinkColor = properties.blinkColor;
+		showPauseIcon = properties.showPauseIcon;
+		showHiScores = properties.showHiScores;
+		showLives = properties.showLives;
+		showNext = properties.showNext;
+		
 		// set the size of the canvas based on GAME_FIELD_ASPECT_RATIO
 		Dimension d = UIUtils.getDimensionWithAspectRatio(new Dimension(width, height),
 		        GAME_FIELD_ASPECT_RATIO);
@@ -863,45 +885,97 @@ public final class Drawer {
 		// calculate size of a one square
 		squareSideLength = d.height / (properties.board.getHeight() + 1);
 		
-		canvas = initCanvas(canvas, d.width, d.height);
+		boolean updateBoard = false;
+		boolean updatePreview = false;
+		boolean updateLabels = false;
+		boolean updateMainCanvas = false;
+		
+		// checking of the need to update canvases
+		if (d.width != prevWidth || d.height != prevHeight || prevProperties == null
+		        || canvas == null || boardCanvas == null || previewCanvas == null) {
+			updateBoard = updatePreview = updateLabels = updateMainCanvas = true;
+		} else {
+			if (prevProperties.blinkColor != properties.blinkColor) {
+				updateBoard = properties.board.hasBlinkedCell();
+				updatePreview = properties.preview.hasBlinkedCell();
+			}
+			if (!updateBoard
+			        && (!prevProperties.board.equals(properties.board)
+			                || properties.status == Status.ComingSoon
+			                && prevProperties.status != Status.ComingSoon || prevProperties.status == Status.ComingSoon
+			                && properties.status != Status.ComingSoon)) {
+				updateBoard = true;
+			}
+			if (!updatePreview && !prevProperties.preview.equals(properties.preview)) {
+				updatePreview = true;
+			}
+			if (!prevProperties.isLabelsEquals(properties)) {
+				updateLabels = true;
+			}
+		}
+		
+		if (updateMainCanvas) {
+			canvas = initCanvas(canvas, d.width, d.height);
+		}
 		
 		float borderLineWidth = calcBorderLineWidth();
-		boardCanvas = initCanvas(boardCanvas, properties.board, squareSideLength, borderLineWidth);
-		previewCanvas = initCanvas(previewCanvas, properties.preview, squareSideLength,
-		        borderLineWidth);
+		if (updateBoard) {
+			boardCanvas = initCanvas(boardCanvas, properties.board, squareSideLength,
+			        borderLineWidth);
+		}
+		if (updatePreview) {
+			previewCanvas = initCanvas(previewCanvas, properties.preview, squareSideLength,
+			        borderLineWidth);
+		}
 		
 		if (boardCanvas != null && previewCanvas != null) {
-			// draw the board and the preview
-			updateCanvas(boardCanvas, properties.board, borderLineWidth);
-			updateCanvas(previewCanvas, properties.preview, borderLineWidth);
-			
-			canvasSetBorder(boardCanvas, borderLineWidth);
-			drawComingSoonStatus(boardCanvas, properties.status);
-			
 			int space = squareSideLength / 2;
-			labelsCanvas = initCanvas(labelsCanvas, d.width - (boardCanvas.getWidth() + space),
-			        boardCanvas.getHeight());
-			// append labels and icons
-			drawLabelsAndIcons(labelsCanvas, properties);
 			
-			// add main board canvas
+			// draw the board and the preview
 			int boardX = space;
 			int boardY = space;
-			appendCanvas(canvas, boardCanvas, boardX, boardY);
+			if (updateBoard) {
+				updateCanvas(boardCanvas, properties.board, borderLineWidth);
+				canvasSetBorder(boardCanvas, borderLineWidth);
+				drawComingSoonStatus(boardCanvas, properties.status);
+				// add main board canvas
+				appendCanvas(canvas, boardCanvas, boardX, boardY);
+			}
 			
-			// add label canvas
 			int labelX = boardX + boardCanvas.getWidth();
 			int labelY = boardY;
-			appendCanvas(canvas, labelsCanvas, labelX, labelY);
+			if (updateLabels) {
+				int newWidth = d.width - (boardCanvas.getWidth() + space);
+				int newHeight = boardCanvas.getHeight();
+				
+				// clear the labelsCanvas only when dimensional changes
+				boolean needToClearCanvas = labelsCanvas == null
+				        || newWidth != labelsCanvas.getWidth()
+				        || newHeight != labelsCanvas.getHeight();
+				
+				labelsCanvas = initCanvas(labelsCanvas, newWidth, newHeight, needToClearCanvas);
+				// append labels and icons
+				drawLabelsAndIcons(labelsCanvas, properties);
+				// add label canvas
+				appendCanvas(canvas, labelsCanvas, labelX, labelY);
+			}
 			
-			// add preview canvas
 			int previewX = labelX
 			// center of the label canvas
 			        + (labelsCanvas.getWidth() - previewCanvas.getWidth()) / 2;
 			int previewY = labelY + 5 * squareSideLength;
-			appendCanvas(canvas, previewCanvas, previewX, previewY);
+			if (updatePreview) {
+				updateCanvas(previewCanvas, properties.preview, borderLineWidth);
+			}
+			if (updatePreview || updateLabels) {
+				// add preview canvas
+				appendCanvas(canvas, previewCanvas, previewX, previewY);
+			}
 		}
 		
+		prevProperties = properties.clone();
+		prevWidth = d.width;
+		prevHeight = d.height;
 		return canvas;
 	}
 	
