@@ -176,6 +176,12 @@ public class InvadersGame extends GameWithGun {
 		loadNewLevel();
 	}
 	
+	@Override
+	protected void animatedClearBoard(int millis) {
+		theXDimension = false;
+		super.animatedClearBoard(millis);
+	}
+	
 	/**
 	 * Processing breaking bricks
 	 * 
@@ -229,10 +235,10 @@ public class InvadersGame extends GameWithGun {
 					// magic aiming algorithm
 					if (ballX < curX) { // if the ball to the left of the gun
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? LEFT
-						        : RIGHT;
+								: RIGHT;
 					} else {
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? RIGHT
-						        : LEFT;
+								: LEFT;
 					}
 					// delete this brick from bricks wall
 					bricks.setCell(Cell.Empty, x, y);
@@ -299,10 +305,8 @@ public class InvadersGame extends GameWithGun {
 	 */
 	private boolean droppingDown() {
 		int newBricksY = bricksY - 1;
-		if (newBricksY <= -bricks.getHeight()) {
-			win();
-			return true;
-		}
+		
+		if (newBricksY < -bricks.getHeight()) return true;
 		
 		boolean result = true;
 		synchronized (lock) {
@@ -315,8 +319,7 @@ public class InvadersGame extends GameWithGun {
 			for (int i = 0; i < boardWidth; i++) {
 				if (board.getCell(i, curY + gun.maxY()) == Cell.Full) {
 					// checking for compliance with the conditions of
-					// teleportation
-					// in the X-Dimension
+					// teleportation in the X-Dimension
 					if (isReadyToXDimension) {
 						for (int j = 0; j < bricks.getHeight(); j++) {
 							if (bricks.getCell(bricksX + startX, j) == Cell.Full) {
@@ -349,111 +352,25 @@ public class InvadersGame extends GameWithGun {
 		return result;
 	}
 	
-	/**
-	 * Erasing the ball from the board
-	 */
-	private void initBall() {
-		isFlyingBall = false;
-		synchronized (lock) {
-			setBoard(drawBall(getBoard(), -1, -1));
-		}
-	}
-	
-	/**
-	 * Move the ball to a new position in movement direction
-	 */
-	private void moveBall() {
-		Point newCoords;
-		// set new coordinates from directions
-		newCoords = BallUtils
-		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
-		
-		// if the ball fall off the board then remove it
-		if (newCoords.y < 0) {
-			removeBall();
-			return;
-		}
-		
-		// whether the ball bounced off the surface?
-		boolean bounce = false;
-		
-		// check collision with the board's borders
-		if (newCoords.x < 0 || newCoords.x >= boardWidth) {
-			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
-			bounce = true;
-		}
-		newCoords = BallUtils
-		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
-		
-		synchronized (lock) {
-			// if ball was destroyed then return
-			if (ballX == -1 && ballY == -1) return;
-			Board board = getBoard();
-			// check collision with the gun
-			if (newCoords.y <= curY + gun.maxY()) {
-				if (checkCollision(board, ball, newCoords.x, newCoords.y)) {
-					isDead = true;
-					return;
-				}
-			}
-			// draw the ball in the new position
-			board = drawBall(board, newCoords.x, newCoords.y);
-			setBoard(board);
-		}
-		
-		if (bounce) {
-			GameSound.playEffect(Effects.turn);
-		}
-	}
-	
-	/**
-	 * Removes the ball from the board
-	 */
-	private void removeBall() {
-		initBall();
-		bricks.setBricksCount(bricks.getBricksCount() - 1);
-	}
-	
-	/**
-	 * Shift the bricks wall horizontally
-	 */
-	private void shiftBricks() {
-		// shift bricks
-		bricks = bricks.shift(r.nextBoolean() ? -1 : 1);
-		synchronized (lock) {
-			// insert shifted bricks to the board
-			setBoard(insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY));
-		}
-	}
-	
-	/**
-	 * Processing actions of invaders
-	 */
-	void processInvasion() {
-		if (!Thread.currentThread().isInterrupted()) {
-			if (isFlyingBall) { // the ball already created
-				moveBall();
-			} else {
-				// dropping down the bricks wall
-				if (!droppingDown()) {
-					isDead = true;
-				} else {
-					createBall();
-				}
-			}
-		}
-	}
-	
 	@Override
 	protected void fireBoardChanged(Board board) {
-		Board newBoard = board.clone();
+		Board newBoard = board;
 		
 		// the X-Dimension has its own laws
 		if (theXDimension) {
+			newBoard = board.clone();
 			for (int i = 0; i < newBoard.getWidth(); i++) {
 				for (int j = 0; j < newBoard.getHeight(); j++) {
-					if (newBoard.getCell(i, j) == Cell.Full && r.nextInt(4) != 0) {
-						newBoard.setCell(Cell.Empty, i, j);
+					if (newBoard.getCell(i, j) == Cell.Full) {
+						// replace some full cells to empty
+						if (r.nextInt(4) == 0) {
+							newBoard.setCell(Cell.Empty, i, j);
+						}
+					} else {
+						// and empty to full for more fun
+						if (j > 2 && r.nextInt(20) == 0) {
+							newBoard.setCell(Cell.Full, i, j);
+						}
 					}
 				}
 			}
@@ -471,6 +388,16 @@ public class InvadersGame extends GameWithGun {
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 55;
+	}
+	
+	/**
+	 * Erasing the ball from the board
+	 */
+	private void initBall() {
+		isFlyingBall = false;
+		synchronized (lock) {
+			setBoard(drawBall(getBoard(), -1, -1));
+		}
 	}
 	
 	/**
@@ -524,6 +451,71 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	/**
+	 * Move the ball to a new position in movement direction
+	 */
+	private void moveBall() {
+		Point newCoords;
+		// set new coordinates from directions
+		newCoords = BallUtils
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		
+		// if the ball fall off the board then remove it
+		if (newCoords.y < 0) {
+			removeBall();
+			return;
+		}
+		
+		// whether the ball bounced off the surface?
+		boolean bounce = false;
+		
+		// check collision with the board's borders
+		if (newCoords.x < 0 || newCoords.x >= boardWidth) {
+			ballHorizontalDirection = ballHorizontalDirection.getOpposite();
+			bounce = true;
+		}
+		newCoords = BallUtils
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		
+		synchronized (lock) {
+			// if ball was destroyed then return
+			if (ballX == -1 && ballY == -1) return;
+			Board board = getBoard();
+			// check collision with the gun
+			if (newCoords.y <= curY + gun.maxY()) {
+				if (checkCollision(board, ball, newCoords.x, newCoords.y)) {
+					isDead = true;
+					return;
+				}
+			}
+			// draw the ball in the new position
+			board = drawBall(board, newCoords.x, newCoords.y);
+			setBoard(board);
+		}
+		
+		if (bounce) {
+			GameSound.playEffect(Effects.turn);
+		}
+	}
+	
+	/**
+	 * Processing actions of invaders
+	 */
+	void processInvasion() {
+		if (!Thread.currentThread().isInterrupted()) {
+			if (isFlyingBall) { // the ball already created
+				moveBall();
+			} else {
+				// dropping down the bricks wall
+				if (!droppingDown()) {
+					isDead = true;
+				} else {
+					createBall();
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Processing of key presses
 	 */
 	@Override
@@ -570,6 +562,14 @@ public class InvadersGame extends GameWithGun {
 		}
 	}
 	
+	/**
+	 * Removes the ball from the board
+	 */
+	private void removeBall() {
+		initBall();
+		bricks.setBricksCount(bricks.getBricksCount() - 1);
+	}
+	
 	@Override
 	protected void removeCell(Board board, int x, int y) {
 		synchronized (lock) {
@@ -580,17 +580,6 @@ public class InvadersGame extends GameWithGun {
 				breakBrick(board, x, y);
 			}
 		}
-	}
-	
-	@Override
-	protected void win() {
-		// if the invasionTimer was set, then cancel it
-		if (invasionHandler != null) {
-			invasionHandler.cancel(true);
-		}
-		// clear the ball from the board
-		initBall();
-		super.win();
 	}
 	
 	/**
@@ -621,7 +610,7 @@ public class InvadersGame extends GameWithGun {
 					// must be in the main thread
 					loss(curX, curY);
 					// check the number of remaining bricks
-				} else if (bricks.getBricksCount() <= 0) {
+				} else if (bricks.getBricksCount() <= 0 || (bricksY <= -bricks.getHeight())) {
 					clearBullets(getBoard());
 					win();
 				}
@@ -632,5 +621,28 @@ public class InvadersGame extends GameWithGun {
 		
 		bulletSwarm.shutdownNow();
 		invasionTimer.shutdownNow();
+	}
+	
+	/**
+	 * Shift the bricks wall horizontally
+	 */
+	private void shiftBricks() {
+		// shift bricks
+		bricks = bricks.shift(r.nextBoolean() ? -1 : 1);
+		synchronized (lock) {
+			// insert shifted bricks to the board
+			setBoard(insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY));
+		}
+	}
+	
+	@Override
+	protected void win() {
+		// if the invasionTimer was set, then cancel it
+		if (invasionHandler != null) {
+			invasionHandler.cancel(true);
+		}
+		// clear the ball from the board
+		initBall();
+		super.win();
 	}
 }
