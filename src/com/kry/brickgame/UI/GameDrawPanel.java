@@ -81,36 +81,6 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	}
 	
 	/**
-	 * Returns the overlay image for drawing it above the gamefield
-	 * 
-	 * @param width
-	 *            width of the overlay
-	 * @param height
-	 *            height of the overlay
-	 * @return the overlay image
-	 */
-	private BufferedImage getOverlayImage(int width, int height) {
-		if (null == backgroundImage) return overlay = null;
-		// update overlay only if necessary
-		if (null == overlay || overlay.getWidth() != width || overlay.getHeight() != height) {
-			overlay = UIUtils.getCompatibleImage(width, height, Transparency.TRANSLUCENT);
-			// calculating the overlay position on the backgroundImage
-			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
-			        backgroundImage.getHeight());
-			
-			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
-			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-			        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-			// get overlay from the backgroundImage
-			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
-			        overlayRect.width, overlayRect.height), 0, 0, width, height, null);
-			g2d.dispose();
-		}
-		return overlay;
-	}
-	
-	/**
 	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
 	 * and vice versa, for blinking "Pause" icon
 	 */
@@ -130,7 +100,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	public void blinkingSquares() {
 		if (properties.board != null && properties.board.hasBlinkedCell()) {
 			properties.blinkColor = properties.blinkColor.equals(fullColor) ? emptyColor
-			        : fullColor;
+					: fullColor;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		}
 	}
@@ -138,15 +108,43 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	/* Events */
 	@Override
 	public void boardChanged(GameEvent event) {
-		if (properties.board == null || !properties.board.equals(event.getBoard())) {
-			properties.board = event.getBoard();
-			repaint(UIUtils.getGameFieldRectangle(getSize()));
-		}
+		properties.board = event.getBoard();
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override
 	public void exit(GameEvent event) {
 		System.exit(0);
+	}
+	
+	/**
+	 * Returns the overlay image for drawing it above the gamefield
+	 * 
+	 * @param width
+	 *            width of the overlay
+	 * @param height
+	 *            height of the overlay
+	 * @return the overlay image
+	 */
+	private BufferedImage getOverlayImage(int width, int height) {
+		if (null == backgroundImage) return overlay = null;
+		// update overlay only if necessary
+		if (null == overlay || overlay.getWidth() != width || overlay.getHeight() != height) {
+			overlay = UIUtils.getCompatibleImage(width, height, Transparency.TRANSLUCENT);
+			// calculating the overlay position on the backgroundImage
+			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
+					backgroundImage.getHeight());
+			
+			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
+			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			// get overlay from the backgroundImage
+			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
+					overlayRect.width, overlayRect.height), 0, 0, width, height, null);
+			g2d.dispose();
+		}
+		return overlay;
 	}
 	
 	@Override
@@ -197,7 +195,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		// prepare the gamefield
 		Rectangle gameFieldRect = UIUtils.getGameFieldRectangle(size);
 		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldRect.width,
-		        gameFieldRect.height, properties);
+				gameFieldRect.height, properties);
 		
 		// draw the gamefield
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -208,11 +206,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 			if (needForUpdate) {
 				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+						RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
 			} else {
 				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
-				        gameFieldRect.x, gameFieldRect.y, null);
+						gameFieldRect.x, gameFieldRect.y, null);
 			}
 		}
 		

@@ -103,6 +103,9 @@ public class GameProperties implements Serializable {
 		if (mute != other.mute) return false;
 		if (speed != other.speed) return false;
 		if (level != other.level) return false;
+		if (status == null) {
+			if (other.status != null) return false;
+		} else if (status != other.status) return false;
 		if (rotation == null) {
 			if (other.rotation != null) return false;
 		} else if (rotation != other.rotation) return false;
