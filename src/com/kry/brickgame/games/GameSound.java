@@ -97,7 +97,7 @@ public class GameSound {
 		if (!Game.isMuted() && !SoundManager.isPlaying(GameSound.music)) {
 			// get sound priority
 			int priority = GameSound.effectsPriority.containsKey(sound) ? GameSound.effectsPriority
-			        .get(sound) : Thread.NORM_PRIORITY;
+					.get(sound) : Thread.NORM_PRIORITY;
 			SoundManager.play(GameSound.effects, sound, priority);
 		}
 	}
@@ -133,11 +133,7 @@ public class GameSound {
 				SoundManager.stopAll(GameSound.effects);
 			}
 			
-			if (Music.start.equals(sound)) {
-				SoundManager.playAndWait(GameSound.music, sound);
-			} else {
-				SoundManager.play(GameSound.music, sound);
-			}
+			SoundManager.play(GameSound.music, sound);
 		}
 	}
 	

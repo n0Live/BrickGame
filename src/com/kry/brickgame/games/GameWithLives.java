@@ -16,18 +16,6 @@ public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
 	
 	/**
-	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
-	 * seconds
-	 */
-	private static void playAndWaitMusic() {
-		if (!isMuted()) {
-			GameSound.playMusic(Music.start);
-		} else {
-			sleep(1500);
-		}
-	}
-	
-	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
@@ -35,6 +23,17 @@ public abstract class GameWithLives extends Game {
 	private volatile int lives;
 	
 	protected boolean isStarted;
+	
+	/**
+	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
+	 * seconds
+	 */
+	private static void playAndWaitMusic() {
+		if (!isMuted()) {
+			GameSound.playMusic(Music.start);
+		}
+		sleep(1500); // start.m4a duration
+	}
 	
 	/**
 	 * The Game with lives without rotation
@@ -123,6 +122,16 @@ public abstract class GameWithLives extends Game {
 		loadNewLevel();
 	}
 	
+	@Override
+	public void run() {
+		super.run();
+		// play music only in first isStarted, not after deserialization
+		if (isStarted) {
+			isStarted = false;
+			playAndWaitMusic();
+		}
+	}
+	
 	/**
 	 * Set lives
 	 * 
@@ -164,16 +173,6 @@ public abstract class GameWithLives extends Game {
 			if (!Thread.currentThread().isInterrupted()) {
 				loadNewLevel();
 			}
-		}
-	}
-	
-	@Override
-	public void run() {
-		super.run();
-		// play music only in first isStarted, not after deserialization
-		if (isStarted) {
-			isStarted = false;
-			playAndWaitMusic();
 		}
 	}
 	
