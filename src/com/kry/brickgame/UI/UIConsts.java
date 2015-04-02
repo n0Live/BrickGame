@@ -69,16 +69,16 @@ public class UIConsts {
 	
 	// white if dark device color or same as device color otherwise
 	protected static final Color resizerNormalColor = isDarkColor(deviceBgColor) ? Color.white
-	        : deviceBgColor;
+			: deviceBgColor;
 	protected static final Color resizerOverColor = isDarkColor(deviceBgColor) ? getReduced(resizerNormalColor)
-	        : getEnhanced(resizerNormalColor);
+			: getEnhanced(resizerNormalColor);
 	
 	protected static final Stroke lineNormaStroke = new BasicStroke(2f);
 	protected static final Stroke lineOverStroke = new BasicStroke(3f);
 	
 	protected static final int TYPICAL_DEVICE_WIDTH = 1080;
 	protected static final int TYPICAL_DEVICE_HEIGHT = (int) Math.ceil(TYPICAL_DEVICE_WIDTH
-	        * DEVICE_ASPECT_RATIO);
+			* DEVICE_ASPECT_RATIO);
 	
 	protected static final int MIN_WIDTH = 190;
 	protected static final int MIN_HEIGHT = (int) Math.ceil(MIN_WIDTH * DEVICE_ASPECT_RATIO);
@@ -123,4 +123,8 @@ public class UIConsts {
 	 * whole width of the device
 	 */
 	static final float inBorderVertSpaceRatio = (float) 1 / 18;
+	/**
+	 * Whether or not to show FPS for debug
+	 */
+	static final boolean SHOW_FPS = getSettingsManager().getShowFPS();
 }

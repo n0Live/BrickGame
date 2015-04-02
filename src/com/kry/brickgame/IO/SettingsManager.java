@@ -29,29 +29,7 @@ public class SettingsManager {
 		// random color by default
 		defaults.put("color", colorToHexString(new Color(new Random().nextInt(0xFFFFFF))));
 		defaults.put("exit_confirmation", Boolean.TRUE.toString());
-	}
-	
-	/**
-	 * Converts a {@code Color} to a {@code HexString}.
-	 * 
-	 * @param c
-	 *            Color
-	 * @return HexString
-	 */
-	private static String colorToHexString(Color c) {
-		return String.format("#%06X", 0xFFFFFF & c.getRGB());
-	}
-	
-	/**
-	 * Converts a {@code HexString} to a {@code Color}.
-	 * 
-	 * @param hexString
-	 *            HexString
-	 * @return Color
-	 */
-	private static Color hexStringToColor(String hexString) {
-		// skip the '#' character
-		return new Color(Integer.parseInt(hexString.substring(1), 16));
+		defaults.put("show_fps", Boolean.FALSE.toString());
 	}
 	
 	/**
@@ -63,6 +41,17 @@ public class SettingsManager {
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static SettingsManager instance;
+	
+	/**
+	 * Converts a {@code Color} to a {@code HexString}.
+	 * 
+	 * @param c
+	 *            Color
+	 * @return HexString
+	 */
+	private static String colorToHexString(Color c) {
+		return String.format("#%06X", 0xFFFFFF & c.getRGB());
+	}
 	
 	/**
 	 * Delete a file with saved properties.
@@ -85,8 +74,21 @@ public class SettingsManager {
 		return instance;
 	}
 	
+	/**
+	 * Converts a {@code HexString} to a {@code Color}.
+	 * 
+	 * @param hexString
+	 *            HexString
+	 * @return Color
+	 */
+	private static Color hexStringToColor(String hexString) {
+		// skip the '#' character
+		return new Color(Integer.parseInt(hexString.substring(1), 16));
+	}
+	
 	private SettingsManager() {
-		properties = new Properties(defaults);
+		properties = new Properties();
+		loadProperties();
 	}
 	
 	/**
@@ -98,7 +100,6 @@ public class SettingsManager {
 		try {
 			return hexStringToColor(properties.getProperty("color"));
 		} catch (Exception e) {
-			e.printStackTrace();
 			properties.remove("color");
 			return hexStringToColor(defaults.getProperty("color"));
 		}
@@ -113,7 +114,6 @@ public class SettingsManager {
 		try {
 			return Boolean.valueOf(properties.getProperty("exit_confirmation"));
 		} catch (Exception e) {
-			e.printStackTrace();
 			properties.remove("exit_confirmation");
 			return Boolean.valueOf(defaults.getProperty("exit_confirmation"));
 		}
@@ -128,7 +128,6 @@ public class SettingsManager {
 		try {
 			return Boolean.valueOf(properties.getProperty("muted"));
 		} catch (Exception e) {
-			e.printStackTrace();
 			properties.remove("muted");
 			return Boolean.valueOf(defaults.getProperty("muted"));
 		}
@@ -143,9 +142,22 @@ public class SettingsManager {
 		try {
 			return Rotation.valueOf(properties.getProperty("rotation"));
 		} catch (Exception e) {
-			e.printStackTrace();
 			properties.remove("rotation");
 			return Rotation.valueOf(defaults.getProperty("rotation"));
+		}
+	}
+	
+	/**
+	 * Returns the saved "show fps" property
+	 * 
+	 * @return whether or not to show FPS
+	 */
+	public boolean getShowFPS() {
+		try {
+			return Boolean.valueOf(properties.getProperty("show_fps"));
+		} catch (Exception e) {
+			properties.remove("show_fps");
+			return Boolean.valueOf(defaults.getProperty("show_fps"));
 		}
 	}
 	
@@ -258,6 +270,16 @@ public class SettingsManager {
 	 */
 	public void setRotation(Rotation r) {
 		properties.setProperty("rotation", r.toString());
+		saveProperties(true);
+	}
+	
+	/**
+	 * Sets and saves the "muted" property
+	 * 
+	 * @param muted
+	 */
+	public void setShowFPS(boolean showFPS) {
+		properties.setProperty("show_fps", String.valueOf(showFPS));
 		saveProperties(true);
 	}
 	

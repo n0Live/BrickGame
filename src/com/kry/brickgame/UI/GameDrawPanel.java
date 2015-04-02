@@ -2,11 +2,13 @@ package com.kry.brickgame.UI;
 
 import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.UI.Drawer.getDrawer;
+import static com.kry.brickgame.UI.UIConsts.SHOW_FPS;
 import static com.kry.brickgame.UI.UIConsts.deviceBgColor;
 import static com.kry.brickgame.UI.UIConsts.emptyColor;
 import static com.kry.brickgame.UI.UIConsts.fullColor;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,6 +18,7 @@ import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -41,6 +44,18 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	private Dimension size;
 	
 	transient private final MouseInputListener resizeListener = new GameMouseListener();
+	
+	/**
+	 * Number of frames that have passed before FPS measuring
+	 */
+	private static final int FRAMES = 30;
+	private long totalTime;
+	private long curTime;
+	private long totalFrameCount;
+	private int curFPS;
+	private int avgFPS;
+	private int minFPS = Integer.MAX_VALUE; // 0 - isn't allowed
+	private int maxFPS;
 	
 	public GameDrawPanel() {
 		super(null, true);
@@ -105,7 +120,6 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		}
 	}
 	
-	/* Events */
 	@Override
 	public void boardChanged(GameEvent event) {
 		properties.board = event.getBoard();
@@ -172,6 +186,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void paintComponent(Graphics g) {
+		long start = 0;
+		if (SHOW_FPS) {
+			start = System.nanoTime();
+		}
+		
 		boolean needForUpdate = false;
 		size = getSize();
 		
@@ -219,6 +238,32 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		/* Component graphics */
 		g2d = (Graphics2D) g.create();
 		g2d.drawRenderedImage(canvas, null);
+		
+		// Show FPS for debug
+		if (SHOW_FPS) {
+			long now = System.nanoTime();
+			if (totalFrameCount % FRAMES == 0 && totalFrameCount > 0) {
+				curFPS = Math.round((float) FRAMES * TimeUnit.SECONDS.toNanos(1) / curTime);
+				avgFPS = Math.round((float) totalFrameCount * TimeUnit.SECONDS.toNanos(1)
+						/ totalTime);
+				minFPS = Math.min(minFPS, curFPS);
+				maxFPS = Math.max(maxFPS, curFPS);
+				curTime = 0;
+			} else {
+				curTime += now - start;
+			}
+			totalTime += now - start;
+			totalFrameCount++;
+			String s;
+			if (curFPS > 0) {
+				s = String.format("FPS CUR:%1$4d AVG:%2$4d MIN:%3$4d MAX:%4$4d", curFPS, avgFPS,
+						minFPS, maxFPS);
+			} else {
+				s = "FPS CUR: -   AVG: -   MIN: -   MAX: -";
+			}
+			g2d.setColor(Color.white);
+			g2d.drawString(s, gameFieldRect.x, gameFieldRect.y + gameFieldRect.height);
+		}
 	}
 	
 	@Override

@@ -45,7 +45,7 @@ import com.kry.brickgame.games.SplashScreen;
 
 public class Window extends JFrame {
 	private static final class ComponentEventListener extends ComponentAdapter implements
-	        Serializable {
+			Serializable {
 		private static final long serialVersionUID = 730763037448145667L;
 		
 		public ComponentEventListener() {
@@ -85,7 +85,7 @@ public class Window extends JFrame {
 			Main.getGame().pause();
 			try {
 				if (!getSettingsManager().getExitConfirmation()
-				        || CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
+						|| CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
 					Main.getGame().keyPressed(KeyPressed.KeyShutdown);
 				}
 			} catch (Exception exp) {
@@ -117,10 +117,9 @@ public class Window extends JFrame {
 			// set cross-platform LookAndFeel
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-		        | UnsupportedLookAndFeelException e) {
+				| UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		getSettingsManager().loadProperties();
 		initialize();
 	}
 	
@@ -147,65 +146,65 @@ public class Window extends JFrame {
 		
 		final GameDrawPanel drawPanel = new GameDrawPanel();
 		drawPanel.setLayout(new MigLayout(getInsetsInPercents(INSET_TOP, INSET_LEFT, INSET_BOTTOM,
-		        INSET_RIGHT) + ", nocache", "[][][][grow][]", "[]["
-		        + getFormatedPercent(210, MIN_HEIGHT) + ":n,grow][][][][]"));
+				INSET_RIGHT) + ", nocache", "[][][][grow][]", "[]["
+				+ getFormatedPercent(210, MIN_HEIGHT) + ":n,grow][][][][]"));
 		
 		/* -- Window buttons -- */
 		if (getToolkit().isFrameStateSupported(ICONIFIED)) {
 			drawPanel.add(
-			        ButtonsFactory.getMinimizeButton(),
-			        "cell 4 0, alignx right, aligny center, "
-			                + getDimensionInPercents(WINDOW_BTN_SIZE, WINDOW_BTN_SIZE));
+					ButtonsFactory.getMinimizeButton(),
+					"cell 4 0, alignx right, aligny center, "
+							+ getDimensionInPercents(WINDOW_BTN_SIZE, WINDOW_BTN_SIZE));
 		}
 		drawPanel.add(ButtonsFactory.getCloseButton(), "cell 4 0, alignx right, aligny center, "
-		        + getDimensionInPercents(WINDOW_BTN_SIZE, WINDOW_BTN_SIZE));
+				+ getDimensionInPercents(WINDOW_BTN_SIZE, WINDOW_BTN_SIZE));
 		/* ---- */
 		
 		/* -- Control buttons -- */
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyUp),
-		        "cell 1 3, alignx center, aligny center, "
-		                + getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyUp),
+				"cell 1 3, alignx center, aligny center, "
+						+ getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyLeft),
-		        "cell 0 4, alignx center, aligny center, "
-		                + getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyLeft),
+				"cell 0 4, alignx center, aligny center, "
+						+ getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyDown),
-		        "cell 1 5, alignx center, aligny center, "
-		                + getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyDown),
+				"cell 1 5, alignx center, aligny center, "
+						+ getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyRight),
-		        "cell 2 4, alignx center, aligny center, "
-		                + getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyRight),
+				"cell 2 4, alignx center, aligny center, "
+						+ getDimensionInPercents(CONTROL_BTN_SIZE, CONTROL_BTN_SIZE));
 		/* ---- */
 		
 		/* Rotate button */
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyRotate),
-		        "cell 4 3 1 3, alignx right, aligny center, "
-		                + getDimensionInPercents(ROTATE_BTN_SIZE, ROTATE_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyRotate),
+				"cell 4 3 1 3, alignx right, aligny center, "
+						+ getDimensionInPercents(ROTATE_BTN_SIZE, ROTATE_BTN_SIZE));
 		
 		/* Menu buttons */
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyShutdown),
-		        "cell 3 2, alignx center, aligny top, "
-		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyShutdown),
+				"cell 3 2, alignx center, aligny top, "
+						+ getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyReset),
-		        "cell 3 2, alignx center, aligny top, "
-		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyReset),
+				"cell 3 2, alignx center, aligny top, "
+						+ getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyMute),
-		        "cell 3 2, alignx center, aligny top, "
-		                + getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyMute),
+				"cell 3 2, alignx center, aligny top, "
+						+ getDimensionInPercents(MENU_BTN_SIZE, MENU_BTN_SIZE));
 		/* ---- */
 		
 		/* Start button */
 		drawPanel.add(
-		        ButtonsFactory.getButton(KeyPressed.KeyStart),
-		        "cell 3 3, alignx center, aligny bottom, "
-		                + getDimensionInPercents(START_BTN_SIZE, START_BTN_SIZE));
+				ButtonsFactory.getButton(KeyPressed.KeyStart),
+				"cell 3 3, alignx center, aligny bottom, "
+						+ getDimensionInPercents(START_BTN_SIZE, START_BTN_SIZE));
 		
 		setContentPane(drawPanel);
 		
@@ -214,7 +213,7 @@ public class Window extends JFrame {
 		addKeyListener(Main.gameKeyAdapter);
 		Game.addGameListener(drawPanel);
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-		        new ButtonsFactory.ButtonsKeyEventDispatcher());
+				new ButtonsFactory.ButtonsKeyEventDispatcher());
 		
 		setTitle("Brick Game");
 		Game game = GameLoader.loadGame();
