@@ -33,10 +33,10 @@ public final class BallUtils {
 	 */
 	protected static Board drawBall(Board board, Shape ball, int oldX, int oldY, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
-		Board newBoard = board.clone();
+		Board newBoard;
 		
 		// Erase the ball and draw on the new place
-		newBoard = drawShape(newBoard, oldX, oldY, ball, Cell.Empty);
+		newBoard = drawShape(board, oldX, oldY, ball, Cell.Empty);
 		newBoard = drawShape(newBoard, newX, newY, ball, ball.getFill());
 		
 		return newBoard;
@@ -72,7 +72,7 @@ public final class BallUtils {
 	 * @return the new coordinates of the ball
 	 */
 	protected static Point moveBall(int x, int y, RotationAngle horizontalDirection,
-	        RotationAngle verticalDirection) {
+			RotationAngle verticalDirection) {
 		Point newCoords = new Point(x, y);
 		
 		if (horizontalDirection == RotationAngle.d90) {
