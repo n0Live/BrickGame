@@ -17,6 +17,7 @@ import static com.kry.brickgame.games.ObstacleUtils.getRandomObstacles;
 import static com.kry.brickgame.games.ObstacleUtils.getTanksObstacles;
 
 import java.awt.Point;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,8 +49,8 @@ public class TanksGame extends GameWithLives {
 	 * Spawn point of enemy tanks
 	 */
 	final private static int[][] spawnPoints = new int[][] { { 0, 0 }, { BOARD_WIDTH - 1, 0 }, // bottom
-	        { 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
-	        { 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
+			{ 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
+			{ 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
 	};
 	/**
 	 * Quantity of destroyed tanks to enter to the next level
@@ -59,6 +60,54 @@ public class TanksGame extends GameWithLives {
 	 * Maximum number of the simultaneous firing player's bullets
 	 */
 	final private static int PLAYER_BULLETS_COUNT = 4;
+	
+	/**
+	 * Controlled-by-the-player tank
+	 */
+	private TankShape playerTank;
+	
+	/**
+	 * Group of enemy tanks
+	 */
+	private final TankShape enemyTanks[];
+	
+	/**
+	 * Count of enemy tanks
+	 */
+	private final int enemiesCount;
+	
+	/**
+	 * Number of the enemy tanks whose turn
+	 */
+	private int enemyTankNumber;
+	
+	/**
+	 * Bullets fired by the enemy tanks
+	 */
+	private final AtomicReferenceArray<Bullet> enemyBullets;
+	
+	/**
+	 * Bullets fired by the player tank
+	 */
+	private final AtomicReferenceArray<Bullet> playerBullets;
+	
+	/**
+	 * Count of destroyed enemy tanks on this level
+	 */
+	private int enemiesKilled;
+	/**
+	 * Count of enemy tanks on the board now
+	 */
+	private int enemiesOnBoard;
+	/**
+	 * Use preloaded levels or generate new ones?
+	 */
+	private final boolean usePreloadedLevels;
+	
+	/**
+	 * The flag is set at a loss and initiates a call loss()
+	 */
+	private volatile boolean isDead;
 	
 	/**
 	 * Collision check of the {@code bullet} with the each bullet from the
@@ -71,12 +120,12 @@ public class TanksGame extends GameWithLives {
 	 * @return {@code true} if there is a collision
 	 */
 	private static Bullet checkCollisionWithBullets(Bullet bullet,
-	        AtomicReferenceArray<Bullet> bullets) {
+			AtomicReferenceArray<Bullet> bullets) {
 		for (int i = 0; i < bullets.length(); i++) {
 			Bullet checkBullet = bullets.get(i);
 			if (checkBullet != null && checkBullet != bullet
-			        && checkBullet.getCoordinates().equals(bullet.getCoordinates()))
-			    return checkBullet;
+					&& checkBullet.getCoordinates().equals(bullet.getCoordinates()))
+				return checkBullet;
 		}
 		return null;
 	}
@@ -115,6 +164,50 @@ public class TanksGame extends GameWithLives {
 		} while (left <= right);
 		
 		return result;
+	}
+	
+	/**
+	 * Checking distance between the {@code startPoint} and a nearest obstacle
+	 * in the specified {@code direction}.
+	 * 
+	 * @param startPoint
+	 *            starting point for the check
+	 * @param direction
+	 *            direction for the check
+	 * @param board
+	 *            the board for checking
+	 * @return distance to a nearest obstacle or {@code -1} if not obstacles
+	 *         found.
+	 */
+	private static int distanceToObstacle(Point startPoint, RotationAngle direction, Board board) {
+		int distance = 0;
+		int signX = 0, signY = 0;
+		
+		switch (direction) {
+		case d90: // Right
+			distance = board.getWidth() - startPoint.x;
+			signX = 1;
+			break;
+		case d270: // Left
+			distance = startPoint.x;
+			signX = -1;
+			break;
+		case d0: // Up
+			distance = board.getHeight() - startPoint.y;
+			signY = 1;
+			break;
+		case d180: // Down
+			distance = startPoint.y;
+			signY = -1;
+			break;
+		}
+		
+		for (int i = 1; i < distance; i++) {
+			if (board.getCell(startPoint.x + (i * signX), startPoint.y + (i * signY)) == Cell.Full)
+				return i;
+		}
+		
+		return -1;
 	}
 	
 	/**
@@ -160,7 +253,7 @@ public class TanksGame extends GameWithLives {
 	 *         {@code distance}
 	 */
 	private static boolean isTankAhead(Point startPoint, int distance, RotationAngle viewDirection,
-	        TankShape tank) {
+			TankShape tank) {
 		
 		// returns false when the tank's position and the startPoint is the same
 		if (startPoint.equals(tank.getCoordinates())) return false;
@@ -169,65 +262,19 @@ public class TanksGame extends GameWithLives {
 		case d90: // Right
 		case d270: // Left
 			if (Math.abs(tank.y() - startPoint.y) <= tank.getHeight() / 2
-			        && (tank.x() - startPoint.x) * (viewDirection == LEFT ? -1 : 1) <= distance)
-			    return true;
+					&& (tank.x() - startPoint.x) * (viewDirection == LEFT ? -1 : 1) <= distance)
+				return true;
 			break;
 		case d0: // Up
 		case d180: // Down
 			if (Math.abs(tank.x() - startPoint.x) <= tank.getWidth() / 2
-			        && (tank.y() - startPoint.y) * (viewDirection == DOWN ? -1 : 1) <= distance)
-			    return true;
+					&& (tank.y() - startPoint.y) * (viewDirection == DOWN ? -1 : 1) <= distance)
+				return true;
 			break;
 		}
 		
 		return false;
 	}
-	
-	/**
-	 * Controlled-by-the-player tank
-	 */
-	private TankShape playerTank;
-	/**
-	 * Group of enemy tanks
-	 */
-	private final TankShape enemyTanks[];
-	/**
-	 * Count of enemy tanks
-	 */
-	private final int enemiesCount;
-	
-	/**
-	 * Number of the enemy tanks whose turn
-	 */
-	private int enemyTankNumber;
-	
-	/**
-	 * Bullets fired by the enemy tanks
-	 */
-	private final AtomicReferenceArray<Bullet> enemyBullets;
-	
-	/**
-	 * Bullets fired by the player tank
-	 */
-	private final AtomicReferenceArray<Bullet> playerBullets;
-	
-	/**
-	 * Count of destroyed enemy tanks on this level
-	 */
-	private int enemiesKilled;
-	/**
-	 * Count of enemy tanks on the board now
-	 */
-	private int enemiesOnBoard;
-	
-	/**
-	 * Use preloaded levels or generate new ones?
-	 */
-	private final boolean usePreloadedLevels;
-	/**
-	 * The flag is set at a loss and initiates a call loss()
-	 */
-	private volatile boolean isDead;
 	
 	/**
 	 * The Gun Game
@@ -364,21 +411,16 @@ public class TanksGame extends GameWithLives {
 		int horizontalDistance = tank.x() - playerTank.x();
 		int verticalDistance = tank.y() - playerTank.y();
 		
-		int minDistance, maxDistance;
-		if (Math.abs(horizontalDistance) < Math.abs(verticalDistance)) {
-			minDistance = Math.abs(horizontalDistance);
-			maxDistance = Math.abs(verticalDistance);
-		} else {
-			minDistance = Math.abs(verticalDistance);
-			maxDistance = Math.abs(horizontalDistance);
-		}
-		// chance of shot decreases with distance
-		float chance = 1 - (minDistance + maxDistance - 1) * rate;
+		int minDistance = Math.min(Math.abs(horizontalDistance), Math.abs(verticalDistance));
+		int maxDistance = Math.max(Math.abs(horizontalDistance), Math.abs(verticalDistance));
+		
+		// chance of shot decreases with distance, but not less than zero
+		float chance = Math.max(1 - (minDistance + maxDistance - 1) * rate, 0);
 		// chance of shot increases when the player tank going closer
 		if (horizontalDistance < 0 && playerTank.getDirection() == LEFT || horizontalDistance > 0
-		        && playerTank.getDirection() == RIGHT || verticalDistance < 0
-		        && playerTank.getDirection() == DOWN || verticalDistance > 0
-		        && playerTank.getDirection() == UP) {
+				&& playerTank.getDirection() == RIGHT || verticalDistance < 0
+				&& playerTank.getDirection() == DOWN || verticalDistance > 0
+				&& playerTank.getDirection() == UP) {
 			chance += rate;
 		}
 		
@@ -386,11 +428,18 @@ public class TanksGame extends GameWithLives {
 		
 		// chance decreases when ahead of a friendly tank
 		if (isFrendlyTankAhead(tank,
-		        shotDirection == LEFT || shotDirection == RIGHT ? horizontalDistance
-		                : verticalDistance, shotDirection)) {
+				shotDirection == LEFT || shotDirection == RIGHT ? horizontalDistance
+						: verticalDistance, shotDirection)) {
 			chance -= rate * 2;
 		} else if (minDistance <= playerTank.getWidth() / 2) {
-			chance += rate * 6;
+			chance += rate * 10;
+		} else {
+			// increase a chance to shoot at near obstacle
+			int dist = distanceToObstacle(tank.getCoordinates(), shotDirection,
+					eraseTank(getBoard(), tank));
+			if (dist > 0 && dist <= 5) {
+				chance += rate * (9 - dist);
+			}
 		}
 		
 		// chance from rate to 1 - rate
@@ -559,6 +608,20 @@ public class TanksGame extends GameWithLives {
 	}
 	
 	/**
+	 * Processing the flight of bullets
+	 */
+	void flightOfBullets() {
+		for (int i = 0; i < enemyBullets.length(); i++) {
+			if (Thread.currentThread().isInterrupted()
+					|| !flightOfBullet(enemyBullets.get(i), false)) return;
+		}
+		for (int i = 0; i < playerBullets.length(); i++) {
+			if (Thread.currentThread().isInterrupted()
+					|| !flightOfBullet(playerBullets.get(i), true)) return;
+		}
+	}
+	
+	/**
 	 * Getting the optimal direction for the movement
 	 * 
 	 * @param tank
@@ -573,36 +636,20 @@ public class TanksGame extends GameWithLives {
 		
 		// weight for each direction,
 		// to calculate the chance of movement in this direction
-		float[] weightOfDirection = new float[] { 0.25f, 0.25f, 0.25f, 0.25f };
+		float[] weightOfDirection = new float[RotationAngle.values().length];
+		Arrays.fill(weightOfDirection, 0.25f);
 		
 		int horizontalDistance = x - playerTank.x();
 		int verticalDistance = y - playerTank.y();
 		
 		boolean isHorizontalMinDistance = Math.abs(horizontalDistance) < Math.abs(verticalDistance);
-		// increases the weight of the current direction
-		weightOfDirection[tank.getDirection().ordinal()] += 0.45f;
+		
 		// defines the direction to get closer to the player tank vertically and
 		// horizontally
 		RotationAngle prefHorDirection = horizontalDistance < 0 ? RIGHT : LEFT;
 		RotationAngle prefVertDirection = verticalDistance < 0 ? UP : DOWN;
 		
-		// increases the weight of the preferred directions to 0.25
-		// and weight of the direction for minimal distance to 0.5
-		if (horizontalDistance != 0) {
-			weightOfDirection[prefHorDirection.ordinal()] += isHorizontalMinDistance ? 0.5f : 0.25f;
-		}
-		if (verticalDistance != 0) {
-			weightOfDirection[prefVertDirection.ordinal()] += isHorizontalMinDistance ? 0.25f
-			        : 0.5f;
-		}
-		
-		// decreases the weight of direction when it crosses the direction of
-		// movement of the player tank
-		if (playerTank.getDirection() == LEFT || playerTank.getDirection() == RIGHT) {
-			weightOfDirection[prefVertDirection.ordinal()] -= 0.25f;
-		} else {
-			weightOfDirection[prefHorDirection.ordinal()] -= 0.25f;
-		}
+		boolean[] blockedWays = new boolean[weightOfDirection.length];
 		
 		// decreases the weight of direction when it isn't possible for
 		// tank.getWidth() to 0.25
@@ -632,16 +679,38 @@ public class TanksGame extends GameWithLives {
 				break;
 			}
 			
-			if (!isPossibleMove(tank, farPoint, checkingDir)) {
-				weightOfDirection[i] -= 0.25f;
-				
-				if (!isPossibleMove(tank, nearPoint, checkingDir)) {
-					weightOfDirection[i] -= 0.75f;
+			if (!isPossibleMove(tank, nearPoint, checkingDir)) {
+				weightOfDirection[i] -= 0.50f;
+				blockedWays[i] = true;
+				if (!isPossibleMove(tank, farPoint, checkingDir)) {
+					weightOfDirection[i] -= 0.25f;
 				}
 			} else {
 				weightOfDirection[i] += 0.25f;
 			}
-			
+		}
+		// increases the weight of the current direction
+		if (!blockedWays[tank.getDirection().ordinal()]) {
+			weightOfDirection[tank.getDirection().ordinal()] += 0.25f;
+		}
+		
+		// increases the weight of the preferred directions to 0.25
+		// and weight of the direction for minimal distance to 0.5
+		if (horizontalDistance != 0) {
+			weightOfDirection[prefHorDirection.ordinal()] += (isHorizontalMinDistance && !blockedWays[prefHorDirection
+					.ordinal()]) ? 0.5f : 0.25f;
+		}
+		if (verticalDistance != 0) {
+			weightOfDirection[prefVertDirection.ordinal()] += (!isHorizontalMinDistance && !blockedWays[prefVertDirection
+					.ordinal()]) ? 0.5f : 0.25f;
+		}
+		
+		// decreases the weight of direction when it crosses the direction of
+		// movement of the player tank
+		if (playerTank.getDirection() == LEFT || playerTank.getDirection() == RIGHT) {
+			weightOfDirection[prefVertDirection.ordinal()] -= 0.25f;
+		} else {
+			weightOfDirection[prefHorDirection.ordinal()] -= 0.25f;
 		}
 		
 		// Sorting the direction to descending order of their weights
@@ -687,6 +756,16 @@ public class TanksGame extends GameWithLives {
 		return result;
 	}
 	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 1000;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 240;
+	}
+	
 	/**
 	 * Checking if one of the enemy tanks is located in the
 	 * {@code viewDirection} from the another enemy {@code tank} no further the
@@ -704,8 +783,8 @@ public class TanksGame extends GameWithLives {
 	private boolean isFrendlyTankAhead(TankShape tank, int distance, RotationAngle viewDirection) {
 		for (TankShape enemyTank : enemyTanks) {
 			if (enemyTank != null && enemyTank != tank
-			        && isTankAhead(tank.getCoordinates(), distance, viewDirection, enemyTank))
-			    return true;
+					&& isTankAhead(tank.getCoordinates(), distance, viewDirection, enemyTank))
+				return true;
 		}
 		return false;
 	}
@@ -733,9 +812,38 @@ public class TanksGame extends GameWithLives {
 		checkingTank.changeRotationAngle(direction);
 		
 		if (checkBoardCollision(board, checkingTank, newPlace.x, newPlace.y)
-		        || checkCollision(board, checkingTank, newPlace.x, newPlace.y)) return false;
+				|| checkCollision(board, checkingTank, newPlace.x, newPlace.y)) return false;
 		
 		return true;
+	}
+	
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// reset isDead flag
+		isDead = false;
+		
+		resetBullets();
+		resetPlayerTank();
+		resetEnemyTanks();
+		
+		synchronized (lock) {
+			// draws the playerTank
+			setBoard(drawTank(getBoard(), playerTank));
+			
+			if (usePreloadedLevels) {
+				loadPreparedObstacles();
+			} else {
+				loadRandomObstacles();
+			}
+		}
+		
+		enemiesKilled = 0;
+		enemiesOnBoard = 0;
+		
+		super.loadNewLevel();
 	}
 	
 	/**
@@ -797,12 +905,47 @@ public class TanksGame extends GameWithLives {
 			}
 			
 			if (checkBoardCollision(board, newTank, newTank.x(), newTank.y())
-			        || checkCollision(board, newTank, newTank.x(), newTank.y())) return tank;
+					|| checkCollision(board, newTank, newTank.x(), newTank.y())) return tank;
 			
 			// draw the playerTank on the new place
 			setBoard(drawTank(board, newTank));
 		}
 		return newTank;
+	}
+	
+	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (keys.isEmpty() || getStatus() == Status.None) return;
+		
+		super.processKeys();
+		
+		if (getStatus() == Status.Running) {
+			
+			if (containsKey(KeyPressed.KeyLeft)) {
+				movePlayerTank(LEFT);
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (containsKey(KeyPressed.KeyRight)) {
+				movePlayerTank(RIGHT);
+				keys.remove(KeyPressed.KeyRight);
+			}
+			if (containsKey(KeyPressed.KeyDown)) {
+				movePlayerTank(DOWN);
+				keys.remove(KeyPressed.KeyDown);
+			}
+			if (containsKey(KeyPressed.KeyUp)) {
+				movePlayerTank(UP);
+				keys.remove(KeyPressed.KeyUp);
+			}
+			if (containsKey(KeyPressed.KeyRotate)) {
+				GameSound.playEffect(Effects.move);
+				fire(playerTank);
+				keys.remove(KeyPressed.KeyRotate);
+			}
+		}
 	}
 	
 	/**
@@ -880,94 +1023,6 @@ public class TanksGame extends GameWithLives {
 		setBoard(drawTank(getBoard(), newTank));
 		
 		return true;
-	}
-	
-	/**
-	 * Processing the flight of bullets
-	 */
-	void flightOfBullets() {
-		for (int i = 0; i < enemyBullets.length(); i++) {
-			if (Thread.currentThread().isInterrupted()
-			        || !flightOfBullet(enemyBullets.get(i), false)) return;
-		}
-		for (int i = 0; i < playerBullets.length(); i++) {
-			if (Thread.currentThread().isInterrupted()
-			        || !flightOfBullet(playerBullets.get(i), true)) return;
-		}
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 1000;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 240;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// reset isDead flag
-		isDead = false;
-		
-		resetBullets();
-		resetPlayerTank();
-		resetEnemyTanks();
-		
-		synchronized (lock) {
-			// draws the playerTank
-			setBoard(drawTank(getBoard(), playerTank));
-			
-			if (usePreloadedLevels) {
-				loadPreparedObstacles();
-			} else {
-				loadRandomObstacles();
-			}
-		}
-		
-		enemiesKilled = 0;
-		enemiesOnBoard = 0;
-		
-		super.loadNewLevel();
-	}
-	
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
-		super.processKeys();
-		
-		if (getStatus() == Status.Running) {
-			
-			if (containsKey(KeyPressed.KeyLeft)) {
-				movePlayerTank(LEFT);
-				keys.remove(KeyPressed.KeyLeft);
-			}
-			if (containsKey(KeyPressed.KeyRight)) {
-				movePlayerTank(RIGHT);
-				keys.remove(KeyPressed.KeyRight);
-			}
-			if (containsKey(KeyPressed.KeyDown)) {
-				movePlayerTank(DOWN);
-				keys.remove(KeyPressed.KeyDown);
-			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				movePlayerTank(UP);
-				keys.remove(KeyPressed.KeyUp);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				GameSound.playEffect(Effects.move);
-				fire(playerTank);
-				keys.remove(KeyPressed.KeyRotate);
-			}
-		}
 	}
 	
 	/**
