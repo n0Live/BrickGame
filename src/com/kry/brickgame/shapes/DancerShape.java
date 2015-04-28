@@ -30,7 +30,7 @@ public class DancerShape extends CharacterShape {
 		minY = cMinY;
 		maxY = cMaxY;
 		height = maxY - minY + 1;
-	};
+	}
 	
 	private DancerShape(int type) {
 		super(type, charactersTable[type].length);

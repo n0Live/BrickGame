@@ -9,7 +9,7 @@ public class BoardNumbers extends Board {
 		None, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9
 	}
 	
-	private static final long serialVersionUID = 5903070508565392642L;;
+	private static final long serialVersionUID = 5903070508565392642L;
 	
 	public final static int width = 3;
 	public final static int height = 5;
@@ -136,7 +136,7 @@ public class BoardNumbers extends Board {
 		setNumber(Numbers.None);
 	}
 	
-	protected Numbers getLetter() {
+	protected Numbers getNumber() {
 		return number;
 	}
 	
@@ -146,9 +146,8 @@ public class BoardNumbers extends Board {
 		if (!super.equals(obj)) return false;
 		if (getClass() != obj.getClass()) return false;
 		BoardNumbers other = (BoardNumbers) obj;
-		if (number != other.number) return false;
-		return true;
-	}
+        return number == other.number;
+    }
 	
 	@Override
 	public int hashCode() {

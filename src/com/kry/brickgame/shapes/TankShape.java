@@ -78,8 +78,7 @@ public class TankShape extends CoordinatedShape {
 	
 	@Override
 	public TankShape clone() {
-		TankShape cloned = (TankShape) super.clone();
-		return cloned;
+        return (TankShape) super.clone();
 	}
 	
 }

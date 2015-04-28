@@ -14,8 +14,8 @@ public class Bullet extends CoordinatedShape {
 	/**
 	 * Copy constructor of the bullet
 	 * 
-	 * @param aTank
-	 *            a tank for copying
+	 * @param aBullet
+	 *            a bullet for copying
 	 */
 	public Bullet(Bullet aBullet) {
 		super(aBullet);
@@ -45,16 +45,13 @@ public class Bullet extends CoordinatedShape {
 	
 	@Override
 	public Bullet clone() {
-		Bullet cloned = (Bullet) super.clone();
-		return cloned;
+        return (Bullet) super.clone();
 	}
 	
 	/**
-	 * Setting the coordinates of the new position depending of the direction
-	 * 
-	 * @param direction
-	 *            movement direction
-	 */
+	 * Continue flight in the current direction
+	 *
+     */
 	public Bullet flight() {
 		move(getDirection());
 		return this;

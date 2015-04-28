@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Random;
 
@@ -25,7 +26,7 @@ public class SettingsManager {
 	static {
 		defaults = new Properties();
 		defaults.put("muted", Boolean.FALSE.toString());
-		defaults.put("rotation", Rotation.Clockwise.toString());
+		defaults.put("rotation", Rotation.CLOCKWISE.toString());
 		// random color by default
 		defaults.put("color", colorToHexString(new Color(new Random().nextInt(0xFFFFFF))));
 		defaults.put("exit_confirmation", Boolean.TRUE.toString());
@@ -140,7 +141,11 @@ public class SettingsManager {
 	 */
 	public Rotation getRotation() {
 		try {
-			return Rotation.valueOf(properties.getProperty("rotation"));
+			String rotation = properties.getProperty("rotation");
+			if (rotation != null) {
+				rotation = rotation.toUpperCase(Locale.ENGLISH);
+			}
+			return Rotation.valueOf(rotation);
 		} catch (Exception e) {
 			properties.remove("rotation");
 			return Rotation.valueOf(defaults.getProperty("rotation"));

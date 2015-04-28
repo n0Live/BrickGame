@@ -1,19 +1,17 @@
 package com.kry.brickgame.games;
 
 import static com.kry.brickgame.IO.ScoresManager.getScoresManager;
+import static com.kry.brickgame.IO.SettingsManager.getSettingsManager;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
+import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.SwingUtilities;
-
-import com.kry.brickgame.Main;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.BoardLetters;
 import com.kry.brickgame.boards.BoardNumbers;
@@ -36,7 +34,7 @@ public class GameSelector extends Game {
 	 */
 	private static Map<Character, String> gamesList;
 	static {
-		gamesList = new HashMap<Character, String>();
+		gamesList = new HashMap<>();
 		gamesList.put('A', "com.kry.brickgame.games.DanceGame");
 		gamesList.put('B', "com.kry.brickgame.games.TanksGame");
 		gamesList.put('C', "com.kry.brickgame.games.ArkanoidGame");
@@ -92,12 +90,42 @@ public class GameSelector extends Game {
 	/**
 	 * Timer for the splash screen of the game
 	 */
-	transient private ScheduledExecutorService splashTimer;
+	transient private ScheduledFuture<?> splashTimer;
 	
 	public GameSelector() {
 		super();
 		splash = null;
+		setRotation(getSettingsManager().getRotation());
 		restart();
+	}
+	
+	public GameSelector(int speed, int level, String gameClassName, int type) {
+		super();
+		setRotation(getSettingsManager().getRotation());
+		setSpeed(speed);
+		setLevel(level);
+		setGameAndType(gameClassName, type);
+	}
+	
+	@Override
+	public Game call() {
+		super.init();
+		
+		if (drawAll()) {
+			setStatus(Status.DoSomeWork);
+		} else {
+			setStatus(Status.ComingSoon);
+		}
+		
+		while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+			processKeys();
+		}
+		// stop the splash animation timer
+		if (splashTimer != null) {
+			splashTimer.cancel(true);
+		}
+		
+		return nextGame;
 	}
 	
 	/**
@@ -125,15 +153,10 @@ public class GameSelector extends Game {
 					// gets parameters without rotation
 					args = new Object[] { getSpeed(), getLevel(), number };
 				}
-				
 				// creates an instance of the game
-				Game game = constructor.newInstance(args);
-				// stop the splash animation timer
-				if (splashTimer != null) {
-					splashTimer.shutdownNow();
-				}
+				nextGame = constructor.newInstance(args);
 				// starts the selected game
-				Main.setGame(game);
+				exitFlag = true;
 			} catch (RuntimeException e) {
 				throw e;
 			} catch (Exception e) {
@@ -151,7 +174,7 @@ public class GameSelector extends Game {
 	private boolean drawAll() {
 		// stop the splash animation timer
 		if (splashTimer != null) {
-			splashTimer.shutdownNow();
+			splashTimer.cancel(true);
 		}
 		
 		drawLetter(letter);
@@ -183,16 +206,10 @@ public class GameSelector extends Game {
 			
 			if (splash != null) {
 				// starts the timer to show splash screen of the game
-				splashTimer = Executors.newSingleThreadScheduledExecutor();
-				splashTimer.scheduleWithFixedDelay(new Runnable() {
+				splashTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 					@Override
 					public void run() {
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								drawGameSplash(splash);
-							}
-						});
+						drawGameSplash(splash);
 					}
 				}, 0, 500, TimeUnit.MILLISECONDS);
 			} else {
@@ -217,6 +234,25 @@ public class GameSelector extends Game {
 		drawNumber(number);
 		
 		return c != null;
+	}
+	
+	/**
+	 * Displays one frame of the splash screen of the game
+	 * <p>
+	 * If splash is {@code null} then clears the rectangle of the splash screen
+	 * 
+	 * @param splash
+	 *            splash screen instance
+	 */
+	void drawGameSplash(Splash splash) {
+		if (splash != null) {
+			insertBoard(splash.getNextFrame(), 0,// x
+			        BoardNumbers.height + 1);// y
+		} else {
+			Board clear = new Board(Splash.width, Splash.height);
+			insertBoard(clear, 0,// x
+			        BoardNumbers.height + 1);// y
+		}
 	}
 	
 	/**
@@ -255,6 +291,16 @@ public class GameSelector extends Game {
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
 		insertBoard(boardNumber, boardWidth / 2,// x
 		        0);// y
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 0;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 0;
 	}
 	
 	/**
@@ -322,32 +368,70 @@ public class GameSelector extends Game {
 	}
 	
 	/**
-	 * Displays one frame of the splash screen of the game
-	 * <p>
-	 * If splash is {@code null} then clears the rectangle of the splash screen
-	 * 
-	 * @param splash
-	 *            splash screen instance
+	 * Processing of key presses
 	 */
-	void drawGameSplash(Splash splash) {
-		if (splash != null) {
-			insertBoard(splash.getNextFrame(), 0,// x
-			        BoardNumbers.height + 1);// y
-		} else {
-			Board clear = new Board(Splash.width, Splash.height);
-			insertBoard(clear, 0,// x
-			        BoardNumbers.height + 1);// y
+	@Override
+	protected void processKeys() {
+		// decrease CPU loading
+		sleep(30);
+		
+		if (keys.isEmpty()) return;
+		
+		if (keys.contains(KeyPressed.KeyShutdown)) {
+			keys.remove(KeyPressed.KeyShutdown);
+			quit();
+			return;
 		}
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 0;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 0;
+		
+		if (keys.contains(KeyPressed.KeyReset)) {
+			keys.remove(KeyPressed.KeyReset);
+			returnToSplashScreen();
+			return;
+		}
+		
+		// if keys contains any other key
+		GameSound.playEffect(Effects.select);
+		
+		if (keys.contains(KeyPressed.KeyMute)) {
+			keys.remove(KeyPressed.KeyMute);
+			setMuted(!isMuted());
+			return;
+		}
+		
+		if (keys.contains(KeyPressed.KeyStart)) {
+			keys.remove(KeyPressed.KeyStart);
+			changeGame();
+			return;
+		}
+		
+		if (keys.contains(KeyPressed.KeyLeft)) {
+			keys.remove(KeyPressed.KeyLeft);
+			setSpeed(getSpeed() + 1);
+		}
+		
+		if (keys.contains(KeyPressed.KeyRight)) {
+			keys.remove(KeyPressed.KeyRight);
+			setLevel(getLevel() + 1);
+		}
+		
+		if (keys.contains(KeyPressed.KeyUp)) {
+			keys.remove(KeyPressed.KeyUp);
+			nextNumber();
+		}
+		
+		if (keys.contains(KeyPressed.KeyDown)) {
+			keys.remove(KeyPressed.KeyDown);
+			prevNumber();
+		}
+		
+		if (keys.contains(KeyPressed.KeyRotate)) {
+			keys.remove(KeyPressed.KeyRotate);
+			if (getRotation() == Rotation.COUNTERCLOCKWISE) {
+				prevLetter();
+			} else {
+				nextLetter();
+			}
+		}
 	}
 	
 	/**
@@ -361,77 +445,16 @@ public class GameSelector extends Game {
 		return this;
 	}
 	
-	@Override
-	public void keyPressed(KeyPressed key) {
-		switch (key) {
-		case KeyLeft:
-			GameSound.playEffect(Effects.select);
-			setSpeed(getSpeed() + 1);
-			break;
-		case KeyRight:
-			GameSound.playEffect(Effects.select);
-			setLevel(getLevel() + 1);
-			break;
-		case KeyRotate:
-			GameSound.playEffect(Effects.select);
-			if (getRotation() == Rotation.Counterclockwise) {
-				prevLetter();
-			} else {
-				nextLetter();
-			}
-			break;
-		case KeyUp:
-			GameSound.playEffect(Effects.select);
-			nextNumber();
-			break;
-		case KeyDown:
-			GameSound.playEffect(Effects.select);
-			prevNumber();
-			break;
-		case KeyStart:
-			GameSound.playEffect(Effects.select);
-			changeGame();
-			break;
-		case KeyMute:
-			GameSound.playEffect(Effects.select);
-			setMuted(!isMuted());
-			break;
-		case KeyReset:
-			// stop the splash animation timer
-			if (splashTimer != null) {
-				splashTimer.shutdownNow();
-			}
-			SplashScreen ss = new SplashScreen();
-			// show actual speed and level
-			ss.setLevel(getLevel());
-			ss.setSpeed(getSpeed());
-			Main.setGame(ss);
-			break;
-		case KeyShutdown:
-			if (splashTimer != null) {
-				splashTimer.shutdownNow();
-			}
-			quit();
-			break;
-		default:
-			break;
-		}
+	/**
+	 * Close game selector and start splash screen
+	 */
+	private void returnToSplashScreen() {
+		nextGame = new SplashScreen();
+		// show actual speed and level
+		nextGame.setLevel(getLevel());
+		nextGame.setSpeed(getSpeed());
 		
-	}
-	
-	@Override
-	public void run() {
-		clearBoard();
-		clearPreview();
-		
-		// show default rotation
-		fireRotationChanged(getRotation());
-		
-		if (drawAll()) {
-			setStatus(Status.DoSomeWork);
-		} else {
-			setStatus(Status.ComingSoon);
-		}
+		exitFlag = true;
 	}
 	
 	/**
@@ -451,10 +474,5 @@ public class GameSelector extends Game {
 				break;
 			}
 		}
-	}
-	
-	@Override
-	public void setRotation(Rotation rotation) {
-		super.setRotation(rotation);
 	}
 }

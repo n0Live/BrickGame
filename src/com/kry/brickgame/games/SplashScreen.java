@@ -7,11 +7,11 @@ import static com.kry.brickgame.games.GameUtils.sleep;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
-import com.kry.brickgame.Main;
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.boards.BoardNumbers;
@@ -26,6 +26,8 @@ import com.kry.brickgame.sound.SoundManager;
 public class SplashScreen extends Game {
 	private static final long serialVersionUID = 6213953274430176604L;
 	
+	private static final ExecutorService splashScreenThread = Executors.newSingleThreadExecutor();
+	
 	private final Music welcome = Music.welcome;
 	
 	/**
@@ -37,6 +39,97 @@ public class SplashScreen extends Game {
 		super();
 		SoundManager.prepare(GameSound.music, welcome);
 		resetFlag = false;
+	}
+	
+	/**
+	 * Animated walking in a spiral with inverting cells on the main board
+	 */
+	void animatedInvertBoard() {
+		Board board = getBoard();
+		// x: 0 --> board.width
+		int fromX = 0;
+		int toX = board.getWidth() - 1;
+		// y: board.height --> 0
+		int fromY = board.getHeight() - 1;
+		int toY = 0;
+		
+		// until it reaches the middle of the board
+		while (fromX != board.getWidth() / 2) {
+			// spiral motion with a gradually narrowing
+			if (!horizontalMove(fromX, toX, fromY--) || !verticalMove(fromY, toY, toX--)
+			        || !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
+			    return;
+		}
+		sleep(ANIMATION_DELAY * 5);
+	}
+	
+	/**
+	 * Blinking "9999" on the board specified number of times
+	 * 
+	 * @param repeatCount
+	 *            the number of repeats of blinks
+	 */
+	void blinkNumbers(int repeatCount) {
+		if (repeatCount <= 0) return;
+		
+		for (int i = 0; i < repeatCount; i++) {
+			if (exitFlag || Thread.currentThread().isInterrupted()) return;
+			
+			clearBoard();
+			sleep(ANIMATION_DELAY * 5);
+			insertNumbers();
+			sleep(ANIMATION_DELAY * 6);
+		}
+	}
+	
+	@Override
+	public Game call() {
+		setStatus(Status.DoSomeWork);
+		
+		GameSound.playMusic(welcome);
+		sleep(ANIMATION_DELAY);
+		
+		insertNumbers();
+		
+		// Splash screen will be run in a separate thread
+		Future<?> splashScreenHandler = splashScreenThread.submit(new Runnable() {
+			@Override
+			public void run() {
+				while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+					animatedInvertBoard();
+					blinkNumbers(5);
+				}
+			}
+		});
+		
+		// by pressing any key status sets to Status.None
+		while (getStatus() == Status.DoSomeWork) {
+			processKeys();
+		}
+		
+		GameSound.stopAllSounds();
+		
+		splashScreenHandler.cancel(true);
+		
+		if (resetFlag) {
+			nextGame = new SplashScreen();
+			// show actual speed and level
+			nextGame.setLevel(getLevel());
+			nextGame.setSpeed(getSpeed());
+		} else {
+			nextGame = new GameSelector();
+		}
+		return nextGame;
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 0;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 0;
 	}
 	
 	/**
@@ -59,7 +152,7 @@ public class SplashScreen extends Game {
 		// left to right
 		if (isRightDirection) {
 			for (int i = fromX; i <= toX; i++) {
-				if (Thread.currentThread().isInterrupted()) return false;
+				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
@@ -69,7 +162,7 @@ public class SplashScreen extends Game {
 			// right to left
 		} else {
 			for (int i = fromX; i >= toX; i--) {
-				if (Thread.currentThread().isInterrupted()) return false;
+				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
@@ -93,7 +186,8 @@ public class SplashScreen extends Game {
 		
 		/* Easter (New Year) egg */
 		int year = 0;
-		DateFormat dateFormat = new SimpleDateFormat("yyyy");
+		DateFormat dateFormat = new SimpleDateFormat("yyyy", Locale.ENGLISH);
+		
 		Calendar calendar = Calendar.getInstance();
 		if (calendar.get(Calendar.MONTH) == Calendar.DECEMBER
 		        && calendar.get(Calendar.DAY_OF_MONTH) == 31) {
@@ -132,9 +226,35 @@ public class SplashScreen extends Game {
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
 		        - boardNumbers[k].getWidth() - 1, 1);
 		
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			setBoard(board);
 		}
+	}
+	
+	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (keys.isEmpty() || getStatus() == Status.None) return;
+		
+		if (containsKey(KeyPressed.KeyMute)) {
+			keys.remove(KeyPressed.KeyMute);
+			setMuted(!isMuted());
+		}
+		
+		if (containsKey(KeyPressed.KeyReset)) {
+			resetFlag = true;
+		}
+		
+		// when status set to None - stop showing the SplashScreen
+		setStatus(Status.None);
+		
+		if (containsKey(KeyPressed.KeyShutdown)) {
+			keys.remove(KeyPressed.KeyShutdown);
+			quit();
+		}
+		
 	}
 	
 	/**
@@ -157,7 +277,7 @@ public class SplashScreen extends Game {
 		// bottom to top
 		if (isUpDirection) {
 			for (int i = fromY; i <= toY; i++) {
-				if (Thread.currentThread().isInterrupted()) return false;
+				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);
@@ -167,7 +287,7 @@ public class SplashScreen extends Game {
 			// top to bottom
 		} else {
 			for (int i = fromY; i >= toY; i--) {
-				if (Thread.currentThread().isInterrupted()) return false;
+				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);
@@ -176,133 +296,6 @@ public class SplashScreen extends Game {
 			}
 		}
 		return true;
-	}
-	
-	/**
-	 * Animated walking in a spiral with inverting cells on the main board
-	 */
-	void animatedInvertBoard() {
-		Board board = getBoard();
-		// x: 0 --> board.width
-		int fromX = 0;
-		int toX = board.getWidth() - 1;
-		// y: board.height --> 0
-		int fromY = board.getHeight() - 1;
-		int toY = 0;
-		
-		// until it reaches the middle of the board
-		while (fromX != board.getWidth() / 2) {
-			// spiral motion with a gradually narrowing
-			if (!horizontalMove(fromX, toX, fromY--) || !verticalMove(fromY, toY, toX--)
-			        || !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
-			    return;
-		}
-		sleep(ANIMATION_DELAY * 2);
-	}
-	
-	/**
-	 * Blinking "9999" on the board specified number of times
-	 * 
-	 * @param repeatCount
-	 *            the number of repeats of blinks
-	 */
-	void blinkNumbers(int repeatCount) {
-		if (repeatCount <= 0) return;
-		
-		for (int i = 0; i < repeatCount; i++) {
-			if (Thread.currentThread().isInterrupted()) return;
-			
-			clearBoard();
-			sleep(ANIMATION_DELAY * 5);
-			insertNumbers();
-			sleep(ANIMATION_DELAY * 6);
-		}
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 0;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 0;
-	}
-	
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
-		if (!keys.isEmpty()) {
-			if (containsKey(KeyPressed.KeyMute)) {
-				keys.remove(KeyPressed.KeyMute);
-				setMuted(!isMuted());
-			}
-			
-			if (containsKey(KeyPressed.KeyReset)) {
-				resetFlag = true;
-			}
-			
-			// when status set to None - stop showing the SplashScreen
-			setStatus(Status.None);
-			
-			if (containsKey(KeyPressed.KeyShutdown)) {
-				keys.remove(KeyPressed.KeyShutdown);
-				quit();
-				return;
-			}
-		}
-		
-	}
-	
-	@Override
-	public void run() {
-		setStatus(Status.DoSomeWork);
-		
-		GameSound.playMusic(welcome);
-		sleep(ANIMATION_DELAY);
-		
-		insertNumbers();
-		
-		// Splash screen will be run in a separate thread
-		ExecutorService splashScreenThread = Executors.newSingleThreadExecutor();
-		splashScreenThread.execute(new Runnable() {
-			@Override
-			public void run() {
-				while (!Thread.currentThread().isInterrupted()) {
-					animatedInvertBoard();
-					blinkNumbers(5);
-				}
-			}
-		});
-		
-		// by pressing any key status sets to Status.None
-		while (getStatus() == Status.DoSomeWork) {
-			processKeys();
-		}
-		
-		GameSound.stopAllSounds();
-		
-		splashScreenThread.shutdownNow();
-		// Waits for end of interrupting splashScreenThread
-		try {
-			splashScreenThread.awaitTermination(1, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		if (resetFlag) {
-			SplashScreen ss = new SplashScreen();
-			// show actual speed and level
-			ss.setLevel(getLevel());
-			ss.setSpeed(getSpeed());
-			Main.setGame(ss);
-		} else {
-			Main.setGame(Main.gameSelector.restart());
-		}
 	}
 	
 }

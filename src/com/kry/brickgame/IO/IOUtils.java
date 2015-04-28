@@ -21,12 +21,7 @@ public class IOUtils {
 	 */
 	public static boolean deleteFile(String fileName) {
 		File file = new File(fileName);
-		if (file.exists()) {
-			if (file.canWrite())
-				return file.delete();
-			return false;
-		}
-		return true;
+		return !file.exists() || file.canWrite() && file.delete();
 	}
 
 	/**

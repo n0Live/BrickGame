@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.kry.brickgame.Main;
+import com.kry.brickgame.games.Game;
 import com.kry.brickgame.games.GameConsts.KeyPressed;
 
 /**
@@ -34,16 +35,18 @@ public class GameKeyAdapter extends KeyAdapter {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int keycode = e.getKeyCode();
-		if (keycodeMap.containsKey(keycode)) {
-			Main.getGame().keyPressed(keycodeMap.get(keycode));
+		Game game = Main.getGame();
+		if (game != null && keycodeMap.containsKey(keycode)) {
+			game.keyPressed(keycodeMap.get(keycode));
 		}
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
 		int keycode = e.getKeyCode();
-		if (keycodeMap.containsKey(keycode)) {
-			Main.getGame().keyReleased(keycodeMap.get(keycode));
+		Game game = Main.getGame();
+		if (game != null && keycodeMap.containsKey(keycode)) {
+			game.keyReleased(keycodeMap.get(keycode));
 		}
 	}
 }

@@ -40,8 +40,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 	
 	@Override
 	public CoordinatedShape clone() {
-		CoordinatedShape cloned = (CoordinatedShape) super.clone();
-		return cloned;
+		return (CoordinatedShape) super.clone();
 	}
 	
 	/**
@@ -99,7 +98,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 	/**
 	 * Setting the x-coordinate position on the board
 	 * 
-	 * @param x
+	 * @param coordX
 	 *            - the x-coordinate
 	 */
 	public void setX(int coordX) {
@@ -109,7 +108,7 @@ public abstract class CoordinatedShape extends CharacterShape {
 	/**
 	 * Setting the y-coordinate position on the board
 	 * 
-	 * @param y
+	 * @param coordY
 	 *            - the y-coordinate
 	 */
 	public void setY(int coordY) {

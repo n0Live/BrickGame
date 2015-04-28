@@ -18,8 +18,7 @@ import static com.kry.brickgame.games.ObstacleUtils.getTanksObstacles;
 
 import java.awt.Point;
 import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -203,7 +202,7 @@ public class TanksGame extends GameWithLives {
 		}
 		
 		for (int i = 1; i < distance; i++) {
-			if (board.getCell(startPoint.x + (i * signX), startPoint.y + (i * signY)) == Cell.Full)
+			if (board.getCell(startPoint.x + i * signX, startPoint.y + i * signY) == Cell.Full)
 				return i;
 		}
 		
@@ -211,26 +210,26 @@ public class TanksGame extends GameWithLives {
 	}
 	
 	/**
-	 * Draw the playerTank to the board
+	 * Draw a tank to a board
 	 * 
 	 * @param board
-	 *            the board for drawing
-	 * @param playerTank
-	 *            the playerTank for drawing
-	 * @return the board after drawing the playerTank
+	 *            a board for drawing
+	 * @param tank
+	 *            a tank for drawing
+	 * @return a board after drawing a tank
 	 */
 	private static Board drawTank(Board board, TankShape tank) {
 		return drawShape(board, tank, tank.getFill());
 	}
 	
 	/**
-	 * Erase the playerTank from the board
+	 * Erase a tank from a board
 	 * 
 	 * @param board
-	 *            the board for drawing
-	 * @param playerTank
-	 *            the playerTank for drawing
-	 * @return the board after drawing the playerTank
+	 *            a board for drawing
+	 * @param tank
+	 *            a tank for drawing
+	 * @return a board after erasing a tank
 	 */
 	private static Board eraseTank(Board board, TankShape tank) {
 		return drawShape(board, tank, Cell.Empty);
@@ -361,6 +360,47 @@ public class TanksGame extends GameWithLives {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		// create timer for bullets
+		ScheduledFuture<?> bulletSwarm = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if (getStatus() == Status.Running) {
+					flightOfBullets();
+				}
+			}
+		}, 0, ANIMATION_DELAY * 4, TimeUnit.MILLISECONDS);
+		
+		while (!(exitFlag || Thread.currentThread().isInterrupted())
+				&& getStatus() != Status.GameOver) {
+			if (getStatus() == Status.Running) {
+				if (isDead) {
+					// must be in the main thread
+					loss(playerTank.x(), playerTank.y());
+				} else if (enemiesKilled >= KILLS_TO_NEXT_LEVEL) {
+					win();
+				} else if (elapsedTime(getSpeed(true))) {
+					int tryCount = enemiesCount;
+					do {
+						if (enemyTankNumber >= enemiesCount) {
+							enemyTankNumber = 0;
+						}
+						tryCount--;
+					} while (!aiTurn(enemyTankNumber++) && tryCount > 0);
+				}
+			}
+			// processing of key presses
+			processKeys();
+		}
+		bulletSwarm.cancel(true);
+		return nextGame;
 	}
 	
 	/**
@@ -612,11 +652,11 @@ public class TanksGame extends GameWithLives {
 	 */
 	void flightOfBullets() {
 		for (int i = 0; i < enemyBullets.length(); i++) {
-			if (Thread.currentThread().isInterrupted()
+			if (exitFlag || Thread.currentThread().isInterrupted()
 					|| !flightOfBullet(enemyBullets.get(i), false)) return;
 		}
 		for (int i = 0; i < playerBullets.length(); i++) {
-			if (Thread.currentThread().isInterrupted()
+			if (exitFlag || Thread.currentThread().isInterrupted()
 					|| !flightOfBullet(playerBullets.get(i), true)) return;
 		}
 	}
@@ -697,12 +737,12 @@ public class TanksGame extends GameWithLives {
 		// increases the weight of the preferred directions to 0.25
 		// and weight of the direction for minimal distance to 0.5
 		if (horizontalDistance != 0) {
-			weightOfDirection[prefHorDirection.ordinal()] += (isHorizontalMinDistance && !blockedWays[prefHorDirection
-					.ordinal()]) ? 0.5f : 0.25f;
+			weightOfDirection[prefHorDirection.ordinal()] += isHorizontalMinDistance
+					&& !blockedWays[prefHorDirection.ordinal()] ? 0.5f : 0.25f;
 		}
 		if (verticalDistance != 0) {
-			weightOfDirection[prefVertDirection.ordinal()] += (!isHorizontalMinDistance && !blockedWays[prefVertDirection
-					.ordinal()]) ? 0.5f : 0.25f;
+			weightOfDirection[prefVertDirection.ordinal()] += !isHorizontalMinDistance
+					&& !blockedWays[prefVertDirection.ordinal()] ? 0.5f : 0.25f;
 		}
 		
 		// decreases the weight of direction when it crosses the direction of
@@ -811,10 +851,8 @@ public class TanksGame extends GameWithLives {
 		
 		checkingTank.changeRotationAngle(direction);
 		
-		if (checkBoardCollision(board, checkingTank, newPlace.x, newPlace.y)
-				|| checkCollision(board, checkingTank, newPlace.x, newPlace.y)) return false;
-		
-		return true;
+		return !(checkBoardCollision(board, checkingTank, newPlace.x, newPlace.y) || checkCollision(
+				board, checkingTank, newPlace.x, newPlace.y));
 	}
 	
 	/**
@@ -1023,46 +1061,6 @@ public class TanksGame extends GameWithLives {
 		setBoard(drawTank(getBoard(), newTank));
 		
 		return true;
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		// create timer for bullets
-		ScheduledExecutorService bulletSwarm = Executors.newSingleThreadScheduledExecutor();
-		bulletSwarm.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				if (getStatus() == Status.Running) {
-					flightOfBullets();
-				}
-			}
-		}, 0, ANIMATION_DELAY * 4, TimeUnit.MILLISECONDS);
-		
-		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
-				if (isDead) {
-					// must be in the main thread
-					loss(playerTank.x(), playerTank.y());
-				} else if (enemiesKilled >= KILLS_TO_NEXT_LEVEL) {
-					win();
-				} else if (elapsedTime(getSpeed(true))) {
-					int tryCount = enemiesCount;
-					do {
-						if (enemyTankNumber >= enemiesCount) {
-							enemyTankNumber = 0;
-						}
-						tryCount--;
-					} while (!aiTurn(enemyTankNumber++) && tryCount > 0);
-				}
-			}
-			// processing of key presses
-			processKeys();
-		}
-		bulletSwarm.shutdownNow();
 	}
 	
 }

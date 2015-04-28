@@ -11,8 +11,6 @@ import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.awt.Point;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -91,7 +89,6 @@ public class InvadersGame extends GameWithGun {
 	/**
 	 * Timer for the invasion
 	 */
-	private transient ScheduledExecutorService invasionTimer;
 	private transient ScheduledFuture<?> invasionHandler;
 	// Easter egg
 	/**
@@ -214,6 +211,48 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		// create timer for invasion,
+		// for the deserialization
+		createInvasionTimer();
+		
+		// create timer for bullets
+		ScheduledFuture<?> bulletSwarm = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if (!(exitFlag || Thread.currentThread().isInterrupted())
+						&& getStatus() == Status.Running) {
+					flightOfBullets();
+				}
+			}
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
+		
+		while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+			if (getStatus() != Status.GameOver) {
+				if (isDead) {
+					// must be in the main thread
+					loss(curX, curY);
+					// check the number of remaining bricks
+				} else if (bricks.getBricksCount() <= 0 || bricksY <= -bricks.getHeight()) {
+					clearBullets(getBoard());
+					win();
+				}
+			}
+			// processing of key presses
+			processKeys();
+		}
+		
+		bulletSwarm.cancel(true);
+		invasionHandler.cancel(true);
+		return nextGame;
+	}
+	
+	/**
 	 * Creating the ball from one of a bricks in the bricks wall
 	 * <p>
 	 * Setting the coordinates of the ball and ball's movement direction
@@ -264,8 +303,7 @@ public class InvadersGame extends GameWithGun {
 		// slow down if invaders is more than 50
 		final int currentSpeed = getSpeed(true) + Math.max(bricks.getBricksCount() - 50, 0);
 		
-		invasionTimer = Executors.newSingleThreadScheduledExecutor();
-		invasionHandler = invasionTimer.scheduleWithFixedDelay(new Runnable() {
+		invasionHandler = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				if (getStatus() == Status.Running) {
@@ -501,7 +539,7 @@ public class InvadersGame extends GameWithGun {
 	 * Processing actions of invaders
 	 */
 	void processInvasion() {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			if (isFlyingBall) { // the ball already created
 				moveBall();
 			} else {
@@ -580,47 +618,6 @@ public class InvadersGame extends GameWithGun {
 				breakBrick(board, x, y);
 			}
 		}
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		// create timer for invasion,
-		// for the deserialization
-		createInvasionTimer();
-		
-		// create timer for bullets
-		ScheduledExecutorService bulletSwarm = Executors.newSingleThreadScheduledExecutor();
-		bulletSwarm.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				if (!Thread.currentThread().isInterrupted() && getStatus() == Status.Running) {
-					flightOfBullets();
-				}
-			}
-			// twice as slow if hasTwoSmokingBarrels
-		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
-		
-		while (!Thread.currentThread().isInterrupted()) {
-			if (getStatus() != Status.GameOver) {
-				if (isDead) {
-					// must be in the main thread
-					loss(curX, curY);
-					// check the number of remaining bricks
-				} else if (bricks.getBricksCount() <= 0 || (bricksY <= -bricks.getHeight())) {
-					clearBullets(getBoard());
-					win();
-				}
-			}
-			// processing of key presses
-			processKeys();
-		}
-		
-		bulletSwarm.shutdownNow();
-		invasionTimer.shutdownNow();
 	}
 	
 	/**

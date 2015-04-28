@@ -217,8 +217,7 @@ public class BricksWall extends Board {
 	
 	@Override
 	public BricksWall clone() {
-		BricksWall cloned = (BricksWall) super.clone();
-		return cloned;
+        return (BricksWall) super.clone();
 	}
 	
 	@Override
@@ -227,9 +226,8 @@ public class BricksWall extends Board {
 		if (!super.equals(obj)) return false;
 		if (getClass() != obj.getClass()) return false;
 		BricksWall other = (BricksWall) obj;
-		if (bricksCount != other.bricksCount) return false;
-		return true;
-	}
+        return bricksCount == other.bricksCount;
+    }
 	
 	public int getBricksCount() {
 		return bricksCount;
@@ -253,7 +251,7 @@ public class BricksWall extends Board {
 	 * @param dX
 	 *            delta x, if {@code dX > 0} then shift to the right, otherwise
 	 *            shift to the left
-	 * @return
+	 * @return shifted bricks wall
 	 */
 	public BricksWall shift(int dX) {
 		return (BricksWall) GameUtils.boardHorizontalShift(this, dX);

@@ -222,8 +222,7 @@ public class Window extends JFrame {
 		}
 		// try to load saved properties
 		Game.setMuted(getSettingsManager().getMuted());
-		Main.gameSelector.setRotation(getSettingsManager().getRotation());
 		
-		Main.setGame(game);
+		Main.setGameLoop(game);
 	}
 }

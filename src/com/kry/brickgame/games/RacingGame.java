@@ -136,7 +136,7 @@ public class RacingGame extends GameWithLives {
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-			        && r.nextInt(10 - getLevel() / 2) == 0) {
+					&& r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(new int[] { coordX, coordY });
@@ -169,6 +169,38 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		
+		// don't start playing sound after deserialization
+		if (getStatus() != Status.Paused) {
+			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
+		}
+		
+		while (!(exitFlag || Thread.currentThread().isInterrupted())
+				&& getStatus() != Status.GameOver) {
+			if (getStatus() == Status.Running) {
+				int currentSpeed = getSpeed(true);
+				if (isThreelaneTraffic) {
+					// slow down if isThreelaneTraffic
+					currentSpeed = Math.round(currentSpeed * 1.5f);
+				}
+				
+				// moving
+				if (elapsedTime(currentSpeed)) {
+					moveOn();
+				}
+			}
+			// processing of key presses
+			processKeys();
+		}
+		return nextGame;
+	}
+	
+	/**
 	 * Drawing the borders on the board.
 	 * 
 	 * @param board
@@ -188,8 +220,6 @@ public class RacingGame extends GameWithLives {
 		
 		Cell[] border = new Cell[boardHeight];
 		
-		Board newBoard = getBoard();
-		
 		// generate border
 		for (int i = 0; i < border.length; i++) {
 			if ((i + borderPosition) % spanLength < filledSpanLength) {
@@ -199,6 +229,7 @@ public class RacingGame extends GameWithLives {
 			}
 		}
 		// add borders to the board
+		Board newBoard = board.clone();
 		newBoard.setColumn(border, boardWidth - 1);
 		if (isBoth) {
 			newBoard.setColumn(border, 0);
@@ -212,6 +243,50 @@ public class RacingGame extends GameWithLives {
 		}
 		
 		return newBoard;
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 200;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 50;
+	}
+	
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// set position
+		curPosition = 1;
+		curX = positions[curPosition];
+		curY = 0 - car.minY();
+		
+		borderPosition = 0;
+		
+		// initialization of the opponents
+		opponents = new LinkedList<>();
+		addOpponents();
+		
+		// draw the car
+		moveCar(curPosition);
+		// draw the opponents and the borders
+		moveOn();
+		
+		super.loadNewLevel();
+		
+		if (!isStarted) {
+			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
+		}
+	}
+	
+	@Override
+	protected void loss(int x, int y) {
+		GameSound.stop(GameSound.effects, Effects.engine);
+		super.loss(x, y);
 	}
 	
 	/**
@@ -284,50 +359,6 @@ public class RacingGame extends GameWithLives {
 		addOpponents();
 	}
 	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 200;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 50;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// set position
-		curPosition = 1;
-		curX = positions[curPosition];
-		curY = 0 - car.minY();
-		
-		borderPosition = 0;
-		
-		// initialization of the opponents
-		opponents = new LinkedList<>();
-		addOpponents();
-		
-		// draw the car
-		moveCar(curPosition);
-		// draw the opponents and the borders
-		moveOn();
-		
-		super.loadNewLevel();
-		
-		if (!isStarted) {
-			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
-		}
-	}
-	
-	@Override
-	protected void loss(int x, int y) {
-		GameSound.stop(GameSound.effects, Effects.engine);
-		super.loss(x, y);
-	}
-	
 	/**
 	 * Processing of key presses
 	 */
@@ -362,6 +393,14 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	@Override
+	public void resume() {
+		if (getStatus() == Status.Paused) {
+			GameSound.loop(GameSound.effects, Effects.engine, ANIMATION_DELAY * 14);
+		}
+		super.resume();
+	}
+	
+	@Override
 	protected void setScore(int score) {
 		int oldHundreds = getScore() / 100;
 		
@@ -381,44 +420,6 @@ public class RacingGame extends GameWithLives {
 	protected void win() {
 		GameSound.stop(GameSound.effects, Effects.engine);
 		super.win();
-	}
-	
-	@Override
-	public void resume() {
-		if (getStatus() == Status.Paused) {
-			GameSound.loop(GameSound.effects, Effects.engine, ANIMATION_DELAY * 14);
-		}
-		super.resume();
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		
-		// don't start playing sound after deserialization
-		if (getStatus() != Status.Paused) {
-			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
-		}
-		
-		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
-				int currentSpeed = getSpeed(true);
-				if (isThreelaneTraffic) {
-					// slow down if isThreelaneTraffic
-					currentSpeed = Math.round(currentSpeed * 1.5f);
-				}
-				
-				// moving
-				if (elapsedTime(currentSpeed)) {
-					moveOn();
-				}
-			}
-			// processing of key presses
-			processKeys();
-		}
 	}
 	
 }

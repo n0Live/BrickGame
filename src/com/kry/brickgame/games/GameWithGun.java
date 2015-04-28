@@ -31,9 +31,8 @@ public abstract class GameWithGun extends GameWithLives {
 	 * Array that stores the coordinates of the bullets
 	 */
 	protected final AtomicReferenceArray<AtomicIntegerArray> bullets;
-	// is equals int[][] but atomic
 	
-	private final int bulletsArrayWidth, bulletsArrayHeight;
+	// is equals int[][] but atomic
 	
 	/**
 	 * The Game with gun
@@ -50,70 +49,9 @@ public abstract class GameWithGun extends GameWithLives {
 		
 		gun = new GunShape();
 		
-		bulletsArrayWidth = boardWidth;
-		bulletsArrayHeight = boardHeight - gun.getHeight();
-		
+		int bulletsArrayWidth = boardWidth;
 		bullets = new AtomicReferenceArray<>(new AtomicIntegerArray[bulletsArrayWidth]);
 		initBullets(bullets);
-	}
-	
-	private void flight(boolean ofBullets) {
-		synchronized (lock) {
-			Board board = getBoard();
-			clearBullets(board);
-			for (int x = 0; x < bullets.length(); x++) {
-				for (int y = 0; y < bullets.get(x).length(); y++) {
-					if (Thread.currentThread().isInterrupted()) return;
-					// if 0, than bullet is not exist
-					if (bullets.get(x).get(y) > 0) {
-						// if the bullet does not reach the border of the
-						// board
-						if (bullets.get(x).get(y) < boardHeight - 1) {
-							// if under the bullet is filled cell
-							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-								if (ofBullets) {// flightOfBullets
-									removeCell(board, x, bullets.get(x).get(y));
-								} else {// flightOfMud
-									// stop the bullet before the cell
-									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
-								}
-								// remove the bullet
-								bullets.get(x).set(y, 0);
-							} else {
-								// otherwise, continues flying
-								board.setCell(Cell.Blink, x, bullets.get(x).getAndIncrement(y));
-							}
-						} else if (bullets.get(x).get(y) == boardHeight - 1) {
-							if (ofBullets) { // flightOfBullets
-								// if under the bullet is filled cell
-								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-									removeCell(board, x, bullets.get(x).get(y));
-								}
-								// show the bullet
-								board.setCell(Cell.Blink, x, bullets.get(x).get(y));
-								fireBoardChanged(board);
-								sleep(ANIMATION_DELAY / 2);
-								// remove the bullet
-								board.setCell(Cell.Empty, x, bullets.get(x).get(y));
-							} else {// flightOfMud
-								// if under the bullet is filled cell
-								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-									// stop the bullet before the cell
-									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
-								} else {
-									// stop the bullet on the border of the
-									// board
-									addCellAndCheckLine(board, x, bullets.get(x).get(y));
-								}
-							}
-							// remove the bullet
-							bullets.get(x).set(y, 0);
-						}
-						fireBoardChanged(board);
-					}
-				}
-			}
-		}
 	}
 	
 	/**
@@ -201,6 +139,65 @@ public abstract class GameWithGun extends GameWithLives {
 		// playEffect(Effects.turn); <= removed due occurring audio artifacts
 	}
 	
+	private void flight(boolean ofBullets) {
+		synchronized (lock) {
+			Board board = getBoard();
+			clearBullets(board);
+			for (int x = 0; x < bullets.length(); x++) {
+				for (int y = 0; y < bullets.get(x).length(); y++) {
+					if (exitFlag || Thread.currentThread().isInterrupted()) return;
+					// if 0, than bullet is not exist
+					if (bullets.get(x).get(y) > 0) {
+						// if the bullet does not reach the border of the
+						// board
+						if (bullets.get(x).get(y) < boardHeight - 1) {
+							// if under the bullet is filled cell
+							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+								if (ofBullets) {// flightOfBullets
+									removeCell(board, x, bullets.get(x).get(y));
+								} else {// flightOfMud
+									// stop the bullet before the cell
+									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+								}
+								// remove the bullet
+								bullets.get(x).set(y, 0);
+							} else {
+								// otherwise, continues flying
+								board.setCell(Cell.Blink, x, bullets.get(x).getAndIncrement(y));
+							}
+						} else if (bullets.get(x).get(y) == boardHeight - 1) {
+							if (ofBullets) { // flightOfBullets
+								// if under the bullet is filled cell
+								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+									removeCell(board, x, bullets.get(x).get(y));
+								}
+								// show the bullet
+								board.setCell(Cell.Blink, x, bullets.get(x).get(y));
+								fireBoardChanged(board);
+								sleep(ANIMATION_DELAY / 2);
+								// remove the bullet
+								board.setCell(Cell.Empty, x, bullets.get(x).get(y));
+							} else {// flightOfMud
+								// if under the bullet is filled cell
+								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
+									// stop the bullet before the cell
+									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+								} else {
+									// stop the bullet on the border of the
+									// board
+									addCellAndCheckLine(board, x, bullets.get(x).get(y));
+								}
+							}
+							// remove the bullet
+							bullets.get(x).set(y, 0);
+						}
+						fireBoardChanged(board);
+					}
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Processing the flight of bullets (destruction mode)
 	 */
@@ -222,8 +219,10 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            the bullets array
 	 */
 	protected void initBullets(AtomicReferenceArray<AtomicIntegerArray> bullets) {
+		int bulletsArrayHeight = boardHeight - gun.getHeight();
+		int[] array = new int[bulletsArrayHeight];
+		
 		for (int i = 0; i < bullets.length(); i++) {
-			int[] array = new int[bulletsArrayHeight];
 			Arrays.fill(array, 0);
 			bullets.set(i, new AtomicIntegerArray(array));
 		}

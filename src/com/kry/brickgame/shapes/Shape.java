@@ -1,9 +1,9 @@
 package com.kry.brickgame.shapes;
 
+import com.kry.brickgame.boards.Board.Cell;
+
 import java.io.Serializable;
 import java.util.Arrays;
-
-import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
@@ -195,9 +195,8 @@ public class Shape implements Cloneable, Serializable {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Shape other = (Shape) obj;
-		if (!Arrays.deepEquals(coords, other.coords)) return false;
-		return true;
-	}
+        return Arrays.deepEquals(coords, other.coords);
+    }
 	
 	/**
 	 * Get the coordinates of the single point
@@ -390,13 +389,13 @@ public class Shape implements Cloneable, Serializable {
 			char line[] = new char[max_x - min_x + 1];
 			
 			for (int x = min_x; x <= max_x; x++) {
-				// [x + (0 - min_x)]: because x can be less than 0, then x is
+				// [x - min_x]: because x can be less than 0, then x is
 				// shifted to 0
-				line[x + 0 - min_x] = ' ';
+				line[x - min_x] = ' ';
 				for (int k = 0; k < getLength(); k++) {
 					if (x(k) == x && y(k) == y) {
 						// see previous comment
-						line[x + 0 - min_x] = getFill() == Cell.Blink ? '*' : '0';
+						line[x - min_x] = getFill() == Cell.Blink ? '*' : '0';
 						break;
 					}
 				}

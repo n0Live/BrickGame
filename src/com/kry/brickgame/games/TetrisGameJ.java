@@ -2,8 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.games.GameConsts.Rotation;
@@ -31,6 +30,30 @@ public class TetrisGameJ extends TetrisGameI {
 	}
 	
 	@Override
+	public Game call() {
+		// create timer for addition of lines
+		ScheduledFuture<?> addLineTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if (!Thread.currentThread().isInterrupted() && getStatus() == Status.Running) {
+					fireInfoChanged("-" + String.format("%02d", getTime()) + "-");
+					if (getTime() == 0) {
+						isTimeToAddLine = true;
+					} else {
+						setTime(getTime() - 1);
+					}
+				}
+			}
+		}, 0, 1, TimeUnit.SECONDS);
+		
+		nextGame = super.call();
+		
+		addLineTimer.cancel(true);
+		
+		return nextGame;
+	}
+	
+	@Override
 	protected void doRepetitiveWork() {
 		// if it's time to add a line, trying to add a line
 		if ((isTimeToAddLine) && (tryAddLine())) {
@@ -43,29 +66,6 @@ public class TetrisGameJ extends TetrisGameI {
 	
 	int getTime() {
 		return time;
-	}
-	
-	@Override
-	public void run() {
-		// create timer for addition of lines
-		ScheduledExecutorService addLineTimer = Executors.newSingleThreadScheduledExecutor();
-		addLineTimer.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				if (getStatus() == Status.Running) {
-					fireInfoChanged("-" + String.format("%02d", getTime()) + "-");
-					if (getTime() == 0) {
-						isTimeToAddLine = true;
-					} else {
-						setTime(getTime() - 1);
-					}
-				}
-			}
-		}, 0, 1, TimeUnit.SECONDS);
-		
-		super.run();
-		
-		addLineTimer.shutdownNow();
 	}
 	
 	void setTime(int time) {

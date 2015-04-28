@@ -169,8 +169,7 @@ public class SnakeShape extends Shape {
 	
 	@Override
 	public SnakeShape clone() {
-		SnakeShape cloned = (SnakeShape) super.clone();
-		return cloned;
+        return (SnakeShape) super.clone();
 	}
 	
 	/**
@@ -204,9 +203,8 @@ public class SnakeShape extends Shape {
 		if (getClass() != obj.getClass()) return false;
 		SnakeShape other = (SnakeShape) obj;
 		if (direction != other.direction) return false;
-		if (length != other.length) return false;
-		return true;
-	}
+        return length == other.length;
+    }
 	
 	/**
 	 * Return direction of movement of the snake

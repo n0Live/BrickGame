@@ -16,7 +16,7 @@ public class PentixGameQ extends TetrisGameI {
 	/**
 	 * The Tetris with the Pentominoes figures
 	 * 
-	 * @see TetrisGameI#TetrisGame(int, int, Rotation, int)
+	 * @see TetrisGameI#TetrisGameI(int, int, Rotation, int)
 	 */
 	public PentixGameQ(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);

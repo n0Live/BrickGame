@@ -113,9 +113,10 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 * {@code emptyColor} and vice versa
 	 */
 	public void blinkingSquares() {
-		if (properties.board != null && properties.board.hasBlinkedCell()) {
+		if (properties.board != null && properties.board.hasBlinkedCell()
+		        || properties.preview != null && properties.preview.hasBlinkedCell()) {
 			properties.blinkColor = properties.blinkColor.equals(fullColor) ? emptyColor
-					: fullColor;
+			        : fullColor;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
 		}
 	}
@@ -147,15 +148,15 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			overlay = UIUtils.getCompatibleImage(width, height, Transparency.TRANSLUCENT);
 			// calculating the overlay position on the backgroundImage
 			Rectangle overlayRect = UIUtils.getGameFieldRectangle(backgroundImage.getWidth(),
-					backgroundImage.getHeight());
+			        backgroundImage.getHeight());
 			
 			Graphics2D g2d = (Graphics2D) overlay.getGraphics();
 			g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-					RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+			        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 			// get overlay from the backgroundImage
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
 			g2d.drawImage(backgroundImage.getSubimage(overlayRect.x, overlayRect.y,
-					overlayRect.width, overlayRect.height), 0, 0, width, height, null);
+			        overlayRect.width, overlayRect.height), 0, 0, width, height, null);
 			g2d.dispose();
 		}
 		return overlay;
@@ -214,7 +215,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		// prepare the gamefield
 		Rectangle gameFieldRect = UIUtils.getGameFieldRectangle(size);
 		BufferedImage gameField = getDrawer().getDrawnGameField(gameFieldRect.width,
-				gameFieldRect.height, properties);
+		        gameFieldRect.height, properties);
 		
 		// draw the gamefield
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
@@ -225,11 +226,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 			if (needForUpdate) {
 				g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-						RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+				        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 				g2d.drawImage(backgroundImage, 0, 0, size.width, size.height, null);
 			} else {
 				g2d.drawImage(getOverlayImage(gameField.getWidth(), gameField.getHeight()),
-						gameFieldRect.x, gameFieldRect.y, null);
+				        gameFieldRect.x, gameFieldRect.y, null);
 			}
 		}
 		
@@ -245,7 +246,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			if (totalFrameCount % FRAMES == 0 && totalFrameCount > 0) {
 				curFPS = Math.round((float) FRAMES * TimeUnit.SECONDS.toNanos(1) / curTime);
 				avgFPS = Math.round((float) totalFrameCount * TimeUnit.SECONDS.toNanos(1)
-						/ totalTime);
+				        / totalTime);
 				minFPS = Math.min(minFPS, curFPS);
 				maxFPS = Math.max(maxFPS, curFPS);
 				curTime = 0;
@@ -257,7 +258,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 			String s;
 			if (curFPS > 0) {
 				s = String.format("FPS CUR:%1$4d AVG:%2$4d MIN:%3$4d MAX:%4$4d", curFPS, avgFPS,
-						minFPS, maxFPS);
+				        minFPS, maxFPS);
 			} else {
 				s = "FPS CUR: -   AVG: -   MIN: -   MAX: -";
 			}
@@ -271,6 +272,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		properties.preview = event.getPreview();
 		properties.showLives = event.getSource() instanceof GameWithLives;
 		properties.showNext = event.getSource() instanceof TetrisGameI;
+		repaint(UIUtils.getGameFieldRectangle(getSize()));
 	}
 	
 	@Override

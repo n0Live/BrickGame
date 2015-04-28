@@ -10,7 +10,7 @@ public class BoardLetters extends Board {
 		None, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
 	}
 	
-	private static final long serialVersionUID = -2320950183789497365L;;
+	private static final long serialVersionUID = -2320950183789497365L;
 	
 	public final static int width = 5;
 	public final static int height = 5;
@@ -231,9 +231,8 @@ public class BoardLetters extends Board {
 		if (!super.equals(obj)) return false;
 		if (getClass() != obj.getClass()) return false;
 		BoardLetters other = (BoardLetters) obj;
-		if (letter != other.letter) return false;
-		return true;
-	}
+        return letter == other.letter;
+    }
 	
 	protected Letters getLetter() {
 		return letter;

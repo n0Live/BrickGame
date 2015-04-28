@@ -40,6 +40,20 @@ public class SnakeGame extends GameWithLives {
 	public static final int subtypesNumber = 4;
 	
 	/**
+	 * The snake
+	 */
+	private SnakeShape snake;
+	
+	/**
+	 * Whether the snake can teleporting from one side of the board to another?
+	 */
+	private final boolean isToroidalField;
+	/**
+	 * Use preloaded levels or generate new ones?
+	 */
+	private final boolean usePreloadedLevels;
+	
+	/**
 	 * Drawing of the snake on the board
 	 * 
 	 * @param board
@@ -56,24 +70,10 @@ public class SnakeGame extends GameWithLives {
 			// draws the snake on the board
 			// the head of the snake is blinking
 			result = drawPoint(result, x + snake.x(i), y + snake.y(i), i == 0 ? Cell.Blink
-			        : Cell.Full);
+					: Cell.Full);
 		}
 		return result;
 	}
-	
-	/**
-	 * The snake
-	 */
-	private SnakeShape snake;
-	/**
-	 * Whether the snake can teleporting from one side of the board to another?
-	 */
-	private final boolean isToroidalField;
-	
-	/**
-	 * Use preloaded levels or generate new ones?
-	 */
-	private final boolean usePreloadedLevels;
 	
 	/**
 	 * The Snake
@@ -121,6 +121,37 @@ public class SnakeGame extends GameWithLives {
 	}
 	
 	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		while (!(exitFlag || Thread.currentThread().isInterrupted())
+				&& getStatus() != Status.GameOver) {
+			int currentSpeed = getSpeed(true);
+			if (!usePreloadedLevels && getLevel() > 5) {
+				currentSpeed += ANIMATION_DELAY;
+			}
+			if (isToroidalField) {
+				currentSpeed += ANIMATION_DELAY / 2;
+			}
+			
+			// moving of the snake
+			if (getStatus() == Status.Running && elapsedTime(currentSpeed))
+				if (!tryMove(snake.getDirection())) {
+					loss(curX, curY);
+				}
+			// when the snake has reached the maximum length
+			if (snake.getLength() >= SnakeShape.getMaxLength()) {
+				win();
+			}
+			// processing of key presses
+			processKeys();
+		}
+		return nextGame;
+	}
+	
+	/**
 	 * Generate the random coordinates for placing the gates
 	 * 
 	 * @param gatesCount
@@ -159,7 +190,7 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-		    return snake.x(snake.tail());
+			return snake.x(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftX(direction);
 	}
@@ -175,9 +206,46 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-		    return snake.y(snake.tail());
+			return snake.y(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftY(direction);
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 400;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 150;
+	}
+	
+	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		snake = new SnakeShape(getRotation() == Rotation.CLOCKWISE ? RIGHT : LEFT);
+		// starting position - the middle of the bottom border of the board
+		curX = boardWidth / 2 + (snake.getDirection() == RIGHT ? -1 : 1);
+		
+		curY = isToroidalField ? 1 : 0;
+		
+		tryMove(snake.getDirection());
+		
+		if (isToroidalField) {
+			prepareBorders(!usePreloadedLevels);
+		}
+		
+		if (usePreloadedLevels) {
+			loadPreparedObstacle();
+		} else {
+			loadRandomObstacles();
+		}
+		addApple();
+		
+		super.loadNewLevel();
 	}
 	
 	/**
@@ -195,7 +263,7 @@ public class SnakeGame extends GameWithLives {
 	private void loadRandomObstacles() {
 		if (getLevel() > 1) {
 			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0, isToroidalField ? 2 : 1,
-			        0));
+					0));
 		}
 	}
 	
@@ -245,6 +313,49 @@ public class SnakeGame extends GameWithLives {
 			
 			getBoard().setCell(fill, i, 0);
 			getBoard().setCell(fill, i, boardHeight - 1);
+		}
+	}
+	
+	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (keys.isEmpty() || getStatus() == Status.None) return;
+		
+		super.processKeys();
+		
+		if (getStatus() == Status.Running) {
+			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(LEFT)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
+			}
+			if (containsKey(KeyPressed.KeyRight)) if (tryMove(RIGHT)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
+			}
+			if (containsKey(KeyPressed.KeyDown)) if (tryMove(DOWN)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
+			}
+			if (containsKey(KeyPressed.KeyUp)) if (tryMove(UP)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
+			} else {
+				loss(curX, curY);
+			}
+			if (containsKey(KeyPressed.KeyRotate)) if (tryMove(snake.getDirection())) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
+			} else {
+				loss(curX, curY);
+			}
 		}
 	}
 	
@@ -336,115 +447,6 @@ public class SnakeGame extends GameWithLives {
 		elapsedTime(0);
 		
 		return true;
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 400;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 150;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		snake = new SnakeShape(getRotation() == Rotation.Clockwise ? RIGHT : LEFT);
-		// starting position - the middle of the bottom border of the board
-		curX = boardWidth / 2 + (snake.getDirection() == RIGHT ? -1 : 1);
-		
-		curY = isToroidalField ? 1 : 0;
-		
-		tryMove(snake.getDirection());
-		
-		if (isToroidalField) {
-			prepareBorders(!usePreloadedLevels);
-		}
-		
-		if (usePreloadedLevels) {
-			loadPreparedObstacle();
-		} else {
-			loadRandomObstacles();
-		}
-		addApple();
-		
-		super.loadNewLevel();
-	}
-	
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
-		super.processKeys();
-		
-		if (getStatus() == Status.Running) {
-			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(LEFT)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
-			} else {
-				loss(curX, curY);
-			}
-			if (containsKey(KeyPressed.KeyRight)) if (tryMove(RIGHT)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
-			} else {
-				loss(curX, curY);
-			}
-			if (containsKey(KeyPressed.KeyDown)) if (tryMove(DOWN)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
-			} else {
-				loss(curX, curY);
-			}
-			if (containsKey(KeyPressed.KeyUp)) if (tryMove(UP)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
-			} else {
-				loss(curX, curY);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) if (tryMove(snake.getDirection())) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
-			} else {
-				loss(curX, curY);
-			}
-		}
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
-			int currentSpeed = getSpeed(true);
-			if (!usePreloadedLevels && getLevel() > 5) {
-				currentSpeed += ANIMATION_DELAY;
-			}
-			if (isToroidalField) {
-				currentSpeed += ANIMATION_DELAY / 2;
-			}
-			
-			// moving of the snake
-			if (getStatus() == Status.Running && elapsedTime(currentSpeed))
-			    if (!tryMove(snake.getDirection())) {
-				    loss(curX, curY);
-			    }
-			// when the snake has reached the maximum length
-			if (snake.getLength() >= SnakeShape.getMaxLength()) {
-				win();
-			}
-			// processing of key presses
-			processKeys();
-		}
 	}
 	
 }

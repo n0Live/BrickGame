@@ -60,7 +60,7 @@ public class TetrisGameL extends TetrisGameJ {
 		if (getStatus() == Status.Running && !isFallingFinished
 		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
 			TetrisShape rotatedPiece;
-			if (getRotation() == Rotation.Counterclockwise) {
+			if (getRotation() == Rotation.COUNTERCLOCKWISE) {
 				rotatedPiece = getPrevFigure(curPiece);
 			} else {
 				rotatedPiece = getNextFigure(curPiece);

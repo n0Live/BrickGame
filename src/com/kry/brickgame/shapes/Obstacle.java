@@ -1,8 +1,8 @@
 package com.kry.brickgame.shapes;
 
-import java.util.Random;
-
 import com.kry.brickgame.boards.Board.Cell;
+
+import java.util.Random;
 
 /**
  * @author noLive
@@ -31,13 +31,13 @@ public class Obstacle extends CharacterShape {
 	}
 	
 	/**
-	 * Get instance of a {@link #setRandomShape random obstacle} and a
+	 * Get instance of a {@link #getRandomTypeInstance random obstacle} and a
 	 * {@link #setRandomRotate random rotation angle}
 	 * 
-	 * @see #setRandomShape
+	 * @see #getRandomTypeInstance
 	 * @see #setRandomRotate
 	 */
-	public static Obstacle setRandomShapeAndRotate() {
+	public static Obstacle getRandomShapeAndRotate() {
 		return (Obstacle) getRandomTypeInstance().setRandomRotate();
 	}
 	

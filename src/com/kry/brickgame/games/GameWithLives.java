@@ -46,7 +46,7 @@ public abstract class GameWithLives extends Game {
 	 *            type of the game
 	 */
 	public GameWithLives(int speed, int level, int type) {
-		this(speed, level, Rotation.None, type);
+		this(speed, level, Rotation.NONE, type);
 	}
 	
 	/**
@@ -79,6 +79,16 @@ public abstract class GameWithLives extends Game {
 		return lives;
 	}
 	
+	@Override
+	public void init() {
+		super.init();
+		// play music only in first isStarted, not after deserialization
+		if (isStarted) {
+			isStarted = false;
+			playAndWaitMusic();
+		}
+	}
+	
 	/**
 	 * Loading the specified level
 	 */
@@ -106,7 +116,7 @@ public abstract class GameWithLives extends Game {
 			setLives(getLives() - 1);
 			if (getLives() > 0) {
 				animatedClearBoard(CB_LOSE);
-				if (!Thread.currentThread().isInterrupted()) {
+				if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 					reloadLevel();
 				}
 			} else {
@@ -120,16 +130,6 @@ public abstract class GameWithLives extends Game {
 	 */
 	protected void reloadLevel() {
 		loadNewLevel();
-	}
-	
-	@Override
-	public void run() {
-		super.run();
-		// play music only in first isStarted, not after deserialization
-		if (isStarted) {
-			isStarted = false;
-			playAndWaitMusic();
-		}
 	}
 	
 	/**
@@ -170,7 +170,7 @@ public abstract class GameWithLives extends Game {
 				setSpeed(getSpeed() + 1);
 			}
 			
-			if (!Thread.currentThread().isInterrupted()) {
+			if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 				loadNewLevel();
 			}
 		}

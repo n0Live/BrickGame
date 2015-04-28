@@ -1,11 +1,11 @@
 package com.kry.brickgame.shapes;
 
+import com.kry.brickgame.boards.Board.Cell;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-
-import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
@@ -33,7 +33,7 @@ public class TetrisShape extends Shape {
 	
 	public static enum Polyominoes {
 		Trominoes, Tetraminoes, Pentominoes
-	};
+	}
 	
 	private static final long serialVersionUID = -4165024906477016657L;
 	
@@ -114,9 +114,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[1];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
-		return newTetrisShape;
+
+        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -147,9 +146,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[Figures.REF_TO_FIRST_TETRAMINOES];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
-		return newTetrisShape;
+
+        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -177,9 +175,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[lastItem];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
-		return newTetrisShape;
+
+        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -210,9 +207,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[lastItem];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
-		
-		TetrisShape newTetrisShape = new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
-		return newTetrisShape;
+
+        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -287,10 +283,10 @@ public class TetrisShape extends Shape {
 	}
 	
 	/**
-	 * Get instance of a {@link #setRandomShape random figure} with a
+	 * Get instance of a {@link #getRandomShapeInstance random figure} with a
 	 * {@link #setRandomRotate random rotation angle}
 	 * 
-	 * @see #setRandomShape
+	 * @see #getRandomShapeInstance
 	 * @see #setRandomRotate
 	 */
 	public static TetrisShape getRandomShapeAndRotate() {
@@ -301,7 +297,7 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random Polyominoes figure or super figure
 	 */
 	public static TetrisShape getRandomShapeAndSuper(int[] superShapes) {
-		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
+		Set<Polyominoes> polyominoes = new HashSet<>();
 		polyominoes.add(Polyominoes.Trominoes);
 		polyominoes.add(Polyominoes.Tetraminoes);
 		polyominoes.add(Polyominoes.Pentominoes);
@@ -313,7 +309,7 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random figure
 	 */
 	public static TetrisShape getRandomShapeInstance() {
-		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
+		Set<Polyominoes> polyominoes = new HashSet<>();
 		polyominoes.add(Polyominoes.Trominoes);
 		polyominoes.add(Polyominoes.Tetraminoes);
 		polyominoes.add(Polyominoes.Pentominoes);
@@ -368,7 +364,7 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random Tetraminoes figure
 	 */
 	public static TetrisShape getRandomTetraminoes() {
-		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
+		Set<Polyominoes> polyominoes = new HashSet<>();
 		polyominoes.add(Polyominoes.Tetraminoes);
 		
 		return getRandomPolyominoesAndSuper(polyominoes, new int[0]);
@@ -381,7 +377,7 @@ public class TetrisShape extends Shape {
 	 *            the array of numbered super figures (from 0 to 4)
 	 */
 	public static TetrisShape getRandomTetraminoesAndSuper(int[] superShapes) {
-		Set<Polyominoes> polyominoes = new HashSet<Polyominoes>();
+		Set<Polyominoes> polyominoes = new HashSet<>();
 		polyominoes.add(Polyominoes.Tetraminoes);
 		
 		return getRandomPolyominoesAndSuper(polyominoes, superShapes);
@@ -513,9 +509,8 @@ public class TetrisShape extends Shape {
 		if (getClass() != obj.getClass()) return false;
 		final TetrisShape other = (TetrisShape) obj;
 		if (!Arrays.equals(boardFill, other.boardFill)) return false;
-		if (shape != other.shape) return false;
-		return true;
-	}
+        return shape == other.shape;
+    }
 	
 	public Cell[] getBoardFill() {
 		return boardFill.clone();

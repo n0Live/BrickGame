@@ -26,92 +26,92 @@ public final class ObstacleUtils {
 	}
 	
 	private final static PlacedObstacle[][] snakeObstacles = new PlacedObstacle[][] { { null },// 0
-		{ null },// 1
-		{// 2
+			{ null },// 1
+			{// 2
 			new PlacedObstacle(new Obstacle(1), 1, 3),
-			new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
 			{// 3
-				new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-				new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) },//
-				{// 4
-					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) },//
+			{// 4
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
 					new PlacedObstacle(new Obstacle(2), 3, 11) },//
-					{// 5
-						new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-						new PlacedObstacle(new Obstacle(2), 3, 6) },//
-						{// 6
-							new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-							new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-							new PlacedObstacle(new Obstacle(2), 3, 11),
-							new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
-							{// 7
-								new PlacedObstacle(new Obstacle(1), 1, 3),
-								new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-								new PlacedObstacle(new Obstacle(2), 3, 6),
-								new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) }, //
-								{// 8
-									new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-									new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-									new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
-									new PlacedObstacle(new Obstacle(2), 8, 8) },//
-									{// 9
-										new PlacedObstacle(new Obstacle(1), 1, 3),
-										new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-										new PlacedObstacle(new Obstacle(2), 3, 11),
-										new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) },//
-										{// 10
-											new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-											new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-											new PlacedObstacle(new Obstacle(2), 3, 6),
-											new PlacedObstacle(new Obstacle(2), 3, 11) }, };
+			{// 5
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 6) },//
+			{// 6
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 11),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
+			{// 7
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 6),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) }, //
+			{// 8
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
+					new PlacedObstacle(new Obstacle(2), 8, 8) },//
+			{// 9
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(2), 3, 11),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8) },//
+			{// 10
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 6),
+					new PlacedObstacle(new Obstacle(2), 3, 11) }, };
 	
 	private final static PlacedObstacle[][] tanksObstacles = new PlacedObstacle[][] { { null },// 0
-		{ null },// 1
-		{// 2
+			{ null },// 1
+			{// 2
 			new PlacedObstacle(new Obstacle(1), 1, 3),
-			new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-			new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 8) },//
 			{// 3
-				new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-				new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-				new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9) }, //
-				{// 4
-					new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9) }, //
+			{// 4
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
 					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
 					new PlacedObstacle(new Obstacle(2), 3, 11) }, //
-					{// 5
-						new PlacedObstacle(new Obstacle(1), 1, 3),
-						new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15) },//
-						{// 6
-							new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-							new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-							new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
-							new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 9) },//
-							{// 7
-								new PlacedObstacle(new Obstacle(1), 1, 3),
-								new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-								new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-								new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
-								new PlacedObstacle(new Obstacle(2), 3, 11) },//
-								{// 8
-									new PlacedObstacle(new Obstacle(1), 1, 3),
-									new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-									new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-									new PlacedObstacle(new Obstacle(2), 3, 11) },//
-									{// 9
-										new PlacedObstacle(new Obstacle(1), 1, 3),
-										new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-										new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-										new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
-										new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 9),
-										new PlacedObstacle(new Obstacle(2), 3, 11) },//
-										{// 10
-											new PlacedObstacle(new Obstacle(1), 1, 3),
-											new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
-											new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
-											new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
-											new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
-											new PlacedObstacle(new Obstacle(2), 3, 11) }, };
+			{// 5
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15) },//
+			{// 6
+			new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 9) },//
+			{// 7
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 8
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 9
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 9),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 8, 9),
+					new PlacedObstacle(new Obstacle(2), 3, 11) },//
+			{// 10
+			new PlacedObstacle(new Obstacle(1), 1, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(LEFT), 6, 3),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(RIGHT), 1, 15),
+					new PlacedObstacle(new Obstacle(1).changeRotationAngle(DOWN), 6, 15),
+					new PlacedObstacle(new Obstacle(2).changeRotationAngle(LEFT), 0, 8),
+					new PlacedObstacle(new Obstacle(2), 3, 11) }, };
 	
 	/**
 	 * Creates an obstacle and places it on the board randomly
@@ -168,8 +168,9 @@ public final class ObstacleUtils {
 	 */
 	protected static Board getPreparedObstacles(Board board, PlacedObstacle[] obstacles) {
 		Board result = board;
-		for (PlacedObstacle obstacle : obstacles)
+		for (PlacedObstacle obstacle : obstacles) {
 			result = drawShape(result, obstacle.x, obstacle.y, obstacle.obstacle, Cell.Full);
+		}
 		return result;
 	}
 	
@@ -201,8 +202,8 @@ public final class ObstacleUtils {
 		for (int i = 0; i < count; i++) {
 			int k = 10; // maximum of attempts
 			do {
-				result = generateObstacle(result, r.nextInt(3),
-						leftBorderSpace, rightBorderSpace, bottomBorderSpace, topBorderSpace);
+				result = generateObstacle(result, r.nextInt(3), leftBorderSpace, rightBorderSpace,
+						bottomBorderSpace, topBorderSpace);
 				k--;
 			} while (board.equals(result) && k > 0);
 		}

@@ -76,7 +76,7 @@ public class Board implements Cloneable, Serializable {
 	}
 	
 	@Override
-	public Board clone() {
+	public Board clone(){
 		Board cloned;
 		try {
 			cloned = (Board) super.clone();
@@ -99,9 +99,8 @@ public class Board implements Cloneable, Serializable {
 		Board other = (Board) obj;
 		if (height != other.height) return false;
 		if (width != other.width) return false;
-		if (!Arrays.deepEquals(board, other.board)) return false;
-		return true;
-	}
+        return Arrays.deepEquals(board, other.board);
+    }
 	
 	public Cell[][] getBoard() {
 		lock.readLock().lock();
@@ -129,10 +128,8 @@ public class Board implements Cloneable, Serializable {
 		lock.readLock().lock();
 		try {
 			Cell column[] = new Cell[getHeight()];
-			
-			for (int i = 0; i < column.length; i++) {
-				column[i] = board[x][i];
-			}
+
+            System.arraycopy(board[x], 0, column, 0, column.length);
 			
 			return column;
 		} finally {
@@ -204,15 +201,11 @@ public class Board implements Cloneable, Serializable {
 	 *            x-coordinate of the column
 	 */
 	public void setColumn(Cell[] column, int x) {
+        if (x < 0 || x >= board.length) return;
 		lock.writeLock().lock();
 		try {
-			for (int i = 0; i < column.length; i++) {
-				try {
-					board[x][i] = column[i];
-				} catch (IndexOutOfBoundsException e) {
-					continue;
-				}
-			}
+            int columnLength = Math.min(column.length, board[x].length);
+            System.arraycopy(column, 0, board[x], 0, columnLength);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -227,14 +220,12 @@ public class Board implements Cloneable, Serializable {
 	 *            y-coordinate of the row
 	 */
 	public void setRow(Cell[] row, int y) {
-		lock.writeLock().lock();
-		try {
-			for (int i = 0; i < row.length; i++) {
-				try {
-					board[i][y] = row[i];
-				} catch (IndexOutOfBoundsException e) {
-					continue;
-				}
+        if (y < 0 || y >= board[0].length) return;
+        lock.writeLock().lock();
+        try {
+            int rowLength = Math.min(row.length, board.length);
+			for (int i = 0; i < rowLength; i++) {
+			    board[i][y] = row[i];
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -245,7 +236,7 @@ public class Board implements Cloneable, Serializable {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		
-		result.append("Board [" + width + "x" + height + "]").append("\n");
+		result.append("Board [").append(width).append("x").append(height).append("]\n");
 		// Going through the board (the board is filled from the bottom up)
 		for (int i = height - 1; i >= 0; i--) {
 			char line[] = new char[width];

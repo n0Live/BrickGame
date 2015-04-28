@@ -11,21 +11,21 @@ public class GameSound {
 	 * Sound effects
 	 */
 	protected enum Effects {
-		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, engine;
+		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, engine
 	}
 	
 	/**
 	 * Melodies for Dance game
 	 */
 	protected enum Melodies {
-		melody1, melody2, melody3, melody4, melody5, melody6, melody7, melody8, melody9;
+		melody1, melody2, melody3, melody4, melody5, melody6, melody7, melody8, melody9
 	}
 	
 	/**
 	 * Music
 	 */
 	protected enum Music {
-		welcome, start, win, game_over, tetris, kaboom;
+		welcome, start, win, game_over, tetris, kaboom
 	}
 	
 	// load the sounds at initialization to reduce the delay in the first play

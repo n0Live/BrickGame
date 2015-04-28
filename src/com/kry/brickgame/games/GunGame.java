@@ -8,8 +8,7 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.boards.Board;
@@ -116,6 +115,53 @@ public class GunGame extends GameWithGun {
 	}
 	
 	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		// create timer for bullets
+		ScheduledFuture<?> bulletSwarm = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
+			@Override
+			public void run() {
+				if (!(exitFlag || Thread.currentThread().isInterrupted())
+						&& getStatus() == Status.Running) {
+					if (isCreationMode) {
+						flightOfMud();
+					} else {
+						flightOfBullets();
+					}
+				}
+			}
+			// twice as slow if hasTwoSmokingBarrels
+		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
+		
+		while (!(exitFlag || Thread.currentThread().isInterrupted())
+				&& getStatus() != Status.GameOver) {
+			if (getStatus() == Status.Running) {
+				int currentSpeed = getSpeed(true);
+				// increase game speed when hasTwoSmokingBarrels
+				if (hasTwoSmokingBarrels && !isCreationMode) {
+					currentSpeed -= ANIMATION_DELAY / 2;
+				}
+				
+				// moving
+				if (elapsedTime(currentSpeed)) {
+					// try drop down lines
+					if (!droppingDown()) {
+						loss(curX, curY);
+					}
+				}
+			}
+			// processing of key presses
+			processKeys();
+		}
+		
+		bulletSwarm.cancel(true);
+		return nextGame;
+	}
+	
+	/**
 	 * Drop down one row
 	 * 
 	 * @return {@code true} there is no collision with the gun, otherwise
@@ -148,24 +194,6 @@ public class GunGame extends GameWithGun {
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * Shift the board horizontally on a random direction
-	 */
-	private void shiftBoard() {
-		synchronized (lock) {
-			Board board = getBoard();
-			// erase the gun to not interfere
-			board = drawShape(board, curX, curY, gun, Cell.Empty);
-			// remove bullets from the board
-			clearBullets(board);
-			// shifts the board
-			board = boardHorizontalShift(board, r.nextBoolean() ? -1 : 1);
-			// return the gun to the board
-			board = drawShape(board, curX, curY, gun, Cell.Full);
-			setBoard(board);
-		}
 	}
 	
 	@Override
@@ -246,7 +274,7 @@ public class GunGame extends GameWithGun {
 					keys.remove(KeyPressed.KeyRotate);
 				} else {
 					int fireSpeed = Math.round(ANIMATION_DELAY
-					        * (hasTwoSmokingBarrels ? 2.5f : 1.5f));
+							* (hasTwoSmokingBarrels ? 2.5f : 1.5f));
 					// slow down if hasTwoSmokingBarrels
 					setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
 				}
@@ -295,48 +323,21 @@ public class GunGame extends GameWithGun {
 	}
 	
 	/**
-	 * Launching the game
+	 * Shift the board horizontally on a random direction
 	 */
-	@Override
-	public void run() {
-		super.run();
-		// create timer for bullets
-		ScheduledExecutorService bulletSwarm = Executors.newSingleThreadScheduledExecutor();
-		bulletSwarm.scheduleWithFixedDelay(new Runnable() {
-			@Override
-			public void run() {
-				if (!Thread.currentThread().isInterrupted() && getStatus() == Status.Running) {
-					if (isCreationMode) {
-						flightOfMud();
-					} else {
-						flightOfBullets();
-					}
-				}
-			}
-			// twice as slow if hasTwoSmokingBarrels
-		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
-		
-		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
-				int currentSpeed = getSpeed(true);
-				// increase game speed when hasTwoSmokingBarrels
-				if (hasTwoSmokingBarrels && !isCreationMode) {
-					currentSpeed -= ANIMATION_DELAY / 2;
-				}
-				
-				// moving
-				if (elapsedTime(currentSpeed)) {
-					// try drop down lines
-					if (!droppingDown()) {
-						loss(curX, curY);
-					}
-				}
-			}
-			// processing of key presses
-			processKeys();
+	private void shiftBoard() {
+		synchronized (lock) {
+			Board board = getBoard();
+			// erase the gun to not interfere
+			board = drawShape(board, curX, curY, gun, Cell.Empty);
+			// remove bullets from the board
+			clearBullets(board);
+			// shifts the board
+			board = boardHorizontalShift(board, r.nextBoolean() ? -1 : 1);
+			// return the gun to the board
+			board = drawShape(board, curX, curY, gun, Cell.Full);
+			setBoard(board);
 		}
-		
-		bulletSwarm.shutdownNow();
 	}
 	
 }

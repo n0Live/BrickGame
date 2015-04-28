@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 import com.kry.brickgame.UI.GameKeyAdapter;
 import com.kry.brickgame.UI.Window;
 import com.kry.brickgame.games.Game;
-import com.kry.brickgame.games.GameSelector;
 
 /**
  * The main class to launching
@@ -17,18 +16,32 @@ import com.kry.brickgame.games.GameSelector;
  */
 public final class Main {
 	
+	private static class MainGameLoop implements Runnable {
+		public MainGameLoop() {
+		}
+		
+		@Override
+		public void run() {
+			while (!Thread.currentThread().isInterrupted()) {
+				try {
+					setGame(getGame().call());
+				} catch (Exception e) {
+					e.printStackTrace();
+					break;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * The current game
 	 */
-	private static Game game;
+	private static volatile Game game;
 	/**
 	 * The current thread of the game
 	 */
-	private static volatile ExecutorService gameThread;
-	/**
-	 * The selection screen of a game
-	 */
-	public static final GameSelector gameSelector = new GameSelector();
+	private static ExecutorService gameThread;
+	
 	/**
 	 * Observer to {@code KeyEvent}
 	 */
@@ -55,12 +68,14 @@ public final class Main {
 		});
 	}
 	
-	public static void setGame(Game game) {
+	protected static void setGame(Game game) {
 		Main.game = game;
-		if (null == gameThread) {
-			gameThread = Executors.newSingleThreadExecutor();
-		}
-		gameThread.execute(game);
+	}
+	
+	public static void setGameLoop(final Game game) {
+		gameThread = Executors.newSingleThreadExecutor();
+		setGame(game);
+		gameThread.execute(new MainGameLoop());
 	}
 	
 }

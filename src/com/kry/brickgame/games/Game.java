@@ -7,7 +7,7 @@ import static com.kry.brickgame.games.GameConsts.BOARD_WIDTH;
 import static com.kry.brickgame.games.GameConsts.CB_GAME_OVER;
 import static com.kry.brickgame.games.GameConsts.PREVIEW_HEIGHT;
 import static com.kry.brickgame.games.GameConsts.PREVIEW_WIDTH;
-import static com.kry.brickgame.games.GameUtils.getInvertedBoard;
+import static com.kry.brickgame.games.GameUtils.getInvertedVerticalBoard;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.isKeySuspended;
 import static com.kry.brickgame.games.GameUtils.sleep;
@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
-import com.kry.brickgame.Main;
 import com.kry.brickgame.IO.GameLoader;
 import com.kry.brickgame.UI.GameEvent;
 import com.kry.brickgame.UI.GameListener;
@@ -33,7 +35,7 @@ import com.kry.brickgame.games.GameSound.Music;
 /**
  * @author noLive
  */
-public abstract class Game implements Runnable, Serializable {
+public abstract class Game implements Callable<Game>, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 	
 	private static ArrayList<GameListener> listeners = new ArrayList<>();
@@ -45,60 +47,35 @@ public abstract class Game implements Runnable, Serializable {
 	
 	protected final static Object lock = new Object();
 	
-	protected static void fireMuteChanged(boolean mute) {
-		GameEvent event = new GameEvent(Game.class, mute);
-		for (GameListener listener : listeners) {
-			listener.muteChanged(event);
-		}
-	}
-	
-	protected static boolean isMuted() {
-		return mute;
-	}
-	
-	public static synchronized void addGameListener(GameListener listener) {
-		listeners.add(listener);
-	}
-	
-	public static synchronized GameListener[] getGameListeners() {
-		return listeners.toArray(new GameListener[listeners.size()]);
-	}
-	
-	public static synchronized void removeGameListener(GameListener listener) {
-		listeners.remove(listener);
-	}
-	
-	public static void setMuted(boolean mute) {
-		Game.mute = mute;
-		if (mute) {
-			GameSound.stopAllSounds();
-		}
-		fireMuteChanged(mute);
-	}
-	
 	static final Random r = new Random();
+	
 	/**
 	 * Set of the pressed keys
 	 */
-	protected final Set<KeyPressed> keys = new HashSet<KeyPressed>();
+	protected final Set<KeyPressed> keys = new HashSet<>();
+	
 	/**
 	 * Speed
 	 */
 	private int speed;
+	
 	/**
 	 * Cached value of the genuine speed.
 	 * <p>
 	 * A zero or negative value indicates that not cached values yet.
 	 */
 	private int cachedGenuineSpeed;
+	
 	/**
 	 * Level
 	 */
 	private int level;
+	
 	/**
 	 * Score
 	 */
 	private volatile int score;
+	
 	/**
 	 * Type of game
 	 */
@@ -115,7 +92,6 @@ public abstract class Game implements Runnable, Serializable {
 	 * Height of the board
 	 */
 	protected int boardHeight;
-	
 	/**
 	 * Width of the preview board
 	 */
@@ -124,27 +100,27 @@ public abstract class Game implements Runnable, Serializable {
 	 * Height of the preview board
 	 */
 	protected int previewHeight;
-	
 	/**
 	 * X-coordinate position on the board
 	 */
 	protected int curX;
-	
 	/**
 	 * Y-coordinate position on the board
 	 */
 	protected int curY;
-	
 	/**
 	 * Game status
 	 */
 	private volatile Status status;
+	/**
+	 * Next game instance
+	 */
+	protected transient Game nextGame;
 	
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
 	private long timePoint;
-	
 	/**
 	 * The main (base) board
 	 */
@@ -156,9 +132,82 @@ public abstract class Game implements Runnable, Serializable {
 	private Board preview;
 	
 	/**
+	 * If true than game will interrupted
+	 */
+	protected boolean exitFlag;
+	
+	/**
+	 * Scheduled thread pool
+	 */
+	protected static final ScheduledExecutorService scheduledExecutors = Executors
+	        .newScheduledThreadPool(2);
+	
+	/**
 	 * Whether to draw the board upside down?
 	 */
 	private boolean drawInvertedBoard;
+	
+	public static synchronized void addGameListener(GameListener listener) {
+		listeners.add(listener);
+	}
+	
+	protected static void fireMuteChanged(boolean mute) {
+		GameEvent event = new GameEvent(Game.class, mute);
+		for (GameListener listener : listeners) {
+			listener.muteChanged(event);
+		}
+	}
+	
+	public static synchronized GameListener[] getGameListeners() {
+		return listeners.toArray(new GameListener[listeners.size()]);
+	}
+	
+	protected static boolean isMuted() {
+		return mute;
+	}
+	
+	public static synchronized void removeGameListener(GameListener listener) {
+		listeners.remove(listener);
+	}
+	
+	public static void setMuted(boolean mute) {
+		Game.mute = mute;
+		if (mute) {
+			GameSound.stopAllSounds();
+		}
+		fireMuteChanged(mute);
+	}
+	
+	/**
+	 * The Game
+	 */
+	public Game() {
+		setStatus(Status.None);
+		
+		GameSound.stopAllSounds();
+		
+		setSpeed(1);
+		setLevel(1);
+		setRotation(Rotation.NONE);
+		
+		setBoard(new Board(BOARD_WIDTH, BOARD_HEIGHT));
+		setPreview(new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));
+		
+		setDrawInvertedBoard(false);
+		
+		curX = 0;
+		curY = 0;
+		
+		timePoint = System.currentTimeMillis();
+		
+		boardWidth = board.getWidth();
+		boardHeight = board.getHeight();
+		previewWidth = preview.getWidth();
+		previewHeight = preview.getHeight();
+		
+		clearBoard();
+		clearPreview();
+	}
 	
 	/**
 	 * The Game
@@ -192,37 +241,6 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	/**
-	 * The Game
-	 */
-	public Game() {
-		setStatus(Status.None);
-		
-		GameSound.stopAllSounds();
-		
-		setSpeed(1);
-		setLevel(1);
-		setRotation(Rotation.None);
-		
-		setBoard(new Board(BOARD_WIDTH, BOARD_HEIGHT));
-		setPreview(new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));
-		
-		setDrawInvertedBoard(false);
-		
-		curX = 0;
-		curY = 0;
-		
-		timePoint = System.currentTimeMillis();
-		
-		boardWidth = board.getWidth();
-		boardHeight = board.getHeight();
-		previewWidth = preview.getWidth();
-		previewHeight = preview.getHeight();
-		
-		clearBoard();
-		clearPreview();
-	}
-	
-	/**
 	 * The Game without rotation
 	 * 
 	 * @param speed
@@ -233,7 +251,7 @@ public abstract class Game implements Runnable, Serializable {
 	 *            type of the game
 	 */
 	public Game(int speed, int level, int type) {
-		this(speed, level, Rotation.None, type);
+		this(speed, level, Rotation.NONE, type);
 	}
 	
 	/**
@@ -278,7 +296,7 @@ public abstract class Game implements Runnable, Serializable {
 		// the board is filled upwards
 		for (int y = 0; y < boardHeight; y++) {
 			processKeys();
-			if (Thread.currentThread().isInterrupted()) return;
+			if (exitFlag || Thread.currentThread().isInterrupted()) return;
 			for (int x = 0; x < boardWidth; x++) {
 				board.setCell(Cell.Full, x, y);
 			}
@@ -288,7 +306,7 @@ public abstract class Game implements Runnable, Serializable {
 		// and is cleaned downwards
 		for (int y = boardHeight - 1; y >= 0; y--) {
 			processKeys();
-			if (Thread.currentThread().isInterrupted()) return;
+			if (exitFlag || Thread.currentThread().isInterrupted()) return;
 			
 			for (int x = 0; x < boardWidth; x++) {
 				board.setCell(Cell.Empty, x, y);
@@ -327,7 +345,7 @@ public abstract class Game implements Runnable, Serializable {
 			
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
-			if (Thread.currentThread().isInterrupted()) return;
+			if (exitFlag || Thread.currentThread().isInterrupted()) return;
 		}
 		
 		// restore previous status
@@ -395,18 +413,15 @@ public abstract class Game implements Runnable, Serializable {
 		
 		setHiScore();
 		
-		Main.gameSelector.setSpeed(speed);
-		Main.gameSelector.setLevel(level);
-		
-		Main.gameSelector.setGameAndType(this.getClass().getCanonicalName(), getType());
-		
-		Thread.currentThread().interrupt();
-		Main.setGame(Main.gameSelector);
+		nextGame = new GameSelector(speed, level, this.getClass().getCanonicalName(), getType());
+		exitFlag = true;
 	}
 	
 	protected void fireBoardChanged(Board board) {
-		if (!Thread.currentThread().isInterrupted()) {
-			GameEvent event = new GameEvent(this, isInvertedBoard() ? getInvertedBoard(board)
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
+			Board invBoard = getInvertedVerticalBoard(board);
+			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard// getInvertedBoard(board)//
+			                                                                  // getInvertedVerticalBoard(board)
 			        : board.clone(), false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
@@ -415,7 +430,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireExit() {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this);
 			for (GameListener listener : listeners) {
 				listener.exit(event);
@@ -424,7 +439,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireInfoChanged(String info) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, info);
 			for (GameListener listener : listeners) {
 				listener.infoChanged(event);
@@ -433,7 +448,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireLevelChanged(int level) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, level);
 			for (GameListener listener : listeners) {
 				listener.levelChanged(event);
@@ -442,7 +457,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void firePreviewChanged(Board preview) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, preview, true);
 			for (GameListener listener : listeners) {
 				listener.previewChanged(event);
@@ -451,7 +466,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireRotationChanged(Rotation rotation) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, rotation);
 			for (GameListener listener : listeners) {
 				listener.rotationChanged(event);
@@ -460,7 +475,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireSpeedChanged(int speed) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, (float) speed);
 			for (GameListener listener : listeners) {
 				listener.speedChanged(event);
@@ -469,7 +484,7 @@ public abstract class Game implements Runnable, Serializable {
 	}
 	
 	protected void fireStatusChanged(Status status) {
-		if (!Thread.currentThread().isInterrupted()) {
+		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, status);
 			for (GameListener listener : listeners) {
 				listener.statusChanged(event);
@@ -598,6 +613,20 @@ public abstract class Game implements Runnable, Serializable {
 		return type;
 	}
 	
+	public void init() {
+		nextGame = null;
+		
+		fireBoardChanged(board);
+		firePreviewChanged(preview);
+		fireSpeedChanged(speed);
+		fireLevelChanged(level);
+		fireRotationChanged(rotation);
+		fireMuteChanged(mute);
+		fireStatusChanged(status);
+		fireInfoChanged(String.valueOf(score));
+		fireInfoChanged(String.valueOf("HI" + getHiScore()));
+	}
+	
 	/**
 	 * Get the flag for the drawing the board invertedly
 	 * 
@@ -721,8 +750,65 @@ public abstract class Game implements Runnable, Serializable {
 			for (int k = 0; k < kaboom.waves.length; k++) {
 				kaboom.blast(newX, newY, k);
 				processKeys();
-				if (Thread.currentThread().isInterrupted()) return;
+				if (exitFlag || Thread.currentThread().isInterrupted()) return;
 			}
+		}
+	}
+	
+	/**
+	 * Processing key pressing
+	 * 
+	 * @param key
+	 *            keyCode associated with the pressed key
+	 */
+	public void keyPressed(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.add(KeyPressed.KeyUp);
+				return;
+			}
+			if (key == KeyPressed.KeyUp) {
+				keys.add(KeyPressed.KeyDown);
+				return;
+			}
+		}
+		keys.add(key);
+	}
+	
+	/**
+	 * Processing key releasing
+	 * 
+	 * @param key
+	 *            keyCode associated with the released key
+	 */
+	public void keyReleased(KeyPressed key) {
+		if (isInvertedBoard()) {
+			// swap the up and down buttons
+			if (key == KeyPressed.KeyDown) {
+				keys.remove(KeyPressed.KeyUp);
+			} else if (key == KeyPressed.KeyUp) {
+				keys.remove(KeyPressed.KeyDown);
+			} else {
+				keys.remove(key);
+			}
+		} else {
+			keys.remove(key);
+		}
+	}
+	
+	/**
+	 * Pause
+	 */
+	public void pause() {
+		if (getStatus() == Status.Running) {
+			// send score
+			fireInfoChanged(String.valueOf(score));
+			// send high score
+			fireInfoChanged(String.valueOf("HI" + setHiScore()));
+			
+			setStatus(Status.Paused);
+			GameSound.stopAllSounds();
 		}
 	}
 	
@@ -730,10 +816,10 @@ public abstract class Game implements Runnable, Serializable {
 	 * Processing of key presses
 	 */
 	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
 		// decrease CPU loading
-		sleep(10);
+		sleep(30);
+		
+		if (keys.isEmpty() || getStatus() == Status.None) return;
 		
 		if (keys.contains(KeyPressed.KeyShutdown)) {
 			keys.remove(KeyPressed.KeyShutdown);
@@ -777,6 +863,29 @@ public abstract class Game implements Runnable, Serializable {
 			GameLoader.deleteSavedGame();
 		}
 		fireExit();
+	}
+	
+	/**
+	 * Resume
+	 */
+	public void resume() {
+		if (getStatus() == Status.Paused) {
+			setStatus(Status.Running);
+		}
+	}
+	
+	/**
+	 * Save state of the current game
+	 * 
+	 * @return {@code true} - when success, {@code false} - otherwise
+	 */
+	public boolean saveState() {
+		if (!(this instanceof GameSelector || this instanceof SplashScreen)
+		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
+			setStatus(Status.Paused);
+			return GameLoader.saveGame(this);
+		}
+		return false;
 	}
 	
 	/**
@@ -840,7 +949,7 @@ public abstract class Game implements Runnable, Serializable {
 	 * @param rotation
 	 *            the direction of rotation
 	 */
-	protected void setRotation(Rotation rotation) {
+	public void setRotation(Rotation rotation) {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
 	}
@@ -890,99 +999,6 @@ public abstract class Game implements Runnable, Serializable {
 	protected void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
-	}
-	
-	/**
-	 * Processing key pressing
-	 * 
-	 * @param key
-	 *            keyCode associated with the pressed key
-	 */
-	public void keyPressed(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown) {
-				keys.add(KeyPressed.KeyUp);
-				return;
-			}
-			if (key == KeyPressed.KeyUp) {
-				keys.add(KeyPressed.KeyDown);
-				return;
-			}
-		}
-		keys.add(key);
-	}
-	
-	/**
-	 * Processing key releasing
-	 * 
-	 * @param key
-	 *            keyCode associated with the released key
-	 */
-	public void keyReleased(KeyPressed key) {
-		if (isInvertedBoard()) {
-			// swap the up and down buttons
-			if (key == KeyPressed.KeyDown) {
-				keys.remove(KeyPressed.KeyUp);
-			} else if (key == KeyPressed.KeyUp) {
-				keys.remove(KeyPressed.KeyDown);
-			} else {
-				keys.remove(key);
-			}
-		} else {
-			keys.remove(key);
-		}
-	}
-	
-	/**
-	 * Pause
-	 */
-	public void pause() {
-		if (getStatus() == Status.Running) {
-			// send score
-			fireInfoChanged(String.valueOf(score));
-			// send high score
-			fireInfoChanged(String.valueOf("HI" + setHiScore()));
-			
-			setStatus(Status.Paused);
-			GameSound.stopAllSounds();
-		}
-	}
-	
-	/**
-	 * Resume
-	 */
-	public void resume() {
-		if (getStatus() == Status.Paused) {
-			setStatus(Status.Running);
-		}
-	}
-	
-	@Override
-	public void run() {
-		fireBoardChanged(board);
-		firePreviewChanged(preview);
-		fireSpeedChanged(speed);
-		fireLevelChanged(level);
-		fireRotationChanged(rotation);
-		fireMuteChanged(mute);
-		fireStatusChanged(status);
-		fireInfoChanged(String.valueOf(score));
-		fireInfoChanged(String.valueOf("HI" + getHiScore()));
-	}
-	
-	/**
-	 * Save state of the current game
-	 * 
-	 * @return {@code true} - when success, {@code false} - otherwise
-	 */
-	public boolean saveState() {
-		if (!(this instanceof GameSelector || this instanceof SplashScreen)
-		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
-			setStatus(Status.Paused);
-			return GameLoader.saveGame(this);
-		}
-		return false;
 	}
 	
 }

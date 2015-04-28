@@ -182,13 +182,30 @@ public class FroggerGame extends GameWithLives {
 		shiftRoadWithFrog = getType() % 4 == 1 || getType() % 4 == 2;
 		// for every 4-8 type of game
 		isRoadWithOncomingTraffic = getType() % 8 == 5 || getType() % 8 == 6 || getType() % 8 == 7
-		        || getType() % 8 == 0;
+				|| getType() % 8 == 0;
 		// for types 1-8 and 16-24
 		usePreloadedTracts = getType() <= 8 || getType() >= 16 && getType() <= 24;
 		// for types 16-32
 		setDrawInvertedBoard(getType() > 16);
 		
 		loadNewLevel();
+	}
+	
+	/**
+	 * Launching the game
+	 */
+	@Override
+	public Game call() {
+		super.init();
+		while (!(exitFlag || Thread.currentThread().isInterrupted())
+				&& getStatus() != Status.GameOver) {
+			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true) * 3)) {
+				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+			}
+			// processing of key presses
+			processKeys();
+		}
+		return nextGame;
 	}
 	
 	/**
@@ -216,6 +233,16 @@ public class FroggerGame extends GameWithLives {
 		} else {
 			setFrog();
 		}
+	}
+	
+	@Override
+	protected int getSpeedOfFirstLevel() {
+		return 450;
+	}
+	
+	@Override
+	protected int getSpeedOfTenthLevel() {
+		return 120;
 	}
 	
 	/**
@@ -266,6 +293,24 @@ public class FroggerGame extends GameWithLives {
 	}
 	
 	/**
+	 * Loading or reloading the specified level
+	 */
+	@Override
+	protected void loadNewLevel() {
+		// create the road
+		road = loadRoad(usePreloadedTracts);
+		Board board = getBoard();
+		// set road
+		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
+		// restores the frogs' row
+		board.setRow(frogs, boardHeight - 1);
+		setBoard(board);
+		// initialize the frog
+		setFrog();
+		super.loadNewLevel();
+	}
+	
+	/**
 	 * Creating the road
 	 * 
 	 * @param usePreloaded
@@ -278,15 +323,15 @@ public class FroggerGame extends GameWithLives {
 		final Cell E = Cell.Empty;
 		// preloaded tracks
 		tracts = new Cell[][] {
-		        //
-		        { E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
-		        { E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
-		        { F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
-		        { E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
-		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-		        { F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
-		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-		        { F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
+				//
+				{ E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
+				{ E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
+				{ F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
+				{ E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
+				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+				{ F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
+				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+				{ F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
 		
 		// initial position changes from level
 		roadPositions = new int[tracts.length];
@@ -305,9 +350,10 @@ public class FroggerGame extends GameWithLives {
 			// from 1 on level 1, to 4 on level 10
 			for (int i = 0; i < getLevel() / 3 + 1; i++) {
 				// defines a few random non-recurring tracts
-				while (!oncomingTraffic.add(r.nextInt(tracts.length))) {
-					// do nothing until filled oncomingTraffic
-				}
+				boolean trafficAdded;
+				do {
+					trafficAdded = oncomingTraffic.add(r.nextInt(tracts.length));
+				} while (!trafficAdded);
 			}
 		}
 		
@@ -399,6 +445,57 @@ public class FroggerGame extends GameWithLives {
 	}
 	
 	/**
+	 * Processing of key presses
+	 */
+	@Override
+	protected void processKeys() {
+		if (keys.isEmpty() || getStatus() == Status.None) return;
+		
+		super.processKeys();
+		
+		if (getStatus() == Status.Running) {
+			int newX = curX, newY = curY;
+			boolean move = false;
+			
+			if (containsKey(KeyPressed.KeyLeft)) {
+				newX = newX - 1;
+				move = true;
+				keys.remove(KeyPressed.KeyLeft);
+			}
+			if (containsKey(KeyPressed.KeyRight)) {
+				newX = newX + 1;
+				move = true;
+				keys.remove(KeyPressed.KeyRight);
+			}
+			
+			if (containsKey(KeyPressed.KeyDown)) {
+				newY = newY - 2;
+				move = true;
+				keys.remove(KeyPressed.KeyDown);
+			}
+			if (containsKey(KeyPressed.KeyUp)) {
+				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+				move = true;
+				keys.remove(KeyPressed.KeyUp);
+			}
+			if (containsKey(KeyPressed.KeyRotate)) {
+				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+				move = true;
+				keys.remove(KeyPressed.KeyRotate);
+			}
+			
+			if (move) {
+				if (jumpFrog(newX, newY)) {
+					GameSound.playEffect(Effects.move);
+				} else {
+					loss(curX, curY);
+				}
+			}
+			
+		}
+	}
+	
+	/**
 	 * Drawing the frog in the start position
 	 */
 	private void setFrog() {
@@ -474,106 +571,12 @@ public class FroggerGame extends GameWithLives {
 		
 		// checks for collision with the frog and an obstacles
 		boolean isFrogMustDie = checkBoardCollisionHorizontal(board, frog, curX)
-		        || checkCollision(board, frog, curX, curY);
+				|| checkCollision(board, frog, curX, curY);
 		
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 		
 		if (isFrogMustDie) {
 			loss(curX, curY);
-		}
-	}
-	
-	@Override
-	protected int getSpeedOfFirstLevel() {
-		return 450;
-	}
-	
-	@Override
-	protected int getSpeedOfTenthLevel() {
-		return 120;
-	}
-	
-	/**
-	 * Loading or reloading the specified level
-	 */
-	@Override
-	protected void loadNewLevel() {
-		// create the road
-		road = loadRoad(usePreloadedTracts);
-		Board board = getBoard();
-		// set road
-		board = insertCellsToBoard(board, road.getBoard(), 0, 1);
-		// restores the frogs' row
-		board.setRow(frogs, boardHeight - 1);
-		setBoard(board);
-		// initialize the frog
-		setFrog();
-		super.loadNewLevel();
-	}
-	
-	/**
-	 * Processing of key presses
-	 */
-	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
-		super.processKeys();
-		
-		if (getStatus() == Status.Running) {
-			int newX = curX, newY = curY;
-			boolean move = false;
-			
-			if (containsKey(KeyPressed.KeyLeft)) {
-				newX = newX - 1;
-				move = true;
-				keys.remove(KeyPressed.KeyLeft);
-			}
-			if (containsKey(KeyPressed.KeyRight)) {
-				newX = newX + 1;
-				move = true;
-				keys.remove(KeyPressed.KeyRight);
-			}
-			
-			if (containsKey(KeyPressed.KeyDown)) {
-				newY = newY - 2;
-				move = true;
-				keys.remove(KeyPressed.KeyDown);
-			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyUp);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyRotate);
-			}
-			
-			if (move) {
-				if (jumpFrog(newX, newY)) {
-					GameSound.playEffect(Effects.move);
-				} else {
-					loss(curX, curY);
-				}
-			}
-			
-		}
-	}
-	
-	/**
-	 * Launching the game
-	 */
-	@Override
-	public void run() {
-		super.run();
-		while (!Thread.currentThread().isInterrupted() && getStatus() != Status.GameOver) {
-			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true) * 3)) {
-				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
-			}
-			// processing of key presses
-			processKeys();
 		}
 	}
 	

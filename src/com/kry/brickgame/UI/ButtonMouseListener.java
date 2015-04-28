@@ -47,13 +47,13 @@ class ButtonMouseListener extends MouseAdapter {
 	 * Menu buttons (Shutdown, Reset, Mute, Start)
 	 */
 	private static final List<KeyPressed> menuKeys = Collections.unmodifiableList(Arrays.asList(
-	        KeyPressed.KeyShutdown, KeyPressed.KeyReset, KeyPressed.KeyMute, KeyPressed.KeyStart));
+			KeyPressed.KeyShutdown, KeyPressed.KeyReset, KeyPressed.KeyMute, KeyPressed.KeyStart));
 	
 	/**
 	 * Threads for processing of pressed keys
 	 */
 	private final ScheduledExecutorService scheduledThreadPool = Executors
-	        .newScheduledThreadPool(5);
+			.newScheduledThreadPool(2);
 	
 	/**
 	 * Pressed keys
@@ -77,7 +77,7 @@ class ButtonMouseListener extends MouseAdapter {
 		} else {
 			// process the pressing buttons as well as pressing a key
 			ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(
-			        key), 300, 40, TimeUnit.MILLISECONDS);
+					key), 300, 40, TimeUnit.MILLISECONDS);
 			pressedKeys.put(key, pressedKey);
 			
 			Main.getGame().keyPressed(key);
@@ -95,7 +95,7 @@ class ButtonMouseListener extends MouseAdapter {
 			if (key == KeyPressed.KeyShutdown && e.getComponent().contains(e.getPoint())) {
 				// send closing event to parent frame
 				JFrame frame = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class,
-				        e.getComponent());
+						e.getComponent());
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			} else {
 				Main.getGame().keyReleased(key);

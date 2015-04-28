@@ -26,7 +26,7 @@ public class TetrisGameO extends TetrisGameK {
 	protected void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
-			int dX = (getRotation() == Rotation.Clockwise ? 1 : -1);
+			int dX = (getRotation() == Rotation.CLOCKWISE ? 1 : -1);
 			Board board = boardHorizontalShift(getBoard(), dX);
 			setBoard(board);
 		}

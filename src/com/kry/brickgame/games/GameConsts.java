@@ -8,10 +8,10 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
 public final class GameConsts {
 	public static enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyShutdown
-	};
+	}
 	
 	public static enum Rotation {
-		None, Clockwise, Counterclockwise;
+		NONE, CLOCKWISE, COUNTERCLOCKWISE;
 		
 		/**
 		 * Get the next rotation
@@ -22,15 +22,15 @@ public final class GameConsts {
 		 */
 		public Rotation getNext() {
 			// if None then getNext() return None
-			if (this == Rotation.None) return this;
+			if (this == Rotation.NONE) return this;
 			return ordinal() < Rotation.values().length - 1 ? Rotation.values()[ordinal() + 1]
 					: Rotation.values()[1];
 		}
-	};
+	}
 	
 	public static enum Status {
 		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
-	};
+	}
 	
 	// ** Direction constants **
 	public static final RotationAngle UP = RotationAngle.d0;
