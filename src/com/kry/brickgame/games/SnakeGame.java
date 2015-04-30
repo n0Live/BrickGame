@@ -70,7 +70,7 @@ public class SnakeGame extends GameWithLives {
 			// draws the snake on the board
 			// the head of the snake is blinking
 			result = drawPoint(result, x + snake.x(i), y + snake.y(i), i == 0 ? Cell.Blink
-					: Cell.Full);
+			        : Cell.Full);
 		}
 		return result;
 	}
@@ -109,15 +109,17 @@ public class SnakeGame extends GameWithLives {
 	 */
 	private void addApple() {
 		int x, y;
-		
+		Board board = getBoard();
 		// finds empty cell
 		do {
 			x = r.nextInt(boardWidth);
 			y = r.nextInt(boardHeight);
-		} while (getBoard().getCell(x, y) != Cell.Empty);
+		} while (board.getCell(x, y) != Cell.Empty);
 		
 		// adds "apple" - the blinking cell
-		getBoard().setCell(Cell.Blink, x, y);
+		board.setCell(Cell.Blink, x, y);
+		
+		setBoard(board);
 	}
 	
 	/**
@@ -127,7 +129,7 @@ public class SnakeGame extends GameWithLives {
 	public Game call() {
 		super.init();
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			int currentSpeed = getSpeed(true);
 			if (!usePreloadedLevels && getLevel() > 5) {
 				currentSpeed += ANIMATION_DELAY;
@@ -138,9 +140,9 @@ public class SnakeGame extends GameWithLives {
 			
 			// moving of the snake
 			if (getStatus() == Status.Running && elapsedTime(currentSpeed))
-				if (!tryMove(snake.getDirection())) {
-					loss(curX, curY);
-				}
+			    if (!tryMove(snake.getDirection())) {
+				    loss(curX, curY);
+			    }
 			// when the snake has reached the maximum length
 			if (snake.getLength() >= SnakeShape.getMaxLength()) {
 				win();
@@ -190,7 +192,7 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-			return snake.x(snake.tail());
+		    return snake.x(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftX(direction);
 	}
@@ -206,7 +208,7 @@ public class SnakeGame extends GameWithLives {
 		// if snake made a 180-degree turn
 		if (direction == snake.getDirection().getOpposite())
 		// than returns the last cell (tail) of the snake as the offset
-			return snake.y(snake.tail());
+		    return snake.y(snake.tail());
 		// otherwise gets the offset in dependence on the direction
 		return SnakeShape.getShiftY(direction);
 	}
@@ -263,7 +265,7 @@ public class SnakeGame extends GameWithLives {
 	private void loadRandomObstacles() {
 		if (getLevel() > 1) {
 			setBoard(getRandomObstacles(getBoard(), getLevel() - 1, 0, 0, isToroidalField ? 2 : 1,
-					0));
+			        0));
 		}
 	}
 	
