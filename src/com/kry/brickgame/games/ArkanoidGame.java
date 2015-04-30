@@ -275,7 +275,8 @@ public class ArkanoidGame extends GameWithLives {
 	 * @param y
 	 *            y-coordinate of the brick for breaking
 	 */
-	private void breakBrick(Board board, int x, int y) {
+	private Board breakBrick(Board board, int x, int y) {
+		Board result = board;
 		// coordinates are given to the bricks wall's grid
 		int givenX = x - bricksX;
 		int givenY = y - bricksY;
@@ -283,11 +284,13 @@ public class ArkanoidGame extends GameWithLives {
 		if (bricks.breakBrick(givenX, givenY)) {
 			GameSound.playEffect(Effects.hit_cell);
 			
-			setBoard(insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY));
+			result = insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
+			setBoard(result);
 			
 			// increase scores
 			setScore(getScore() + 1);
 		}
+		return result;
 	}
 	
 	/**
@@ -304,7 +307,7 @@ public class ArkanoidGame extends GameWithLives {
 				@Override
 				public void run() {
 					if (!(exitFlag || Thread.currentThread().isInterrupted())
-							&& getStatus() == Status.Running) {
+					        && getStatus() == Status.Running) {
 						shiftBricks();
 					}
 				}
@@ -315,7 +318,7 @@ public class ArkanoidGame extends GameWithLives {
 		final float speedStep = 0.20f;
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running) {
 				// change the speed in depending of the platform size
 				// (slower when used small platform)
@@ -386,8 +389,8 @@ public class ArkanoidGame extends GameWithLives {
 	 */
 	private boolean isPlatform(int x, int y) {
 		return x >= curX + platform.minX()//
-				&& x <= curX + platform.maxX()//
-				&& (y == curY || useDoubleSidedPlatform && y == secY);
+		        && x <= curX + platform.maxX()//
+		        && (y == curY || useDoubleSidedPlatform && y == secY);
 	}
 	
 	/**
@@ -412,13 +415,13 @@ public class ArkanoidGame extends GameWithLives {
 			
 			bricksX = 0;
 			bricksY = useDoubleSidedPlatform ? (boardHeight - bricks.getHeight()) / 2 : boardHeight
-					- bricks.getHeight();
+			        - bricks.getHeight();
 		}
 		
 		Board board = insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY);
 		
 		// init ball
-		drawBall(board, ballX, ballY);
+		board = drawBall(board, ballX, ballY);
 		
 		setBoard(board);
 		
@@ -448,7 +451,7 @@ public class ArkanoidGame extends GameWithLives {
 		Point newCoords;
 		// set new coordinates from directions
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// if the ball fall off the board then game_over live
 		if (newCoords.y < 0 || useDoubleSidedPlatform && newCoords.y >= boardHeight) {
@@ -469,26 +472,25 @@ public class ArkanoidGame extends GameWithLives {
 			bounce = true;
 		}
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		synchronized (lock) {
-			Board board = getBoard();
 			// try to break brick under current position of the ball
-			breakBrick(board, ballX, ballY);
+			Board board = breakBrick(getBoard(), ballX, ballY);
 			
 			// check collision with the bricks or the platform
 			if (board.getCell(newCoords.x, ballY) != Cell.Empty
-					|| board.getCell(ballX, newCoords.y) != Cell.Empty
-					|| board.getCell(newCoords.x, newCoords.y) != Cell.Empty) {
+			        || board.getCell(ballX, newCoords.y) != Cell.Empty
+			        || board.getCell(newCoords.x, newCoords.y) != Cell.Empty) {
 				
 				// at first, checked the cells with whom the ball touches the
 				// edges
 				if (board.getCell(newCoords.x, ballY) != Cell.Empty
-						|| board.getCell(ballX, newCoords.y) != Cell.Empty) {
+				        || board.getCell(ballX, newCoords.y) != Cell.Empty) {
 					if (board.getCell(newCoords.x, ballY) != Cell.Empty) {
 						ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 						if (!isPlatform(newCoords.x, ballY)) {
-							breakBrick(board, newCoords.x, ballY);
+							board = breakBrick(board, newCoords.x, ballY);
 						} else {
 							bounce = true;
 						}
@@ -496,7 +498,7 @@ public class ArkanoidGame extends GameWithLives {
 					if (board.getCell(ballX, newCoords.y) != Cell.Empty) {
 						ballVerticalDirection = ballVerticalDirection.getOpposite();
 						if (!isPlatform(ballX, newCoords.y)) {
-							breakBrick(board, ballX, newCoords.y);
+							board = breakBrick(board, ballX, newCoords.y);
 						} else {
 							bounce = true;
 						}
@@ -507,7 +509,7 @@ public class ArkanoidGame extends GameWithLives {
 					ballHorizontalDirection = ballHorizontalDirection.getOpposite();
 					ballVerticalDirection = ballVerticalDirection.getOpposite();
 					if (!isPlatform(newCoords.x, newCoords.y)) {
-						breakBrick(board, newCoords.x, newCoords.y);
+						board = breakBrick(board, newCoords.x, newCoords.y);
 					} else {
 						bounce = true;
 					}
@@ -551,9 +553,9 @@ public class ArkanoidGame extends GameWithLives {
 			
 			// Move the ball, if it upon the platform
 			if ((ballY == curY + 1//
-					|| useDoubleSidedPlatform && ballY == secY - 1)//
-					&& ballX >= curX + platform.minX()//
-					&& ballX <= curX + platform.maxX()) {
+			        || useDoubleSidedPlatform && ballY == secY - 1)//
+			        && ballX >= curX + platform.minX()//
+			        && ballX <= curX + platform.maxX()) {
 				
 				int newBallX = ballX + x - curX;
 				board = drawBall(board, newBallX, ballY);
@@ -581,7 +583,7 @@ public class ArkanoidGame extends GameWithLives {
 			final float slowestSpeed = 1.75f;
 			final float speedStep = 0.25f;
 			int movementDelay = Math.round(ANIMATION_DELAY
-					* (slowestSpeed - platform.getType() * speedStep));
+			        * (slowestSpeed - platform.getType() * speedStep));
 			
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (movePlatform(curX - 1)) {
@@ -623,7 +625,9 @@ public class ArkanoidGame extends GameWithLives {
 			Board board = getBoard();
 			board = insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
 			// re-drawing the ball
-			setBoard(drawBall(board, ballX, ballY));
+			board = drawBall(board, ballX, ballY);
+			
+			setBoard(board);
 		}
 	}
 	
