@@ -1,12 +1,11 @@
 package com.kry.brickgame.boards;
 
-
 /**
  * @author noLive
  */
 public class BoardNumbers extends Board {
 	enum Numbers {
-		None, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9
+		NONE, N0, N1, N2, N3, N4, N5, N6, N7, N8, N9
 	}
 	
 	private static final long serialVersionUID = 5903070508565392642L;
@@ -89,14 +88,16 @@ public class BoardNumbers extends Board {
 	 * Convert a string to a Numbers object
 	 * 
 	 * @param str
-	 *            - string like "0" .. "9"
+	 *            string like "0" .. "9"
 	 */
-	protected static Numbers stringToNumbers(String str) {
+	public static Numbers stringToNumbers(String str) {
+		final String PREFIX = "N";
 		Numbers result;
+		
 		try {
-			result = Numbers.valueOf("n" + str);
+			result = Numbers.valueOf(PREFIX + str);
 		} catch (IllegalArgumentException e) {
-			result = Numbers.None;
+			result = Numbers.NONE;
 		}
 		
 		return result;
@@ -106,37 +107,45 @@ public class BoardNumbers extends Board {
 	 * Convert a character to a Numbers object
 	 * 
 	 * @param ch
-	 *            - character like '0' .. '9'
+	 *            character like '0' .. '9'
 	 */
 	public static Numbers charToNumbers(char ch) {
-		Numbers result;
-		try {
-			result = Numbers.valueOf("n" + String.valueOf(ch));
-		} catch (IllegalArgumentException e) {
-			result = Numbers.None;
-		}
-		
-		return result;
+		return stringToNumbers(String.valueOf(ch));
 	}
 	
 	/**
 	 * Convert an integer to a Numbers object
 	 * 
 	 * @param i
-	 *            - integer from 0 to 9
+	 *            integer from 0 to 9
 	 */
 	public static Numbers intToNumbers(int i) {
 		return stringToNumbers(String.valueOf(i));
+	}
+	
+	/**
+	 * Convert a Numbers object to a integer
+	 * 
+	 * @param number
+	 *            a Numbers object
+	 * @return an integer representation of a Numbers object, or {@code -1} if
+	 *         number is {@code NONE}
+	 */
+	public static int numbersToInt(Numbers number) {
+		if (number.equals(Numbers.NONE)) return -1;
+		
+		char[] numbers = number.toString().toCharArray();
+		return Integer.parseInt(String.valueOf(numbers[1]));
 	}
 	
 	private Numbers number;
 	
 	public BoardNumbers() {
 		super(width, height);
-		setNumber(Numbers.None);
+		setNumber(Numbers.NONE);
 	}
 	
-	protected Numbers getNumber() {
+	public Numbers getNumber() {
 		return number;
 	}
 	
@@ -146,8 +155,8 @@ public class BoardNumbers extends Board {
 		if (!super.equals(obj)) return false;
 		if (getClass() != obj.getClass()) return false;
 		BoardNumbers other = (BoardNumbers) obj;
-        return number == other.number;
-    }
+		return number == other.number;
+	}
 	
 	@Override
 	public int hashCode() {

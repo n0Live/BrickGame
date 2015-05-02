@@ -474,5 +474,6 @@ public class GameSelector extends Game {
 				break;
 			}
 		}
+		drawAll();
 	}
 }
