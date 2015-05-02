@@ -194,12 +194,12 @@ public class ButtonsFactory {
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent e) {
 			if (e.getID() == Event.KEY_PRESS) {
-				KeyPressed key = GameKeyAdapter.keycodeMap.get(e.getKeyCode());
+				KeyPressed key = GameKeyAdapter.getKey(e.getKeyCode());
 				if (key != null && buttons != null) {
 					setPressed(buttons.get(key));
 				}
 			} else if (e.getID() == Event.KEY_RELEASE) {
-				KeyPressed key = GameKeyAdapter.keycodeMap.get(e.getKeyCode());
+				KeyPressed key = GameKeyAdapter.getKey(e.getKeyCode());
 				if (key != null && buttons != null) {
 					setUnpressed(buttons.get(key));
 				}
@@ -311,7 +311,7 @@ public class ButtonsFactory {
 			boolean firstCompare = true;
 			
 			// search in the map of keyboard shortcuts
-			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.keycodeMap.entrySet()) {
+			for (Entry<Integer, KeyPressed> entry : GameKeyAdapter.getKeycodeMapEntrySet()) {
 				if (entry.getValue() == key) {
 					isCompare = true;
 					if (firstCompare) {

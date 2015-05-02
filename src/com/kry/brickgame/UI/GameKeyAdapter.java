@@ -4,6 +4,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.kry.brickgame.Main;
 import com.kry.brickgame.games.Game;
@@ -13,7 +15,7 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
  * @author noLive
  */
 public class GameKeyAdapter extends KeyAdapter {
-	public final static Map<Integer, KeyPressed> keycodeMap;
+	private final static Map<Integer, KeyPressed> keycodeMap;
 	static {
 		keycodeMap = new LinkedHashMap<>();
 		keycodeMap.put(KeyEvent.VK_LEFT, KeyPressed.KeyLeft);
@@ -49,4 +51,29 @@ public class GameKeyAdapter extends KeyAdapter {
 			game.keyReleased(keycodeMap.get(keycode));
 		}
 	}
+	
+	/**
+	 * Returns the {@code KeyPressed} object associated with the specified
+	 * {@code keycode}.
+	 * 
+	 * @param keycode
+	 *            the integer keyCode
+	 * @return the {@code KeyPressed} object associated with the specified
+	 *         {@code keycode}, or {@code null} if no associating for the
+	 *         {@code keycode}.
+	 */
+	public static KeyPressed getKey(int keycode) {
+		return keycodeMap.get(keycode);
+	}
+	
+	/**
+	 * Returns a {@code Set} view of the mappings contained in
+	 * {@code keycodeMap}.
+	 * 
+	 * @return a set view of the mappings contained in {@code keycodeMap}
+	 */
+	public static Set<Entry<Integer, KeyPressed>> getKeycodeMapEntrySet() {
+		return keycodeMap.entrySet();
+	}
+	
 }
