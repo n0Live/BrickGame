@@ -36,23 +36,23 @@ public final class GameUtils {
 	 * @return the board after adding lines
 	 */
 	protected static Board addLinesToBoard(Board board, int fromLine, int linesCount,
-			boolean isUpwardDirection) {
+	        boolean isUpwardDirection) {
 		if (board == null) return null;
 		
 		if (linesCount < 1//
-				|| isUpwardDirection && //
-				fromLine + linesCount - 1 > board.getHeight()//
-				|| !isUpwardDirection && //
-				fromLine - (linesCount - 1) < 0) return board;
+		        || isUpwardDirection && //
+		        fromLine + linesCount - 1 > board.getHeight()//
+		        || !isUpwardDirection && //
+		        fromLine - (linesCount - 1) < 0) return board;
 		
 		// checks whether there are full cells at a distance of
 		// <i>linesCount</i> from the top or the bottom of the board
 		for (int i = 0; i < board.getWidth(); i++)
 			if (//
 			isUpwardDirection && //
-					board.getCell(i, board.getHeight() - 1 - linesCount) == Cell.Full//
-					|| !isUpwardDirection && //
-					board.getCell(i, linesCount - 1) == Cell.Full//
+			        board.getCell(i, board.getHeight() - 1 - linesCount) == Cell.Full//
+			        || !isUpwardDirection && //
+			        board.getCell(i, linesCount - 1) == Cell.Full//
 			) return board;
 		
 		Cell newLines[][] = new Cell[linesCount][board.getWidth()];
@@ -93,7 +93,7 @@ public final class GameUtils {
 			
 			// adds the created line to the board
 			resultBoard.setRow(newLines[line], isUpwardDirection ? fromLine + line : fromLine
-					- line);
+			        - line);
 		}
 		return resultBoard;
 	}
@@ -122,7 +122,7 @@ public final class GameUtils {
 			// if shift to the right, then get the first column as temporary,
 			// otherwise get the last column
 			Cell[] tempColumn = reducedDX > 0 ? board.getColumn(board.getWidth() - 1) : board
-					.getColumn(0);
+			        .getColumn(0);
 			
 			for (int j = 0; j < board.getWidth(); j++) {
 				Cell[] nextColumn;
@@ -162,7 +162,7 @@ public final class GameUtils {
 	 */
 	protected static boolean checkBoardCollision(Board board, Shape piece, int x, int y) {
 		return checkBoardCollisionVertical(board, piece, y, true)
-				|| checkBoardCollisionHorizontal(board, piece, x);
+		        || checkBoardCollisionHorizontal(board, piece, x);
 	}
 	
 	/**
@@ -202,7 +202,7 @@ public final class GameUtils {
 	 * @see #checkCollision
 	 */
 	protected static boolean checkBoardCollisionVertical(Board board, Shape piece, int y,
-			boolean checkTopBoundary) {
+	        boolean checkTopBoundary) {
 		return checkTopBoundary && y + piece.maxY() >= board.getHeight() || y + piece.minY() < 0;
 	}
 	
@@ -246,39 +246,30 @@ public final class GameUtils {
 	 * @see #checkBoardCollision
 	 */
 	protected static boolean checkCollision(Board board, Shape piece, int x, int y,
-			boolean withBorder) {
+	        boolean withBorder) {
 		int board_x, board_y;
 		Board checkBoard = board.clone();
-		if (withBorder) {
-			for (int k = 0; k < piece.getLength(); k++) {
-				// include in the check collision the area around the point
-				for (int i = -1; i <= 1; i++) {
-					for (int j = -1; j <= 1; j++) {
-						board_x = x + piece.x(k) + i;
-						board_y = y + piece.y(k) + j;
-						
-						if (board_x < 0 || board_x >= checkBoard.getWidth() || board_y < 0
-								|| board_y >= checkBoard.getHeight()) {
-							continue;
-						}
-						
-						if (checkBoard.getCell(board_x, board_y) != Cell.Empty) return true;
+		
+		int minCheckRange = withBorder ? -1 : 0;
+		int maxCheckRange = withBorder ? 1 : 0;
+		
+		for (int k = 0; k < piece.getLength(); k++) {
+			// include in the check collision the area around the point
+			for (int i = minCheckRange; i <= maxCheckRange; i++) {
+				for (int j = minCheckRange; j <= maxCheckRange; j++) {
+					board_x = x + piece.x(k) + i;
+					board_y = y + piece.y(k) + j;
+					
+					if (board_x < 0 || board_x >= checkBoard.getWidth() || board_y < 0
+					        || board_y >= checkBoard.getHeight()) {
+						continue;
 					}
+					
+					if (checkBoard.getCell(board_x, board_y) != Cell.Empty) return true;
 				}
-			}
-		} else {
-			for (int i = 0; i < piece.getLength(); i++) {
-				board_x = x + piece.x(i);
-				board_y = y + piece.y(i);
-				
-				if (board_x < 0 || board_x >= checkBoard.getWidth() || board_y < 0
-						|| board_y >= checkBoard.getHeight()) {
-					continue;
-				}
-				
-				if (checkBoard.getCell(board_x, board_y) != Cell.Empty) return true;
 			}
 		}
+		
 		return false;
 	}
 	
@@ -298,11 +289,11 @@ public final class GameUtils {
 		CoordinatedShape checkedSecond = second.clone();
 		// when the figures are placed too far apart, returns false
 		if (Math.abs(checkedFirst.y() + checkedFirst.minY() - checkedSecond.y()
-				+ checkedSecond.minY()) > Math.max(checkedFirst.getHeight(),
-				checkedSecond.getHeight())
-				&& Math.abs(checkedFirst.x() + checkedFirst.minX() - checkedSecond.x()
-						+ checkedSecond.minX()) > Math.max(checkedFirst.getWidth(),
-						checkedSecond.getWidth())) return false;
+		        + checkedSecond.minY()) > Math.max(checkedFirst.getHeight(),
+		        checkedSecond.getHeight())
+		        && Math.abs(checkedFirst.x() + checkedFirst.minX() - checkedSecond.x()
+		                + checkedSecond.minX()) > Math.max(checkedFirst.getWidth(),
+		                checkedSecond.getWidth())) return false;
 		
 		for (int i = 0; i < checkedFirst.getLength(); i++) {
 			int givenFirstX = checkedFirst.x() + checkedFirst.x(i);
@@ -400,7 +391,7 @@ public final class GameUtils {
 			
 			// if the figure does not leave off the board
 			if (board_y < board.getHeight() && board_y >= 0 && board_x < board.getWidth()
-					&& board_x >= 0) {
+			        && board_x >= 0) {
 				// draws the point of the figure on the board
 				resultBoard = drawPoint(resultBoard, board_x, board_y, fill);
 			}
@@ -481,7 +472,7 @@ public final class GameUtils {
 		if (board == null) return null;
 		
 		if (x >= board.getWidth() || y >= board.getHeight() || x + cells.length <= 0
-				|| y + cells[0].length <= 0) return board;
+		        || y + cells[0].length <= 0) return board;
 		
 		// calculate the shift when the cells is not completely inserted into
 		// the board
@@ -490,7 +481,7 @@ public final class GameUtils {
 		
 		int fromY = y < 0 ? -y : 0;
 		int toY = y + cells[0].length >= board.getHeight() ? board.getHeight() - y
-				: cells[0].length;
+		        : cells[0].length;
 		
 		Board resultBoard = board.clone();
 		for (int i = fromX; i < toX; i++) {
