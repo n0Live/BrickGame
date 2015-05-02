@@ -58,6 +58,8 @@ public class RacingGame extends GameWithLives {
 	 */
 	private final boolean isThreelaneTraffic;
 	
+	private boolean oddMove;
+	
 	/**
 	 * The Race
 	 * 
@@ -136,7 +138,7 @@ public class RacingGame extends GameWithLives {
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-					&& r.nextInt(10 - getLevel() / 2) == 0) {
+			        && r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(new int[] { coordX, coordY });
@@ -181,7 +183,7 @@ public class RacingGame extends GameWithLives {
 		}
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
@@ -190,8 +192,9 @@ public class RacingGame extends GameWithLives {
 				}
 				
 				// moving
-				if (elapsedTime(currentSpeed)) {
-					moveOn();
+				if (elapsedTime(Math.round(currentSpeed / 2f))) {
+					// borders moving twice as fast as opponents
+					moveOn(oddMove = !oddMove);
 				}
 			}
 			// processing of key presses
@@ -274,7 +277,7 @@ public class RacingGame extends GameWithLives {
 		// draw the car
 		moveCar(curPosition);
 		// draw the opponents and the borders
-		moveOn();
+		moveOn(true);
 		
 		super.loadNewLevel();
 		
@@ -324,39 +327,41 @@ public class RacingGame extends GameWithLives {
 	/**
 	 * Shifting the borders and opponents on a one cell down and drawing it
 	 */
-	private void moveOn() {
+	private void moveOn(boolean catchOpponents) {
 		Board board = getBoard();
 		// draw borders
 		board = drawBorder(board, !isThreelaneTraffic);
-		// draw opponents
-		Iterator<int[]> it = opponents.iterator();
-		while (it.hasNext()) {
-			int[] opponent = it.next();
-			// erase the opponent from the board
-			board = drawShape(board, opponent[0], opponent[1], car, Cell.Empty);
-			
-			// if the opponent does not leave off the board
-			if (opponent[1] + car.maxY() > 0) {
+		if (catchOpponents) {
+			// draw opponents
+			Iterator<int[]> it = opponents.iterator();
+			while (it.hasNext()) {
+				int[] opponent = it.next();
+				// erase the opponent from the board
+				board = drawShape(board, opponent[0], opponent[1], car, Cell.Empty);
 				
-				// check for accident
-				boolean isAccident = checkCollision(board, car, opponent[0], opponent[1] - 1);
-				
-				// draw the opponent on one cell below
-				board = drawShape(board, opponent[0], --opponent[1], car, Cell.Full);
-				
-				if (isAccident) {
-					setBoard(board);
-					loss(curX, curY + car.maxY());
-					return;
+				// if the opponent does not leave off the board
+				if (opponent[1] + car.maxY() > 0) {
+					
+					// check for accident
+					boolean isAccident = checkCollision(board, car, opponent[0], opponent[1] - 1);
+					
+					// draw the opponent on one cell below
+					board = drawShape(board, opponent[0], --opponent[1], car, Cell.Full);
+					
+					if (isAccident) {
+						setBoard(board);
+						loss(curX, curY + car.maxY());
+						return;
+					}
+				} else {
+					it.remove();
+					setScore(getScore() + 1);
 				}
-			} else {
-				it.remove();
-				setScore(getScore() + 1);
 			}
-			setBoard(board);
+			// add new opponents
+			addOpponents();
 		}
-		// add new opponents
-		addOpponents();
+		setBoard(board);
 	}
 	
 	/**
@@ -382,11 +387,11 @@ public class RacingGame extends GameWithLives {
 				keys.remove(KeyPressed.KeyRight);
 			}
 			if (containsKey(KeyPressed.KeyUp)) {
-				moveOn();
+				moveOn(oddMove = !oddMove);
 				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY);
 			}
 			if (containsKey(KeyPressed.KeyRotate)) {
-				moveOn();
+				moveOn(oddMove = !oddMove);
 				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY);
 			}
 		}
