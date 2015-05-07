@@ -6,11 +6,11 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
  * @author User
  */
 public final class GameConsts {
-	public static enum KeyPressed {
+	public enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyShutdown
 	}
 	
-	public static enum Rotation {
+	public enum Rotation {
 		NONE, CLOCKWISE, COUNTERCLOCKWISE;
 		
 		/**
@@ -28,7 +28,7 @@ public final class GameConsts {
 		}
 	}
 	
-	public static enum Status {
+	public enum Status {
 		None, Running, Paused, GameOver, DoSomeWork, ComingSoon
 	}
 	

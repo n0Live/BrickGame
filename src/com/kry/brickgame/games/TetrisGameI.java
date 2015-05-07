@@ -91,6 +91,7 @@ public class TetrisGameI extends Game {
 	private static Board drawShape(Board board, int x, int y, TetrisShape piece, Cell fill) {
 		Cell[] boardFill = new Cell[piece.getLength()];
 		Board resultBoard = board;
+		
 		for (int i = 0; i < piece.getLength(); i++) {
 			int board_x = x + piece.x(i);
 			int board_y = y + piece.y(i);
@@ -109,6 +110,7 @@ public class TetrisGameI extends Game {
 			}
 		}
 		piece.setBoardFill(boardFill);
+		
 		return resultBoard;
 	}
 	

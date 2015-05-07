@@ -326,8 +326,6 @@ public final class GameUtils {
 	 * @return the board with the point
 	 */
 	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
-		if (board == null) return null;
-		
 		int board_x = x;
 		int board_y = y;
 		
@@ -469,8 +467,6 @@ public final class GameUtils {
 	 * @return a new board after the insertion.
 	 */
 	protected static Board insertCellsToBoard(Board board, Cell[][] cells, int x, int y) {
-		if (board == null) return null;
-		
 		if (x >= board.getWidth() || y >= board.getHeight() || x + cells.length <= 0
 		        || y + cells[0].length <= 0) return board;
 		
