@@ -623,8 +623,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 		fireRotationChanged(rotation);
 		fireMuteChanged(mute);
 		fireStatusChanged(status);
-		fireInfoChanged(String.valueOf(score));
 		fireInfoChanged(String.valueOf("HI" + getHiScore()));
+		fireInfoChanged(String.valueOf(score));
 	}
 	
 	/**

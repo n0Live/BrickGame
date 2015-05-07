@@ -683,7 +683,8 @@ public final class Drawer {
 			oldScoresInfo = "";
 		}
 		
-		if (cleared || !scoresInfo.equals(oldScoresInfo)) {
+		if (cleared || !scoresInfo.equals(oldScoresInfo)
+		        || showHiScores != oldProperties.showHiScores) {
 			/* Scores */
 			maxWidth = canvas.getWidth();
 			fontManager.setOptimalDigitalFont(g, SCORE_SUBSTRATE, maxWidth);
