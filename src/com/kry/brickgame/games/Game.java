@@ -134,7 +134,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * If true than game will interrupted
 	 */
-	protected boolean exitFlag;
+	protected volatile boolean exitFlag;
 	
 	/**
 	 * Scheduled thread pool
@@ -413,16 +413,17 @@ public abstract class Game implements Callable<Game>, Serializable {
 		
 		setHiScore();
 		
-		nextGame = new GameSelector(speed, level, this.getClass().getCanonicalName(), getType());
-		exitFlag = true;
+		if (!exitFlag) {
+			nextGame = new GameSelector(speed, level, this.getClass().getCanonicalName(), getType());
+			exitFlag = true;
+		}
 	}
 	
 	protected void fireBoardChanged(Board board) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			Board invBoard = getInvertedVerticalBoard(board);
-			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard// getInvertedBoard(board)//
-			                                                                  // getInvertedVerticalBoard(board)
-			        : board.clone(), false);
+			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard : board.clone(),
+			        false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
 			}
