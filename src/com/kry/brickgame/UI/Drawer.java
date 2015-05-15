@@ -639,18 +639,19 @@ public final class Drawer {
 		int x, y;
 		
 		int maxWidth = canvas.getWidth() - squareSideLength;
-		fontManager.setOptimalDigitalFont(g, COMING, maxWidth);
+		Font font = fontManager.digitalFont.deriveFont(Font.PLAIN);
+		font = FontManager.setOptimalFont(font, g, COMING, maxWidth);
 		
 		// set on center of the canvas
 		x = squareSideLength / 2;
-		y = canvas.getHeight() / 2 - fontManager.digitalFont.getSize() / 2;
-		drawTextOnCanvas(canvas, COMING, COMING, fontManager.digitalFont, x, y, false);
+		y = canvas.getHeight() / 2 - font.getSize() / 2;
+		drawTextOnCanvas(canvas, COMING, COMING, font, x, y, false);
 		
 		fm = g.getFontMetrics(fontManager.digitalFont);
 		// set on center of the canvas
 		x = (canvas.getWidth() - squareSideLength - fm.stringWidth(SOON)) / 2;
-		y = canvas.getHeight() / 2 + fontManager.digitalFont.getSize() / 2;
-		drawTextOnCanvas(canvas, SOON, SOON, fontManager.digitalFont, x, y, false);
+		y = canvas.getHeight() / 2 + font.getSize() / 2;
+		drawTextOnCanvas(canvas, SOON, SOON, font, x, y, false);
 		/* --- */
 	}
 	
