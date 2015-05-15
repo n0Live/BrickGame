@@ -177,7 +177,9 @@ public class GameSelector extends Game {
 			splashTimer.cancel(true);
 		}
 		
-		drawLetter(letter);
+		Board board = getBoard();
+		
+		board = drawLetter(board, letter);
 		
 		try {
 			c = (Class<Game>) Class.forName(gamesList.get(letter));
@@ -204,34 +206,36 @@ public class GameSelector extends Game {
 				splash = null;
 			}
 			
-			if (splash != null) {
-				// starts the timer to show splash screen of the game
-				splashTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
-					@Override
-					public void run() {
-						drawGameSplash(splash);
-					}
-				}, 0, 500, TimeUnit.MILLISECONDS);
-			} else {
-				// if unable - clears the rectangle of the splash screen
-				drawGameSplash(null);
-			}
-			
 			// show high scores
 			fireInfoChanged(String.valueOf("HI"
 			        + getScoresManager().getHiScore(c.getCanonicalName())));
 			
 		} catch (ClassNotFoundException e) {
 			c = null;
+			splash = null;
 			maxNumber = 1;
-			drawGameSplash(null);
 		}
 		
 		// checks that the current number does not exceed the maximum number
 		if (number > maxNumber) {
 			number = 1;
 		}
-		drawNumber(number);
+		board = drawNumber(board, number);
+		setBoard(board);
+		
+		// draw splash
+		if (splash != null) {
+			// starts the timer to show splash screen of the game
+			splashTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
+				@Override
+				public void run() {
+					drawGameSplash(splash);
+				}
+			}, 0, 500, TimeUnit.MILLISECONDS);
+		} else {
+			// if unable - clears the rectangle of the splash screen
+			drawGameSplash(null);
+		}
 		
 		return c != null;
 	}
@@ -245,30 +249,44 @@ public class GameSelector extends Game {
 	 *            splash screen instance
 	 */
 	void drawGameSplash(Splash splash) {
+		Board board = getBoard();
 		if (splash != null) {
-			insertBoard(splash.getNextFrame(), 0,// x
-			        BoardNumbers.height + 1);// y
+			board = insertCellsToBoard(board, splash.getNextFrame().getBoard(), 0,
+			        BoardNumbers.height + 1);
 		} else {
 			Board clear = new Board(Splash.width, Splash.height);
-			insertBoard(clear, 0,// x
-			        BoardNumbers.height + 1);// y
+			board = insertCellsToBoard(board, clear.getBoard(), 0, BoardNumbers.height + 1);
 		}
+		setBoard(board);
 	}
 	
 	/**
 	 * Displays a letter at the top of the basic board
+	 * 
+	 * @param board
+	 *            a board for drawing a letter
+	 * @param letter
+	 *            a letter
+	 * @return a board with a drawn letter
 	 */
-	private void drawLetter(char letter) {
+	private Board drawLetter(Board board, char letter) {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(BoardLetters.charToLetters(letter));
-		insertBoard(boardLetter, boardWidth / 2 - BoardLetters.width / 2 - 1,// x
-		        boardHeight - BoardLetters.height);// y
+		Board result = insertCellsToBoard(board, boardLetter.getBoard(), boardWidth / 2
+		        - BoardLetters.width / 2 - 1, boardHeight - BoardLetters.height);
+		return result;
 	}
 	
 	/**
 	 * Displays a two numbers at the bottom of the basic board
+	 * 
+	 * @param board
+	 *            a board for drawing a numbers
+	 * @param number
+	 *            a number
+	 * @return a board with a drawn numbers
 	 */
-	private void drawNumber(int number) {
+	private Board drawNumber(Board board, int number) {
 		int number_1;
 		int number_2;
 		
@@ -281,16 +299,19 @@ public class GameSelector extends Game {
 		}
 		
 		BoardNumbers boardNumber = new BoardNumbers();
+		Board result = board;
 		
 		// 1st number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
-		insertBoard(boardNumber, boardWidth / 2 - BoardNumbers.width - 1,// x
-		        0);// y
-		
+		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2
+		        - BoardNumbers.width - 1,// x
+		        0);
 		// 2nd number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
-		insertBoard(boardNumber, boardWidth / 2,// x
-		        0);// y
+		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2,// x
+		        0);
+		
+		return result;
 	}
 	
 	@Override
@@ -301,22 +322,6 @@ public class GameSelector extends Game {
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 0;
-	}
-	
-	/**
-	 * Insert a Letters or a Numbers board in the basic board. Coordinate (
-	 * {@code x, y}) is set a point, which gets the lower left corner of the
-	 * {@code boardToInsert}
-	 * 
-	 * @param boardToInsert
-	 *            a Letters or a Numbers board
-	 * @param x
-	 *            x-coordinate for the insertion
-	 * @param y
-	 *            y-coordinate for the insertion
-	 */
-	private void insertBoard(Board boardToInsert, int x, int y) {
-		setBoard(insertCellsToBoard(getBoard(), boardToInsert.getBoard(), x, y));
 	}
 	
 	/**
@@ -340,7 +345,7 @@ public class GameSelector extends Game {
 	 */
 	private void nextNumber() {
 		number = number < maxNumber ? number + 1 : 1;
-		drawNumber(number);
+		setBoard(drawNumber(getBoard(), number));
 	}
 	
 	/**
@@ -364,7 +369,7 @@ public class GameSelector extends Game {
 	 */
 	private void prevNumber() {
 		number = number > 1 ? number - 1 : maxNumber;
-		drawNumber(number);
+		setBoard(drawNumber(getBoard(), number));
 	}
 	
 	/**
