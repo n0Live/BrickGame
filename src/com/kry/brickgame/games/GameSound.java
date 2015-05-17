@@ -6,7 +6,11 @@ import java.util.Map;
 import com.kry.brickgame.sound.SoundBank;
 import com.kry.brickgame.sound.SoundManager;
 
-public class GameSound {
+/**
+ * @author noLive
+ */
+public enum GameSound {
+	;
 	/**
 	 * Sound effects
 	 */
@@ -97,7 +101,7 @@ public class GameSound {
 		if (!Game.isMuted() && !SoundManager.isPlaying(GameSound.music)) {
 			// get sound priority
 			int priority = GameSound.effectsPriority.containsKey(sound) ? GameSound.effectsPriority
-					.get(sound) : Thread.NORM_PRIORITY;
+			        .get(sound) : Thread.NORM_PRIORITY;
 			SoundManager.play(GameSound.effects, sound, priority);
 		}
 	}

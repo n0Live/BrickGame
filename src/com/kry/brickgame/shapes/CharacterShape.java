@@ -13,7 +13,7 @@ public abstract class CharacterShape extends Shape {
 	/**
 	 * Type of the character
 	 */
-	protected int type;
+	private int type;
 	
 	/**
 	 * Copy constructor of the player character
@@ -73,7 +73,7 @@ public abstract class CharacterShape extends Shape {
 	 * @param fill
 	 *            type of fill of the character
 	 */
-	protected CharacterShape setType(int type, RotationAngle rotationAngle, Cell fill) {
+	public CharacterShape setType(int type, RotationAngle rotationAngle, Cell fill) {
 		for (int i = 0; i < getCharactersTable()[type].length; i++) {
 			setX(i, getCharactersTable()[type][i][0]);
 			setY(i, getCharactersTable()[type][i][1]);
@@ -105,7 +105,7 @@ public abstract class CharacterShape extends Shape {
 		// the type and rotation angle
 		return "CharacterShape [" + getType() + ", " + getRotationAngle()
 		// width and height
-				+ ", width:" + getWidth() + ", height:" + getHeight() + "]\n" + super.toString();
+		        + ", width:" + getWidth() + ", height:" + getHeight() + "]\n" + super.toString();
 	}
 	
 }

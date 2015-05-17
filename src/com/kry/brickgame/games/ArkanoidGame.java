@@ -41,7 +41,7 @@ public class ArkanoidGame extends GameWithLives {
 	/**
 	 * The bit, who which kicks the ball
 	 */
-	private ArkanoidPlatformShape platform;
+	private final ArkanoidPlatformShape platform;
 	/**
 	 * The ball breaking bricks
 	 */
@@ -368,12 +368,12 @@ public class ArkanoidGame extends GameWithLives {
 	}
 	
 	@Override
-	protected int getSpeedOfFirstLevel() {
+	int getSpeedOfFirstLevel() {
 		return 400;
 	}
 	
 	@Override
-	protected int getSpeedOfTenthLevel() {
+	int getSpeedOfTenthLevel() {
 		return 80;
 	}
 	
@@ -388,9 +388,9 @@ public class ArkanoidGame extends GameWithLives {
 	 *         {@code false}
 	 */
 	private boolean isPlatform(int x, int y) {
-		return x >= curX + platform.minX()//
-		        && x <= curX + platform.maxX()//
-		        && (y == curY || useDoubleSidedPlatform && y == secY);
+		return !(x < curX + platform.minX()//
+		        || x > curX + platform.maxX()//
+		|| y != curY && (!useDoubleSidedPlatform || y != secY));
 	}
 	
 	/**
@@ -432,7 +432,7 @@ public class ArkanoidGame extends GameWithLives {
 	}
 	
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		loadLevel(true);
 		super.loadNewLevel();
 	}

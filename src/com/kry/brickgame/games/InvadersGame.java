@@ -174,7 +174,7 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected void animatedClearBoard(int millis) {
+	void animatedClearBoard(int millis) {
 		theXDimension = false;
 		super.animatedClearBoard(millis);
 	}
@@ -225,7 +225,7 @@ public class InvadersGame extends GameWithGun {
 			@Override
 			public void run() {
 				if (!(exitFlag || Thread.currentThread().isInterrupted())
-						&& getStatus() == Status.Running) {
+				        && getStatus() == Status.Running) {
 					flightOfBullets();
 				}
 			}
@@ -274,10 +274,10 @@ public class InvadersGame extends GameWithGun {
 					// magic aiming algorithm
 					if (ballX < curX) { // if the ball to the left of the gun
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? LEFT
-								: RIGHT;
+						        : RIGHT;
 					} else {
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? RIGHT
-								: LEFT;
+						        : LEFT;
 					}
 					// delete this brick from bricks wall
 					bricks.setCell(Cell.Empty, x, y);
@@ -442,7 +442,7 @@ public class InvadersGame extends GameWithGun {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// reset isDead flag
 		isDead = false;
 		
@@ -479,7 +479,7 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected void loss(int x, int y) {
+	void loss(int x, int y) {
 		// if the invasionTimer was set, then cancel it
 		if (invasionHandler != null) {
 			invasionHandler.cancel(true);
@@ -495,7 +495,7 @@ public class InvadersGame extends GameWithGun {
 		Point newCoords;
 		// set new coordinates from directions
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// if the ball fall off the board then remove it
 		if (newCoords.y < 0) {
@@ -512,7 +512,7 @@ public class InvadersGame extends GameWithGun {
 			bounce = true;
 		}
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		synchronized (lock) {
 			// if ball was destroyed then return
@@ -609,7 +609,7 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected void removeCell(Board board, int x, int y) {
+	void removeCell(Board board, int x, int y) {
 		synchronized (lock) {
 			if (x == ballX && y == ballY) {
 				GameSound.playEffect(Effects.hit_cell);
@@ -633,7 +633,7 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected void win() {
+	void win() {
 		// if the invasionTimer was set, then cancel it
 		if (invasionHandler != null) {
 			invasionHandler.cancel(true);

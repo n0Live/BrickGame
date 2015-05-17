@@ -13,7 +13,9 @@ import com.kry.brickgame.shapes.Shape;
 /**
  * @author noLive
  */
-public final class GameUtils {
+public enum GameUtils {
+	;
+	
 	/**
 	 * Suspended keys
 	 * <p>
@@ -35,7 +37,7 @@ public final class GameUtils {
 	 *            if {@code true}, then the bottom-up direction of addition
 	 * @return the board after adding lines
 	 */
-	protected static Board addLinesToBoard(Board board, int fromLine, int linesCount,
+	static Board addLinesToBoard(Board board, int fromLine, int linesCount,
 	        boolean isUpwardDirection) {
 		if (board == null) return null;
 		
@@ -160,7 +162,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionHorizontal
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollision(Board board, Shape piece, int x, int y) {
+	static boolean checkBoardCollision(Board board, Shape piece, int x, int y) {
 		return checkBoardCollisionVertical(board, piece, y, true)
 		        || checkBoardCollisionHorizontal(board, piece, x);
 	}
@@ -180,7 +182,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollisionHorizontal(Board board, Shape piece, int x) {
+	static boolean checkBoardCollisionHorizontal(Board board, Shape piece, int x) {
 		return x + piece.minX() < 0 || x + piece.maxX() >= board.getWidth();
 	}
 	
@@ -201,7 +203,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollision
 	 * @see #checkCollision
 	 */
-	protected static boolean checkBoardCollisionVertical(Board board, Shape piece, int y,
+	static boolean checkBoardCollisionVertical(Board board, Shape piece, int y,
 	        boolean checkTopBoundary) {
 		return checkTopBoundary && y + piece.maxY() >= board.getHeight() || y + piece.minY() < 0;
 	}
@@ -222,7 +224,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x, int y) {
+	static boolean checkCollision(Board board, Shape piece, int x, int y) {
 		return checkCollision(board, piece, x, y, false);
 	}
 	
@@ -245,8 +247,7 @@ public final class GameUtils {
 	 * @see #checkBoardCollisionVertical
 	 * @see #checkBoardCollision
 	 */
-	protected static boolean checkCollision(Board board, Shape piece, int x, int y,
-	        boolean withBorder) {
+	static boolean checkCollision(Board board, Shape piece, int x, int y, boolean withBorder) {
 		int board_x, board_y;
 		Board checkBoard = board.clone();
 		
@@ -282,7 +283,7 @@ public final class GameUtils {
 	 *            the second figure
 	 * @return {@code true} if there is a collision
 	 */
-	protected static boolean checkTwoShapeCollision(CoordinatedShape first, CoordinatedShape second) {
+	static boolean checkTwoShapeCollision(CoordinatedShape first, CoordinatedShape second) {
 		if (first == null || second == null) return false;
 		
 		CoordinatedShape checkedFirst = first.clone();
@@ -325,7 +326,7 @@ public final class GameUtils {
 	 *            type of fill the point
 	 * @return the board with the point
 	 */
-	protected static Board drawPoint(Board board, int x, int y, Cell fill) {
+	static Board drawPoint(Board board, int x, int y, Cell fill) {
 		int board_x = x;
 		int board_y = y;
 		
@@ -359,7 +360,7 @@ public final class GameUtils {
 	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * @return the board with the figure
 	 */
-	protected static Board drawShape(Board board, CoordinatedShape shape, Cell fill) {
+	static Board drawShape(Board board, CoordinatedShape shape, Cell fill) {
 		return drawShape(board, shape.x(), shape.y(), shape, fill);
 	}
 	
@@ -379,7 +380,7 @@ public final class GameUtils {
 	 *            figure, {@code Cells.Empty} - to erase the figure
 	 * @return the board with the figure
 	 */
-	protected static Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
+	static Board drawShape(Board board, int x, int y, Shape shape, Cell fill) {
 		if (shape == null || board == null) return board;
 		
 		Board resultBoard = board.clone();
@@ -404,7 +405,7 @@ public final class GameUtils {
 	 *            specified board
 	 * @return the full inverted copy of the board
 	 */
-	protected static Board getInvertedBoard(Board board) {
+	static Board getInvertedBoard(Board board) {
 		if (board == null) return null;
 		
 		Board resultBoard = board.clone();
@@ -425,7 +426,7 @@ public final class GameUtils {
 	 *            specified board
 	 * @return the inverted horizontal copy of the board
 	 */
-	protected static Board getInvertedHorizontalBoard(Board board) {
+	static Board getInvertedHorizontalBoard(Board board) {
 		if (board == null) return null;
 		
 		Board resultBoard = board.clone();
@@ -442,7 +443,7 @@ public final class GameUtils {
 	 *            specified board
 	 * @return the inverted vertical copy of the board
 	 */
-	protected static Board getInvertedVerticalBoard(Board board) {
+	static Board getInvertedVerticalBoard(Board board) {
 		if (board == null) return null;
 		
 		Board resultBoard = board.clone();
@@ -466,7 +467,7 @@ public final class GameUtils {
 	 *            y-coordinate for the insertion
 	 * @return a new board after the insertion.
 	 */
-	protected static Board insertCellsToBoard(Board board, Cell[][] cells, int x, int y) {
+	static Board insertCellsToBoard(Board board, Cell[][] cells, int x, int y) {
 		if (x >= board.getWidth() || y >= board.getHeight() || x + cells.length <= 0
 		        || y + cells[0].length <= 0) return board;
 		
@@ -497,7 +498,7 @@ public final class GameUtils {
 	 *            number of the checked line.
 	 * @return {@code true} if the line is full; {@code false} - otherwise.
 	 */
-	protected static boolean isFullLine(Board board, int y) {
+	static boolean isFullLine(Board board, int y) {
 		boolean result = true;
 		for (int x = 0; x < board.getWidth(); x++)
 			if (board.getCell(x, y) == Cell.Empty) {
@@ -513,7 +514,7 @@ public final class GameUtils {
 	 * @param key
 	 *            specified key
 	 */
-	protected static boolean isKeySuspended(KeyPressed key) {
+	static boolean isKeySuspended(KeyPressed key) {
 		Long value = suspendedKeys.get(key);
 		if (value != null) {
 			if (value > System.currentTimeMillis()) return true;
@@ -531,7 +532,7 @@ public final class GameUtils {
 	 * @param millis
 	 *            period of time
 	 */
-	protected static void setKeyDelay(KeyPressed key, int millis) {
+	static void setKeyDelay(KeyPressed key, int millis) {
 		suspendedKeys.put(key, System.currentTimeMillis() + millis);
 	}
 	
@@ -541,7 +542,7 @@ public final class GameUtils {
 	 * @param millis
 	 *            the length of time to sleep in milliseconds
 	 */
-	protected static void sleep(long millis) {
+	static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {

@@ -10,11 +10,11 @@ public abstract class CoordinatedShape extends CharacterShape {
 	/**
 	 * X-coordinate position
 	 */
-	protected int x;
+	int x;
 	/**
 	 * Y-coordinate position
 	 */
-	protected int y;
+	int y;
 	
 	public CoordinatedShape(CoordinatedShape aShape) {
 		super(aShape);

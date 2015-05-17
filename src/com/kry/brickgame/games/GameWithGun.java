@@ -25,12 +25,12 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * The Gun
 	 */
-	protected GunShape gun;
+	final GunShape gun;
 	
 	/**
 	 * Array that stores the coordinates of the bullets
 	 */
-	protected final AtomicReferenceArray<AtomicIntegerArray> bullets;
+	final AtomicReferenceArray<AtomicIntegerArray> bullets;
 	
 	// is equals int[][] but atomic
 	
@@ -64,7 +64,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @param y
 	 *            y-coordinate of the cell
 	 */
-	protected void addCell(Board board, int x, int y) {
+	private void addCell(Board board, int x, int y) {
 		GameSound.playEffect(Effects.add_cell);
 		synchronized (lock) {
 			// add the cell
@@ -85,7 +85,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @param y
 	 *            y-coordinate of the cell
 	 */
-	protected void addCellAndCheckLine(Board board, int x, int y) {
+	private void addCellAndCheckLine(Board board, int x, int y) {
 		addCell(board, x, y);
 		removeFullLines(y);
 	}
@@ -96,7 +96,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @param board
 	 *            the board, which is necessary to remove the bullets
 	 */
-	protected void clearBullets(Board board) {
+	void clearBullets(Board board) {
 		synchronized (lock) {
 			for (int i = 0; i < boardWidth; i++) {
 				for (int j = 0; j < boardHeight; j++)
@@ -120,7 +120,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            if {@code true},then shot is made with two guns on the sides,
 	 *            otherwise shot is made with one gun on the center
 	 */
-	protected void fire(int x, int y, boolean hasTwoSmokingBarrels) {
+	void fire(int x, int y, boolean hasTwoSmokingBarrels) {
 		if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) return;
 		
 		for (int i = x - 1; i <= x + 1; i++) {
@@ -201,14 +201,14 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * Processing the flight of bullets (destruction mode)
 	 */
-	protected void flightOfBullets() {
+	void flightOfBullets() {
 		flight(true);
 	}
 	
 	/**
 	 * Processing the flight of mud bullets (creation mode)
 	 */
-	protected void flightOfMud() {
+	void flightOfMud() {
 		flight(false);
 	}
 	
@@ -218,7 +218,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @param bullets
 	 *            the bullets array
 	 */
-	protected void initBullets(AtomicReferenceArray<AtomicIntegerArray> bullets) {
+	void initBullets(AtomicReferenceArray<AtomicIntegerArray> bullets) {
 		int bulletsArrayHeight = boardHeight - gun.getHeight();
 		int[] array = new int[bulletsArrayHeight];
 		
@@ -229,7 +229,7 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	@Override
-	protected void loss(int x, int y) {
+	void loss(int x, int y) {
 		clearBullets(getBoard());
 		super.loss(x, y);
 	}
@@ -243,7 +243,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 *            y-coordinate position of the new location
 	 * @return {@code false} if there was a collision, otherwise {@code true}
 	 */
-	protected boolean moveGun(int x, int y) {
+	boolean moveGun(int x, int y) {
 		if (x < 0 || x >= boardWidth || y < 0 || y >= boardHeight) return true;
 		
 		synchronized (lock) {
@@ -273,7 +273,7 @@ public abstract class GameWithGun extends GameWithLives {
 	 * @param y
 	 *            y-coordinate of the cell
 	 */
-	protected void removeCell(Board board, int x, int y) {
+	void removeCell(Board board, int x, int y) {
 		GameSound.playEffect(Effects.hit_cell);
 		synchronized (lock) {
 			// remove the cell
@@ -286,7 +286,7 @@ public abstract class GameWithGun extends GameWithLives {
 	/**
 	 * Removing of a filled lines
 	 */
-	protected boolean removeFullLines(int y) {
+	private boolean removeFullLines(int y) {
 		boolean result = false;
 		
 		Board board = getBoard();
@@ -330,7 +330,7 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	@Override
-	protected void win() {
+	void win() {
 		clearBullets(getBoard());
 		super.win();
 	}

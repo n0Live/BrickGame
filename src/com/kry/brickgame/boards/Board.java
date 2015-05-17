@@ -12,7 +12,7 @@ public class Board implements Cloneable, Serializable {
 	/**
 	 * Cell type
 	 */
-	public static enum Cell {
+	public enum Cell {
 		Empty, Full, Blink
 	}
 	

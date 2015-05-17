@@ -43,12 +43,12 @@ public class TetrisGameI extends Game {
 	/**
 	 * Flag to check the completion of falling of a figure
 	 */
-	protected boolean isFallingFinished;
+	boolean isFallingFinished;
 	
 	/**
 	 * The current figure
 	 */
-	protected TetrisShape curPiece;
+	TetrisShape curPiece;
 	
 	/**
 	 * The "next" figure
@@ -382,7 +382,7 @@ public class TetrisGameI extends Game {
 	/**
 	 * Adds one randomly generated line at the bottom of the board
 	 */
-	protected boolean addLines() {
+	boolean addLines() {
 		Board board = addLinesToBoard(getBoard(), 0, 1, true);
 		if (!board.equals(getBoard())) {
 			setBoard(board);
@@ -437,7 +437,7 @@ public class TetrisGameI extends Game {
 	/**
 	 * Do the work that needs to be repeated until the end of the game
 	 */
-	protected void doRepetitiveWork() {
+	void doRepetitiveWork() {
 		if (getStatus() == Status.Running && elapsedTime(getSpeed(true))) {
 			if (isFallingFinished) {
 				isFallingFinished = false;
@@ -523,7 +523,7 @@ public class TetrisGameI extends Game {
 	 * Get a random figure with a random rotation angle
 	 */
 	@SuppressWarnings("static-method")
-	protected TetrisShape getRandomShape() {
+	TetrisShape getRandomShape() {
 		return TetrisShape.getRandomTetraminoes().setRandomRotate();
 	}
 	
@@ -534,7 +534,7 @@ public class TetrisGameI extends Game {
 	 *            the array of numbered super figures (from 0 to 4)
 	 */
 	@SuppressWarnings("static-method")
-	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+	TetrisShape getRandomShapeAndSuper(int[] superShapes) {
 		return TetrisShape.getRandomTetraminoesAndSuper(superShapes);
 	}
 	
@@ -557,7 +557,7 @@ public class TetrisGameI extends Game {
 	 * @param y
 	 *            y-coordinate of the cell from where shot will be made
 	 */
-	protected void mudShoot(int x, int y) {
+	private void mudShoot(int x, int y) {
 		if (y <= 0 || y > boardHeight) return;
 		
 		Board board = getBoard();
@@ -652,7 +652,7 @@ public class TetrisGameI extends Game {
 	/**
 	 * Ending of falling of the figure
 	 */
-	protected void pieceDropped() {
+	void pieceDropped() {
 		isFallingFinished = true;
 		if (curPiece.getShape() == Figures.SuperGun// guns
 		        || curPiece.getShape() == Figures.SuperMudGun) {
@@ -833,7 +833,7 @@ public class TetrisGameI extends Game {
 	}
 	
 	@Override
-	protected void setScore(int score) {
+	void setScore(int score) {
 		int oldHundreds = getScore() / 100;
 		
 		super.setScore(score);
@@ -860,7 +860,7 @@ public class TetrisGameI extends Game {
 	 * @param y
 	 *            y-coordinate of the cell from where shot will be made
 	 */
-	protected void shoot(int x, int y) {
+	private void shoot(int x, int y) {
 		if (y <= 0 || y > boardHeight) return;
 		
 		Board board = getBoard();
@@ -885,7 +885,7 @@ public class TetrisGameI extends Game {
 	 *            y-coordinate position on the board of the figure
 	 * @return {@code true} if the movement succeeded, otherwise {@code false}
 	 */
-	protected boolean tryMove(TetrisShape newPiece, int newX, int newY) {
+	boolean tryMove(TetrisShape newPiece, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
 		Board board = getBoard();
 		

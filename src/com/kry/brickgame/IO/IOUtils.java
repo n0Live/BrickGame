@@ -8,10 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * @author User
+ * @author noLive
  */
-public class IOUtils {
-
+public enum IOUtils {
+	;
+	
 	/**
 	 * Delete the specified file.
 	 * 
@@ -23,7 +24,7 @@ public class IOUtils {
 		File file = new File(fileName);
 		return !file.exists() || file.canWrite() && file.delete();
 	}
-
+	
 	/**
 	 * Creates an InputStream by opening a connection to the specified file.
 	 * 
@@ -32,12 +33,11 @@ public class IOUtils {
 	 * @return FileInputStream
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getInputStream(String fileName)
-			throws FileNotFoundException {
+	public static InputStream getInputStream(String fileName) throws FileNotFoundException {
 		File file = new File(fileName);
 		return new FileInputStream(file);
 	}
-
+	
 	/**
 	 * Creates a file output stream to write to the specified file.
 	 * 
@@ -46,10 +46,9 @@ public class IOUtils {
 	 * @return FileOutputStream
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream getOutputStream(String fileName)
-			throws FileNotFoundException {
+	public static OutputStream getOutputStream(String fileName) throws FileNotFoundException {
 		File file = new File(fileName);
 		return new FileOutputStream(file);
 	}
-
+	
 }

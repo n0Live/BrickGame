@@ -22,7 +22,10 @@ public abstract class GameWithLives extends Game {
 	 */
 	private volatile int lives;
 	
-	protected boolean isStarted;
+	/**
+	 * Whether the game is started?
+	 */
+	boolean isStarted;
 	
 	/**
 	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
@@ -75,12 +78,12 @@ public abstract class GameWithLives extends Game {
 	 * 
 	 * @return lives 0 - 4
 	 */
-	protected int getLives() {
+	int getLives() {
 		return lives;
 	}
 	
 	@Override
-	public void init() {
+	void init() {
 		super.init();
 		// play music only in first isStarted, not after deserialization
 		if (isStarted) {
@@ -92,7 +95,7 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Loading the specified level
 	 */
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// play music always except the first isStarted
 		if (!isStarted) {
 			playAndWaitMusic();
@@ -108,7 +111,7 @@ public abstract class GameWithLives extends Game {
 	 * @param y
 	 *            y-coordinate of the epicenter of the explosion
 	 */
-	protected void loss(int x, int y) {
+	void loss(int x, int y) {
 		setStatus(Status.DoSomeWork);
 		synchronized (lock) {
 			// kaboom and decrease lives
@@ -128,7 +131,7 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Reloading the specified level
 	 */
-	protected void reloadLevel() {
+	void reloadLevel() {
 		loadNewLevel();
 	}
 	
@@ -138,7 +141,7 @@ public abstract class GameWithLives extends Game {
 	 * @param lives
 	 *            lives 0 - 4
 	 */
-	protected void setLives(int lives) {
+	void setLives(int lives) {
 		if (lives > 4) {
 			this.lives = 4;
 		} else if (lives < 0) {
@@ -159,7 +162,7 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Increase the level and load it
 	 */
-	protected void win() {
+	void win() {
 		setStatus(Status.DoSomeWork);
 		synchronized (lock) {
 			GameSound.playMusic(Music.win);

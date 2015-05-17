@@ -182,7 +182,7 @@ public class FroggerGame extends GameWithLives {
 		shiftRoadWithFrog = getType() % 4 == 1 || getType() % 4 == 2;
 		// for every 4-8 type of game
 		isRoadWithOncomingTraffic = getType() % 8 == 5 || getType() % 8 == 6 || getType() % 8 == 7
-				|| getType() % 8 == 0;
+		        || getType() % 8 == 0;
 		// for types 1-8 and 16-24
 		usePreloadedTracts = getType() <= 8 || getType() >= 16 && getType() <= 24;
 		// for types 16-32
@@ -198,7 +198,7 @@ public class FroggerGame extends GameWithLives {
 	public Game call() {
 		super.init();
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true) * 3)) {
 				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
 			}
@@ -296,7 +296,7 @@ public class FroggerGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// create the road
 		road = loadRoad(usePreloadedTracts);
 		Board board = getBoard();
@@ -323,15 +323,15 @@ public class FroggerGame extends GameWithLives {
 		final Cell E = Cell.Empty;
 		// preloaded tracks
 		tracts = new Cell[][] {
-				//
-				{ E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
-				{ E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
-				{ F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
-				{ E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
-				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-				{ F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
-				{ F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
-				{ F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
+		        //
+		        { E, E, F, F, E, E, E, E, E, F, F, F, F, E, E, E },
+		        { E, E, E, F, F, E, E, E, E, E, F, F, F, F, E, E },
+		        { F, E, E, E, E, F, F, E, E, E, E, E, F, F, F, F },
+		        { E, E, E, F, E, E, E, E, F, F, E, E, E, E, F, F },
+		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+		        { F, F, F, E, E, E, E, F, F, F, F, E, E, E, E, F },
+		        { F, E, E, E, E, F, F, F, F, E, E, E, E, F, F, F },
+		        { F, F, E, E, E, E, E, F, F, F, E, E, E, E, E, F }, };
 		
 		// initial position changes from level
 		roadPositions = new int[tracts.length];
@@ -571,7 +571,7 @@ public class FroggerGame extends GameWithLives {
 		
 		// checks for collision with the frog and an obstacles
 		boolean isFrogMustDie = checkBoardCollisionHorizontal(board, frog, curX)
-				|| checkCollision(board, frog, curX, curY);
+		        || checkCollision(board, frog, curX, curY);
 		
 		setBoard(drawShape(board, curX, curY, frog, frog.getFill()));
 		

@@ -42,7 +42,7 @@ public class RacingGame extends GameWithLives {
 	/**
 	 * Array of possible x-axis positions of the car
 	 */
-	private int[] positions;
+	private final int[] positions;
 	/**
 	 * Current position of the racing car
 	 */
@@ -114,8 +114,8 @@ public class RacingGame extends GameWithLives {
 	 *         {@code false} - otherwise
 	 */
 	private boolean addOpponents() {
-		// from 10 - on level 1, to 5 - on level 10
-		int distance = 10 - getLevel() / 2;
+		// from 10 - on level 1, to 5 - on level 10 plus some random
+		int distance = 10 - getLevel() / 2 + r.nextInt(3);
 		
 		int lastOpponentY;
 		if (opponents.isEmpty()) {
@@ -262,7 +262,7 @@ public class RacingGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// set position
 		curPosition = 1;
 		curX = positions[curPosition];
@@ -287,7 +287,7 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	@Override
-	protected void loss(int x, int y) {
+	void loss(int x, int y) {
 		GameSound.stop(GameSound.effects, Effects.engine);
 		super.loss(x, y);
 	}
@@ -398,7 +398,7 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	@Override
-	public void resume() {
+	void resume() {
 		if (getStatus() == Status.Paused) {
 			GameSound.loop(GameSound.effects, Effects.engine, ANIMATION_DELAY * 14);
 		}
@@ -406,7 +406,7 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	@Override
-	protected void setScore(int score) {
+	void setScore(int score) {
 		int oldHundreds = getScore() / 100;
 		
 		super.setScore(score);
@@ -422,7 +422,7 @@ public class RacingGame extends GameWithLives {
 	}
 	
 	@Override
-	protected void win() {
+	void win() {
 		GameSound.stop(GameSound.effects, Effects.engine);
 		super.win();
 	}

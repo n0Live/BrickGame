@@ -1,8 +1,8 @@
 package com.kry.brickgame.shapes;
 
-import com.kry.brickgame.boards.Board.Cell;
-
 import java.util.Random;
+
+import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
@@ -13,13 +13,13 @@ public class Obstacle extends CharacterShape {
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	private static int[][][] charactersTable = new int[][][] {//
+	private static final int[][][] charactersTable = new int[][][] {//
 	// 0 - square
-			{ { 0, 0 } },
-			// 1 - corner
-			{ { 1, 0 }, { 0, 0 }, { 0, 1 } },
-			// 2 - rectangle
-			{ { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
+	        { { 0, 0 } },
+	        // 1 - corner
+	        { { 1, 0 }, { 0, 0 }, { 0, 1 } },
+	        // 2 - rectangle
+	        { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 0, 1 }, { 1, 1 }, { 2, 1 } }, }; //
 	
 	/**
 	 * Get instance of a random obstacle
@@ -72,7 +72,7 @@ public class Obstacle extends CharacterShape {
 	 *            type of fill of the obstacle
 	 */
 	@Override
-	protected Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
+	public Obstacle setType(int type, RotationAngle rotationAngle, Cell fill) {
 		super.setType(type, rotationAngle, fill);
 		
 		// sets the lower left corner to the coordinates [0, 0]

@@ -32,7 +32,7 @@ public class GameSelector extends Game {
 	/**
 	 * List of games with the letters associated with them
 	 */
-	private static Map<Character, String> gamesList;
+	private static final Map<Character, String> gamesList;
 	static {
 		gamesList = new HashMap<>();
 		gamesList.put('A', "com.kry.brickgame.games.DanceGame");
@@ -85,7 +85,7 @@ public class GameSelector extends Game {
 	/**
 	 * Animated splash for a game
 	 */
-	Splash splash;
+	private Splash splash;
 	
 	/**
 	 * Timer for the splash screen of the game
@@ -226,10 +226,11 @@ public class GameSelector extends Game {
 		// draw splash
 		if (splash != null) {
 			// starts the timer to show splash screen of the game
+			final Splash localSplash = splash;
 			splashTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 				@Override
 				public void run() {
-					drawGameSplash(splash);
+					drawGameSplash(localSplash);
 				}
 			}, 0, 500, TimeUnit.MILLISECONDS);
 		} else {
@@ -471,7 +472,7 @@ public class GameSelector extends Game {
 	 * @param type
 	 *            type of a game
 	 */
-	public void setGameAndType(String gameClassName, int type) {
+	private void setGameAndType(String gameClassName, int type) {
 		number = type;
 		for (Entry<Character, String> entry : gamesList.entrySet()) {
 			if (entry.getValue().equals(gameClassName)) {

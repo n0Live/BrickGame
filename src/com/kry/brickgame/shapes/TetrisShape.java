@@ -11,7 +11,7 @@ import java.util.Set;
  * @author noLive
  */
 public class TetrisShape extends Shape {
-	public static enum Figures {
+	public enum Figures {
 		NoShape, //
 		// Trominoes
 		TroLineShape, CornerShape,
@@ -31,7 +31,7 @@ public class TetrisShape extends Shape {
 		public final static int REF_TO_FIRST_SUPER_SHAPE = 27;
 	}
 	
-	public static enum Polyominoes {
+	public enum Polyominoes {
 		Trominoes, Tetraminoes, Pentominoes
 	}
 	
@@ -41,7 +41,7 @@ public class TetrisShape extends Shape {
 	 * A set of coordinates of a points of the figures:
 	 * [shapeIndex][pointIndex][coordinate:0-x,1-y]
 	 */
-	private final static int[][][] coordsTable = new int[][][] { { { 0, 0 } }, // NoShape
+	private static final int[][][] coordsTable = new int[][][] { { { 0, 0 } }, // NoShape
 	        // Trominoes
 	        { { -1, -1 }, { 0, 0 }, { 1, 1 } }, // TroLineShape
 	        { { 0, 1 }, { 0, 0 }, { 1, 0 } }, // CornerShape

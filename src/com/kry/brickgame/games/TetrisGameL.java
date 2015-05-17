@@ -33,7 +33,7 @@ public class TetrisGameL extends TetrisGameJ {
 	 * @return the next figure from {@code aTetrisShape}
 	 */
 	@SuppressWarnings("static-method")
-	protected TetrisShape getNextFigure(TetrisShape aTetrisShape) {
+	TetrisShape getNextFigure(TetrisShape aTetrisShape) {
 		return TetrisShape.getNextTetraminoes(aTetrisShape);
 	}
 	
@@ -47,7 +47,7 @@ public class TetrisGameL extends TetrisGameJ {
 	 * @return the previous figure from {@code aTetrisShape}
 	 */
 	@SuppressWarnings("static-method")
-	protected TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
+	TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
 		return TetrisShape.getPrevTetraminoes(aTetrisShape);
 	}
 	

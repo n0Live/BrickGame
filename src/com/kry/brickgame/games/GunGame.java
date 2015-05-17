@@ -125,7 +125,7 @@ public class GunGame extends GameWithGun {
 			@Override
 			public void run() {
 				if (!(exitFlag || Thread.currentThread().isInterrupted())
-						&& getStatus() == Status.Running) {
+				        && getStatus() == Status.Running) {
 					if (isCreationMode) {
 						flightOfMud();
 					} else {
@@ -137,7 +137,7 @@ public class GunGame extends GameWithGun {
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running) {
 				int currentSpeed = getSpeed(true);
 				// increase game speed when hasTwoSmokingBarrels
@@ -210,7 +210,7 @@ public class GunGame extends GameWithGun {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
@@ -274,7 +274,7 @@ public class GunGame extends GameWithGun {
 					keys.remove(KeyPressed.KeyRotate);
 				} else {
 					int fireSpeed = Math.round(ANIMATION_DELAY
-							* (hasTwoSmokingBarrels ? 2.5f : 1.5f));
+					        * (hasTwoSmokingBarrels ? 2.5f : 1.5f));
 					// slow down if hasTwoSmokingBarrels
 					setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
 				}

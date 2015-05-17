@@ -6,7 +6,7 @@ package com.kry.brickgame.splashes;
 public class TetrisSplash extends Splash {
 	private static final long serialVersionUID = 534555333873259137L;
 	
-	private static Cell[][][] frameTable = new Cell[][][] { {
+	private static final Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ E, E, E, F, E, E, E, E, E, E }, //
 			{ E, E, F, F, E, E, E, E, E, E }, //

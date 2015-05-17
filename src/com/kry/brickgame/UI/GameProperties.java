@@ -69,6 +69,7 @@ public class GameProperties implements Serializable {
 	 * The copy constructor
 	 * 
 	 * @param aObj
+	 *            a GameProperties for copying
 	 */
 	private GameProperties(GameProperties aObj) {
 		board = aObj.board.clone();

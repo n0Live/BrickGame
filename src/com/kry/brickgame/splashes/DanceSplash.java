@@ -6,7 +6,7 @@ package com.kry.brickgame.splashes;
 public class DanceSplash extends Splash {
 	private static final long serialVersionUID = 4698308435944509589L;
 	
-	private static Cell[][][] frameTable = new Cell[][][] { {
+	private static final Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ E, E, F, E, F }, //
 			{ E, F, F, F, E }, //

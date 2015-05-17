@@ -11,9 +11,11 @@ import com.kry.brickgame.games.GameSelector;
 import com.kry.brickgame.games.SplashScreen;
 
 /**
- * @author User
+ * @author noLive
  */
-public class GameLoader {
+public enum GameLoader {
+	;
+	
 	private final static String SAVED_GAME_FILE = "lastgame.sav";
 	
 	/**

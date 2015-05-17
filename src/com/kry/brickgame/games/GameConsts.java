@@ -5,7 +5,9 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
 /**
  * @author User
  */
-public final class GameConsts {
+public enum GameConsts {
+	;
+	
 	public enum KeyPressed {
 		KeyNone, KeyLeft, KeyRight, KeyUp, KeyDown, KeyRotate, KeyStart, KeyReset, KeyMute, KeyShutdown
 	}
@@ -24,7 +26,7 @@ public final class GameConsts {
 			// if None then getNext() return None
 			if (this == Rotation.NONE) return this;
 			return ordinal() < Rotation.values().length - 1 ? Rotation.values()[ordinal() + 1]
-					: Rotation.values()[1];
+			        : Rotation.values()[1];
 		}
 	}
 	

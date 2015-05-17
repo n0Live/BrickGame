@@ -10,7 +10,7 @@ public class DancerShape extends CharacterShape {
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	private static int[][][] charactersTable = new int[][][] {//
+	private static final int[][][] charactersTable = new int[][][] {//
 			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 1, 0 }, { -1, 1 },
 					{ 1, 1 } }, // up-down
 			{ { -1, -1 }, { 0, -1 }, { 1, -1 }, { -1, 0 }, { 1, 0 } } // left-right

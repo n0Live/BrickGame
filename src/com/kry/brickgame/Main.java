@@ -68,7 +68,7 @@ public final class Main {
 		});
 	}
 	
-	protected static void setGame(Game game) {
+	static void setGame(Game game) {
 		Main.game = game;
 	}
 	

@@ -9,7 +9,7 @@ public class Bullet extends CoordinatedShape {
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	private static int[][][] charactersTable = new int[][][] { { { 0, 0 } } };
+	private static final int[][][] charactersTable = new int[][][] { { { 0, 0 } } };
 	
 	/**
 	 * Copy constructor of the bullet

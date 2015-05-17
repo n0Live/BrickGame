@@ -109,25 +109,6 @@ public class TanksGame extends GameWithLives {
 	private volatile boolean isDead;
 	
 	/**
-	 * Collision check of the {@code bullet} with the each bullet from the
-	 * {@code bullets} array
-	 * 
-	 * @param bullet
-	 *            checking bullet
-	 * @param bullets
-	 *            array of the checking bullets
-	 * @return {@code true} if there is a collision
-	 */
-	private static Bullet checkCollisionWithBullets(Bullet bullet, Bullet[] bullets) {
-		for (Bullet checkBullet : bullets) {
-			if (checkBullet != null && checkBullet != bullet
-			        && checkBullet.getCoordinates().equals(bullet.getCoordinates()))
-			    return checkBullet;
-		}
-		return null;
-	}
-	
-	/**
 	 * Sorting an array of directions in descending order of their weights using
 	 * shaker (cocktail) sort
 	 * 
@@ -328,8 +309,11 @@ public class TanksGame extends GameWithLives {
 			// chance for respawn 3 from 4
 			if (r.nextInt(4) != 0 && respawn(tankNumber)) {
 				enemiesOnBoard++;
-				// chance for shooting after spawn 1 from 10
-				if (r.nextInt(10) == 0) {
+				// chance for shooting after spawn:
+				// 1 from 20 on the first level and
+				// 1 from 11 on the last level
+				int chance = 10 + 11 - getLevel();
+				if (r.nextInt(chance) == 0) {
 					isBornWithGun = true;
 				} else return true;
 			} else return false;
@@ -399,20 +383,6 @@ public class TanksGame extends GameWithLives {
 		}
 		bulletSwarm.cancel(true);
 		return nextGame;
-	}
-	
-	/**
-	 * Collision check of the {@code bullet} with the each another bullet
-	 * 
-	 * @param bullet
-	 *            checking bullet
-	 * @return {@code true} if there is a collision
-	 */
-	private Bullet checkCollisionWithAllBullets(Bullet bullet) {
-		if (bullet == null) return null;
-		Bullet result = checkCollisionWithBullets(bullet, enemyBullets);
-		if (result != null) return result;
-		return checkCollisionWithBullets(bullet, playerBullets);
 	}
 	
 	/**
@@ -491,24 +461,53 @@ public class TanksGame extends GameWithLives {
 	}
 	
 	/**
-	 * Remove the bullet from the bullets arrays
+	 * Remove the bullet from the bullets array
+	 * 
+	 * @param bullets
+	 *            array of the checking bullets
+	 * @param bulletIndex
+	 *            index of a removing bullet
+	 */
+	private static void destroyBullet(Bullet[] bullets, int bulletIndex) {
+		bullets[bulletIndex] = null;
+	}
+	
+	/**
+	 * Check collision of the {@code bullet} with the each bullet from the
+	 * {@code bullets} array and destroy a collided bullet
 	 * 
 	 * @param bullet
-	 *            removed bullet
+	 *            checking bullet
+	 * @param bullets
+	 *            array of the checking bullets
+	 * @return {@code true} if there is a collision
 	 */
-	private void destroyBullet(Bullet bullet) {
-		for (int i = 0; i < enemyBullets.length; i++) {
-			if (enemyBullets[i] == bullet) {
-				enemyBullets[i] = null;
-				return;
+	private static boolean destroyCollidedBullets(Bullet bullet, Bullet[] bullets) {
+		for (int i = 0; i < bullets.length; i++) {
+			Bullet checkBullet = bullets[i];
+			if (checkBullet != null && checkBullet != bullet
+			        && checkBullet.getCoordinates().equals(bullet.getCoordinates())) {
+				destroyBullet(bullets, i);
+				return true;
 			}
 		}
-		for (int i = 0; i < playerBullets.length; i++) {
-			if (playerBullets[i] == bullet) {
-				playerBullets[i] = null;
-				return;
-			}
+		return false;
+	}
+	
+	/**
+	 * Check collision of the {@code bullet} with each another bullet and
+	 * destroy a collided bullet
+	 * 
+	 * @param bullet
+	 *            checking bullet
+	 * @return {@code true} if there is a collision
+	 */
+	private boolean destroyCollidedBullets(Bullet bullet) {
+		boolean result = destroyCollidedBullets(bullet, enemyBullets);
+		if (!result) {
+			result = destroyCollidedBullets(bullet, playerBullets);
 		}
+		return result;
 	}
 	
 	/**
@@ -563,9 +562,10 @@ public class TanksGame extends GameWithLives {
 						break;
 					}
 					
-					bullets[i] = new Bullet(bulletX, bulletY, tank.getDirection());
-					
-					flightOfBullet(bullets[i], isPlayerBullet);
+					if (!exitFlag && !Thread.currentThread().isInterrupted()) {
+						bullets[i] = new Bullet(bulletX, bulletY, tank.getDirection());
+						flightOfBullet(isPlayerBullet, i);
+					}
 					
 					return true;
 				}
@@ -577,16 +577,17 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Processing the flight of one bullet
 	 * 
-	 * @param bullet
-	 *            flying bullet
 	 * @param isPlayerBullet
 	 *            {@code true} when bullet fired by the player tank
+	 * @param bulletIndex
+	 *            index of a flying bullet
 	 * @return {@code false} if an enemy bullet hit the player tank, or
 	 *         {@code true} otherwise
 	 */
-	private boolean flightOfBullet(Bullet bullet, boolean isPlayerBullet) {
-		if (bullet == null) return true;
+	private boolean flightOfBullet(boolean isPlayerBullet, int bulletIndex) {
 		synchronized (lock) {
+			Bullet bullet = isPlayerBullet ? playerBullets[bulletIndex] : enemyBullets[bulletIndex];
+			if (bullet == null) return true;
 			// erase bullet from the board only if it has flew out of the
 			// tank
 			if (!checkCollisionWithTank(bullet, isPlayerBullet)) {
@@ -598,24 +599,23 @@ public class TanksGame extends GameWithLives {
 			
 			if (checkBoardCollision(board, result, result.x(), result.y())) {
 				// if the bullet has left the board
-				destroyBullet(result);
+				destroyBullet(isPlayerBullet ? playerBullets : enemyBullets, bulletIndex);
 			} else {
 				// if the bullet hit something
 				if (board.getCell(result.x(), result.y()) != Cell.Empty) {
 					GameSound.playEffect(Effects.hit_cell);
 					// bullet hit a simple obstacle?
 					boolean isObstacle = true;
+					
 					// collision check with one of another bullets
-					Bullet checkBullet;
+					boolean collisionWithBullets;
 					if (isPlayerBullet) {
-						checkBullet = checkCollisionWithBullets(result, enemyBullets);
+						collisionWithBullets = destroyCollidedBullets(result, enemyBullets);
 					} else {
-						checkBullet = checkCollisionWithAllBullets(result);
+						collisionWithBullets = destroyCollidedBullets(result);
 					}
 					
-					if (checkBullet != null) {
-						destroyBullet(checkBullet);
-					} else {
+					if (!collisionWithBullets) {
 						if (!isPlayerBullet && checkTwoShapeCollision(playerTank, result)) {
 							// when the enemy bullet hit the player tank
 							isDead = true;
@@ -638,7 +638,7 @@ public class TanksGame extends GameWithLives {
 					if (isObstacle) {
 						board.setCell(Cell.Empty, result.x(), result.y());
 					}
-					destroyBullet(result);
+					destroyBullet(isPlayerBullet ? playerBullets : enemyBullets, bulletIndex);
 				} else {
 					board.setCell(result.getFill(), result.x(), result.y());
 				}
@@ -652,13 +652,13 @@ public class TanksGame extends GameWithLives {
 	 * Processing the flight of bullets
 	 */
 	void flightOfBullets() {
-		for (Bullet enemyBullet : enemyBullets) {
-			if (exitFlag || Thread.currentThread().isInterrupted()
-			        || !flightOfBullet(enemyBullet, false)) return;
+		for (int i = 0; i < enemyBullets.length; i++) {
+			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(false, i))
+			    return;
 		}
-		for (Bullet playerBullet : playerBullets) {
-			if (exitFlag || Thread.currentThread().isInterrupted()
-			        || !flightOfBullet(playerBullet, true)) return;
+		for (int i = 0; i < playerBullets.length; i++) {
+			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(true, i))
+			    return;
 		}
 	}
 	
@@ -799,12 +799,12 @@ public class TanksGame extends GameWithLives {
 	
 	@Override
 	protected int getSpeedOfFirstLevel() {
-		return 1000;
+		return 1500;
 	}
 	
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 240;
+		return 350;// 240
 	}
 	
 	/**
@@ -860,7 +860,7 @@ public class TanksGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		// reset isDead flag
 		isDead = false;
 		

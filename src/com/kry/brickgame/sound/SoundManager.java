@@ -7,7 +7,12 @@ import java.util.Map;
 
 import javafx.scene.media.AudioClip;
 
-public final class SoundManager {
+/**
+ * @author noLive
+ */
+public enum SoundManager {
+	;
+	
 	private final static String soundFolder = "/sounds/";
 	private final static String soundExtension = ".m4a";
 	

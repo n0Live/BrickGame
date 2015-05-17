@@ -1,9 +1,9 @@
 package com.kry.brickgame.shapes;
 
-import com.kry.brickgame.boards.Board.Cell;
-
 import java.io.Serializable;
 import java.util.Arrays;
+
+import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
@@ -195,8 +195,8 @@ public class Shape implements Cloneable, Serializable {
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
 		Shape other = (Shape) obj;
-        return Arrays.deepEquals(coords, other.coords);
-    }
+		return Arrays.deepEquals(coords, other.coords);
+	}
 	
 	/**
 	 * Get the coordinates of the single point

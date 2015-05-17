@@ -15,7 +15,7 @@ public abstract class Splash extends Board {
 	 *            source array
 	 * @return copy of the source array
 	 */
-	private static Cell[][][] get3DArrayCopy(Cell[][][] array) {
+	private static final Cell[][][] get3DArrayCopy(Cell[][][] array) {
 		Cell[][][] newArray = array.clone();
 		for (int i = 0; i < array.length; i++) {
 			newArray[i] = array[i].clone();

@@ -48,7 +48,7 @@ public final class Drawer {
 	/**
 	 * Font Manager class
 	 */
-	private static class FontManager {
+	private static final class FontManager {
 		/**
 		 * Instance of the standalone FontManager class
 		 */
@@ -190,7 +190,7 @@ public final class Drawer {
 		 * @param maxWidth
 		 *            maximal width of the {@code text}
 		 */
-		protected void setOptimalDigitalFont(Graphics g, String text, int maxWidth) {
+		void setOptimalDigitalFont(Graphics g, String text, int maxWidth) {
 			digitalFont = digitalFont
 			        .deriveFont(calcOptimumFontSize(g, digitalFont, text, maxWidth));
 		}
@@ -207,7 +207,7 @@ public final class Drawer {
 		 * @param maxWidth
 		 *            maximal width of the {@code text}
 		 */
-		protected void setOptimalIconFont(Graphics g, String text, int maxWidth) {
+		void setOptimalIconFont(Graphics g, String text, int maxWidth) {
 			iconFont = setOptimalFont(iconFont, g, text, maxWidth);
 		}
 		
@@ -223,7 +223,7 @@ public final class Drawer {
 		 * @param maxWidth
 		 *            maximal width of the {@code text}
 		 */
-		protected void setOptimalTextFont(Graphics g, String text, int maxWidth) {
+		void setOptimalTextFont(Graphics g, String text, int maxWidth) {
 			textFont = setOptimalFont(textFont, g, text, maxWidth);
 		}
 	}

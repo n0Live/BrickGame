@@ -99,7 +99,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 * Changes the {@code showPauseIcon} flag from {@code true} to {@code false}
 	 * and vice versa, for blinking "Pause" icon
 	 */
-	public void blinkingPauseIcon() {
+	void blinkingPauseIcon() {
 		if (properties.status == Status.Paused) {
 			properties.showPauseIcon = properties.showHiScores = !properties.showPauseIcon;
 			repaint(UIUtils.getGameFieldRectangle(getSize()));
@@ -112,7 +112,7 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	 * Changes the {@code blinkColor} color from {@code fullColor} to
 	 * {@code emptyColor} and vice versa
 	 */
-	public void blinkingSquares() {
+	void blinkingSquares() {
 		if (properties.board != null && properties.board.hasBlinkedCell()
 		        || properties.preview != null && properties.preview.hasBlinkedCell()) {
 			properties.blinkColor = properties.blinkColor.equals(fullColor) ? emptyColor
@@ -167,8 +167,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 		if (event.getInfo() != null) {
 			properties.info = event.getInfo();
 		}
-		if (event.gethiScores() != null) {
-			properties.hiScores = event.gethiScores();
+		if (event.getHiScores() != null) {
+			properties.hiScores = event.getHiScores();
 		}
 	}
 	

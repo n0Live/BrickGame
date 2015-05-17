@@ -38,21 +38,21 @@ import com.kry.brickgame.games.GameSound.Music;
 public abstract class Game implements Callable<Game>, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
 	
-	private static ArrayList<GameListener> listeners = new ArrayList<>();
+	private static final ArrayList<GameListener> listeners = new ArrayList<>();
 	
 	/**
 	 * Is the sound turned off?
 	 */
 	private static boolean mute;
 	
-	protected final static Object lock = new Object();
+	static final Object lock = new Object();
 	
 	static final Random r = new Random();
 	
 	/**
 	 * Set of the pressed keys
 	 */
-	protected final Set<KeyPressed> keys = new HashSet<>();
+	final Set<KeyPressed> keys = new HashSet<>();
 	
 	/**
 	 * Speed
@@ -87,27 +87,27 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Width of the board
 	 */
-	protected int boardWidth;
+	int boardWidth;
 	/**
 	 * Height of the board
 	 */
-	protected int boardHeight;
+	int boardHeight;
 	/**
 	 * Width of the preview board
 	 */
-	protected int previewWidth;
+	int previewWidth;
 	/**
 	 * Height of the preview board
 	 */
-	protected int previewHeight;
+	int previewHeight;
 	/**
 	 * X-coordinate position on the board
 	 */
-	protected int curX;
+	int curX;
 	/**
 	 * Y-coordinate position on the board
 	 */
-	protected int curY;
+	int curY;
 	/**
 	 * Game status
 	 */
@@ -115,7 +115,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Next game instance
 	 */
-	protected transient Game nextGame;
+	transient Game nextGame;
 	
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
@@ -134,13 +134,12 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * If true than game will interrupted
 	 */
-	protected volatile boolean exitFlag;
+	volatile boolean exitFlag;
 	
 	/**
 	 * Scheduled thread pool
 	 */
-	protected static final ScheduledExecutorService scheduledExecutors = Executors
-	        .newScheduledThreadPool(2);
+	static final ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(2);
 	
 	/**
 	 * Whether to draw the board upside down?
@@ -151,7 +150,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		listeners.add(listener);
 	}
 	
-	protected static void fireMuteChanged(boolean mute) {
+	static void fireMuteChanged(boolean mute) {
 		GameEvent event = new GameEvent(Game.class, mute);
 		for (GameListener listener : listeners) {
 			listener.muteChanged(event);
@@ -162,7 +161,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		return listeners.toArray(new GameListener[listeners.size()]);
 	}
 	
-	protected static boolean isMuted() {
+	public static boolean isMuted() {
 		return mute;
 	}
 	
@@ -279,7 +278,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Animated clearing of the board on Game Over
 	 */
-	protected void animatedClearBoard() {
+	private void animatedClearBoard() {
 		animatedClearBoard(CB_GAME_OVER);
 	}
 	
@@ -289,7 +288,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param millis
 	 *            duration of the animation in milliseconds
 	 */
-	protected void animatedClearBoard(int millis) {
+	void animatedClearBoard(int millis) {
 		// delay between animation frames
 		int delay = millis / (boardHeight * 2);
 		
@@ -325,7 +324,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param y
 	 *            number of the line to be removed (y-coordinate)
 	 */
-	protected void animatedClearLine(Board board, int x, int y) {
+	void animatedClearLine(Board board, int x, int y) {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
 		
@@ -355,7 +354,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Select another rotation
 	 */
-	protected void changeRotation() {
+	private void changeRotation() {
 		setRotation(rotation.getNext());
 	}
 	
@@ -363,7 +362,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Clears the cells of the board and fire the
 	 * {@link #fireBoardChanged(Board)} event
 	 */
-	protected void clearBoard() {
+	void clearBoard() {
 		board.clearBoard();
 		fireBoardChanged(board);
 	}
@@ -372,7 +371,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Clears the cells of the preview and fire the
 	 * {@link #firePreviewChanged(Board)} event
 	 */
-	protected void clearPreview() {
+	void clearPreview() {
 		preview.clearBoard();
 		firePreviewChanged(preview);
 	}
@@ -384,7 +383,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param key
 	 *            specified key
 	 */
-	protected boolean containsKey(KeyPressed key) {
+	boolean containsKey(KeyPressed key) {
 		return keys.contains(key) && !isKeySuspended(key);
 	}
 	
@@ -396,7 +395,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 *            delay in milliseconds
 	 * @return true - if elapsed of {@code millis} since the last time point
 	 */
-	protected boolean elapsedTime(int millis) {
+	boolean elapsedTime(int millis) {
 		long nowTime = System.currentTimeMillis();
 		boolean result = nowTime - timePoint >= millis;
 		if (result) {
@@ -408,7 +407,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Exit to Main menu
 	 */
-	protected void exitToMainMenu() {
+	private void exitToMainMenu() {
 		GameSound.stopAllSounds();
 		
 		setHiScore();
@@ -419,7 +418,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireBoardChanged(Board board) {
+	void fireBoardChanged(Board board) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			Board invBoard = getInvertedVerticalBoard(board);
 			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard : board.clone(),
@@ -430,7 +429,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireExit() {
+	void fireExit() {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this);
 			for (GameListener listener : listeners) {
@@ -439,7 +438,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireInfoChanged(String info) {
+	void fireInfoChanged(String info) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, info);
 			for (GameListener listener : listeners) {
@@ -448,7 +447,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireLevelChanged(int level) {
+	void fireLevelChanged(int level) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, level);
 			for (GameListener listener : listeners) {
@@ -457,7 +456,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void firePreviewChanged(Board preview) {
+	void firePreviewChanged(Board preview) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, preview, true);
 			for (GameListener listener : listeners) {
@@ -466,7 +465,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireRotationChanged(Rotation rotation) {
+	void fireRotationChanged(Rotation rotation) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, rotation);
 			for (GameListener listener : listeners) {
@@ -475,7 +474,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireSpeedChanged(int speed) {
+	void fireSpeedChanged(int speed) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, (float) speed);
 			for (GameListener listener : listeners) {
@@ -484,7 +483,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 	}
 	
-	protected void fireStatusChanged(Status status) {
+	void fireStatusChanged(Status status) {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			GameEvent event = new GameEvent(this, status);
 			for (GameListener listener : listeners) {
@@ -496,7 +495,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Game Over
 	 */
-	protected void gameOver() {
+	void gameOver() {
 		setStatus(Status.GameOver);
 		
 		GameSound.playMusic(Music.game_over);
@@ -511,11 +510,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return the main board
 	 */
-	protected Board getBoard() {
+	Board getBoard() {
 		return board;
 	}
 	
-	protected int getHiScore() {
+	int getHiScore() {
 		return getScoresManager().getHiScore(this.getClass().getCanonicalName());
 	}
 	
@@ -524,7 +523,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return level 1-10
 	 */
-	protected int getLevel() {
+	int getLevel() {
 		return level;
 	}
 	
@@ -533,7 +532,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return the preview board
 	 */
-	protected Board getPreview() {
+	Board getPreview() {
 		return preview;
 	}
 	
@@ -542,7 +541,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return the direction of rotation
 	 */
-	protected Rotation getRotation() {
+	Rotation getRotation() {
 		return rotation;
 	}
 	
@@ -551,7 +550,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return the score
 	 */
-	protected int getScore() {
+	int getScore() {
 		return score;
 	}
 	
@@ -560,7 +559,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return speed level 1-10
 	 */
-	protected int getSpeed() {
+	int getSpeed() {
 		return speed;
 	}
 	
@@ -572,7 +571,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @return if genuine than return genuine speed in millisecond else return
 	 *         speed level 1-10
 	 */
-	protected int getSpeed(boolean genuine) {
+	int getSpeed(boolean genuine) {
 		if (genuine) {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
@@ -589,19 +588,19 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Game speed on the 1st level
 	 */
-	abstract protected int getSpeedOfFirstLevel();
+	abstract int getSpeedOfFirstLevel();
 	
 	/**
 	 * Game speed on the 10th level
 	 */
-	abstract protected int getSpeedOfTenthLevel();
+	abstract int getSpeedOfTenthLevel();
 	
 	/**
 	 * Get the status of game
 	 * 
 	 * @return the status
 	 */
-	protected Status getStatus() {
+	Status getStatus() {
 		return status;
 	}
 	
@@ -610,11 +609,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return the type
 	 */
-	protected int getType() {
+	int getType() {
 		return type;
 	}
 	
-	public void init() {
+	void init() {
 		nextGame = null;
 		
 		fireBoardChanged(board);
@@ -633,7 +632,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * 
 	 * @return {@code true} if needed to draw the inverted board
 	 */
-	protected boolean isInvertedBoard() {
+	boolean isInvertedBoard() {
 		return drawInvertedBoard;
 	}
 	
@@ -645,7 +644,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param y
 	 *            y-coordinate of the epicenter
 	 */
-	protected void kaboom(int x, int y) {
+	void kaboom(int x, int y) {
 		/**
 		 * Nested (inner) class to draw an explosion
 		 */
@@ -816,7 +815,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Processing of key presses
 	 */
-	protected void processKeys() {
+	void processKeys() {
 		// decrease CPU loading
 		sleep(30);
 		
@@ -859,7 +858,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Quit from the game
 	 */
-	protected void quit() {
+	void quit() {
 		if (!saveState()) {
 			GameLoader.deleteSavedGame();
 		}
@@ -869,7 +868,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Resume
 	 */
-	public void resume() {
+	void resume() {
 		if (getStatus() == Status.Paused) {
 			setStatus(Status.Running);
 		}
@@ -895,7 +894,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param board
 	 *            the main board
 	 */
-	protected void setBoard(Board board) {
+	void setBoard(Board board) {
 		this.board = board;
 		fireBoardChanged(board);
 	}
@@ -906,11 +905,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param drawInvertedBoard
 	 *            {@code true} if needed to draw the inverted board
 	 */
-	protected void setDrawInvertedBoard(boolean drawInvertedBoard) {
+	void setDrawInvertedBoard(boolean drawInvertedBoard) {
 		this.drawInvertedBoard = drawInvertedBoard;
 	}
 	
-	protected int setHiScore() {
+	int setHiScore() {
 		return getScoresManager().setHiScore(this.getClass().getCanonicalName(), getScore());
 	}
 	
@@ -920,7 +919,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param level
 	 *            level 1-10
 	 */
-	protected void setLevel(int level) {
+	void setLevel(int level) {
 		if (level < 1) {
 			this.level = 10;
 		} else if (level > 10) {
@@ -938,7 +937,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param preview
 	 *            the preview board
 	 */
-	protected void setPreview(Board preview) {
+	void setPreview(Board preview) {
 		this.preview = preview;
 		firePreviewChanged(preview);
 	}
@@ -950,7 +949,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param rotation
 	 *            the direction of rotation
 	 */
-	public void setRotation(Rotation rotation) {
+	void setRotation(Rotation rotation) {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
 	}
@@ -961,7 +960,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param score
 	 *            score 0 - 19999
 	 */
-	protected void setScore(int score) {
+	void setScore(int score) {
 		if (score > 19999) {
 			this.score = 19999;
 		} else if (score < 0) {
@@ -978,7 +977,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param speed
 	 *            speed level 1-10
 	 */
-	protected void setSpeed(int speed) {
+	void setSpeed(int speed) {
 		if (speed < 1) {
 			this.speed = 10;
 		} else if (speed > 10) {
@@ -997,7 +996,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param status
 	 *            the status of game
 	 */
-	protected void setStatus(Status status) {
+	void setStatus(Status status) {
 		this.status = status;
 		fireStatusChanged(status);
 	}

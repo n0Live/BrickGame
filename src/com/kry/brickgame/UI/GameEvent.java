@@ -40,7 +40,7 @@ public class GameEvent extends EventObject {
 	 *            game level
 	 */
 	public GameEvent(Object source, Board board, Board preview, Status status, String info,
-			String hiScores, int speed, int level, Rotation rotation, boolean mute) {
+	        String hiScores, int speed, int level, Rotation rotation, boolean mute) {
 		this(source);
 		properties.board = board;
 		properties.preview = preview;
@@ -96,39 +96,39 @@ public class GameEvent extends EventObject {
 		}
 	}
 	
-	protected Board getBoard() {
+	Board getBoard() {
 		return properties.board;
 	}
 	
-	protected String gethiScores() {
+	String getHiScores() {
 		return properties.hiScores;
 	}
 	
-	protected String getInfo() {
+	String getInfo() {
 		return properties.info;
 	}
 	
-	protected int getLevel() {
+	int getLevel() {
 		return properties.level;
 	}
 	
-	protected Board getPreview() {
+	Board getPreview() {
 		return properties.preview;
 	}
 	
-	protected Rotation getRotation() {
+	Rotation getRotation() {
 		return properties.rotation;
 	}
 	
-	protected int getSpeed() {
+	int getSpeed() {
 		return properties.speed;
 	}
 	
-	protected Status getStatus() {
+	Status getStatus() {
 		return properties.status;
 	}
 	
-	protected boolean isMute() {
+	boolean isMute() {
 		return properties.mute;
 	}
 	

@@ -6,7 +6,7 @@ package com.kry.brickgame.splashes;
 public class GunSplash extends Splash {
 	private static final long serialVersionUID = -8553198050273372439L;
 	
-	private static Cell[][][] frameTable = new Cell[][][] { {
+	private static final Cell[][][] frameTable = new Cell[][][] { {
 			// 0
 			{ F, F, E, E, F, F, F, E, F, F }, //
 			{ F, F, F, F, F, E, E, E, F, E }, //

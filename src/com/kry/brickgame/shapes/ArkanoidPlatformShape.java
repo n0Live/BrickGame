@@ -9,7 +9,7 @@ public class ArkanoidPlatformShape extends CharacterShape {
 	 * A set of the coordinates of points of the player character:
 	 * [type][point][coordinate:0-x,1-y]
 	 */
-	private static int[][][] charactersTable = new int[][][] { //
+	private static final int[][][] charactersTable = new int[][][] { //
 	{ { 0, 0 } }, // 0 - platform1
 			{ { 0, 0 }, { 1, 0 } }, // 1 - platform2
 			{ { -1, 0 }, { 0, 0 }, { 1, 0 } }, // 2 - platform3

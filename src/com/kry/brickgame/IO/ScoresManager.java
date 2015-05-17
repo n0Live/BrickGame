@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author noLive
  */
-public class ScoresManager {
+public final class ScoresManager {
 	/**
 	 * Name of file containing the high scores
 	 */

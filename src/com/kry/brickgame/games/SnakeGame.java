@@ -227,7 +227,7 @@ public class SnakeGame extends GameWithLives {
 	 * Loading or reloading the specified level
 	 */
 	@Override
-	protected void loadNewLevel() {
+	void loadNewLevel() {
 		snake = new SnakeShape(getRotation() == Rotation.CLOCKWISE ? RIGHT : LEFT);
 		// starting position - the middle of the bottom border of the board
 		curX = boardWidth / 2 + (snake.getDirection() == RIGHT ? -1 : 1);

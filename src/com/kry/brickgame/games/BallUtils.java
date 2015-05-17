@@ -12,7 +12,8 @@ import com.kry.brickgame.shapes.Shape.RotationAngle;
 /**
  * @author noLive
  */
-public final class BallUtils {
+public enum BallUtils {
+	;
 	
 	/**
 	 * Draw the ball to a new position and erase it from the old position
@@ -31,7 +32,7 @@ public final class BallUtils {
 	 *            y-coordinate of the new position
 	 * @return the board after drawing the ball
 	 */
-	protected static Board drawBall(Board board, Shape ball, int oldX, int oldY, int newX, int newY) {
+	static Board drawBall(Board board, Shape ball, int oldX, int oldY, int newX, int newY) {
 		// Create a temporary board, a copy of the basic board
 		Board newBoard;
 		
@@ -49,7 +50,7 @@ public final class BallUtils {
 	 *            type of fill of the ball
 	 * @return the new ball
 	 */
-	protected static Shape getBall(Cell fill) {
+	static Shape getBall(Cell fill) {
 		Shape ball = new Shape(1);
 		ball.setCoord(0, new int[] { 0, 0 });
 		ball.setFill(fill);
@@ -71,8 +72,8 @@ public final class BallUtils {
 	 *            the vertical direction of the ball
 	 * @return the new coordinates of the ball
 	 */
-	protected static Point moveBall(int x, int y, RotationAngle horizontalDirection,
-			RotationAngle verticalDirection) {
+	static Point moveBall(int x, int y, RotationAngle horizontalDirection,
+	        RotationAngle verticalDirection) {
 		Point newCoords = new Point(x, y);
 		
 		if (horizontalDirection == RotationAngle.d90) {

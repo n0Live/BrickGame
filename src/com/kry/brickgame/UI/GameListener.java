@@ -8,22 +8,22 @@ import java.util.EventListener;
  */
 public interface GameListener extends EventListener {
 	
-	public void boardChanged(GameEvent event);
+	void boardChanged(GameEvent event);
 	
-	public void exit(GameEvent event);
+	void exit(GameEvent event);
 	
-	public void infoChanged(GameEvent event);
+	void infoChanged(GameEvent event);
 	
-	public void levelChanged(GameEvent event);
+	void levelChanged(GameEvent event);
 	
-	public void muteChanged(GameEvent event);
+	void muteChanged(GameEvent event);
 	
-	public void previewChanged(GameEvent event);
+	void previewChanged(GameEvent event);
 	
-	public void rotationChanged(GameEvent event);
+	void rotationChanged(GameEvent event);
 	
-	public void speedChanged(GameEvent event);
+	void speedChanged(GameEvent event);
 	
-	public void statusChanged(GameEvent event);
+	void statusChanged(GameEvent event);
 	
 }

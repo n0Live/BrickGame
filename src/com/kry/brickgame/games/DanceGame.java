@@ -83,33 +83,29 @@ public class DanceGame extends Game {
 		 * 
 		 * @return {@code true} if the dance position was caught
 		 */
-		protected boolean isCaught() {
+		boolean isCaught() {
 			return caught;
 		}
 		
 		/**
 		 * Caught the dance position.
-		 * <p>
+		 * <p/>
 		 * Caught position starts blinking
-		 * 
-		 * @param caught
-		 *            has taken the dance position?
 		 */
-		protected void setCaught(boolean caught) {
-			this.caught = caught;
-			if (caught) {
-				if (leftShape != null) {
-					leftShape.setFill(Cell.Blink);
-				}
-				if (upShape != null) {
-					upShape.setFill(Cell.Blink);
-				}
-				if (downShape != null) {
-					downShape.setFill(Cell.Blink);
-				}
-				if (rightShape != null) {
-					rightShape.setFill(Cell.Blink);
-				}
+		void caught() {
+			caught = true;
+			
+			if (leftShape != null) {
+				leftShape.setFill(Cell.Blink);
+			}
+			if (upShape != null) {
+				upShape.setFill(Cell.Blink);
+			}
+			if (downShape != null) {
+				downShape.setFill(Cell.Blink);
+			}
+			if (rightShape != null) {
+				rightShape.setFill(Cell.Blink);
 			}
 		}
 	}
@@ -214,7 +210,7 @@ public class DanceGame extends Game {
 			GameSound.playMelody(getMelody(), rate);
 		}
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true))) {
 				// change speed and melody after finished playing the melody
 				if (!isMuted() && !SoundManager.isPlaying(GameSound.melodies)) {
@@ -248,7 +244,6 @@ public class DanceGame extends Game {
 	 */
 	private boolean checkDanceStep(DancerShape dancer) {
 		if (dancer == null) return true;
-		
 		return containsKey(keysToRotate.get(dancer.getRotationAngle()));
 	}
 	
@@ -301,10 +296,10 @@ public class DanceGame extends Game {
 		int newY = prevY + interval;
 		
 		return new DancePosition(newY,//
-				(pos & 8) == 8,// 1000
-				(pos & 4) == 4,// 0100
-				(pos & 2) == 2,// 0010
-				(pos & 1) == 1);// 0001
+		        (pos & 8) == 8,// 1000
+		        (pos & 4) == 4,// 0100
+		        (pos & 2) == 2,// 0010
+		        (pos & 1) == 1);// 0001
 	}
 	
 	/**
@@ -319,19 +314,19 @@ public class DanceGame extends Game {
 				int y = position.y;
 				if (position.leftShape != null) {
 					drawBoard = drawShape(drawBoard, columns[0], y, position.leftShape,
-							position.leftShape.getFill());
+					        position.leftShape.getFill());
 				}
 				if (position.upShape != null) {
 					drawBoard = drawShape(drawBoard, columns[1], y, position.upShape,
-							position.upShape.getFill());
+					        position.upShape.getFill());
 				}
 				if (position.downShape != null) {
 					drawBoard = drawShape(drawBoard, columns[2], y, position.downShape,
-							position.downShape.getFill());
+					        position.downShape.getFill());
 				}
 				if (position.rightShape != null) {
 					drawBoard = drawShape(drawBoard, columns[3], y, position.rightShape,
-							position.rightShape.getFill());
+					        position.rightShape.getFill());
 				}
 			}
 		}
@@ -444,10 +439,10 @@ public class DanceGame extends Game {
 				// checking the coincidence of the all DancerShape in the
 				// position and pressing keys
 				if (!checkDanceStep(position.leftShape) || !checkDanceStep(position.upShape)
-						|| !checkDanceStep(position.downShape)
-						|| !checkDanceStep(position.rightShape)) return;
+				        || !checkDanceStep(position.downShape)
+				        || !checkDanceStep(position.rightShape)) return;
 				int score = 0;
-				position.setCaught(true);
+				position.caught();
 				
 				// add points for every caught DancerShape
 				if (position.leftShape != null) {
@@ -480,7 +475,7 @@ public class DanceGame extends Game {
 	}
 	
 	@Override
-	protected void setSpeed(int speed) {
+	void setSpeed(int speed) {
 		super.setSpeed(speed);
 		
 		if (getSpeed() == 1) {

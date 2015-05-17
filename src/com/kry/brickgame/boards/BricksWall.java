@@ -7,7 +7,7 @@ import com.kry.brickgame.games.GameUtils;
 public class BricksWall extends Board {
 	private static final long serialVersionUID = -5524132721347429556L;
 	
-	static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
+	private static final Cell[][][] preloadedBricks = new Cell[][][] { { { E } },//
 	        // 1
 	        { { E, F, E, F, E, E, F, E, F, E }, //
 	                { E, E, F, E, E, E, E, F, E, E },//
@@ -217,7 +217,7 @@ public class BricksWall extends Board {
 	
 	@Override
 	public BricksWall clone() {
-        return (BricksWall) super.clone();
+		return (BricksWall) super.clone();
 	}
 	
 	@Override
@@ -226,8 +226,8 @@ public class BricksWall extends Board {
 		if (!super.equals(obj)) return false;
 		if (getClass() != obj.getClass()) return false;
 		BricksWall other = (BricksWall) obj;
-        return bricksCount == other.bricksCount;
-    }
+		return bricksCount == other.bricksCount;
+	}
 	
 	public int getBricksCount() {
 		return bricksCount;
