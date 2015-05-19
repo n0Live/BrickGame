@@ -22,7 +22,7 @@ public class TetrisGameM extends TetrisGameI {
 	}
 	
 	@Override
-	protected void pieceDropped() {
+	void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
 			int dX = (getRotation() == Rotation.CLOCKWISE ? 1 : -1);

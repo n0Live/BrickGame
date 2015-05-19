@@ -23,7 +23,7 @@ public class TetrisGameO extends TetrisGameK {
 	}
 	
 	@Override
-	protected void pieceDropped() {
+	void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
 			int dX = (getRotation() == Rotation.CLOCKWISE ? 1 : -1);

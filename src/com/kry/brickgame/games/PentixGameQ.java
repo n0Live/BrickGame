@@ -23,12 +23,12 @@ public class PentixGameQ extends TetrisGameI {
 	}
 	
 	@Override
-	protected TetrisShape getRandomShape() {
+	TetrisShape getRandomShape() {
 		return TetrisShape.getRandomShapeAndRotate();
 	}
 	
 	@Override
-	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+	TetrisShape getRandomShapeAndSuper(int[] superShapes) {
 		return TetrisShape.getRandomShapeAndSuper(superShapes);
 	}
 	

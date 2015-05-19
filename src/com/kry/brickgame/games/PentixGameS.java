@@ -25,22 +25,22 @@ public class PentixGameS extends TetrisGameK {
 	}
 	
 	@Override
-	protected TetrisShape getNextFigure(TetrisShape aTetrisShape) {
+	TetrisShape getNextFigure(TetrisShape aTetrisShape) {
 		return TetrisShape.getNextShape(aTetrisShape, false);
 	}
 	
 	@Override
-	protected TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
+	TetrisShape getPrevFigure(TetrisShape aTetrisShape) {
 		return TetrisShape.getPrevShape(aTetrisShape, false);
 	}
 	
 	@Override
-	protected TetrisShape getRandomShape() {
+	TetrisShape getRandomShape() {
 		return TetrisShape.getRandomShapeAndRotate();
 	}
 	
 	@Override
-	protected TetrisShape getRandomShapeAndSuper(int[] superShapes) {
+	TetrisShape getRandomShapeAndSuper(int[] superShapes) {
 		return TetrisShape.getRandomShapeAndSuper(superShapes);
 	}
 	
