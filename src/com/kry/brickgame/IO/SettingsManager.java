@@ -113,7 +113,8 @@ public class SettingsManager {
 	 */
 	public boolean getExitConfirmation() {
 		try {
-			return Boolean.valueOf(properties.getProperty("exit_confirmation"));
+			return Boolean.valueOf(properties.getProperty("exit_confirmation",
+			        defaults.getProperty("exit_confirmation")));
 		} catch (Exception e) {
 			properties.remove("exit_confirmation");
 			return Boolean.valueOf(defaults.getProperty("exit_confirmation"));
@@ -127,7 +128,7 @@ public class SettingsManager {
 	 */
 	public boolean getMuted() {
 		try {
-			return Boolean.valueOf(properties.getProperty("muted"));
+			return Boolean.valueOf(properties.getProperty("muted", defaults.getProperty("muted")));
 		} catch (Exception e) {
 			properties.remove("muted");
 			return Boolean.valueOf(defaults.getProperty("muted"));
@@ -159,7 +160,8 @@ public class SettingsManager {
 	 */
 	public boolean getShowFPS() {
 		try {
-			return Boolean.valueOf(properties.getProperty("show_fps"));
+			return Boolean.valueOf(properties.getProperty("show_fps",
+			        defaults.getProperty("show_fps")));
 		} catch (Exception e) {
 			properties.remove("show_fps");
 			return Boolean.valueOf(defaults.getProperty("show_fps"));

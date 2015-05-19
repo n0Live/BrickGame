@@ -17,9 +17,11 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -129,7 +131,8 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void exit(GameEvent event) {
-		System.exit(0);
+		JFrame frame = (JFrame) getTopLevelAncestor();
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 	}
 	
 	/**

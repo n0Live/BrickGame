@@ -86,7 +86,7 @@ public class Window extends JFrame {
 			try {
 				if (!getSettingsManager().getExitConfirmation()
 				        || CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
-					Main.getGame().keyPressed(KeyPressed.KeyShutdown);
+					System.exit(0);
 				}
 			} catch (Exception exp) {
 				exp.printStackTrace();

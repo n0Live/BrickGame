@@ -423,7 +423,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			Board invBoard = getInvertedVerticalBoard(board);
 			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard : board.clone(),
-					false);
+			        false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
 			}
@@ -431,11 +431,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 	}
 	
 	void fireExit() {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this);
-			for (GameListener listener : listeners) {
-				listener.exit(event);
-			}
+		GameEvent event = new GameEvent(this);
+		for (GameListener listener : listeners) {
+			listener.exit(event);
 		}
 	}
 	
@@ -578,8 +576,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 			// TENTH_LEVEL_SPEED
 			if (cachedGenuineSpeed <= 0) {
 				cachedGenuineSpeed = Math.round(getSpeedOfFirstLevel()
-						- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
-						* (speed - 1));
+				        - (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
+				        * (speed - 1));
 			}
 			return cachedGenuineSpeed;
 		}
@@ -658,46 +656,46 @@ public abstract class Game implements Callable<Game>, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-					// 0
-					{ F, F, F },//
-					{ F, E, F },//
-					{ F, F, F } }, {
-					// 1
-					{ F, F, F, F, F },//
-					{ F, E, E, E, F },//
-					{ F, E, E, E, F },//
-					{ F, E, E, E, F },//
-					{ F, F, F, F, F } }, {
-					// 2
-					{ F, E, F, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, E, E, F },//
-					{ E, E, E, E, E },//
-					{ F, E, F, E, F } }, {
-					// 3
-					{ F, E, F, E, F },//
-					{ E, F, F, F, E },//
-					{ F, F, E, F, F },//
-					{ E, F, F, F, E },//
-					{ F, E, F, E, F } }, {
-					// 4
-					{ E, E, E, E, E },//
-					{ E, F, F, F, E },//
-					{ E, F, E, F, E },//
-					{ E, F, F, F, E },//
-					{ E, E, E, E, E } }, {
-					// 5
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, F, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }, {
-					// 6
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E },//
-					{ E, E, E, E, E } }
+			        // 0
+			        { F, F, F },//
+			        { F, E, F },//
+			        { F, F, F } }, {
+			        // 1
+			        { F, F, F, F, F },//
+			        { F, E, E, E, F },//
+			        { F, E, E, E, F },//
+			        { F, E, E, E, F },//
+			        { F, F, F, F, F } }, {
+			        // 2
+			        { F, E, F, E, F },//
+			        { E, E, E, E, E },//
+			        { F, E, E, E, F },//
+			        { E, E, E, E, E },//
+			        { F, E, F, E, F } }, {
+			        // 3
+			        { F, E, F, E, F },//
+			        { E, F, F, F, E },//
+			        { F, F, E, F, F },//
+			        { E, F, F, F, E },//
+			        { F, E, F, E, F } }, {
+			        // 4
+			        { E, E, E, E, E },//
+			        { E, F, F, F, E },//
+			        { E, F, E, F, E },//
+			        { E, F, F, F, E },//
+			        { E, E, E, E, E } }, {
+			        // 5
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, F, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E } }, {
+			        // 6
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E },//
+			        { E, E, E, E, E } }
 			
 			};
 			
@@ -889,7 +887,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	public boolean saveState() {
 		if (!(this instanceof GameSelector || this instanceof SplashScreen)
-				&& (getStatus() == Status.Running || getStatus() == Status.Paused)) {
+		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
 			setStatus(Status.Paused);
 			return GameLoader.saveGame(this);
 		}
