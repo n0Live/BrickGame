@@ -2,8 +2,11 @@ package com.kry.brickgame.IO;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +22,11 @@ public final class ScoresManager {
 	 * Single instance of the {@code ScoresManager}
 	 */
 	private static ScoresManager instance;
+	
+	/**
+	 * Comparison of the game class and high scores
+	 */
+	private Map<String, Integer> hiScores;
 	
 	/**
 	 * Delete a high scores file.
@@ -40,11 +48,6 @@ public final class ScoresManager {
 		}
 		return instance;
 	}
-	
-	/**
-	 * Comparison of the game class and high scores
-	 */
-	private Map<String, Integer> hiScores;
 	
 	/**
 	 * Singleton class, which manages the high scores
@@ -74,11 +77,12 @@ public final class ScoresManager {
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean loadScores() {
-		try (ObjectInputStream in = new ObjectInputStream(IOUtils.getInputStream(HI_SCORE_FILE))) {
-			hiScores = (HashMap<String, Integer>) in.readObject();
+		try (InputStream is = IOUtils.getInputStream(HI_SCORE_FILE);
+				ObjectInputStream ois = new ObjectInputStream(is)) {
+			hiScores = (HashMap<String, Integer>) ois.readObject();
 			return true;
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		} catch (ReflectiveOperationException | ObjectStreamException | ClassCastException e) {
+			System.err.println("The hiscores file was corrupted and will be removed:\n" + e);
 			// delete corrupted file
 			deleteScores();
 			return false;
@@ -96,8 +100,9 @@ public final class ScoresManager {
 	 * @return {@code true} if success; {@code false} otherwise
 	 */
 	private boolean saveScores() {
-		try (ObjectOutputStream out = new ObjectOutputStream(IOUtils.getOutputStream(HI_SCORE_FILE))) {
-			out.writeObject(hiScores);
+		try (OutputStream os = IOUtils.getOutputStream(HI_SCORE_FILE);
+				ObjectOutputStream oos = new ObjectOutputStream(os)) {
+			oos.writeObject(hiScores);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

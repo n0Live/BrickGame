@@ -2,9 +2,11 @@ package com.kry.brickgame.IO;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
+import java.io.OutputStream;
 
 import com.kry.brickgame.games.Game;
 import com.kry.brickgame.games.GameSelector;
@@ -33,8 +35,9 @@ public enum GameLoader {
 	 * @return {@code Game} if success; {@code null} otherwise
 	 */
 	public static Game loadGame() {
-		try (ObjectInputStream in = new ObjectInputStream(IOUtils.getInputStream(SAVED_GAME_FILE))) {
-			return (Game) in.readObject();
+		try (InputStream is = IOUtils.getInputStream(SAVED_GAME_FILE);
+				ObjectInputStream ois = new ObjectInputStream(is)) {
+			return (Game) ois.readObject();
 		} catch (ReflectiveOperationException | ObjectStreamException | ClassCastException e) {
 			System.err.println("The gamesave file was corrupted and will be removed:\n" + e);
 			// delete corrupted file
@@ -57,9 +60,9 @@ public enum GameLoader {
 	 */
 	public static <T extends Game> boolean saveGame(T game) {
 		if (game instanceof GameSelector || game instanceof SplashScreen) return false;
-		try (ObjectOutputStream out = new ObjectOutputStream(
-		        IOUtils.getOutputStream(SAVED_GAME_FILE))) {
-			out.writeObject(game);
+		try (OutputStream os = IOUtils.getOutputStream(SAVED_GAME_FILE);
+				ObjectOutputStream oos = new ObjectOutputStream(os)) {
+			oos.writeObject(game);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
