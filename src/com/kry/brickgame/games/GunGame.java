@@ -51,6 +51,10 @@ public class GunGame extends GameWithGun {
 	 * Whether to shift the board?
 	 */
 	private final boolean isShiftingBoard;
+	/**
+	 * Movement speed of the gun
+	 */
+	private static int MOVEMENT_SPEED = Math.round(ANIMATION_DELAY * 1.5f);
 	
 	/**
 	 * The Gun Game
@@ -241,15 +245,13 @@ public class GunGame extends GameWithGun {
 		super.processKeys();
 		
 		if (getStatus() == Status.Running) {
-			int movementSpeed = Math.round(ANIMATION_DELAY * 1.5f);
-			
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveGun(curX - 1, curY)) {
 					GameSound.playEffect(Effects.move);
 					if (isCreationMode) {
 						keys.remove(KeyPressed.KeyLeft);
 					} else {
-						setKeyDelay(KeyPressed.KeyLeft, movementSpeed);
+						setKeyDelay(KeyPressed.KeyLeft, MOVEMENT_SPEED);
 					}
 				}
 			}
@@ -259,7 +261,7 @@ public class GunGame extends GameWithGun {
 					if (isCreationMode) {
 						keys.remove(KeyPressed.KeyRight);
 					} else {
-						setKeyDelay(KeyPressed.KeyRight, movementSpeed);
+						setKeyDelay(KeyPressed.KeyRight, MOVEMENT_SPEED);
 					}
 				}
 			}
@@ -267,7 +269,7 @@ public class GunGame extends GameWithGun {
 				if (containsKey(KeyPressed.KeyDown)) {
 					if (droppingDown()) {
 						GameSound.playEffect(Effects.move);
-						setKeyDelay(KeyPressed.KeyDown, movementSpeed);
+						setKeyDelay(KeyPressed.KeyDown, MOVEMENT_SPEED);
 					} else {
 						loss(curX, curY);
 					}

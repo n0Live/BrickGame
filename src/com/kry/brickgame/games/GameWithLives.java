@@ -3,7 +3,6 @@ package com.kry.brickgame.games;
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
 
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.boards.Board.Cell;
@@ -125,7 +124,8 @@ public abstract class GameWithLives extends Game {
 			GameSound.playMusic(Music.start);
 		}
 		
-		ScheduledFuture<?> waitUntilMusicPlay = scheduledExecutors.schedule(new Runnable() {
+		// wait until the start music played
+		scheduledExecutors.schedule(new Runnable() {
 			@Override
 			public void run() {
 				isStarted = true;
