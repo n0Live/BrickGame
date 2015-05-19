@@ -130,22 +130,23 @@ public class SnakeGame extends GameWithLives {
 		super.init();
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			int currentSpeed = getSpeed(true);
-			if (!usePreloadedLevels && getLevel() > 5) {
-				currentSpeed += ANIMATION_DELAY;
-			}
-			if (isToroidalField) {
-				currentSpeed += ANIMATION_DELAY / 2;
-			}
-			
-			// moving of the snake
-			if (getStatus() == Status.Running && elapsedTime(currentSpeed))
-			    if (!tryMove(snake.getDirection())) {
-				    loss(curX, curY);
-			    }
-			// when the snake has reached the maximum length
-			if (snake.getLength() >= SnakeShape.getMaxLength()) {
-				win();
+			if (getStatus() == Status.Running && isStarted) {
+				int currentSpeed = getSpeed(true);
+				if (!usePreloadedLevels && getLevel() > 5) {
+					currentSpeed += ANIMATION_DELAY;
+				}
+				if (isToroidalField) {
+					currentSpeed += ANIMATION_DELAY / 2;
+				}
+				
+				// moving of the snake
+				if (elapsedTime(currentSpeed) && !move(snake.getDirection())) {
+					loss(curX, curY);
+				}
+				// when the snake has reached the maximum length
+				if (snake.getLength() >= SnakeShape.getMaxLength()) {
+					win();
+				}
 			}
 			// processing of key presses
 			processKeys();
@@ -234,7 +235,7 @@ public class SnakeGame extends GameWithLives {
 		
 		curY = isToroidalField ? 1 : 0;
 		
-		tryMove(snake.getDirection());
+		move(snake.getDirection());
 		
 		if (isToroidalField) {
 			prepareBorders(!usePreloadedLevels);
@@ -327,32 +328,32 @@ public class SnakeGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
-			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(LEFT)) {
+		if (getStatus() == Status.Running && isStarted) {
+			if (containsKey(KeyPressed.KeyLeft)) if (move(LEFT)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
 			} else {
 				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyRight)) if (tryMove(RIGHT)) {
+			if (containsKey(KeyPressed.KeyRight)) if (move(RIGHT)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
 			} else {
 				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyDown)) if (tryMove(DOWN)) {
+			if (containsKey(KeyPressed.KeyDown)) if (move(DOWN)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyDown, ANIMATION_DELAY * 3);
 			} else {
 				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyUp)) if (tryMove(UP)) {
+			if (containsKey(KeyPressed.KeyUp)) if (move(UP)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY * 3);
 			} else {
 				loss(curX, curY);
 			}
-			if (containsKey(KeyPressed.KeyRotate)) if (tryMove(snake.getDirection())) {
+			if (containsKey(KeyPressed.KeyRotate)) if (move(snake.getDirection())) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
 			} else {
@@ -368,7 +369,7 @@ public class SnakeGame extends GameWithLives {
 	 *            the direction of the movement of the snake
 	 * @return {@code true} if the movement succeeded otherwise {@code false}
 	 */
-	private boolean tryMove(RotationAngle direction) {
+	private boolean move(RotationAngle direction) {
 		int newX;
 		int newY;
 		boolean isReversal = direction == snake.getDirection().getOpposite();

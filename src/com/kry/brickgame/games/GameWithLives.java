@@ -2,7 +2,9 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
-import static com.kry.brickgame.games.GameUtils.sleep;
+
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.Rotation;
@@ -25,17 +27,25 @@ public abstract class GameWithLives extends Game {
 	/**
 	 * Whether the game is started?
 	 */
-	boolean isStarted;
+	volatile boolean isStarted;
 	
 	/**
 	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
 	 * seconds
 	 */
-	private static void playAndWaitMusic() {
+	private void playAndWaitMusic() {
 		if (!isMuted()) {
 			GameSound.playMusic(Music.start);
 		}
-		sleep(1500); // start.m4a duration
+		
+		// set isStarted = true after delay
+		final int DELAY = 1500; // start.m4a duration
+		ScheduledFuture<?> waitUntilMusicPlay = scheduledExecutors.schedule(new Runnable() {
+			@Override
+			public void run() {
+				isStarted = true;
+			}
+		}, DELAY, TimeUnit.MILLISECONDS);
 	}
 	
 	/**
@@ -70,7 +80,6 @@ public abstract class GameWithLives extends Game {
 		super(speed, level, rotation, type);
 		
 		setLives(4);
-		isStarted = true;
 	}
 	
 	/**
@@ -82,24 +91,12 @@ public abstract class GameWithLives extends Game {
 		return lives;
 	}
 	
-	@Override
-	void init() {
-		super.init();
-		// play music only in first isStarted, not after deserialization
-		if (isStarted) {
-			isStarted = false;
-			playAndWaitMusic();
-		}
-	}
-	
 	/**
 	 * Loading the specified level
 	 */
 	void loadNewLevel() {
-		// play music always except the first isStarted
-		if (!isStarted) {
-			playAndWaitMusic();
-		}
+		isStarted = false;
+		playAndWaitMusic();
 		setStatus(Status.Running);
 	}
 	

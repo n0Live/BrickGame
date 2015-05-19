@@ -90,10 +90,6 @@ public class ArkanoidGame extends GameWithLives {
 	 * Use the platform on both sides of the board?
 	 */
 	private final boolean useDoubleSidedPlatform;
-	/**
-	 * Is this the beginning of the level?
-	 */
-	private boolean isStartOfLevel;
 	
 	/**
 	 * The Arkanoid
@@ -319,7 +315,7 @@ public class ArkanoidGame extends GameWithLives {
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
+			if (getStatus() == Status.Running && isStarted) {
 				// change the speed in depending of the platform size
 				// (slower when used small platform)
 				float speedFactor = slowestSpeed - platform.getType() * speedStep;
@@ -330,7 +326,7 @@ public class ArkanoidGame extends GameWithLives {
 					currentSpeed += ANIMATION_DELAY;
 				}
 				
-				if (elapsedTime(currentSpeed) && !isStartOfLevel) {
+				if (elapsedTime(currentSpeed)) {
 					moveBall();
 				}
 			}
@@ -424,8 +420,6 @@ public class ArkanoidGame extends GameWithLives {
 		board = drawBall(board, ballX, ballY);
 		
 		setBoard(board);
-		
-		isStartOfLevel = true;
 		
 		// init platform
 		movePlatform(curX);
@@ -597,11 +591,8 @@ public class ArkanoidGame extends GameWithLives {
 					setKeyDelay(KeyPressed.KeyRight, movementDelay);
 				}
 			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				if (isStartOfLevel) {
-					isStartOfLevel = false;
-					GameSound.playEffect(Effects.turn);
-				}
+			if (isStarted && containsKey(KeyPressed.KeyRotate)) {
+				GameSound.playEffect(Effects.turn);
 				moveBall();
 				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY * 2);
 			}

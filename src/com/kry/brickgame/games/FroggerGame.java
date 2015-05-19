@@ -199,8 +199,11 @@ public class FroggerGame extends GameWithLives {
 		super.init();
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			if (getStatus() != Status.Paused && elapsedTime(getSpeed(true) * 3)) {
-				shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+			if (getStatus() == Status.Running && isStarted) {
+				int currentSpeed = getSpeed(true) * 3;
+				if (elapsedTime(currentSpeed)) {
+					shiftRoad(shiftRoadFromLeftToRigth, shiftRoadWithFrog);
+				}
 			}
 			// processing of key presses
 			processKeys();
@@ -468,20 +471,22 @@ public class FroggerGame extends GameWithLives {
 				keys.remove(KeyPressed.KeyRight);
 			}
 			
-			if (containsKey(KeyPressed.KeyDown)) {
-				newY = newY - 2;
-				move = true;
-				keys.remove(KeyPressed.KeyDown);
-			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyUp);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				newY = newY + (curY < boardHeight - 2 ? 2 : 1);
-				move = true;
-				keys.remove(KeyPressed.KeyRotate);
+			if (isStarted) {
+				if (containsKey(KeyPressed.KeyDown)) {
+					newY = newY - 2;
+					move = true;
+					keys.remove(KeyPressed.KeyDown);
+				}
+				if (containsKey(KeyPressed.KeyUp)) {
+					newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+					move = true;
+					keys.remove(KeyPressed.KeyUp);
+				}
+				if (containsKey(KeyPressed.KeyRotate)) {
+					newY = newY + (curY < boardHeight - 2 ? 2 : 1);
+					move = true;
+					keys.remove(KeyPressed.KeyRotate);
+				}
 			}
 			
 			if (move) {

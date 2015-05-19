@@ -184,7 +184,7 @@ public class RacingGame extends GameWithLives {
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
+			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
 					// slow down if isThreelaneTraffic
@@ -281,7 +281,7 @@ public class RacingGame extends GameWithLives {
 		
 		super.loadNewLevel();
 		
-		if (!isStarted) {
+		if (isStarted) {
 			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
 		}
 	}
@@ -373,7 +373,7 @@ public class RacingGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && isStarted) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveCar(curPosition - 1)) {
 					GameSound.playEffect(Effects.move);

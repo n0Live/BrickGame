@@ -138,7 +138,7 @@ public class GunGame extends GameWithGun {
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
+			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				// increase game speed when hasTwoSmokingBarrels
 				if (hasTwoSmokingBarrels && !isCreationMode) {
@@ -260,30 +260,32 @@ public class GunGame extends GameWithGun {
 					}
 				}
 			}
-			if (containsKey(KeyPressed.KeyDown)) {
-				if (droppingDown()) {
-					GameSound.playEffect(Effects.move);
-					setKeyDelay(KeyPressed.KeyDown, movementSpeed);
-				} else {
-					loss(curX, curY);
+			if (isStarted) {
+				if (containsKey(KeyPressed.KeyDown)) {
+					if (droppingDown()) {
+						GameSound.playEffect(Effects.move);
+						setKeyDelay(KeyPressed.KeyDown, movementSpeed);
+					} else {
+						loss(curX, curY);
+					}
 				}
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-				if (isCreationMode) {
-					keys.remove(KeyPressed.KeyRotate);
-				} else {
-					int fireSpeed = Math.round(ANIMATION_DELAY
-					        * (hasTwoSmokingBarrels ? 2.5f : 1.5f));
-					// slow down if hasTwoSmokingBarrels
-					setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+				if (containsKey(KeyPressed.KeyRotate)) {
+					fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
+					if (isCreationMode) {
+						keys.remove(KeyPressed.KeyRotate);
+					} else {
+						int fireSpeed = Math.round(ANIMATION_DELAY
+						        * (hasTwoSmokingBarrels ? 2.5f : 1.5f));
+						// slow down if hasTwoSmokingBarrels
+						setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+					}
 				}
 			}
 		}
 	}
 	
 	@Override
-	protected void setScore(int score) {
+	void setScore(int score) {
 		int oldThousands = getScore() / 1000;
 		
 		super.setScore(score);

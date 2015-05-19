@@ -233,7 +233,7 @@ public class InvadersGame extends GameWithGun {
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			if (getStatus() != Status.GameOver) {
+			if (getStatus() == Status.Running && isStarted) {
 				if (isDead) {
 					// must be in the main thread
 					loss(curX, curY);
@@ -306,7 +306,7 @@ public class InvadersGame extends GameWithGun {
 		invasionHandler = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
-				if (getStatus() == Status.Running) {
+				if (getStatus() == Status.Running && isStarted) {
 					processInvasion();
 				}
 			}
@@ -391,7 +391,7 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	@Override
-	protected void fireBoardChanged(Board board) {
+	void fireBoardChanged(Board board) {
 		Board newBoard = board;
 		
 		// the X-Dimension has its own laws
@@ -473,7 +473,7 @@ public class InvadersGame extends GameWithGun {
 		super.loadNewLevel();
 		
 		// create timer for invasion
-		if (!isStarted) {
+		if (isStarted) {
 			createInvasionTimer();
 		}
 	}
@@ -578,7 +578,7 @@ public class InvadersGame extends GameWithGun {
 				setKeyDelay(KeyPressed.KeyRight, movementSpeed);
 			}
 			
-			if (move && getStatus() == Status.Running) {
+			if (move) {
 				if (moveGun(newX, newY)) {
 					GameSound.playEffect(Effects.move);
 				} else {
@@ -587,15 +587,17 @@ public class InvadersGame extends GameWithGun {
 				}
 			}
 			
-			if (containsKey(KeyPressed.KeyDown)) {
-				processInvasion();
-				setKeyDelay(KeyPressed.KeyDown, movementSpeed);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-				int fireSpeed = ANIMATION_DELAY * (hasTwoSmokingBarrels ? 6 : 3);
-				// slowing fire speed if hasTwoSmokingBarrels
-				setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+			if (isStarted) {
+				if (containsKey(KeyPressed.KeyDown)) {
+					processInvasion();
+					setKeyDelay(KeyPressed.KeyDown, movementSpeed);
+				}
+				if (containsKey(KeyPressed.KeyRotate)) {
+					fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
+					int fireSpeed = ANIMATION_DELAY * (hasTwoSmokingBarrels ? 6 : 3);
+					// slowing fire speed if hasTwoSmokingBarrels
+					setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+				}
 			}
 		}
 	}

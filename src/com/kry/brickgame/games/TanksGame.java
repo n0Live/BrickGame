@@ -362,7 +362,7 @@ public class TanksGame extends GameWithLives {
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 		        && getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running) {
+			if (getStatus() == Status.Running && isStarted) {
 				if (isDead) {
 					// must be in the main thread
 					loss(playerTank.x(), playerTank.y());
@@ -988,7 +988,7 @@ public class TanksGame extends GameWithLives {
 				movePlayerTank(movementDirection);
 			}
 			
-			if (containsKey(KeyPressed.KeyRotate)) {
+			if (isStarted && containsKey(KeyPressed.KeyRotate)) {
 				GameSound.playEffect(Effects.move);
 				fire(playerTank);
 				keys.remove(KeyPressed.KeyRotate);
