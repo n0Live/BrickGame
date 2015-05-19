@@ -612,6 +612,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 		return type;
 	}
 	
+	/**
+	 * Initialize the game
+	 */
 	void init() {
 		nextGame = null;
 		

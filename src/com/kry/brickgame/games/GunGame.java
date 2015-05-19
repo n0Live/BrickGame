@@ -31,6 +31,14 @@ public class GunGame extends GameWithGun {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 16;
+	/**
+	 * Movement speed of the gun
+	 */
+	private static final int MOVEMENT_SPEED = Math.round(ANIMATION_DELAY * 1.5f);
+	/**
+	 * Fire speed of the gun
+	 */
+	private final int FIRE_SPEED;
 	
 	/**
 	 * Kind of game
@@ -51,10 +59,6 @@ public class GunGame extends GameWithGun {
 	 * Whether to shift the board?
 	 */
 	private final boolean isShiftingBoard;
-	/**
-	 * Movement speed of the gun
-	 */
-	private static int MOVEMENT_SPEED = Math.round(ANIMATION_DELAY * 1.5f);
 	
 	/**
 	 * The Gun Game
@@ -99,6 +103,9 @@ public class GunGame extends GameWithGun {
 		isShiftingBoard = getType() % 2 == 0;
 		// for types 8-16
 		setDrawInvertedBoard(getType() > 8);
+		
+		// slow down if hasTwoSmokingBarrels
+		FIRE_SPEED = Math.round(ANIMATION_DELAY * (hasTwoSmokingBarrels ? 2.5f : 1.5f));
 	}
 	
 	/**
@@ -132,7 +139,7 @@ public class GunGame extends GameWithGun {
 			@Override
 			public void run() {
 				if (!(exitFlag || Thread.currentThread().isInterrupted())
-						&& getStatus() == Status.Running) {
+				        && getStatus() == Status.Running) {
 					if (isCreationMode) {
 						flightOfMud();
 					} else {
@@ -144,7 +151,7 @@ public class GunGame extends GameWithGun {
 		}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2), TimeUnit.MILLISECONDS);
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				// increase game speed when hasTwoSmokingBarrels
@@ -279,10 +286,7 @@ public class GunGame extends GameWithGun {
 					if (isCreationMode) {
 						keys.remove(KeyPressed.KeyRotate);
 					} else {
-						int fireSpeed = Math.round(ANIMATION_DELAY
-								* (hasTwoSmokingBarrels ? 2.5f : 1.5f));
-						// slow down if hasTwoSmokingBarrels
-						setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+						setKeyDelay(KeyPressed.KeyRotate, FIRE_SPEED);
 					}
 				}
 			}

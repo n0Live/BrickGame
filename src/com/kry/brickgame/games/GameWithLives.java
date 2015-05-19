@@ -63,7 +63,6 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		
 	}
 	
 	/**
@@ -79,7 +78,7 @@ public abstract class GameWithLives extends Game {
 	void init() {
 		super.init();
 		setLives(4);
-	};
+	}
 	
 	/**
 	 * Loading the specified level

@@ -37,6 +37,14 @@ public class InvadersGame extends GameWithGun {
 	 */
 	public static final int subtypesNumber = 16;
 	/**
+	 * Movement speed of the gun
+	 */
+	private static final int MOVEMENT_SPEED = Math.round(ANIMATION_DELAY * 1.5f);
+	/**
+	 * Fire speed of the gun
+	 */
+	private final int FIRE_SPEED;
+	/**
 	 * The bricks wall
 	 */
 	private volatile BricksWall bricks;
@@ -169,6 +177,9 @@ public class InvadersGame extends GameWithGun {
 		isReadyToXDimension = false;
 		theXDimension = false;
 		startX = boardWidth / 2 - 1;
+		
+		// slowing fire speed if hasTwoSmokingBarrels
+		FIRE_SPEED = ANIMATION_DELAY * (hasTwoSmokingBarrels ? 6 : 3);
 	}
 	
 	@Override
@@ -227,7 +238,7 @@ public class InvadersGame extends GameWithGun {
 			@Override
 			public void run() {
 				if (!(exitFlag || Thread.currentThread().isInterrupted())
-						&& getStatus() == Status.Running) {
+				        && getStatus() == Status.Running) {
 					flightOfBullets();
 				}
 			}
@@ -276,10 +287,10 @@ public class InvadersGame extends GameWithGun {
 					// magic aiming algorithm
 					if (ballX < curX) { // if the ball to the left of the gun
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? LEFT
-								: RIGHT;
+						        : RIGHT;
 					} else {
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? RIGHT
-								: LEFT;
+						        : LEFT;
 					}
 					// delete this brick from bricks wall
 					bricks.setCell(Cell.Empty, x, y);
@@ -496,7 +507,7 @@ public class InvadersGame extends GameWithGun {
 		Point newCoords;
 		// set new coordinates from directions
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// if the ball fall off the board then remove it
 		if (newCoords.y < 0) {
@@ -513,7 +524,7 @@ public class InvadersGame extends GameWithGun {
 			bounce = true;
 		}
 		newCoords = BallUtils
-				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		synchronized (lock) {
 			// if ball was destroyed then return
@@ -564,19 +575,18 @@ public class InvadersGame extends GameWithGun {
 		super.processKeys();
 		
 		if (getStatus() == Status.Running) {
-			int movementSpeed = (int) (ANIMATION_DELAY * 1.5f);
 			int newX = curX, newY = curY;
 			boolean move = false;
 			
 			if (containsKey(KeyPressed.KeyLeft)) {
 				newX = newX - 1;
 				move = true;
-				setKeyDelay(KeyPressed.KeyLeft, movementSpeed);
+				setKeyDelay(KeyPressed.KeyLeft, MOVEMENT_SPEED);
 			}
 			if (containsKey(KeyPressed.KeyRight)) {
 				newX = newX + 1;
 				move = true;
-				setKeyDelay(KeyPressed.KeyRight, movementSpeed);
+				setKeyDelay(KeyPressed.KeyRight, MOVEMENT_SPEED);
 			}
 			
 			if (move) {
@@ -591,13 +601,11 @@ public class InvadersGame extends GameWithGun {
 			if (isStarted) {
 				if (containsKey(KeyPressed.KeyDown)) {
 					processInvasion();
-					setKeyDelay(KeyPressed.KeyDown, movementSpeed);
+					setKeyDelay(KeyPressed.KeyDown, MOVEMENT_SPEED);
 				}
 				if (containsKey(KeyPressed.KeyRotate)) {
 					fire(curX, curY + gun.maxY() + 1, hasTwoSmokingBarrels);
-					int fireSpeed = ANIMATION_DELAY * (hasTwoSmokingBarrels ? 6 : 3);
-					// slowing fire speed if hasTwoSmokingBarrels
-					setKeyDelay(KeyPressed.KeyRotate, fireSpeed);
+					setKeyDelay(KeyPressed.KeyRotate, FIRE_SPEED);
 				}
 			}
 		}
