@@ -180,11 +180,6 @@ public class RacingGame extends GameWithLives {
 			loadNewLevel();
 		}
 		
-		// don't start playing sound after deserialization
-		if (getStatus() != Status.Paused) {
-			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
-		}
-		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
 				&& getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
@@ -378,7 +373,7 @@ public class RacingGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running && isStarted) {
+		if (getStatus() == Status.Running) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveCar(curPosition - 1)) {
 					GameSound.playEffect(Effects.move);

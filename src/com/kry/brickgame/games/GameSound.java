@@ -1,7 +1,10 @@
 package com.kry.brickgame.games;
 
+import static com.kry.brickgame.games.Game.scheduledExecutors;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.kry.brickgame.sound.SoundBank;
 import com.kry.brickgame.sound.SoundManager;
@@ -66,13 +69,18 @@ public enum GameSound {
 	 *            delay before starting the second audio stream. 0 -without
 	 *            echo.
 	 */
-	protected static <E extends Enum<E>> void loop(SoundBank soundBank, Enum<E> sound, int echoDelay) {
+	protected static <E extends Enum<E>> void loop(final SoundBank soundBank, final Enum<E> sound,
+			int echoDelay) {
 		if (!Game.isMuted()) {
 			SoundManager.loop(soundBank, sound);
 			// double loop - workaround for ending gap
 			if (echoDelay > 0) {
-				GameUtils.sleep(echoDelay);
-				SoundManager.loop(soundBank, sound);
+				scheduledExecutors.schedule(new Runnable() {
+					@Override
+					public void run() {
+						SoundManager.loop(soundBank, sound);
+					}
+				}, echoDelay, TimeUnit.MILLISECONDS);
 			}
 		}
 	}
@@ -101,7 +109,7 @@ public enum GameSound {
 		if (!Game.isMuted() && !SoundManager.isPlaying(GameSound.music)) {
 			// get sound priority
 			int priority = GameSound.effectsPriority.containsKey(sound) ? GameSound.effectsPriority
-			        .get(sound) : Thread.NORM_PRIORITY;
+					.get(sound) : Thread.NORM_PRIORITY;
 			SoundManager.play(GameSound.effects, sound, priority);
 		}
 	}
