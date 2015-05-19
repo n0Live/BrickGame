@@ -12,6 +12,8 @@ import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 import static com.kry.brickgame.games.GameUtils.isKeySuspended;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -146,6 +148,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	private boolean drawInvertedBoard;
 	
+	/**
+	 * Was the game deserialized?
+	 */
+	boolean desirialized;
+	
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
@@ -181,31 +188,25 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * The Game
 	 */
 	public Game() {
-		setStatus(Status.None);
-		
-		GameSound.stopAllSounds();
-		
-		setSpeed(1);
-		setLevel(1);
-		setRotation(Rotation.NONE);
-		
-		setBoard(new Board(BOARD_WIDTH, BOARD_HEIGHT));
-		setPreview(new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT));
-		
-		setDrawInvertedBoard(false);
-		
+		desirialized = false;
 		curX = 0;
 		curY = 0;
 		
-		timePoint = System.currentTimeMillis();
-		
+		board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
+		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
 		
-		clearBoard();
-		clearPreview();
+		speed = 1;
+		level = 1;
+		status = Status.None;
+		rotation = Rotation.NONE;
+		
+		setDrawInvertedBoard(false);
+		
+		timePoint = System.currentTimeMillis();
 	}
 	
 	/**
@@ -422,7 +423,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			Board invBoard = getInvertedVerticalBoard(board);
 			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard : board.clone(),
-			        false);
+					false);
 			for (GameListener listener : listeners) {
 				listener.boardChanged(event);
 			}
@@ -577,8 +578,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 			// TENTH_LEVEL_SPEED
 			if (cachedGenuineSpeed <= 0) {
 				cachedGenuineSpeed = Math.round(getSpeedOfFirstLevel()
-				        - (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
-				        * (speed - 1));
+						- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
+						* (speed - 1));
 			}
 			return cachedGenuineSpeed;
 		}
@@ -616,15 +617,17 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void init() {
 		nextGame = null;
 		
-		fireBoardChanged(board);
-		firePreviewChanged(preview);
+		GameSound.stopAllSounds();
+		fireMuteChanged(mute);
+		
 		fireSpeedChanged(speed);
 		fireLevelChanged(level);
 		fireRotationChanged(rotation);
-		fireMuteChanged(mute);
 		fireStatusChanged(status);
 		fireInfoChanged(String.valueOf("HI" + getHiScore()));
 		fireInfoChanged(String.valueOf(score));
+		firePreviewChanged(preview);
+		fireBoardChanged(board);
 	}
 	
 	/**
@@ -655,46 +658,46 @@ public abstract class Game implements Callable<Game>, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-			        // 0
-			        { F, F, F },//
-			        { F, E, F },//
-			        { F, F, F } }, {
-			        // 1
-			        { F, F, F, F, F },//
-			        { F, E, E, E, F },//
-			        { F, E, E, E, F },//
-			        { F, E, E, E, F },//
-			        { F, F, F, F, F } }, {
-			        // 2
-			        { F, E, F, E, F },//
-			        { E, E, E, E, E },//
-			        { F, E, E, E, F },//
-			        { E, E, E, E, E },//
-			        { F, E, F, E, F } }, {
-			        // 3
-			        { F, E, F, E, F },//
-			        { E, F, F, F, E },//
-			        { F, F, E, F, F },//
-			        { E, F, F, F, E },//
-			        { F, E, F, E, F } }, {
-			        // 4
-			        { E, E, E, E, E },//
-			        { E, F, F, F, E },//
-			        { E, F, E, F, E },//
-			        { E, F, F, F, E },//
-			        { E, E, E, E, E } }, {
-			        // 5
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, F, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E } }, {
-			        // 6
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E } }
+					// 0
+					{ F, F, F },//
+					{ F, E, F },//
+					{ F, F, F } }, {
+					// 1
+					{ F, F, F, F, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, F, F, F, F } }, {
+					// 2
+					{ F, E, F, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, E, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, F, E, F } }, {
+					// 3
+					{ F, E, F, E, F },//
+					{ E, F, F, F, E },//
+					{ F, F, E, F, F },//
+					{ E, F, F, F, E },//
+					{ F, E, F, E, F } }, {
+					// 4
+					{ E, E, E, E, E },//
+					{ E, F, F, F, E },//
+					{ E, F, E, F, E },//
+					{ E, F, F, F, E },//
+					{ E, E, E, E, E } }, {
+					// 5
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }, {
+					// 6
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }
 			
 			};
 			
@@ -865,6 +868,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 		fireExit();
 	}
 	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		desirialized = true;
+	}
+	
 	/**
 	 * Resume
 	 */
@@ -881,7 +889,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	public boolean saveState() {
 		if (!(this instanceof GameSelector || this instanceof SplashScreen)
-		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
+				&& (getStatus() == Status.Running || getStatus() == Status.Paused)) {
 			setStatus(Status.Paused);
 			return GameLoader.saveGame(this);
 		}

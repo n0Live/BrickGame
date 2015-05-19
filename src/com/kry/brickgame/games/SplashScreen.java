@@ -57,8 +57,8 @@ public class SplashScreen extends Game {
 		while (fromX != board.getWidth() / 2) {
 			// spiral motion with a gradually narrowing
 			if (!horizontalMove(fromX, toX, fromY--) || !verticalMove(fromY, toY, toX--)
-			        || !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
-			    return;
+					|| !horizontalMove(toX, fromX, toY++) || !verticalMove(toY, fromY, fromX++))
+				return;
 		}
 		sleep(ANIMATION_DELAY * 5);
 	}
@@ -84,8 +84,9 @@ public class SplashScreen extends Game {
 	
 	@Override
 	public Game call() {
-		setStatus(Status.DoSomeWork);
+		super.init();
 		
+		setStatus(Status.DoSomeWork);
 		GameSound.playMusic(welcome);
 		sleep(ANIMATION_DELAY);
 		
@@ -190,10 +191,10 @@ public class SplashScreen extends Game {
 		
 		Calendar calendar = Calendar.getInstance();
 		if (calendar.get(Calendar.MONTH) == Calendar.DECEMBER
-		        && calendar.get(Calendar.DAY_OF_MONTH) == 31) {
+				&& calendar.get(Calendar.DAY_OF_MONTH) == 31) {
 			year = Integer.parseInt(dateFormat.format(calendar.getTime())) + 1;
 		} else if (calendar.get(Calendar.MONTH) == Calendar.JANUARY
-		        && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+				&& calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			year = Integer.parseInt(dateFormat.format(calendar.getTime()));
 		}
 		
@@ -211,20 +212,20 @@ public class SplashScreen extends Game {
 		// upper left
 		k = 0;
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1, board.getHeight()
-		        - boardNumbers[k].getHeight() - 1);
+				- boardNumbers[k].getHeight() - 1);
 		// upper right
 		k = 1;
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
-		        - boardNumbers[k].getWidth() - 1, board.getHeight() - boardNumbers[k].getHeight()
-		        * 2);
+				- boardNumbers[k].getWidth() - 1, board.getHeight() - boardNumbers[k].getHeight()
+				* 2);
 		// lower left
 		k = 2;
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1,
-		        boardNumbers[k].getHeight());
+				boardNumbers[k].getHeight());
 		// lower right
 		k = 3;
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
-		        - boardNumbers[k].getWidth() - 1, 1);
+				- boardNumbers[k].getWidth() - 1, 1);
 		
 		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 			setBoard(board);

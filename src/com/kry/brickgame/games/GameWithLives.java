@@ -30,23 +30,9 @@ public abstract class GameWithLives extends Game {
 	volatile boolean isStarted;
 	
 	/**
-	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
-	 * seconds
+	 * Duration of playing the start music
 	 */
-	private void playAndWaitMusic() {
-		if (!isMuted()) {
-			GameSound.playMusic(Music.start);
-		}
-		
-		// set isStarted = true after delay
-		final int DELAY = 1500; // start.m4a duration
-		ScheduledFuture<?> waitUntilMusicPlay = scheduledExecutors.schedule(new Runnable() {
-			@Override
-			public void run() {
-				isStarted = true;
-			}
-		}, DELAY, TimeUnit.MILLISECONDS);
-	}
+	static final int START_MUSIC_DURATION = 1500;
 	
 	/**
 	 * The Game with lives without rotation
@@ -79,7 +65,6 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 		
-		setLives(4);
 	}
 	
 	/**
@@ -90,6 +75,12 @@ public abstract class GameWithLives extends Game {
 	int getLives() {
 		return lives;
 	}
+	
+	@Override
+	void init() {
+		super.init();
+		setLives(4);
+	};
 	
 	/**
 	 * Loading the specified level
@@ -123,6 +114,23 @@ public abstract class GameWithLives extends Game {
 				gameOver();
 			}
 		}
+	}
+	
+	/**
+	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
+	 * seconds
+	 */
+	private void playAndWaitMusic() {
+		if (!isMuted()) {
+			GameSound.playMusic(Music.start);
+		}
+		
+		ScheduledFuture<?> waitUntilMusicPlay = scheduledExecutors.schedule(new Runnable() {
+			@Override
+			public void run() {
+				isStarted = true;
+			}
+		}, START_MUSIC_DURATION, TimeUnit.MILLISECONDS);
 	}
 	
 	/**

@@ -48,8 +48,8 @@ public class TanksGame extends GameWithLives {
 	 * Spawn point of enemy tanks
 	 */
 	final private static int[][] spawnPoints = new int[][] { { 0, 0 }, { BOARD_WIDTH - 1, 0 }, // bottom
-	        { 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
-	        { 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
+			{ 0, BOARD_HEIGHT / 2 }, { BOARD_WIDTH - 1, BOARD_HEIGHT / 2 },// middle
+			{ 0, BOARD_HEIGHT - 1 }, { BOARD_WIDTH - 1, BOARD_HEIGHT - 1 } // top
 	};
 	/**
 	 * Quantity of destroyed tanks to enter to the next level
@@ -145,6 +145,40 @@ public class TanksGame extends GameWithLives {
 	}
 	
 	/**
+	 * Remove the bullet from the bullets array
+	 * 
+	 * @param bullets
+	 *            array of the checking bullets
+	 * @param bulletIndex
+	 *            index of a removing bullet
+	 */
+	private static void destroyBullet(Bullet[] bullets, int bulletIndex) {
+		bullets[bulletIndex] = null;
+	}
+	
+	/**
+	 * Check collision of the {@code bullet} with the each bullet from the
+	 * {@code bullets} array and destroy a collided bullet
+	 * 
+	 * @param bullet
+	 *            checking bullet
+	 * @param bullets
+	 *            array of the checking bullets
+	 * @return {@code true} if there is a collision
+	 */
+	private static boolean destroyCollidedBullets(Bullet bullet, Bullet[] bullets) {
+		for (int i = 0; i < bullets.length; i++) {
+			Bullet checkBullet = bullets[i];
+			if (checkBullet != null && checkBullet != bullet
+					&& checkBullet.getCoordinates().equals(bullet.getCoordinates())) {
+				destroyBullet(bullets, i);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Checking distance between the {@code startPoint} and a nearest obstacle
 	 * in the specified {@code direction}.
 	 * 
@@ -182,7 +216,7 @@ public class TanksGame extends GameWithLives {
 		
 		for (int i = 1; i < distance; i++) {
 			if (board.getCell(startPoint.x + i * signX, startPoint.y + i * signY) == Cell.Full)
-			    return i;
+				return i;
 		}
 		
 		return -1;
@@ -231,7 +265,7 @@ public class TanksGame extends GameWithLives {
 	 *         {@code distance}
 	 */
 	private static boolean isTankAhead(Point startPoint, int distance, RotationAngle viewDirection,
-	        TankShape tank) {
+			TankShape tank) {
 		
 		// returns false when the tank's position and the startPoint is the same
 		if (startPoint.equals(tank.getCoordinates())) return false;
@@ -240,14 +274,14 @@ public class TanksGame extends GameWithLives {
 		case d90: // Right
 		case d270: // Left
 			if (Math.abs(tank.y() - startPoint.y) <= tank.getHeight() / 2
-			        && (tank.x() - startPoint.x) * (viewDirection == LEFT ? -1 : 1) <= distance)
-			    return true;
+					&& (tank.x() - startPoint.x) * (viewDirection == LEFT ? -1 : 1) <= distance)
+				return true;
 			break;
 		case d0: // Up
 		case d180: // Down
 			if (Math.abs(tank.x() - startPoint.x) <= tank.getWidth() / 2
-			        && (tank.y() - startPoint.y) * (viewDirection == DOWN ? -1 : 1) <= distance)
-			    return true;
+					&& (tank.y() - startPoint.y) * (viewDirection == DOWN ? -1 : 1) <= distance)
+				return true;
 			break;
 		}
 		
@@ -289,8 +323,6 @@ public class TanksGame extends GameWithLives {
 		playerBullets = new Bullet[PLAYER_BULLETS_COUNT];
 		
 		enemyTankNumber = 0;
-		
-		loadNewLevel();
 	}
 	
 	/**
@@ -350,6 +382,11 @@ public class TanksGame extends GameWithLives {
 	@Override
 	public Game call() {
 		super.init();
+		
+		if (!desirialized) {
+			loadNewLevel();
+		}
+		
 		// create timer for bullets
 		ScheduledFuture<?> bulletSwarm = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 			@Override
@@ -361,7 +398,7 @@ public class TanksGame extends GameWithLives {
 		}, 0, ANIMATION_DELAY * 4, TimeUnit.MILLISECONDS);
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-		        && getStatus() != Status.GameOver) {
+				&& getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
 				if (isDead) {
 					// must be in the main thread
@@ -426,9 +463,9 @@ public class TanksGame extends GameWithLives {
 		float chance = Math.max(1 - (minDistance + maxDistance - 1) * rate, 0);
 		// chance of shot increases when the player tank going closer
 		if (horizontalDistance < 0 && playerTank.getDirection() == LEFT || horizontalDistance > 0
-		        && playerTank.getDirection() == RIGHT || verticalDistance < 0
-		        && playerTank.getDirection() == DOWN || verticalDistance > 0
-		        && playerTank.getDirection() == UP) {
+				&& playerTank.getDirection() == RIGHT || verticalDistance < 0
+				&& playerTank.getDirection() == DOWN || verticalDistance > 0
+				&& playerTank.getDirection() == UP) {
 			chance += rate;
 		}
 		
@@ -436,15 +473,15 @@ public class TanksGame extends GameWithLives {
 		
 		// chance decreases when ahead of a friendly tank
 		if (isFrendlyTankAhead(tank,
-		        shotDirection == LEFT || shotDirection == RIGHT ? horizontalDistance
-		                : verticalDistance, shotDirection)) {
+				shotDirection == LEFT || shotDirection == RIGHT ? horizontalDistance
+						: verticalDistance, shotDirection)) {
 			chance -= rate * 2;
 		} else if (minDistance <= playerTank.getWidth() / 2) {
 			chance += rate * 10;
 		} else {
 			// increase a chance to shoot at near obstacle
 			int dist = distanceToObstacle(tank.getCoordinates(), shotDirection,
-			        eraseTank(getBoard(), tank));
+					eraseTank(getBoard(), tank));
 			if (dist > 0 && dist <= 5) {
 				chance += rate * (9 - dist);
 			}
@@ -458,40 +495,6 @@ public class TanksGame extends GameWithLives {
 		}
 		
 		return r.nextFloat() <= chance;
-	}
-	
-	/**
-	 * Remove the bullet from the bullets array
-	 * 
-	 * @param bullets
-	 *            array of the checking bullets
-	 * @param bulletIndex
-	 *            index of a removing bullet
-	 */
-	private static void destroyBullet(Bullet[] bullets, int bulletIndex) {
-		bullets[bulletIndex] = null;
-	}
-	
-	/**
-	 * Check collision of the {@code bullet} with the each bullet from the
-	 * {@code bullets} array and destroy a collided bullet
-	 * 
-	 * @param bullet
-	 *            checking bullet
-	 * @param bullets
-	 *            array of the checking bullets
-	 * @return {@code true} if there is a collision
-	 */
-	private static boolean destroyCollidedBullets(Bullet bullet, Bullet[] bullets) {
-		for (int i = 0; i < bullets.length; i++) {
-			Bullet checkBullet = bullets[i];
-			if (checkBullet != null && checkBullet != bullet
-			        && checkBullet.getCoordinates().equals(bullet.getCoordinates())) {
-				destroyBullet(bullets, i);
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	/**
@@ -654,11 +657,11 @@ public class TanksGame extends GameWithLives {
 	void flightOfBullets() {
 		for (int i = 0; i < enemyBullets.length; i++) {
 			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(false, i))
-			    return;
+				return;
 		}
 		for (int i = 0; i < playerBullets.length; i++) {
 			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(true, i))
-			    return;
+				return;
 		}
 	}
 	
@@ -739,11 +742,11 @@ public class TanksGame extends GameWithLives {
 		// and weight of the direction for minimal distance to 0.5
 		if (horizontalDistance != 0) {
 			weightOfDirection[prefHorDirection.ordinal()] += isHorizontalMinDistance
-			        && !blockedWays[prefHorDirection.ordinal()] ? 0.5f : 0.25f;
+					&& !blockedWays[prefHorDirection.ordinal()] ? 0.5f : 0.25f;
 		}
 		if (verticalDistance != 0) {
 			weightOfDirection[prefVertDirection.ordinal()] += !isHorizontalMinDistance
-			        && !blockedWays[prefVertDirection.ordinal()] ? 0.5f : 0.25f;
+					&& !blockedWays[prefVertDirection.ordinal()] ? 0.5f : 0.25f;
 		}
 		
 		// decreases the weight of direction when it crosses the direction of
@@ -824,8 +827,8 @@ public class TanksGame extends GameWithLives {
 	private boolean isFrendlyTankAhead(TankShape tank, int distance, RotationAngle viewDirection) {
 		for (TankShape enemyTank : enemyTanks) {
 			if (enemyTank != null && enemyTank != tank
-			        && isTankAhead(tank.getCoordinates(), distance, viewDirection, enemyTank))
-			    return true;
+					&& isTankAhead(tank.getCoordinates(), distance, viewDirection, enemyTank))
+				return true;
 		}
 		return false;
 	}
@@ -853,7 +856,7 @@ public class TanksGame extends GameWithLives {
 		checkingTank.changeRotationAngle(direction);
 		
 		return !(checkBoardCollision(board, checkingTank, newPlace.x, newPlace.y) || checkCollision(
-		        board, checkingTank, newPlace.x, newPlace.y));
+				board, checkingTank, newPlace.x, newPlace.y));
 	}
 	
 	/**
@@ -944,7 +947,7 @@ public class TanksGame extends GameWithLives {
 			}
 			
 			if (checkBoardCollision(board, newTank, newTank.x(), newTank.y())
-			        || checkCollision(board, newTank, newTank.x(), newTank.y())) return tank;
+					|| checkCollision(board, newTank, newTank.x(), newTank.y())) return tank;
 			
 			// draw the playerTank on the new place
 			setBoard(drawTank(board, newTank));

@@ -98,7 +98,7 @@ public class TetrisGameI extends Game {
 			
 			// if the figure does not leave off the board
 			if (board_y < board.getHeight() && board_y >= 0 && board_x < board.getWidth()
-			        && board_x >= 0) {
+					&& board_x >= 0) {
 				// gets the fill type from the board cell
 				boardFill[i] = resultBoard.getCell(board_x, board_y);
 				// draws the point of the figure on the board
@@ -137,7 +137,7 @@ public class TetrisGameI extends Game {
 			
 			// if the figure does not leave off the board
 			if (board_y < board.getHeight() && board_y >= 0 && board_x < board.getWidth()
-			        && board_x >= 0) {
+					&& board_x >= 0) {
 				// draws the original point on the board
 				resultBoard = drawPoint(resultBoard, board_x, board_y, piece.getBoardFill()[i]);
 			}
@@ -359,24 +359,13 @@ public class TetrisGameI extends Game {
 		hasAcidFigures = getType() >= 19 && getType() <= 27 || getType() >= 64 && getType() <= 72;
 		// for types 28-36 and 73-81
 		hasThroughfallFigures = getType() >= 28 && getType() <= 36 || getType() >= 73
-		        && getType() <= 81;
+				&& getType() <= 81;
 		// for types 37-45 and 82-90
 		hasRandomFigures = getType() >= 37 && getType() <= 45 || getType() >= 82 && getType() <= 90;
 		// for types 46-90
 		setDrawInvertedBoard(getType() > 45);
 		
 		isFallingFinished = false;
-		
-		// getLevel() - 1 - because on the first level doesn't need to add line
-		setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
-		
-		// Create the "next" figure
-		nextPiece = getRandomShape();
-		newPiece();
-		
-		GameSound.playMusic(Music.tetris);
-		
-		setStatus(Status.Running);
 	}
 	
 	/**
@@ -397,8 +386,21 @@ public class TetrisGameI extends Game {
 	@Override
 	public Game call() {
 		super.init();
+		
+		if (!desirialized) {
+			// getLevel() - 1 - because on the first level doesn't need to add
+			// line
+			setBoard(addLinesToBoard(getBoard(), 0, getLevel() - 1, true));
+			// Create the "next" figure
+			nextPiece = getRandomShape();
+			newPiece();
+			
+			GameSound.playMusic(Music.tetris);
+			setStatus(Status.Running);
+		}
+		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-		        && getStatus() != Status.GameOver) {
+				&& getStatus() != Status.GameOver) {
 			doRepetitiveWork();
 		}
 		return nextGame;
@@ -470,8 +472,8 @@ public class TetrisGameI extends Game {
 	protected void firePreviewChanged(Board board) {
 		// draws the inverted board
 		if (isInvertedBoard()
-		        && !nextPiece.containsIn(new Figures[] { Figures.SuperPoint, Figures.SuperGun,
-		                Figures.SuperMudGun, Figures.SuperBomb })) {
+				&& !nextPiece.containsIn(new Figures[] { Figures.SuperPoint, Figures.SuperGun,
+						Figures.SuperMudGun, Figures.SuperBomb })) {
 			super.firePreviewChanged(getInvertedVerticalBoard(board));
 		} else {
 			super.firePreviewChanged(board);
@@ -622,13 +624,13 @@ public class TetrisGameI extends Game {
 				// (middle of the board)-(half the width of the
 				// figure)-(offset of the leftmost x-coordinate from zero)
 				previewX = previewWidth / 2 - (nextPiece.maxX() - nextPiece.minX() + 1) / 2
-				        - nextPiece.minX();
+						- nextPiece.minX();
 				// Y-coordinate:
 				// (remember that the figure is drawn from the bottom up):
 				// (middle of the board)+(half the height of the
 				// figure)+(offset of the lower y-coordinate from zero)
 				previewY = previewHeight / 2 - (nextPiece.maxY() - nextPiece.minY() + 1) / 2
-				        - nextPiece.minY();
+						- nextPiece.minY();
 			}
 			// for super figures
 			else {
@@ -655,7 +657,7 @@ public class TetrisGameI extends Game {
 	void pieceDropped() {
 		isFallingFinished = true;
 		if (curPiece.getShape() == Figures.SuperGun// guns
-		        || curPiece.getShape() == Figures.SuperMudGun) {
+				|| curPiece.getShape() == Figures.SuperMudGun) {
 			GameSound.playEffect(Effects.fall_super);
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
 			curPiece = new TetrisShape(Figures.NoShape);
@@ -663,11 +665,11 @@ public class TetrisGameI extends Game {
 			kaboom(curX + 1, curY); // shift to the center of the bomb
 		} else { // figures which remain on the board
 			if (hasLiquidFigures // liquid figure
-			        && curPiece.getFill() == Cell.Blink) {
+					&& curPiece.getFill() == Cell.Blink) {
 				GameSound.playEffect(Effects.fall_super);
 				flowDown(getBoard(), curX, curY, curPiece, false);
 			} else if (hasAcidFigures // acid figure
-			        && curPiece.getFill() == Cell.Blink) {
+					&& curPiece.getFill() == Cell.Blink) {
 				GameSound.playEffect(Effects.fall_super);
 				flowDown(getBoard(), curX, curY, curPiece, true);
 			} else { // ordinal figure and SuperPoint
@@ -804,7 +806,7 @@ public class TetrisGameI extends Game {
 		TetrisShape newPiece = null;
 		
 		if ((hasLiquidFigures || hasAcidFigures || hasThroughfallFigures || hasRandomFigures)
-		        && r.nextInt(CHANCE_FOR_SUPER_FIGURE) == 0) {
+				&& r.nextInt(CHANCE_FOR_SUPER_FIGURE) == 0) {
 			// for super figures
 			newPiece = getRandomShape();
 			newPiece.setFill(Cell.Blink);
@@ -904,10 +906,10 @@ public class TetrisGameI extends Game {
 		
 		if (// for super point
 		newPiece.getShape() == Figures.SuperPoint//
-		        || newPiece.getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE && //
-		        // all blink shapes (except super) in type 28-36, 73-81 and some
-		        // in 37-45 82-90
-		        hasThroughfallFigures && newPiece.getFill() == Cell.Blink//
+				|| newPiece.getShape().ordinal() < Figures.REF_TO_FIRST_SUPER_SHAPE && //
+				// all blink shapes (except super) in type 28-36, 73-81 and some
+				// in 37-45 82-90
+				hasThroughfallFigures && newPiece.getFill() == Cell.Blink//
 		) {
 			if (checkCollision(board, newPiece, prepX, newY)) {
 				// checking whether filled line at the current (old) figure

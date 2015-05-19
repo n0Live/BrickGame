@@ -169,8 +169,6 @@ public class InvadersGame extends GameWithGun {
 		isReadyToXDimension = false;
 		theXDimension = false;
 		startX = boardWidth / 2 - 1;
-		
-		loadNewLevel();
 	}
 	
 	@Override
@@ -216,16 +214,20 @@ public class InvadersGame extends GameWithGun {
 	@Override
 	public Game call() {
 		super.init();
-		// create timer for invasion,
-		// for the deserialization
-		createInvasionTimer();
+		
+		if (!desirialized) {
+			loadNewLevel();
+		} else {
+			// create timer for invasion,
+			createInvasionTimer();
+		}
 		
 		// create timer for bullets
 		ScheduledFuture<?> bulletSwarm = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 				if (!(exitFlag || Thread.currentThread().isInterrupted())
-				        && getStatus() == Status.Running) {
+						&& getStatus() == Status.Running) {
 					flightOfBullets();
 				}
 			}
@@ -274,10 +276,10 @@ public class InvadersGame extends GameWithGun {
 					// magic aiming algorithm
 					if (ballX < curX) { // if the ball to the left of the gun
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? LEFT
-						        : RIGHT;
+								: RIGHT;
 					} else {
 						ballHorizontalDirection = Math.abs(ballX - curX) < Math.abs(ballY - curY) ? RIGHT
-						        : LEFT;
+								: LEFT;
 					}
 					// delete this brick from bricks wall
 					bricks.setCell(Cell.Empty, x, y);
@@ -302,6 +304,7 @@ public class InvadersGame extends GameWithGun {
 		// set the invasion speed
 		// slow down if invaders is more than 50
 		final int currentSpeed = getSpeed(true) + Math.max(bricks.getBricksCount() - 50, 0);
+		final int INITIAL_DELAY = desirialized ? 0 : START_MUSIC_DURATION;
 		
 		invasionHandler = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
 			@Override
@@ -310,7 +313,7 @@ public class InvadersGame extends GameWithGun {
 					processInvasion();
 				}
 			}
-		}, currentSpeed * 3, currentSpeed, TimeUnit.MILLISECONDS);
+		}, INITIAL_DELAY, currentSpeed, TimeUnit.MILLISECONDS);
 	}
 	
 	/**
@@ -472,10 +475,8 @@ public class InvadersGame extends GameWithGun {
 		
 		super.loadNewLevel();
 		
-		// create timer for invasion
-		if (isStarted) {
-			createInvasionTimer();
-		}
+		// restart invasion
+		createInvasionTimer();
 	}
 	
 	@Override
@@ -495,7 +496,7 @@ public class InvadersGame extends GameWithGun {
 		Point newCoords;
 		// set new coordinates from directions
 		newCoords = BallUtils
-		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		// if the ball fall off the board then remove it
 		if (newCoords.y < 0) {
@@ -512,7 +513,7 @@ public class InvadersGame extends GameWithGun {
 			bounce = true;
 		}
 		newCoords = BallUtils
-		        .moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
+				.moveBall(ballX, ballY, ballHorizontalDirection, ballVerticalDirection);
 		
 		synchronized (lock) {
 			// if ball was destroyed then return

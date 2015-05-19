@@ -4,6 +4,7 @@ import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameUtils.checkCollision;
 import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.setKeyDelay;
+import static com.kry.brickgame.games.GameUtils.sleep;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -100,8 +101,6 @@ public class RacingGame extends GameWithLives {
 		isThreelaneTraffic = getType() % 2 == 0;
 		// for types 3-4
 		setDrawInvertedBoard(getType() >= 3);
-		
-		loadNewLevel();
 	}
 	
 	/**
@@ -138,7 +137,7 @@ public class RacingGame extends GameWithLives {
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-			        && r.nextInt(10 - getLevel() / 2) == 0) {
+					&& r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(new int[] { coordX, coordY });
@@ -177,13 +176,17 @@ public class RacingGame extends GameWithLives {
 	public Game call() {
 		super.init();
 		
+		if (!desirialized) {
+			loadNewLevel();
+		}
+		
 		// don't start playing sound after deserialization
 		if (getStatus() != Status.Paused) {
 			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
 		}
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-		        && getStatus() != Status.GameOver) {
+				&& getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
@@ -281,9 +284,11 @@ public class RacingGame extends GameWithLives {
 		
 		super.loadNewLevel();
 		
-		if (isStarted) {
-			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
+		// wait until started
+		while (!isStarted) {
+			sleep(START_MUSIC_DURATION / 10);
 		}
+		GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
 	}
 	
 	@Override

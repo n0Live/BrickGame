@@ -72,8 +72,16 @@ public class GameProperties implements Serializable {
 	 *            a GameProperties for copying
 	 */
 	private GameProperties(GameProperties aObj) {
-		board = aObj.board.clone();
-		preview = aObj.preview.clone();
+		if (aObj.board == null) {
+			board = null;
+		} else {
+			board = aObj.board.clone();
+		}
+		if (aObj.preview == null) {
+			preview = null;
+		} else {
+			preview = aObj.preview.clone();
+		}
 		status = aObj.status;
 		info = aObj.info;
 		hiScores = aObj.hiScores;
