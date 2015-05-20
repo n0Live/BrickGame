@@ -29,7 +29,9 @@ public class RacingGame extends GameWithLives {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 4;
-	
+	/**
+	 * Delay for engine sound loop playing
+	 */
 	private static final int LOOP_DELAY = ANIMATION_DELAY * 16;
 	/**
 	 * Racing car
@@ -137,7 +139,7 @@ public class RacingGame extends GameWithLives {
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-					&& r.nextInt(10 - getLevel() / 2) == 0) {
+			        && r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(new int[] { coordX, coordY });
@@ -181,7 +183,7 @@ public class RacingGame extends GameWithLives {
 		}
 		
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		        && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
@@ -297,22 +299,38 @@ public class RacingGame extends GameWithLives {
 	 * 
 	 * @param position
 	 *            the new position of the car
+	 * @return {@code true} if car has been moved to the new position
 	 */
 	private boolean moveCar(int position) {
 		if (position < 0 || position >= positions.length) return false;
 		
-		int newX = positions[position];
-		
 		Board board = getBoard();
 		
-		// Erase the car to not interfere with the checks
-		board = drawShape(board, curX, curY, car, Cell.Empty);
+		int newX = positions[position];
+		if (newX == curX) {
+			// redraw car
+			setBoard(drawShape(board, curX, curY, car, Cell.Full));
+			return true;
+		}
 		
 		// check for accident
 		boolean isAccident = checkCollision(board, car, newX, curY);
 		
-		// draw the car on the new place
-		setBoard(drawShape(board, newX, curY, car, Cell.Full));
+		// smooth moving
+		int step = newX >= curX ? 1 : -1;
+		int moveX = curX;
+		do {
+			// decrease numbers of sleep() calling
+			if (moveX != curX) {
+				sleep(ANIMATION_DELAY / 2);
+			}
+			// erase the car
+			board = drawShape(board, moveX, curY, car, Cell.Empty);
+			// draw the car on the new place
+			moveX += step;
+			board = drawShape(board, moveX, curY, car, Cell.Full);
+			setBoard(board);
+		} while (moveX != newX);
 		
 		curX = newX;
 		curPosition = position;
@@ -326,6 +344,10 @@ public class RacingGame extends GameWithLives {
 	
 	/**
 	 * Shifting the borders and opponents on a one cell down and drawing it
+	 * 
+	 * @param catchOpponents
+	 *            if {@code false} shifting only borders, otherwise shifting
+	 *            borders and opponents both
 	 */
 	private void moveOn(boolean catchOpponents) {
 		Board board = getBoard();
@@ -378,13 +400,13 @@ public class RacingGame extends GameWithLives {
 				if (moveCar(curPosition - 1)) {
 					GameSound.playEffect(Effects.move);
 				}
-				keys.remove(KeyPressed.KeyLeft);
+				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
 			}
 			if (containsKey(KeyPressed.KeyRight)) {
 				if (moveCar(curPosition + 1)) {
 					GameSound.playEffect(Effects.move);
 				}
-				keys.remove(KeyPressed.KeyRight);
+				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
 			}
 			if (containsKey(KeyPressed.KeyUp)) {
 				moveOn(oddMove = !oddMove);
