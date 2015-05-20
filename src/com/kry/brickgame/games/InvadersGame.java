@@ -192,22 +192,25 @@ public class InvadersGame extends GameWithGun {
 	 * Processing breaking bricks
 	 * 
 	 * @param board
-	 *            the board for drawing the bricks wall after breaking bricks
+	 *            a board for drawing the bricks wall after breaking bricks
 	 * @param x
 	 *            x-coordinate of the brick for breaking
 	 * @param y
 	 *            y-coordinate of the brick for breaking
+	 * @return a board after breaking bricks
 	 */
-	private void breakBrick(Board board, int x, int y) {
+	private Board breakBrick(Board board, int x, int y) {
 		// coordinates are given to the bricks wall's grid
 		int givenX = x - bricksX;
 		int givenY = y - bricksY;
 		
+		Board result = board;
 		if (bricks.breakBrick(givenX, givenY)) {
 			GameSound.playEffect(Effects.hit_cell);
 			
 			synchronized (lock) {
-				setBoard(insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY));
+				result = insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY);
+				setBoard(result);
 			}
 			
 			// increase scores
@@ -217,6 +220,7 @@ public class InvadersGame extends GameWithGun {
 				isReadyToXDimension = false;
 			}
 		}
+		return result;
 	}
 	
 	/**
@@ -252,7 +256,6 @@ public class InvadersGame extends GameWithGun {
 					loss(curX, curY);
 					// check the number of remaining bricks
 				} else if (bricks.getBricksCount() <= 0 || bricksY <= -bricks.getHeight()) {
-					clearBullets(getBoard());
 					win();
 				}
 			}
@@ -279,7 +282,7 @@ public class InvadersGame extends GameWithGun {
 					
 					// don't create a ball when it below the gun
 					if (ballY < gun.getHeight()) {
-						initBall();
+						initBall(getBoard());
 						return;
 					}
 					
@@ -443,13 +446,20 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	/**
-	 * Erasing the ball from the board
+	 * Erasing the ball from a board
+	 * 
+	 * @param board
+	 *            a board
+	 * @return a board after erasing the ball
 	 */
-	private void initBall() {
+	private Board initBall(Board board) {
 		isFlyingBall = false;
+		Board result = board;
 		synchronized (lock) {
-			setBoard(drawBall(getBoard(), -1, -1));
+			result = drawBall(board, -1, -1);
+			setBoard(result);
 		}
+		return result;
 	}
 	
 	/**
@@ -467,15 +477,14 @@ public class InvadersGame extends GameWithGun {
 		// clear the bullets
 		initBullets(bullets);
 		
-		// return the ball to the start position
-		initBall();
-		
 		// create the bricks wall
 		bricks = new BricksWall(getLevel(), usePreloadedBricks);
 		bricksX = 0;
 		bricksY = boardHeight - bricks.getHeight();
 		synchronized (lock) {
-			setBoard(insertCellsToBoard(getBoard(), bricks.getBoard(), bricksX, bricksY));
+			// return the ball to the start position
+			Board board = initBall(getBoard());
+			setBoard(insertCellsToBoard(board, bricks.getBoard(), bricksX, bricksY));
 		}
 		
 		// set the starting position of the gun
@@ -511,7 +520,7 @@ public class InvadersGame extends GameWithGun {
 		
 		// if the ball fall off the board then remove it
 		if (newCoords.y < 0) {
-			removeBall();
+			removeBall(getBoard());
 			return;
 		}
 		
@@ -612,22 +621,25 @@ public class InvadersGame extends GameWithGun {
 	}
 	
 	/**
-	 * Removes the ball from the board
+	 * Removes the ball from a board
+	 * 
+	 * @param board
+	 *            a board
+	 * @return a board after removing the ball
 	 */
-	private void removeBall() {
-		initBall();
+	private Board removeBall(Board board) {
 		bricks.setBricksCount(bricks.getBricksCount() - 1);
+		return initBall(board);
 	}
 	
 	@Override
-	void removeCell(Board board, int x, int y) {
+	Board removeCell(Board board, int x, int y) {
 		synchronized (lock) {
 			if (x == ballX && y == ballY) {
 				GameSound.playEffect(Effects.hit_cell);
-				removeBall();
-			} else {
-				breakBrick(board, x, y);
+				return removeBall(board);
 			}
+			return breakBrick(board, x, y);
 		}
 	}
 	
@@ -650,7 +662,7 @@ public class InvadersGame extends GameWithGun {
 			invasionHandler.cancel(true);
 		}
 		// clear the ball from the board
-		initBall();
+		initBall(getBoard());
 		super.win();
 	}
 }

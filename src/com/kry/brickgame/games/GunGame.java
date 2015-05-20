@@ -155,8 +155,9 @@ public class GunGame extends GameWithGun {
 			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				// increase game speed when hasTwoSmokingBarrels
-				if (hasTwoSmokingBarrels && !isCreationMode) {
-					currentSpeed -= ANIMATION_DELAY / 2;
+				if (hasTwoSmokingBarrels) {
+					currentSpeed = isCreationMode ? currentSpeed * 2 : currentSpeed
+					        - ANIMATION_DELAY / 2;
 				}
 				
 				// moving
@@ -309,8 +310,8 @@ public class GunGame extends GameWithGun {
 				synchronized (lock) {
 					Board board = getBoard();
 					// delete flying bullets
-					initBullets(bullets);
 					clearBullets(board);
+					initBullets(bullets);
 					// erase the gun
 					board = drawShape(board, curX, curY, gun, Cell.Empty);
 					

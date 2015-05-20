@@ -55,10 +55,10 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
-	 * Adding the cell to the board and increasing scores
+	 * Adding a cell to a board and increasing scores
 	 * 
 	 * @param board
-	 *            the board
+	 *            a board
 	 * @param x
 	 *            x-coordinate of the cell
 	 * @param y
@@ -75,26 +75,27 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
-	 * Adding the cell to the board and increasing scores, after that removing
-	 * line if is filled.
+	 * Adding a cell to a board and increasing scores, after that removing line
+	 * if is filled.
 	 * 
 	 * @param board
-	 *            the board
+	 *            a board
 	 * @param x
 	 *            x-coordinate of the cell
 	 * @param y
 	 *            y-coordinate of the cell
+	 * @return a board after adding a cell and removing a full lines
 	 */
-	private void addCellAndCheckLine(Board board, int x, int y) {
+	private Board addCellAndCheckLine(Board board, int x, int y) {
 		addCell(board, x, y);
-		removeFullLines(y);
+		return removeFullLines(board, y);
 	}
 	
 	/**
-	 * Remove all bullets from the board
+	 * Remove all bullets from a board
 	 * 
 	 * @param board
-	 *            the board, which is necessary to remove the bullets
+	 *            a board, which is necessary to remove a bullets
 	 */
 	void clearBullets(Board board) {
 		synchronized (lock) {
@@ -154,10 +155,10 @@ public abstract class GameWithGun extends GameWithLives {
 							// if under the bullet is filled cell
 							if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
 								if (ofBullets) {// flightOfBullets
-									removeCell(board, x, bullets.get(x).get(y));
+									board = removeCell(board, x, bullets.get(x).get(y));
 								} else {// flightOfMud
 									// stop the bullet before the cell
-									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+									board = addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
 								}
 								// remove the bullet
 								bullets.get(x).set(y, 0);
@@ -169,7 +170,7 @@ public abstract class GameWithGun extends GameWithLives {
 							if (ofBullets) { // flightOfBullets
 								// if under the bullet is filled cell
 								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-									removeCell(board, x, bullets.get(x).get(y));
+									board = removeCell(board, x, bullets.get(x).get(y));
 								}
 								// show the bullet
 								board.setCell(Cell.Blink, x, bullets.get(x).get(y));
@@ -181,11 +182,11 @@ public abstract class GameWithGun extends GameWithLives {
 								// if under the bullet is filled cell
 								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
 									// stop the bullet before the cell
-									addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
+									board = addCellAndCheckLine(board, x, bullets.get(x).get(y) - 1);
 								} else {
 									// stop the bullet on the border of the
 									// board
-									addCellAndCheckLine(board, x, bullets.get(x).get(y));
+									board = addCellAndCheckLine(board, x, bullets.get(x).get(y));
 								}
 							}
 							// remove the bullet
@@ -195,6 +196,7 @@ public abstract class GameWithGun extends GameWithLives {
 					}
 				}
 			}
+			setBoard(board);
 		}
 	}
 	
@@ -230,7 +232,10 @@ public abstract class GameWithGun extends GameWithLives {
 	
 	@Override
 	void loss(int x, int y) {
-		clearBullets(getBoard());
+		Board board = getBoard();
+		clearBullets(board);
+		setBoard(board);
+		
 		super.loss(x, y);
 	}
 	
@@ -264,16 +269,17 @@ public abstract class GameWithGun extends GameWithLives {
 	}
 	
 	/**
-	 * Erasing the cell from the board and increasing scores
+	 * Erasing a cell from a board and increasing scores
 	 * 
 	 * @param board
-	 *            the board
+	 *            a board
 	 * @param x
 	 *            x-coordinate of the cell
 	 * @param y
 	 *            y-coordinate of the cell
+	 * @return a board after erasing a cell
 	 */
-	void removeCell(Board board, int x, int y) {
+	Board removeCell(Board board, int x, int y) {
 		GameSound.playEffect(Effects.hit_cell);
 		synchronized (lock) {
 			// remove the cell
@@ -281,49 +287,53 @@ public abstract class GameWithGun extends GameWithLives {
 		}
 		// increase scores
 		setScore(getScore() + 1);
+		return board;
 	}
 	
 	/**
 	 * Removing of a filled lines
+	 * 
+	 * @param board
+	 *            a board
+	 * @param y
+	 *            number of a checked line (y-coordinate)
+	 * @return a board after removing of a filled lines
 	 */
-	private boolean removeFullLines(int y) {
-		boolean result = false;
-		
-		Board board = getBoard();
+	private Board removeFullLines(Board board, int y) {
+		Board result = board;
 		
 		synchronized (lock) {
-			if (isFullLine(board, y)) {
+			if (isFullLine(result, y)) {
 				// change status for stopping other work
 				Status prevStatus = getStatus();
 				setStatus(Status.DoSomeWork);
 				
+				// reset the bullets
+				initBullets(bullets);
+				clearBullets(result);
+				
 				GameSound.playEffect(Effects.remove_line);
 				
-				animatedClearLine(board, curX, y);
+				animatedClearLine(result, curX, y);
 				
 				// erase the gun from the board before dropping ups lines
-				board = drawShape(board, curX, curY, gun, Cell.Empty);
+				result = drawShape(result, curX, curY, gun, Cell.Empty);
 				
 				// drop the lines up on the filled line
 				for (int i = y; i > 0; i--) {
 					for (int j = 0; j < boardWidth; j++) {
-						board.setCell(board.getCell(j, i - 1), j, i);
+						result.setCell(result.getCell(j, i - 1), j, i);
 					}
 				}
 				
 				// restore the gun after dropping ups lines
-				board = drawShape(board, curX, curY, gun, Cell.Full);
+				result = drawShape(result, curX, curY, gun, Cell.Full);
 				
-				setBoard(board);
 				// increase scores
 				setScore(getScore() + 10);
-				// reset the bullets
-				initBullets(bullets);
 				
 				// restore previous status
 				setStatus(prevStatus);
-				
-				result = true;
 			}
 		}
 		return result;
@@ -331,7 +341,10 @@ public abstract class GameWithGun extends GameWithLives {
 	
 	@Override
 	void win() {
-		clearBullets(getBoard());
+		Board board = getBoard();
+		clearBullets(board);
+		setBoard(board);
+		
 		super.win();
 	}
 	
