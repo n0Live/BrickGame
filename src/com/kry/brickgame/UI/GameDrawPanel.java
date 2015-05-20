@@ -9,6 +9,7 @@ import static com.kry.brickgame.UI.UIConsts.fullColor;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -131,8 +132,11 @@ public class GameDrawPanel extends JPanel implements GameListener {
 	
 	@Override
 	public void exit(GameEvent event) {
-		JFrame frame = (JFrame) getTopLevelAncestor();
-		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+		Container container = getTopLevelAncestor();
+		if (container instanceof JFrame) {
+			JFrame frame = (JFrame) container;
+			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+		}
 	}
 	
 	/**
