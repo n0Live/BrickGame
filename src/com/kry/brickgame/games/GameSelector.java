@@ -186,7 +186,7 @@ public class GameSelector extends Game {
 			try {
 				maxNumber = c.getField("subtypesNumber").getInt(c);
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-			        | SecurityException e) {
+					| SecurityException e) {
 				e.printStackTrace();
 				// if unable - sets 1
 				maxNumber = 1;
@@ -199,14 +199,14 @@ public class GameSelector extends Game {
 				Class<Splash> splashClass = (Class<Splash>) Class.forName(splashClassName);
 				splash = splashClass.newInstance();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-			        | SecurityException | InstantiationException e) {
+					| SecurityException | InstantiationException e) {
 				e.printStackTrace();
 				splash = null;
 			}
 			
 			// show high scores
 			fireInfoChanged(String.valueOf("HI"
-			        + getScoresManager().getHiScore(c.getCanonicalName())));
+					+ getScoresManager().getHiScore(c.getCanonicalName())));
 			
 		} catch (ClassNotFoundException e) {
 			c = null;
@@ -230,7 +230,7 @@ public class GameSelector extends Game {
 				public void run() {
 					drawGameSplash(localSplash);
 				}
-			}, 0, 500, TimeUnit.MILLISECONDS);
+			}, 0, localSplash.getDelay(), TimeUnit.MILLISECONDS);
 		} else {
 			// if unable - clears the rectangle of the splash screen
 			drawGameSplash(null);
@@ -251,7 +251,7 @@ public class GameSelector extends Game {
 		Board board = getBoard();
 		if (splash != null) {
 			board = insertCellsToBoard(board, splash.getNextFrame().getBoard(), 0,
-			        BoardNumbers.height + 1);
+					BoardNumbers.height + 1);
 		} else {
 			Board clear = new Board(Splash.width, Splash.height);
 			board = insertCellsToBoard(board, clear.getBoard(), 0, BoardNumbers.height + 1);
@@ -272,7 +272,7 @@ public class GameSelector extends Game {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(BoardLetters.charToLetters(letter));
 		Board result = insertCellsToBoard(board, boardLetter.getBoard(), boardWidth / 2
-		        - BoardLetters.width / 2 - 1, boardHeight - BoardLetters.height);
+				- BoardLetters.width / 2 - 1, boardHeight - BoardLetters.height);
 		return result;
 	}
 	
@@ -303,12 +303,12 @@ public class GameSelector extends Game {
 		// 1st number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
 		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2
-		        - BoardNumbers.width - 1,// x
-		        0);
+				- BoardNumbers.width - 1,// x
+				0);
 		// 2nd number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
 		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2,// x
-		        0);
+				0);
 		
 		return result;
 	}
