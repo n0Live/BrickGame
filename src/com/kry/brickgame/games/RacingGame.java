@@ -24,7 +24,7 @@ public class RacingGame extends GameWithLives {
 	/**
 	 * Animated splash for game
 	 */
-	public static final String splash = "com.kry.brickgame.splashes.RaceSplash";
+	public static final String splash = "com.kry.brickgame.splashes.RacingSplash";
 	/**
 	 * Number of subtypes
 	 */
