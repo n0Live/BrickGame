@@ -1,9 +1,6 @@
 package com.kry.brickgame.games;
 
-import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Rotation;
-import com.kry.brickgame.games.GameConsts.Status;
-import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.TetrisShape;
 import com.kry.brickgame.shapes.TetrisShape.Figures;
 
@@ -50,28 +47,15 @@ public class TetrisGameK extends TetrisGameI {
 		return TetrisShape.getPrevTetraminoes(aTetrisShape);
 	}
 	
-	/**
-	 * Processing of key presses
-	 */
 	@Override
-	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		if (getStatus() == Status.Running && !isFallingFinished
-		        && containsKey(KeyPressed.KeyRotate) && !curPiece.isSuperShape()) {
-			TetrisShape rotatedPiece;
-			if (getRotation() == Rotation.COUNTERCLOCKWISE) {
-				rotatedPiece = getPrevFigure(curPiece);
-			} else {
-				rotatedPiece = getNextFigure(curPiece);
-			}
-			
-			if (tryMove(rotatedPiece, curX, curY)) {
-				GameSound.playEffect(Effects.turn);
-			}
-			keys.remove(KeyPressed.KeyRotate);
+	protected TetrisShape rotateFigure(TetrisShape figure) {
+		TetrisShape result;
+		if (getRotation() == Rotation.COUNTERCLOCKWISE) {
+			result = getPrevFigure(figure);
 		} else {
-			super.processKeys();
+			result = getNextFigure(figure);
 		}
+		return result;
 	}
 	
 }

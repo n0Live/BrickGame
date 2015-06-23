@@ -29,16 +29,20 @@ public class TetrisGameI extends Game {
 	/**
 	 * Animated splash for game
 	 */
-	public static final String splash = "com.kry.brickgame.splashes.TetrisSplash";
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashI";
 	/**
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 90;
 	
 	/**
-	 * Movement speed of the figures
+	 * Movement speed of a figures
 	 */
-	private static final int MOVEMENT_SPEED = Math.round(ANIMATION_DELAY * 3f);
+	private static final int MOVEMENT_SPEED = ANIMATION_DELAY * 3;
+	/**
+	 * Rotation speed of a figures
+	 */
+	private static final int ROTATION_SPEED = MOVEMENT_SPEED * 3;
 	/**
 	 * Chance for the appearance of a super figure is 1 from {@value}
 	 */
@@ -472,6 +476,23 @@ public class TetrisGameI extends Game {
 		pieceDropped();
 	}
 	
+	/**
+	 * Returns rotated copy of a specified figure
+	 * 
+	 * @param figure
+	 *            a figure for rotation
+	 * @return rotated copy of a figure
+	 */
+	protected TetrisShape rotateFigure(TetrisShape figure) {
+		TetrisShape result;
+		if (getRotation() == Rotation.COUNTERCLOCKWISE) {
+			result = figure.clone().rotateLeft();
+		} else {
+			result = figure.clone().rotateRight();
+		}
+		return result;
+	}
+	
 	@Override
 	protected void firePreviewChanged(Board board) {
 		// draws the inverted board
@@ -699,14 +720,6 @@ public class TetrisGameI extends Game {
 		super.processKeys();
 		
 		if (getStatus() == Status.Running && !isFallingFinished) {
-			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(curPiece, curX - 1, curY)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyLeft, MOVEMENT_SPEED);
-			}
-			if (containsKey(KeyPressed.KeyRight)) if (tryMove(curPiece, curX + 1, curY)) {
-				GameSound.playEffect(Effects.move);
-				setKeyDelay(KeyPressed.KeyRight, MOVEMENT_SPEED);
-			}
 			if (containsKey(KeyPressed.KeyRotate)) {
 				// if we have the super gun
 				if (curPiece.getShape() == Figures.SuperGun) {
@@ -718,17 +731,20 @@ public class TetrisGameI extends Game {
 					mudShoot(curX, curY + curPiece.minY());
 					// if the super point, than do nothing
 				} else if (curPiece.getShape() != Figures.SuperPoint) {
-					TetrisShape rotatedPiece;
-					if (getRotation() == Rotation.COUNTERCLOCKWISE) {
-						rotatedPiece = curPiece.clone().rotateLeft();
-					} else {
-						rotatedPiece = curPiece.clone().rotateRight();
-					}
+					TetrisShape rotatedPiece = rotateFigure(curPiece);
 					if (tryMove(rotatedPiece, curX, curY)) {
 						GameSound.playEffect(Effects.turn);
 					}
 				}
-				keys.remove(KeyPressed.KeyRotate);
+				setKeyDelay(KeyPressed.KeyRotate, ROTATION_SPEED);
+			}
+			if (containsKey(KeyPressed.KeyLeft)) if (tryMove(curPiece, curX - 1, curY)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyLeft, MOVEMENT_SPEED);
+			}
+			if (containsKey(KeyPressed.KeyRight)) if (tryMove(curPiece, curX + 1, curY)) {
+				GameSound.playEffect(Effects.move);
+				setKeyDelay(KeyPressed.KeyRight, MOVEMENT_SPEED);
 			}
 			if (containsKey(KeyPressed.KeyDown)) {
 				oneLineDown();
