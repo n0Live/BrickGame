@@ -9,6 +9,10 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
  */
 public class TetrisGameL extends TetrisGameJ {
 	private static final long serialVersionUID = 751057972065508388L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashL";
 	
 	/**
 	 * The Tetris with the addition of new lines every few seconds and the
