@@ -9,6 +9,10 @@ import com.kry.brickgame.shapes.TetrisShape.Figures;
  */
 public class TetrisGameK extends TetrisGameI {
 	private static final long serialVersionUID = -2765291209922783752L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashK";
 	
 	/**
 	 * The Tetris with the changing of the figures instead of rotating
