@@ -17,6 +17,11 @@ public class PentixSplash extends Splash {
 			{ F, F, E, E, E, F, E, F, F, F }, //
 			{ F, F, F, E, F, F, E, F, F, F } }, {
 			// 1
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ F, E, E, F, F, E, E, E, E, E },//
 			{ F, F, F, F, E, F, E, F, F, F },//
 			{ F, F, F, F, F, F, E, F, F, F } }, {
@@ -30,6 +35,12 @@ public class PentixSplash extends Splash {
 			{ F, F, F, F, E, F, E, F, F, F },//
 			{ F, F, F, F, F, F, E, F, F, F } }, {
 			// 3
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
+			{ E, E, E, E, E, E, E, E, E, E }, //
 			{ F, E, E, F, F, F, F, F, E, E },//
 			{ F, F, F, F, E, F, F, F, F, F } } };
 	
