@@ -13,6 +13,10 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameJ extends TetrisGameI {
 	private static final long serialVersionUID = 4703415063910078444L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashJ";
 	
 	private static final int TIME_BETWEEN_ADDING_LINE = 30;
 	private volatile int time;
@@ -56,7 +60,7 @@ public class TetrisGameJ extends TetrisGameI {
 	@Override
 	protected void doRepetitiveWork() {
 		// if it's time to add a line, trying to add a line
-		if ((isTimeToAddLine) && (tryAddLine())) {
+		if (isTimeToAddLine && tryAddLine()) {
 			setTime(TIME_BETWEEN_ADDING_LINE);
 			isTimeToAddLine = false;
 		} else {
