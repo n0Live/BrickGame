@@ -11,6 +11,10 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameM extends TetrisGameI {
 	private static final long serialVersionUID = 21601260655217157L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashM";
 	
 	/**
 	 * The Tetris with the shifting board content
