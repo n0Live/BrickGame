@@ -4,7 +4,7 @@ package com.kry.brickgame.splashes;
  * @author noLive
  */
 public class TetrisSplashJ extends Splash {
-	private static final long serialVersionUID = -5478214198285461170L;
+	private static final long serialVersionUID = 534555333873259137L;
 	
 	private static final Cell[][][] frameTable = new Cell[][][] { {
 	        // 0

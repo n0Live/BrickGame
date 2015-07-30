@@ -11,6 +11,10 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameP extends TetrisGameL {
 	private static final long serialVersionUID = 3734423526420480573L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashP";
 	
 	/**
 	 * The Tetris with the addition of new lines every few seconds, and the
@@ -27,7 +31,7 @@ public class TetrisGameP extends TetrisGameL {
 	void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
-			int dX = (getRotation() == Rotation.CLOCKWISE ? 1 : -1);
+			int dX = getRotation() == Rotation.CLOCKWISE ? 1 : -1;
 			Board board = boardHorizontalShift(getBoard(), dX);
 			setBoard(board);
 		}
