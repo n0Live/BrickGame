@@ -3,7 +3,7 @@ package com.kry.brickgame.splashes;
 /**
  * @author noLive
  */
-public class TetrisSplashM extends Splash {
+public class TetrisSplashO extends Splash {
 	private static final long serialVersionUID = -2819667366603364942L;
 	
 	private static final Cell[][][] frameTable = new Cell[][][] { {
@@ -17,7 +17,7 @@ public class TetrisSplashM extends Splash {
 	        { E, F, E, E, F, F, F, E, F, E }, //
 	        { F, F, E, F, F, F, F, F, F, F } }, {
 	        // 1
-	        { E, E, F, F, E, E, E, E, E, E }, //
+	        { E, E, E, F, F, E, E, E, E, E }, //
 	        { E, E, E, F, F, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -27,9 +27,9 @@ public class TetrisSplashM extends Splash {
 	        { F, F, E, F, F, F, F, F, F, F } }, {
 	        // 2
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, F, F, E, E, E, E, E, E, E }, //
-	        { E, E, F, F, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, F, F, F, E, E, E, E, E }, //
+	        { E, E, F, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, F, E, E, F, F, F, E, F, E }, //
@@ -37,9 +37,9 @@ public class TetrisSplashM extends Splash {
 	        // 3
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, F, E, E, E, E, E, E }, //
-	        { E, E, F, F, E, E, E, E, E, E }, //
 	        { E, E, F, E, E, E, E, E, E, E }, //
+	        { E, E, F, F, F, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, F, E, E, F, F, F, E, F, E }, //
 	        { F, F, E, F, F, F, F, F, F, F } }, {
@@ -47,10 +47,10 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, F, E, E, E, E, E, E }, //
 	        { E, E, F, F, E, E, E, E, E, E }, //
-	        { E, F, F, E, F, F, F, E, F, E }, //
+	        { E, E, F, E, E, E, E, E, E, E }, //
+	        { E, F, E, E, F, F, F, E, F, E }, //
 	        { F, F, E, F, F, F, F, F, F, F } }, {
 	        // 5
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -98,7 +98,7 @@ public class TetrisSplashM extends Splash {
 	        { E, F, E, E, E, E, E, E, E, E }, //
 	        { F, F, F, F, F, E, F, E, E, F } }, {
 	        // 8
-	        { E, E, E, F, F, F, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
 	        { E, E, E, E, E, F, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -108,8 +108,8 @@ public class TetrisSplashM extends Splash {
 	        { F, F, F, F, F, E, F, E, E, F } }, {
 	        // 9
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, F, F, F, E, E, E, E }, //
+	        { E, E, E, E, E, F, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
 	        { E, E, E, E, E, F, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -119,12 +119,21 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, F, F, F, E, E, E, E }, //
-	        { E, E, E, E, E, F, E, E, E, E }, //
 	        { E, F, E, E, E, E, E, E, E, E }, //
 	        { F, F, F, F, F, E, F, E, E, F } }, {
 	        // 11
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, F, E, E, E, E }, //
+	        { E, E, E, F, F, F, E, E, E, E }, //
+	        { E, F, E, E, E, E, E, E, E, E }, //
+	        { F, F, F, F, F, E, F, E, E, F } }, {
+	        // 12
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -133,7 +142,7 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, F, E, F, F, F, E, E, E, E }, //
 	        { F, F, F, F, F, F, F, E, E, F } }, {
-	        // 11.1
+	        // 12.1
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -142,17 +151,8 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { F, E, F, F, F, E, E, E, E, E }, //
 	        { F, F, F, F, F, F, E, E, F, F } }, {
-	        // 11.2
+	        // 12.2
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, F, F, F, E, E, E, E, E, F }, //
-	        { F, F, F, F, F, E, E, F, F, F } }, {
-	        // 12
-	        { E, E, E, E, F, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -161,8 +161,8 @@ public class TetrisSplashM extends Splash {
 	        { E, F, F, F, E, E, E, E, E, F }, //
 	        { F, F, F, F, F, E, E, F, F, F } }, {
 	        // 13
-	        { E, E, E, E, E, F, F, E, E, E }, //
-	        { E, E, E, E, E, F, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -170,9 +170,9 @@ public class TetrisSplashM extends Splash {
 	        { E, F, F, F, E, E, E, E, E, F }, //
 	        { F, F, F, F, F, E, E, F, F, F } }, {
 	        // 14
-	        { E, E, E, E, E, E, E, F, E, E }, //
-	        { E, E, E, E, E, E, F, F, E, E }, //
 	        { E, E, E, E, E, E, F, E, E, E }, //
+	        { E, E, E, E, F, F, F, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -181,9 +181,9 @@ public class TetrisSplashM extends Splash {
 	        // 15
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, F, F, F, E, E }, //
 	        { E, E, E, E, E, E, E, F, E, E }, //
-	        { E, E, E, E, E, E, F, F, E, E }, //
-	        { E, E, E, E, E, E, F, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, F, F, F, E, E, E, E, E, F }, //
 	        { F, F, F, F, F, E, E, F, F, F } }, {
@@ -191,10 +191,10 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, F, E, E }, //
 	        { E, E, E, E, E, E, F, F, E, E }, //
-	        { E, F, F, F, E, E, F, E, E, F }, //
+	        { E, E, E, E, E, E, F, E, E, E }, //
+	        { E, F, F, F, E, E, E, E, E, F }, //
 	        { F, F, F, F, F, E, E, F, F, F } }, {
 	        // 17
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -224,7 +224,7 @@ public class TetrisSplashM extends Splash {
 	        { F, F, E, E, F, F, E, F, E, F }, //
 	        { F, F, F, E, F, F, F, F, F, F } }, {
 	        // 18
-	        { E, E, E, E, E, F, E, E, E, E }, //
+	        { E, E, E, E, F, F, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -233,8 +233,8 @@ public class TetrisSplashM extends Splash {
 	        { F, F, E, E, F, F, E, F, E, F }, //
 	        { F, F, F, E, F, F, F, F, F, F } }, {
 	        // 19
-	        { E, E, E, F, F, E, E, E, E, E }, //
-	        { E, E, E, E, F, E, E, E, E, E }, //
+	        { E, E, E, F, F, F, E, E, E, E }, //
+	        { E, E, E, F, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -242,10 +242,10 @@ public class TetrisSplashM extends Splash {
 	        { F, F, E, E, F, F, E, F, E, F }, //
 	        { F, F, F, E, F, F, F, F, F, F } }, {
 	        // 20
-	        { E, E, F, E, E, E, E, E, E, E }, //
-	        { E, E, F, F, E, E, E, E, E, E }, //
-	        { E, E, E, F, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, F, E, E, E, E, E, E, E }, //
+	        { E, E, F, F, F, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, F, E, E, E, E }, //
 	        { F, F, E, E, F, F, E, F, E, F }, //
@@ -253,10 +253,10 @@ public class TetrisSplashM extends Splash {
 	        // 21
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, F, E, E, E, E, E, E, E }, //
-	        { E, E, F, F, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, F, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, F, E, E, E, E }, //
+	        { E, E, F, F, E, E, E, E, E, E }, //
+	        { E, E, F, E, E, F, E, E, E, E }, //
 	        { F, F, E, E, F, F, E, F, E, F }, //
 	        { F, F, F, E, F, F, F, F, F, F } }, {
 	        // 22
@@ -305,7 +305,7 @@ public class TetrisSplashM extends Splash {
 	        { F, E, E, F, E, E, E, E, E, E }, //
 	        { F, F, F, F, E, F, E, F, F, F } }, {
 	        // 25
-	        { E, E, E, E, F, F, F, E, E, E }, //
+	        { E, E, E, F, F, F, F, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -314,8 +314,8 @@ public class TetrisSplashM extends Splash {
 	        { F, E, E, F, E, E, E, E, E, E }, //
 	        { F, F, F, F, E, F, E, F, F, F } }, {
 	        // 26
-	        { E, E, E, E, E, E, E, F, E, E }, //
-	        { E, E, E, E, E, F, F, F, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, F, F, F, F, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
@@ -324,10 +324,10 @@ public class TetrisSplashM extends Splash {
 	        { F, F, F, F, E, F, E, F, F, F } }, {
 	        // 27
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, E, E, E }, //
+	        { E, E, E, E, E, E, F, E, E, E }, //
 	        { E, E, E, E, E, E, F, F, E, E }, //
-	        { E, E, E, E, E, E, E, F, E, E }, //
-	        { E, E, E, E, E, E, E, F, E, E }, //
+	        { E, E, E, E, E, E, F, E, E, E }, //
+	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { F, E, E, F, E, E, E, E, E, E }, //
 	        { F, F, F, F, E, F, E, F, F, F } }, {
@@ -335,8 +335,8 @@ public class TetrisSplashM extends Splash {
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
-	        { E, E, E, E, E, E, E, F, F, F }, //
-	        { E, E, E, E, E, E, E, F, E, E }, //
+	        { E, E, E, E, E, E, F, F, E, E }, //
+	        { E, E, E, E, E, E, F, F, E, E }, //
 	        { E, E, E, E, E, E, E, E, E, E }, //
 	        { F, E, E, F, E, E, E, E, E, E }, //
 	        { F, F, F, F, E, F, E, F, F, F } }, {
@@ -377,7 +377,7 @@ public class TetrisSplashM extends Splash {
 	        { E, F, E, E, F, F, F, E, F, E }, //
 	        { F, F, E, F, F, F, F, F, F, F } }, };
 	
-	public TetrisSplashM() {
+	public TetrisSplashO() {
 		super(frameTable);
 	}
 	

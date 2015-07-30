@@ -11,6 +11,10 @@ import com.kry.brickgame.games.GameConsts.Status;
  */
 public class TetrisGameO extends TetrisGameK {
 	private static final long serialVersionUID = 826647707906573426L;
+	/**
+	 * Animated splash for game
+	 */
+	public static final String splash = "com.kry.brickgame.splashes.TetrisSplashO";
 	
 	/**
 	 * The Tetris with the changing of the figures instead of rotating and the
@@ -26,7 +30,7 @@ public class TetrisGameO extends TetrisGameK {
 	void pieceDropped() {
 		super.pieceDropped();
 		if (getStatus() != Status.GameOver) {
-			int dX = (getRotation() == Rotation.CLOCKWISE ? 1 : -1);
+			int dX = getRotation() == Rotation.CLOCKWISE ? 1 : -1;
 			Board board = boardHorizontalShift(getBoard(), dX);
 			setBoard(board);
 		}
