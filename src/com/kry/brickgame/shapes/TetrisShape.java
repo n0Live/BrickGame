@@ -1,11 +1,11 @@
 package com.kry.brickgame.shapes;
 
-import com.kry.brickgame.boards.Board.Cell;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+
+import com.kry.brickgame.boards.Board.Cell;
 
 /**
  * @author noLive
@@ -65,7 +65,7 @@ public class TetrisShape extends Shape {
 	        { { 0, -1 }, { 0, 0 }, { 0, 1 }, { -1, 1 }, { 1, 1 } }, // PentoTShape
 	        { { -1, 0 }, { -1, 1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } }, // PentoUShape
 	        { { 0, 0 }, { 0, 1 }, { 0, 2 }, { 1, 0 }, { 2, 0 } }, // PentoVShape
-	        { { -1, -1 }, { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoWShape
+	        { { -1, 1 }, { -1, 0 }, { 0, 0 }, { 0, -1 }, { 1, -1 } }, // PentoWShape
 	        { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } }, // PentoXShape
 	        { { -2, 0 }, { -1, 0 }, { 0, 0 }, { 0, 1 }, { 1, 0 } }, // PentoYShape
 	        { { -1, 0 }, { 0, 1 }, { 0, 0 }, { 1, 0 }, { 2, 0 } }, // MirroredPentoYShape
@@ -114,8 +114,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[1];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
-
-        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
+		
+		return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -146,8 +146,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[Figures.REF_TO_FIRST_TETRAMINOES];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
-
-        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
+		
+		return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -175,8 +175,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[lastItem];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
-
-        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
+		
+		return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -207,8 +207,8 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[lastItem];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
-
-        return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
+		
+		return new TetrisShape(shape, rotationAngle, aTetrisShape.getFill());
 	}
 	
 	/**
@@ -509,8 +509,8 @@ public class TetrisShape extends Shape {
 		if (getClass() != obj.getClass()) return false;
 		final TetrisShape other = (TetrisShape) obj;
 		if (!Arrays.equals(boardFill, other.boardFill)) return false;
-        return shape == other.shape;
-    }
+		return shape == other.shape;
+	}
 	
 	public Cell[] getBoardFill() {
 		return boardFill.clone();
