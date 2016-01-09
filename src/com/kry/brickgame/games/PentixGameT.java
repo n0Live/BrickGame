@@ -11,7 +11,7 @@ public class PentixGameT extends TetrisGameL {
 	/**
 	 * Animated splash for game
 	 */
-	public static final String splash = "com.kry.brickgame.splashes.PentixSplash";
+	public static final String splash = "com.kry.brickgame.splashes.PentixSplashT";
 	
 	/**
 	 * The Tetris with the Pentominoes figures
