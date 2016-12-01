@@ -119,6 +119,9 @@ public class Board implements Cloneable, Serializable {
 		lock.readLock().lock();
 		try {
 			return board[x][y];
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return Cell.Empty;
 		} finally {
 			lock.readLock().unlock();
 		}
