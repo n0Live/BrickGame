@@ -351,7 +351,7 @@ public class ArkanoidGame extends GameWithLives {
 			shiftBricksTimer.cancel(true);
 		}
 		
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

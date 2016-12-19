@@ -55,7 +55,7 @@ public class TetrisGameJ extends TetrisGameI {
 		
 		addLineTimer.cancel(true);
 		
-		return nextGame;
+		return getNextGame();
 	}
 	
 	@Override

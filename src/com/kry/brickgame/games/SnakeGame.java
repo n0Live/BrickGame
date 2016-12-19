@@ -154,7 +154,7 @@ public class SnakeGame extends GameWithLives {
 			// processing of key presses
 			processKeys();
 		}
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

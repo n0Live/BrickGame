@@ -200,7 +200,7 @@ public class RacingGame extends GameWithLives {
 			// processing of key presses
 			processKeys();
 		}
-		return nextGame;
+		return getNextGame();
 	}
 
 	/**

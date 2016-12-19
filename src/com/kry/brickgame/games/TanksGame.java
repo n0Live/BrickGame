@@ -419,7 +419,7 @@ public class TanksGame extends GameWithLives {
 			processKeys();
 		}
 		bulletSwarm.cancel(true);
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

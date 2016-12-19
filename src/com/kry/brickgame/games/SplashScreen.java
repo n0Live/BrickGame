@@ -120,7 +120,7 @@ public class SplashScreen extends Game {
 		} else {
 			nextGame = new GameSelector();
 		}
-		return nextGame;
+		return getNextGame();
 	}
 	
 	@Override

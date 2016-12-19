@@ -282,7 +282,17 @@ public abstract class Game implements Callable<Game>, Serializable {
 		
 		this.type = type;
 	}
-	
+
+    /**
+     * Gets a next game after this
+     *
+     * @return a next game
+     */
+    protected Game getNextGame() {
+        if (nextGame == null) nextGame = new GameSelector();
+        return nextGame;
+    }
+
 	/**
 	 * Animated clearing of the board on Game Over
 	 */

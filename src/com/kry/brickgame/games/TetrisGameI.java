@@ -411,7 +411,7 @@ public class TetrisGameI extends Game {
 		        && getStatus() != Status.GameOver) {
 			doRepetitiveWork();
 		}
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

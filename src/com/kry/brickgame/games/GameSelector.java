@@ -123,7 +123,7 @@ public class GameSelector extends Game {
 			splashTimer.cancel(true);
 		}
 		
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

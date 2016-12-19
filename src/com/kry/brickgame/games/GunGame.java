@@ -173,7 +173,7 @@ public class GunGame extends GameWithGun {
 		}
 		
 		bulletSwarm.cancel(true);
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

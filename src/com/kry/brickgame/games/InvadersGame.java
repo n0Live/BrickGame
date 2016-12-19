@@ -265,7 +265,7 @@ public class InvadersGame extends GameWithGun {
 		
 		bulletSwarm.cancel(true);
 		invasionHandler.cancel(true);
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**

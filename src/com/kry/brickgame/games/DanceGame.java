@@ -234,7 +234,7 @@ public class DanceGame extends Game {
 			// processing of key presses
 			processKeys();
 		}
-		return nextGame;
+		return getNextGame();
 	}
 	
 	/**
