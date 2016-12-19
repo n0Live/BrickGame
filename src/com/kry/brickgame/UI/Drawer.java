@@ -35,6 +35,7 @@ import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Locale;
 
 import com.kry.brickgame.boards.Board;
 import com.kry.brickgame.boards.Board.Cell;
@@ -469,11 +470,11 @@ public final class Drawer {
 		
 		// draws the backgroundText
 		g2d.setColor(emptyColor);
-		g2d.drawString(String.format(formatString.toString(), backgroundText), x, y);
+		g2d.drawString(String.format(Locale.ENGLISH, formatString.toString(), backgroundText), x, y);
 		
 		// draws the foregroundText
 		g2d.setColor(fullColor);
-		g2d.drawString(String.format(formatString.toString(),
+		g2d.drawString(String.format(Locale.ENGLISH, formatString.toString(),
 		        foregroundText != null ? foregroundText : ""), x, y);
 		
 		g2d.dispose();

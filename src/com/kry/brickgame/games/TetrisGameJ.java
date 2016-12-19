@@ -2,6 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameUtils.checkBoardCollisionVertical;
 
+import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +41,7 @@ public class TetrisGameJ extends TetrisGameI {
 			@Override
 			public void run() {
 				if (!Thread.currentThread().isInterrupted() && getStatus() == Status.Running) {
-					fireInfoChanged("-" + String.format("%02d", getTime()) + "-");
+					fireInfoChanged("-" + String.format(Locale.ENGLISH, "%02d", getTime()) + "-");
 					if (getTime() == 0) {
 						isTimeToAddLine = true;
 					} else {
