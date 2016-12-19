@@ -15,6 +15,7 @@ import com.kry.brickgame.games.GameConsts.KeyPressed;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.shapes.CarShape;
+import com.kry.brickgame.sound.EngineSound;
 
 /**
  * @author noLive
@@ -30,10 +31,6 @@ public class RacingGame extends GameWithLives {
 	 */
 	public static final int subtypesNumber = 4;
 	/**
-	 * Delay for engine sound loop playing
-	 */
-	private static final int LOOP_DELAY = ANIMATION_DELAY * 16;
-	/**
 	 * Racing car
 	 */
 	private final CarShape car;
@@ -41,7 +38,7 @@ public class RacingGame extends GameWithLives {
 	 * List of the opponents
 	 */
 	private LinkedList<int[]> opponents;
-	
+
 	/**
 	 * Array of possible x-axis positions of the car
 	 */
@@ -60,9 +57,11 @@ public class RacingGame extends GameWithLives {
 	 * {@code true} - three-lane, {@code false} - two-lane
 	 */
 	private final boolean isThreelaneTraffic;
-	
+
 	private boolean oddMove;
-	
+
+	private transient EngineSound engineSound;
+
 	/**
 	 * The Race
 	 * 
@@ -83,9 +82,9 @@ public class RacingGame extends GameWithLives {
 	 */
 	public RacingGame(int speed, int level, int type) {
 		super(speed, level, type);
-		
+
 		car = new CarShape();
-		
+
 		// create the array of possible x-axis positions of the car
 		int startPoint;
 		if (type % 2 == 0) {
@@ -98,13 +97,13 @@ public class RacingGame extends GameWithLives {
 		for (int i = 0; i < positions.length; i++) {
 			positions[i] = startPoint + i * car.getWidth();
 		}
-		
+
 		// for every even type of game
 		isThreelaneTraffic = getType() % 2 == 0;
 		// for types 3-4
 		setDrawInvertedBoard(getType() >= 3);
 	}
-	
+
 	/**
 	 * Adding the new opponents
 	 * <p>
@@ -117,29 +116,30 @@ public class RacingGame extends GameWithLives {
 	private boolean addOpponents() {
 		// from 10 - on level 1, to 5 - on level 10 plus some random
 		int distance = 10 - getLevel() / 2 + r.nextInt(3);
-		
+
 		int lastOpponentY;
 		if (opponents.isEmpty()) {
 			lastOpponentY = boardHeight - distance;
 		} else {
 			lastOpponentY = opponents.getLast()[1] + car.maxY();
 		}
-		
-		if (lastOpponentY > boardHeight - distance) return false;
-		
+
+		if (lastOpponentY > boardHeight - distance)
+			return false;
+
 		int positionX;
 		int coordX, coordY;
-		
+
 		// adding opponents until the board has a place
 		do {
 			positionX = r.nextInt(positions.length);
 			coordX = positions[positionX];
 			coordY = lastOpponentY + distance - car.minY();
-			
+
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-			        && r.nextInt(10 - getLevel() / 2) == 0) {
+					&& r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(new int[] { coordX, coordY });
@@ -164,33 +164,33 @@ public class RacingGame extends GameWithLives {
 			} else {
 				opponents.add(new int[] { coordX, coordY });
 			}
-			
+
 			lastOpponentY = opponents.getLast()[1] + car.maxY();
 		} while (lastOpponentY < boardHeight - distance);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Launching the game
 	 */
 	@Override
 	public Game call() {
-		super.init();
-		
+		init();
+
 		if (!desirialized) {
 			loadNewLevel();
 		}
-		
+
 		while (!(exitFlag || Thread.currentThread().isInterrupted())
-		        && getStatus() != Status.GameOver) {
+				&& getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
 				int currentSpeed = getSpeed(true);
 				if (isThreelaneTraffic) {
 					// slow down if isThreelaneTraffic
 					currentSpeed = Math.round(currentSpeed * 1.5f);
 				}
-				
+
 				// moving
 				if (elapsedTime(Math.round(currentSpeed / 2f))) {
 					// borders moving twice as fast as opponents
@@ -202,7 +202,7 @@ public class RacingGame extends GameWithLives {
 		}
 		return nextGame;
 	}
-	
+
 	/**
 	 * Drawing the borders on the board.
 	 * 
@@ -220,9 +220,9 @@ public class RacingGame extends GameWithLives {
 		final int emptySpanLength = 2;
 		// The total length of the regions
 		final int spanLength = filledSpanLength + emptySpanLength;
-		
+
 		Cell[] border = new Cell[boardHeight];
-		
+
 		// generate border
 		for (int i = 0; i < border.length; i++) {
 			if ((i + borderPosition) % spanLength < filledSpanLength) {
@@ -237,27 +237,33 @@ public class RacingGame extends GameWithLives {
 		if (isBoth) {
 			newBoard.setColumn(border, 0);
 		}
-		
+
 		// shift the position of the border
 		if (borderPosition < spanLength - 1) {
 			borderPosition++;
 		} else {
 			borderPosition = 0;
 		}
-		
+
 		return newBoard;
 	}
-	
+
 	@Override
 	protected int getSpeedOfFirstLevel() {
 		return 200;
 	}
-	
+
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 50;
 	}
-	
+
+	@Override
+	void init() {
+		super.init();
+		engineSound = new EngineSound();
+	}
+
 	/**
 	 * Loading or reloading the specified level
 	 */
@@ -267,33 +273,35 @@ public class RacingGame extends GameWithLives {
 		curPosition = 1;
 		curX = positions[curPosition];
 		curY = 0 - car.minY();
-		
+
 		borderPosition = 0;
-		
+
 		// initialization of the opponents
 		opponents = new LinkedList<>();
 		addOpponents();
-		
+
 		// draw the car
 		moveCar(curPosition);
 		// draw the opponents and the borders
 		moveOn(true);
-		
+
 		super.loadNewLevel();
-		
+
 		// wait until started
 		while (!isStarted) {
 			sleep(START_MUSIC_DURATION / 10);
 		}
-		GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
+		if (!Game.isMuted() && engineSound != null)
+			engineSound.play();
 	}
-	
+
 	@Override
 	void loss(int x, int y) {
-		GameSound.stop(GameSound.effects, Effects.engine);
+		if (engineSound != null)
+			engineSound.stop();
 		super.loss(x, y);
 	}
-	
+
 	/**
 	 * Moving the racing car to the new position
 	 * 
@@ -302,20 +310,21 @@ public class RacingGame extends GameWithLives {
 	 * @return {@code true} if car has been moved to the new position
 	 */
 	private boolean moveCar(int position) {
-		if (position < 0 || position >= positions.length) return false;
-		
+		if (position < 0 || position >= positions.length)
+			return false;
+
 		Board board = getBoard();
-		
+
 		int newX = positions[position];
 		if (newX == curX) {
 			// redraw car
 			setBoard(drawShape(board, curX, curY, car, Cell.Full));
 			return true;
 		}
-		
+
 		// check for accident
 		boolean isAccident = checkCollision(board, car, newX, curY);
-		
+
 		// smooth moving
 		int step = newX >= curX ? 1 : -1;
 		int moveX = curX;
@@ -331,17 +340,17 @@ public class RacingGame extends GameWithLives {
 			board = drawShape(board, moveX, curY, car, Cell.Full);
 			setBoard(board);
 		} while (moveX != newX);
-		
+
 		curX = newX;
 		curPosition = position;
-		
+
 		if (isAccident) {
 			loss(curX, curY);
 		}
-		
+
 		return !isAccident;
 	}
-	
+
 	/**
 	 * Shifting the borders and opponents on a one cell down and drawing it
 	 * 
@@ -359,17 +368,20 @@ public class RacingGame extends GameWithLives {
 			while (it.hasNext()) {
 				int[] opponent = it.next();
 				// erase the opponent from the board
-				board = drawShape(board, opponent[0], opponent[1], car, Cell.Empty);
-				
+				board = drawShape(board, opponent[0], opponent[1], car,
+						Cell.Empty);
+
 				// if the opponent does not leave off the board
 				if (opponent[1] + car.maxY() > 0) {
-					
+
 					// check for accident
-					boolean isAccident = checkCollision(board, car, opponent[0], opponent[1] - 1);
-					
+					boolean isAccident = checkCollision(board, car,
+							opponent[0], opponent[1] - 1);
+
 					// draw the opponent on one cell below
-					board = drawShape(board, opponent[0], --opponent[1], car, Cell.Full);
-					
+					board = drawShape(board, opponent[0], --opponent[1], car,
+							Cell.Full);
+
 					if (isAccident) {
 						setBoard(board);
 						loss(curX, curY + car.maxY());
@@ -385,16 +397,17 @@ public class RacingGame extends GameWithLives {
 		}
 		setBoard(board);
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */
 	@Override
 	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
+		if (keys.isEmpty() || getStatus() == Status.None)
+			return;
+
 		super.processKeys();
-		
+
 		if (getStatus() == Status.Running) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveCar(curPosition - 1)) {
@@ -418,35 +431,49 @@ public class RacingGame extends GameWithLives {
 			}
 		}
 	}
-	
+
 	@Override
-	void resume() {
-		if (getStatus() == Status.Paused) {
-			GameSound.loop(GameSound.effects, Effects.engine, LOOP_DELAY);
-		}
-		super.resume();
+	void unmute() {
+		super.unmute();
+		if (getStatus() == Status.Running && engineSound != null) engineSound.play();
 	}
 	
 	@Override
+	void resume() {
+        if (getStatus() == Status.Paused) {
+            if (!Game.isMuted() && engineSound != null) engineSound.play();
+        }
+		super.resume();
+	}
+
+	@Override
 	void setScore(int score) {
 		int oldHundreds = getScore() / 100;
-		
+
 		super.setScore(score);
-		
+
 		// when a sufficient number of points changes the speed and the level
 		if (getScore() / 100 > oldHundreds) {
 			setLevel(getLevel() + 1);
-			
+
 			if (getLevel() == 1) {
 				setSpeed(getSpeed() + 1);
 			}
 		}
 	}
-	
+
+	@Override
+	void stopAllSounds() {
+		if (engineSound != null)
+			engineSound.stop();
+		super.stopAllSounds();
+	}
+
 	@Override
 	void win() {
-		GameSound.stop(GameSound.effects, Effects.engine);
+		if (engineSound != null)
+			engineSound.stop();
 		super.win();
 	}
-	
+
 }

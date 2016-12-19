@@ -168,6 +168,10 @@ public abstract class Game implements Callable<Game>, Serializable {
 		return listeners.toArray(new GameListener[listeners.size()]);
 	}
 	
+    /**
+     * Gets current mute status
+     * @return {@code true} - sounds are playing, {@code false} - sounds don't playing
+     */
 	public static boolean isMuted() {
 		return mute;
 	}
@@ -176,11 +180,12 @@ public abstract class Game implements Callable<Game>, Serializable {
 		listeners.remove(listener);
 	}
 	
+    /**
+     * Sets play or not game's sounds
+     * @param mute {@code true} - sounds are playing, {@code false} - sounds don't playing
+     */
 	public static void setMuted(boolean mute) {
 		Game.mute = mute;
-		if (mute) {
-			GameSound.stopAllSounds();
-		}
 		fireMuteChanged(mute);
 	}
 	
@@ -203,6 +208,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 		level = 1;
 		status = Status.None;
 		rotation = Rotation.NONE;
+
+        exitFlag = false;
 		
 		setDrawInvertedBoard(false);
 		
@@ -409,7 +416,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Exit to Main menu
 	 */
 	private void exitToMainMenu() {
-		GameSound.stopAllSounds();
+		stopAllSounds();
 		
 		setHiScore();
 		
@@ -618,7 +625,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void init() {
 		nextGame = null;
 		
-		GameSound.stopAllSounds();
+		stopAllSounds();
 		fireMuteChanged(mute);
 		
 		fireSpeedChanged(speed);
@@ -631,6 +638,14 @@ public abstract class Game implements Callable<Game>, Serializable {
 		fireBoardChanged(board);
 	}
 	
+    /**
+     * Stops all of game's sounds
+     */
+    @SuppressWarnings("static-method")
+	void stopAllSounds(){
+        GameSound.stopAllSounds();
+    }
+    
 	/**
 	 * Get the flag for the drawing the board invertedly
 	 * 
@@ -805,6 +820,10 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Pause
 	 */
 	public void pause() {
+        //stop sound on games and splash screen
+        if (getStatus() == Status.Running || this instanceof SplashScreen ) {
+            stopAllSounds();
+        }
 		if (getStatus() == Status.Running) {
 			// send score
 			fireInfoChanged(String.valueOf(score));
@@ -812,7 +831,6 @@ public abstract class Game implements Callable<Game>, Serializable {
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
 			
 			setStatus(Status.Paused);
-			GameSound.stopAllSounds();
 		}
 	}
 	
@@ -849,7 +867,11 @@ public abstract class Game implements Callable<Game>, Serializable {
 		
 		if (keys.contains(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
-			setMuted(!isMuted());
+            if (!isMuted()){
+                mute();
+            }else{
+                unmute();
+            }
 			return;
 		}
 		
@@ -858,14 +880,32 @@ public abstract class Game implements Callable<Game>, Serializable {
 			changeRotation();
 		}
 	}
+
+    /**
+     * Sets mute status as {@code true} - game's sounds don't playing
+     */
+    void mute() {
+        setMuted(true);
+        stopAllSounds();
+    }
+
+    /**
+     * Sets mute status as {@code false} - game's sounds are playing
+     */
+    @SuppressWarnings("static-method")
+	void unmute() {
+        setMuted(false);
+    }
 	
 	/**
 	 * Quit from the game
 	 */
 	void quit() {
+        stopAllSounds();
 		if (!saveState()) {
 			GameLoader.deleteSavedGame();
 		}
+		fireInfoChanged(String.valueOf("HI" + setHiScore()));
 		fireExit();
 	}
 	

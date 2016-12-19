@@ -398,7 +398,11 @@ public class GameSelector extends Game {
 		
 		if (keys.contains(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
-			setMuted(!isMuted());
+            if (!isMuted()){
+                mute();
+            }else{
+                unmute();
+            }
 			return;
 		}
 		

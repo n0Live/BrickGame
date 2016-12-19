@@ -18,7 +18,7 @@ public enum GameSound {
 	 * Sound effects
 	 */
 	protected enum Effects {
-		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line, engine
+		select, move, turn, hit_cell, add_cell, bonus, fall, fall_super, remove_line
 	}
 	
 	/**
@@ -55,7 +55,6 @@ public enum GameSound {
 		effectsPriority.put(Effects.fall, Thread.MAX_PRIORITY);
 		effectsPriority.put(Effects.fall_super, Thread.NORM_PRIORITY);
 		effectsPriority.put(Effects.remove_line, Thread.MAX_PRIORITY);
-		effectsPriority.put(Effects.engine, Thread.MIN_PRIORITY);
 	}
 	
 	/**

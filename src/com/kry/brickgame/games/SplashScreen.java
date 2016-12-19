@@ -108,7 +108,7 @@ public class SplashScreen extends Game {
 			processKeys();
 		}
 		
-		GameSound.stopAllSounds();
+		stopAllSounds();
 		
 		splashScreenHandler.cancel(true);
 		
@@ -241,7 +241,11 @@ public class SplashScreen extends Game {
 		
 		if (containsKey(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
-			setMuted(!isMuted());
+            if (!isMuted()){
+                mute();
+            }else{
+                unmute();
+            }
 		}
 		
 		if (containsKey(KeyPressed.KeyReset)) {
