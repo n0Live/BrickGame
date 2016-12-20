@@ -990,21 +990,13 @@ public final class Drawer {
 		}
 		
 		if (boardCanvas != null && previewCanvas != null) {
-			int space = squareSideLength / 2;
-			
 			// draw the board and the preview
+			int space = squareSideLength / 2;	
 			int boardX = space;
 			int boardY = space;
-			if (updateBoard) {
-				updateCanvas(boardCanvas, newProperties.board, borderLineWidth);
-				canvasSetBorder(boardCanvas, borderLineWidth);
-				drawComingSoonStatus(boardCanvas, newProperties.status);
-				// add main board canvas
-				appendCanvas(canvas, boardCanvas, boardX, boardY);
-			}
-			
 			int labelX = boardX + boardCanvas.getWidth();
 			int labelY = boardY;
+			
 			if (updateLabels) {
 				int newWidth = d.width - (boardCanvas.getWidth() + space);
 				int newHeight = boardCanvas.getHeight();
@@ -1025,6 +1017,7 @@ public final class Drawer {
 			// center of the label canvas
 			        + (labelsCanvas.getWidth() - previewCanvas.getWidth()) / 2;
 			int previewY = labelY + 5 * squareSideLength;
+			
 			if (updatePreview) {
 				updateCanvas(previewCanvas, newProperties.preview, borderLineWidth);
 			}
@@ -1032,6 +1025,15 @@ public final class Drawer {
 				// add preview canvas
 				appendCanvas(canvas, previewCanvas, previewX, previewY);
 			}
+			
+			if (updateBoard) {
+				updateCanvas(boardCanvas, newProperties.board, borderLineWidth);
+				canvasSetBorder(boardCanvas, borderLineWidth);
+				drawComingSoonStatus(boardCanvas, newProperties.status);
+				// add main board canvas
+				appendCanvas(canvas, boardCanvas, boardX, boardY);
+			}
+			
 		}
 		
 		prevProperties = newProperties;
