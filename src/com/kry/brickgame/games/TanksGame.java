@@ -565,7 +565,7 @@ public class TanksGame extends GameWithLives {
 						break;
 					}
 					
-					if (!exitFlag && !Thread.currentThread().isInterrupted()) {
+					if (!isInterrupted()) {
 						bullets[i] = new Bullet(bulletX, bulletY, tank.getDirection());
 						flightOfBullet(isPlayerBullet, i);
 					}
@@ -656,11 +656,11 @@ public class TanksGame extends GameWithLives {
 	 */
 	void flightOfBullets() {
 		for (int i = 0; i < enemyBullets.length; i++) {
-			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(false, i))
+			if (isInterrupted() || !flightOfBullet(false, i))
 				return;
 		}
 		for (int i = 0; i < playerBullets.length; i++) {
-			if (exitFlag || Thread.currentThread().isInterrupted() || !flightOfBullet(true, i))
+			if (isInterrupted() || !flightOfBullet(true, i))
 				return;
 		}
 	}

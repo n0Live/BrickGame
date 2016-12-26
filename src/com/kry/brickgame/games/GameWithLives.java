@@ -15,24 +15,24 @@ import com.kry.brickgame.games.GameSound.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
-	
+
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-	
+
 	/**
 	 * Whether the game is started?
 	 */
 	volatile boolean isStarted;
-	
+
 	/**
 	 * Duration of playing the start music
 	 */
 	static final int START_MUSIC_DURATION = 1500;
-	
+
 	/**
 	 * The Game with lives without rotation
 	 * 
@@ -46,7 +46,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.NONE, type);
 	}
-	
+
 	/**
 	 * The Game with lives
 	 * <p>
@@ -64,7 +64,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
 	}
-	
+
 	/**
 	 * Lives
 	 * 
@@ -73,13 +73,13 @@ public abstract class GameWithLives extends Game {
 	int getLives() {
 		return lives;
 	}
-	
+
 	@Override
 	void init() {
 		super.init();
-		setLives(4);
+		if (!desirialized) setLives(4);
 	}
-	
+
 	/**
 	 * Loading the specified level
 	 */
@@ -88,7 +88,7 @@ public abstract class GameWithLives extends Game {
 		playAndWaitMusic();
 		setStatus(Status.Running);
 	}
-	
+
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -112,33 +112,38 @@ public abstract class GameWithLives extends Game {
 				gameOver();
 			}
 		}
+		if (readyToQuitFlag) quit();
 	}
-	
+
 	/**
 	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
 	 * seconds
 	 */
 	private void playAndWaitMusic() {
-		if (!isMuted()) {
-			GameSound.playMusic(Music.start);
-		}
-		
-		// wait until the start music played
-		scheduledExecutors.schedule(new Runnable() {
-			@Override
-			public void run() {
-				isStarted = true;
+		if (!readyToQuitFlag) {
+			if (!isMuted()) {
+				GameSound.playMusic(Music.start);
 			}
-		}, START_MUSIC_DURATION, TimeUnit.MILLISECONDS);
+
+			// wait until the start music played
+			scheduledExecutors.schedule(new Runnable() {
+				@Override
+				public void run() {
+					isStarted = true;
+				}
+			}, START_MUSIC_DURATION, TimeUnit.MILLISECONDS);
+		} else { // don't wait when quit
+			isStarted = true;
+		}
 	}
-	
+
 	/**
 	 * Reloading the specified level
 	 */
 	void reloadLevel() {
 		loadNewLevel();
 	}
-	
+
 	/**
 	 * Set lives
 	 * 
@@ -162,7 +167,7 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-	
+
 	/**
 	 * Increase the level and load it
 	 */
@@ -171,16 +176,17 @@ public abstract class GameWithLives extends Game {
 		synchronized (lock) {
 			GameSound.playMusic(Music.win);
 			animatedClearBoard(CB_WIN);
-			
+
 			setLevel(getLevel() + 1);
 			if (getLevel() == 1) {
 				setSpeed(getSpeed() + 1);
 			}
-			
+
 			if (!(exitFlag || Thread.currentThread().isInterrupted())) {
 				loadNewLevel();
 			}
 		}
+		if (readyToQuitFlag) quit();
 	}
-	
+
 }

@@ -73,7 +73,7 @@ public class SplashScreen extends Game {
 		if (repeatCount <= 0) return;
 		
 		for (int i = 0; i < repeatCount; i++) {
-			if (exitFlag || Thread.currentThread().isInterrupted()) return;
+			if (isInterrupted()) return;
 			
 			clearBoard();
 			sleep(ANIMATION_DELAY * 5);
@@ -96,7 +96,7 @@ public class SplashScreen extends Game {
 		Future<?> splashScreenHandler = splashScreenThread.submit(new Runnable() {
 			@Override
 			public void run() {
-				while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+				while (!isInterrupted()) {
 					animatedInvertBoard();
 					blinkNumbers(5);
 				}
@@ -153,7 +153,7 @@ public class SplashScreen extends Game {
 		// left to right
 		if (isRightDirection) {
 			for (int i = fromX; i <= toX; i++) {
-				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
+				if (isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
@@ -163,7 +163,7 @@ public class SplashScreen extends Game {
 			// right to left
 		} else {
 			for (int i = fromX; i >= toX; i--) {
-				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
+				if (isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(i, y) == Cell.Empty ? Cell.Full : Cell.Empty, i, y);
@@ -227,7 +227,7 @@ public class SplashScreen extends Game {
 		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
 				- boardNumbers[k].getWidth() - 1, 1);
 		
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
+		if (!isInterrupted()) {
 			setBoard(board);
 		}
 	}
@@ -282,7 +282,7 @@ public class SplashScreen extends Game {
 		// bottom to top
 		if (isUpDirection) {
 			for (int i = fromY; i <= toY; i++) {
-				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
+				if (isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);
@@ -292,7 +292,7 @@ public class SplashScreen extends Game {
 			// top to bottom
 		} else {
 			for (int i = fromY; i >= toY; i--) {
-				if (exitFlag || Thread.currentThread().isInterrupted()) return false;
+				if (isInterrupted()) return false;
 				
 				// invert cells
 				board.setCell(board.getCell(x, i) == Cell.Empty ? Cell.Full : Cell.Empty, x, i);

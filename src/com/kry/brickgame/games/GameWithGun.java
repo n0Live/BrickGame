@@ -146,7 +146,7 @@ public abstract class GameWithGun extends GameWithLives {
 			clearBullets(board);
 			for (int x = 0; x < bullets.length(); x++) {
 				for (int y = 0; y < bullets.get(x).length(); y++) {
-					if (exitFlag || Thread.currentThread().isInterrupted()) return;
+					if (isInterrupted()) return;
 					// if 0, than bullet is not exist
 					if (bullets.get(x).get(y) > 0) {
 						// if the bullet does not reach the border of the

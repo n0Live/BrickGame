@@ -39,45 +39,45 @@ import com.kry.brickgame.games.GameSound.Music;
  */
 public abstract class Game implements Callable<Game>, Serializable {
 	private static final long serialVersionUID = -8891762583782516818L;
-	
+
 	private static final ArrayList<GameListener> listeners = new ArrayList<>();
-	
+
 	/**
 	 * Is the sound turned off?
 	 */
 	private static boolean mute;
-	
+
 	static final Object lock = new Object();
-	
+
 	static final Random r = new Random();
-	
+
 	/**
 	 * Set of the pressed keys
 	 */
 	final Set<KeyPressed> keys = new HashSet<>();
-	
+
 	/**
 	 * Speed
 	 */
 	private int speed;
-	
+
 	/**
 	 * Cached value of the genuine speed.
 	 * <p>
 	 * A zero or negative value indicates that not cached values yet.
 	 */
 	private int cachedGenuineSpeed;
-	
+
 	/**
 	 * Level
 	 */
 	private int level;
-	
+
 	/**
 	 * Score
 	 */
 	private volatile int score;
-	
+
 	/**
 	 * Type of game
 	 */
@@ -118,7 +118,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Next game instance
 	 */
 	transient Game nextGame;
-	
+
 	/**
 	 * The time base for the {@link #elapsedTime(int)}
 	 */
@@ -127,68 +127,79 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * The main (base) board
 	 */
 	private volatile Board board;
-	
+
 	/**
 	 * The preview board
 	 */
 	private Board preview;
-	
+
 	/**
 	 * If true than game will interrupted
 	 */
 	volatile boolean exitFlag;
-	
+
+	/**
+	 * If true than game will quit (with or without save)
+	 */
+	volatile boolean readyToQuitFlag;
+
 	/**
 	 * Scheduled thread pool
 	 */
-	static final ScheduledExecutorService scheduledExecutors = Executors.newScheduledThreadPool(2);
-	
+	static final ScheduledExecutorService scheduledExecutors = Executors
+			.newScheduledThreadPool(2);
+
 	/**
 	 * Whether to draw the board upside down?
 	 */
 	private boolean drawInvertedBoard;
-	
+
 	/**
 	 * Was the game deserialized?
 	 */
 	boolean desirialized;
-	
+
 	public static synchronized void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	static void fireMuteChanged(boolean mute) {
 		GameEvent event = new GameEvent(Game.class, mute);
 		for (GameListener listener : listeners) {
 			listener.muteChanged(event);
 		}
 	}
-	
+
 	public static synchronized GameListener[] getGameListeners() {
 		return listeners.toArray(new GameListener[listeners.size()]);
 	}
-	
-    /**
-     * Gets current mute status
-     * @return {@code true} - sounds are playing, {@code false} - sounds don't playing
-     */
+
+	/**
+	 * Gets current mute status
+	 * 
+	 * @return {@code true} - sounds are playing, {@code false} - sounds don't
+	 *         playing
+	 */
 	public static boolean isMuted() {
 		return mute;
 	}
-	
+
 	public static synchronized void removeGameListener(GameListener listener) {
 		listeners.remove(listener);
 	}
-	
-    /**
-     * Sets play or not game's sounds
-     * @param mute {@code true} - sounds are playing, {@code false} - sounds don't playing
-     */
+
+	/**
+	 * Sets play or not game's sounds
+	 * 
+	 * @param mute
+	 *            {@code true} - sounds are playing, {@code false} - sounds
+	 *            don't playing
+	 */
 	public static void setMuted(boolean mute) {
 		Game.mute = mute;
 		fireMuteChanged(mute);
 	}
-	
+
 	/**
 	 * The Game
 	 */
@@ -196,26 +207,27 @@ public abstract class Game implements Callable<Game>, Serializable {
 		desirialized = false;
 		curX = 0;
 		curY = 0;
-		
+
 		board = new Board(BOARD_WIDTH, BOARD_HEIGHT);
 		preview = new Board(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
-		
+
 		speed = 1;
 		level = 1;
 		status = Status.None;
 		rotation = Rotation.NONE;
 
-        exitFlag = false;
-		
+		exitFlag = false;
+		readyToQuitFlag = false;
+
 		setDrawInvertedBoard(false);
-		
+
 		timePoint = System.currentTimeMillis();
 	}
-	
+
 	/**
 	 * The Game
 	 * 
@@ -232,21 +244,22 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * @param type
 	 *            type of the game
 	 */
-	protected Game(int speed, int level, Board board, Board preview, Rotation rotation, int type) {
+	protected Game(int speed, int level, Board board, Board preview,
+			Rotation rotation, int type) {
 		this(speed, level, rotation, type);
-		
+
 		setBoard(board);
 		setPreview(preview);
-		
+
 		boardWidth = board.getWidth();
 		boardHeight = board.getHeight();
 		previewWidth = preview.getWidth();
 		previewHeight = preview.getHeight();
-		
+
 		clearBoard();
 		clearPreview();
 	}
-	
+
 	/**
 	 * The Game without rotation
 	 * 
@@ -260,7 +273,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	public Game(int speed, int level, int type) {
 		this(speed, level, Rotation.NONE, type);
 	}
-	
+
 	/**
 	 * The Game
 	 * 
@@ -275,23 +288,28 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	public Game(int speed, int level, Rotation rotation, int type) {
 		this();
-		
+
 		setSpeed(speed);
 		setLevel(level);
 		setRotation(rotation);
-		
+
 		this.type = type;
 	}
 
-    /**
-     * Gets a next game after this
-     *
-     * @return a next game
-     */
-    protected Game getNextGame() {
-        if (nextGame == null) nextGame = new GameSelector();
-        return nextGame;
-    }
+	protected boolean isInterrupted() {
+		return (exitFlag || readyToQuitFlag || Thread.currentThread()
+				.isInterrupted());
+	}
+
+	/**
+	 * Gets a next game after this
+	 * 
+	 * @return a next game
+	 */
+	protected Game getNextGame() {
+		if (nextGame == null) nextGame = new GameSelector();
+		return nextGame;
+	}
 
 	/**
 	 * Animated clearing of the board on Game Over
@@ -299,7 +317,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	private void animatedClearBoard() {
 		animatedClearBoard(CB_GAME_OVER);
 	}
-	
+
 	/**
 	 * Animated clearing of the board (upwards then downwards)
 	 * 
@@ -309,30 +327,39 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void animatedClearBoard(int millis) {
 		// delay between animation frames
 		int delay = millis / (boardHeight * 2);
-		
-		// the board is filled upwards
-		for (int y = 0; y < boardHeight; y++) {
-			processKeys();
-			if (exitFlag || Thread.currentThread().isInterrupted()) return;
-			for (int x = 0; x < boardWidth; x++) {
-				board.setCell(Cell.Full, x, y);
+
+		CLEAR:
+		// label for exit from both for-loops
+		{
+			// the board is filled upwards
+			for (int y = 0; y < boardHeight; y++) {
+				processKeys();
+				if (isInterrupted()) break CLEAR;
+				for (int x = 0; x < boardWidth; x++) {
+					board.setCell(Cell.Full, x, y);
+				}
+				fireBoardChanged(board);
+				sleep(delay);
 			}
-			fireBoardChanged(board);
-			sleep(delay);
+			// and is cleaned downwards
+			for (int y = boardHeight - 1; y >= 0; y--) {
+				processKeys();
+				if (isInterrupted()) break CLEAR;
+				for (int x = 0; x < boardWidth; x++) {
+					board.setCell(Cell.Empty, x, y);
+				}
+				fireBoardChanged(board);
+				sleep(delay);
+			}
 		}
-		// and is cleaned downwards
-		for (int y = boardHeight - 1; y >= 0; y--) {
-			processKeys();
-			if (exitFlag || Thread.currentThread().isInterrupted()) return;
-			
-			for (int x = 0; x < boardWidth; x++) {
-				board.setCell(Cell.Empty, x, y);
-			}
+
+		// immediately clear board when animation interrupted
+		if (isInterrupted()) {
+			board.clearBoard();
 			fireBoardChanged(board);
-			sleep(delay);
 		}
 	}
-	
+
 	/**
 	 * Animated clearing of a full line
 	 * 
@@ -345,13 +372,13 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void animatedClearLine(Board board, int x, int y) {
 		int x1 = x - 1; // left direction
 		int x2 = x; // right direction
-		
+
 		// change status for stopping other work
 		Status prevStatus = getStatus();
 		setStatus(Status.DoSomeWork);
-		
+
 		GameSound.playEffect(Effects.remove_line);
-		
+
 		while (x1 >= 0 || x2 < board.getWidth()) {
 			if (x1 >= 0) {
 				board.setCell(Cell.Empty, x1--, y);
@@ -359,23 +386,23 @@ public abstract class Game implements Callable<Game>, Serializable {
 			if (x2 < board.getWidth()) {
 				board.setCell(Cell.Empty, x2++, y);
 			}
-			
+
 			fireBoardChanged(board);
 			sleep(ANIMATION_DELAY * 2);
-			if (exitFlag || Thread.currentThread().isInterrupted()) return;
+			if (isInterrupted()) break;
 		}
-		
+
 		// restore previous status
 		setStatus(prevStatus);
 	}
-	
+
 	/**
 	 * Select another rotation
 	 */
 	private void changeRotation() {
 		setRotation(rotation.getNext());
 	}
-	
+
 	/**
 	 * Clears the cells of the board and fire the
 	 * {@link #fireBoardChanged(Board)} event
@@ -384,7 +411,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		board.clearBoard();
 		fireBoardChanged(board);
 	}
-	
+
 	/**
 	 * Clears the cells of the preview and fire the
 	 * {@link #firePreviewChanged(Board)} event
@@ -393,7 +420,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		preview.clearBoard();
 		firePreviewChanged(preview);
 	}
-	
+
 	/**
 	 * Returns {@code true} if the {@code keys} set contains the specified
 	 * {@code key} and processing of this {@code key} isn't suspended.
@@ -404,7 +431,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	boolean containsKey(KeyPressed key) {
 		return keys.contains(key) && !isKeySuspended(key);
 	}
-	
+
 	/**
 	 * Calculates if elapsed of {@code millis} since the last time point. If
 	 * elapsed, the time point is set the current time.
@@ -421,106 +448,93 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Exit to Main menu
 	 */
 	private void exitToMainMenu() {
 		stopAllSounds();
-		
+
 		setHiScore();
-		
+
 		if (!exitFlag) {
-			nextGame = new GameSelector(speed, level, this.getClass().getCanonicalName(), getType());
+			nextGame = new GameSelector(speed, level, this.getClass()
+					.getCanonicalName(), getType());
 			exitFlag = true;
 		}
 	}
-	
+
 	void fireBoardChanged(Board board) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			Board invBoard = getInvertedVerticalBoard(board);
-			GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard : board.clone(),
-			        false);
-			for (GameListener listener : listeners) {
-				listener.boardChanged(event);
-			}
+		Board invBoard = getInvertedVerticalBoard(board);
+		GameEvent event = new GameEvent(this, isInvertedBoard() ? invBoard
+				: board.clone(), false);
+		for (GameListener listener : listeners) {
+			listener.boardChanged(event);
 		}
 	}
-	
+
 	void fireExit() {
 		GameEvent event = new GameEvent(this);
 		for (GameListener listener : listeners) {
 			listener.exit(event);
 		}
 	}
-	
+
 	void fireInfoChanged(String info) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, info);
-			for (GameListener listener : listeners) {
-				listener.infoChanged(event);
-			}
+		GameEvent event = new GameEvent(this, info);
+		for (GameListener listener : listeners) {
+			listener.infoChanged(event);
 		}
 	}
-	
+
 	void fireLevelChanged(int level) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, level);
-			for (GameListener listener : listeners) {
-				listener.levelChanged(event);
-			}
+		GameEvent event = new GameEvent(this, level);
+		for (GameListener listener : listeners) {
+			listener.levelChanged(event);
 		}
 	}
-	
+
 	void firePreviewChanged(Board preview) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, preview, true);
-			for (GameListener listener : listeners) {
-				listener.previewChanged(event);
-			}
+		GameEvent event = new GameEvent(this, preview, true);
+		for (GameListener listener : listeners) {
+			listener.previewChanged(event);
 		}
 	}
-	
+
 	void fireRotationChanged(Rotation rotation) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, rotation);
-			for (GameListener listener : listeners) {
-				listener.rotationChanged(event);
-			}
+		GameEvent event = new GameEvent(this, rotation);
+		for (GameListener listener : listeners) {
+			listener.rotationChanged(event);
 		}
 	}
-	
+
 	void fireSpeedChanged(int speed) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, (float) speed);
-			for (GameListener listener : listeners) {
-				listener.speedChanged(event);
-			}
+		GameEvent event = new GameEvent(this, (float) speed);
+		for (GameListener listener : listeners) {
+			listener.speedChanged(event);
 		}
 	}
-	
+
 	void fireStatusChanged(Status status) {
-		if (!(exitFlag || Thread.currentThread().isInterrupted())) {
-			GameEvent event = new GameEvent(this, status);
-			for (GameListener listener : listeners) {
-				listener.statusChanged(event);
-			}
+		GameEvent event = new GameEvent(this, status);
+		for (GameListener listener : listeners) {
+			listener.statusChanged(event);
 		}
 	}
-	
+
 	/**
 	 * Game Over
 	 */
 	void gameOver() {
 		setStatus(Status.GameOver);
-		
+
 		GameSound.playMusic(Music.game_over);
-		
+
 		animatedClearBoard();
-		
+
 		exitToMainMenu();
 	}
-	
+
 	/**
 	 * Get the main board
 	 * 
@@ -529,11 +543,12 @@ public abstract class Game implements Callable<Game>, Serializable {
 	Board getBoard() {
 		return board;
 	}
-	
+
 	int getHiScore() {
-		return getScoresManager().getHiScore(this.getClass().getCanonicalName());
+		return getScoresManager()
+				.getHiScore(this.getClass().getCanonicalName());
 	}
-	
+
 	/**
 	 * Level
 	 * 
@@ -542,7 +557,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	int getLevel() {
 		return level;
 	}
-	
+
 	/**
 	 * Get the preview board
 	 * 
@@ -551,7 +566,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	Board getPreview() {
 		return preview;
 	}
-	
+
 	/**
 	 * Get the direction of rotation
 	 * 
@@ -560,7 +575,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	Rotation getRotation() {
 		return rotation;
 	}
-	
+
 	/**
 	 * Get the score
 	 * 
@@ -569,7 +584,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	int getScore() {
 		return score;
 	}
-	
+
 	/**
 	 * Speed level
 	 * 
@@ -578,7 +593,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	int getSpeed() {
 		return speed;
 	}
-	
+
 	/**
 	 * Speed
 	 * 
@@ -592,25 +607,26 @@ public abstract class Game implements Callable<Game>, Serializable {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
 			if (cachedGenuineSpeed <= 0) {
-				cachedGenuineSpeed = Math.round(getSpeedOfFirstLevel()
-				        - (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel()) / (10 - 1)
-				        * (speed - 1));
+				cachedGenuineSpeed = Math
+						.round(getSpeedOfFirstLevel()
+								- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel())
+								/ (10 - 1) * (speed - 1));
 			}
 			return cachedGenuineSpeed;
 		}
 		return speed;
 	}
-	
+
 	/**
 	 * Game speed on the 1st level
 	 */
 	abstract int getSpeedOfFirstLevel();
-	
+
 	/**
 	 * Game speed on the 10th level
 	 */
 	abstract int getSpeedOfTenthLevel();
-	
+
 	/**
 	 * Get the status of game
 	 * 
@@ -619,7 +635,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	Status getStatus() {
 		return status;
 	}
-	
+
 	/**
 	 * Get the type of game
 	 * 
@@ -628,16 +644,16 @@ public abstract class Game implements Callable<Game>, Serializable {
 	int getType() {
 		return type;
 	}
-	
+
 	/**
 	 * Initialize the game
 	 */
 	void init() {
 		nextGame = null;
-		
+
 		stopAllSounds();
 		fireMuteChanged(mute);
-		
+
 		fireSpeedChanged(speed);
 		fireLevelChanged(level);
 		fireRotationChanged(rotation);
@@ -647,15 +663,15 @@ public abstract class Game implements Callable<Game>, Serializable {
 		firePreviewChanged(preview);
 		fireBoardChanged(board);
 	}
-	
-    /**
-     * Stops all of game's sounds
-     */
-    @SuppressWarnings("static-method")
-	void stopAllSounds(){
-        GameSound.stopAllSounds();
-    }
-    
+
+	/**
+	 * Stops all of game's sounds
+	 */
+	@SuppressWarnings("static-method")
+	void stopAllSounds() {
+		GameSound.stopAllSounds();
+	}
+
 	/**
 	 * Get the flag for the drawing the board invertedly
 	 * 
@@ -664,7 +680,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	boolean isInvertedBoard() {
 		return drawInvertedBoard;
 	}
-	
+
 	/**
 	 * Drawing effect of the explosion
 	 * 
@@ -684,49 +700,49 @@ public abstract class Game implements Callable<Game>, Serializable {
 			 * Blast waves
 			 */
 			final Cell waves[][][] = new Cell[][][] { {
-			        // 0
-			        { F, F, F },//
-			        { F, E, F },//
-			        { F, F, F } }, {
-			        // 1
-			        { F, F, F, F, F },//
-			        { F, E, E, E, F },//
-			        { F, E, E, E, F },//
-			        { F, E, E, E, F },//
-			        { F, F, F, F, F } }, {
-			        // 2
-			        { F, E, F, E, F },//
-			        { E, E, E, E, E },//
-			        { F, E, E, E, F },//
-			        { E, E, E, E, E },//
-			        { F, E, F, E, F } }, {
-			        // 3
-			        { F, E, F, E, F },//
-			        { E, F, F, F, E },//
-			        { F, F, E, F, F },//
-			        { E, F, F, F, E },//
-			        { F, E, F, E, F } }, {
-			        // 4
-			        { E, E, E, E, E },//
-			        { E, F, F, F, E },//
-			        { E, F, E, F, E },//
-			        { E, F, F, F, E },//
-			        { E, E, E, E, E } }, {
-			        // 5
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, F, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E } }, {
-			        // 6
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E },//
-			        { E, E, E, E, E } }
-			
+					// 0
+					{ F, F, F },//
+					{ F, E, F },//
+					{ F, F, F } }, {
+					// 1
+					{ F, F, F, F, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, E, E, E, F },//
+					{ F, F, F, F, F } }, {
+					// 2
+					{ F, E, F, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, E, E, F },//
+					{ E, E, E, E, E },//
+					{ F, E, F, E, F } }, {
+					// 3
+					{ F, E, F, E, F },//
+					{ E, F, F, F, E },//
+					{ F, F, E, F, F },//
+					{ E, F, F, F, E },//
+					{ F, E, F, E, F } }, {
+					// 4
+					{ E, E, E, E, E },//
+					{ E, F, F, F, E },//
+					{ E, F, E, F, E },//
+					{ E, F, F, F, E },//
+					{ E, E, E, E, E } }, {
+					// 5
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, F, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }, {
+					// 6
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E },//
+					{ E, E, E, E, E } }
+
 			};
-			
+
 			/**
 			 * Drawing a single pass of the blast wave
 			 * 
@@ -742,21 +758,22 @@ public abstract class Game implements Callable<Game>, Serializable {
 				// of the lower left corner
 				int lowerLeftX = x - waves[wave][0].length / 2;
 				int lowerLeftY = y - waves[wave].length / 2;
-				
-				setBoard(insertCellsToBoard(getBoard(), waves[wave], lowerLeftX, lowerLeftY));
+
+				setBoard(insertCellsToBoard(getBoard(), waves[wave],
+						lowerLeftX, lowerLeftY));
 				sleep(ANIMATION_DELAY * 2);
 			}
 		}
-		
+
 		// diameter of the explosion
 		// must be an odd number
 		final int EXPLODE_SIZE = 5;
-		
+
 		final int BLAST_WAVE_PASSES = 4;
-		
+
 		int newX = x;
 		int newY = y;
-		
+
 		// if the explosion leave off the board, move the epicenter point
 		while (newX - EXPLODE_SIZE / 2 < 0) {
 			newX++;
@@ -770,20 +787,20 @@ public abstract class Game implements Callable<Game>, Serializable {
 		while (newY - EXPLODE_SIZE / 2 + EXPLODE_SIZE > boardHeight) {
 			newY--;
 		}
-		
+
 		GameSound.playMusic(Music.kaboom);
 		final Kaboom kaboom = new Kaboom();
-		
+
 		for (int i = 0; i < BLAST_WAVE_PASSES; i++) {
 			// draw the blast waves
 			for (int k = 0; k < kaboom.waves.length; k++) {
 				kaboom.blast(newX, newY, k);
 				processKeys();
-				if (exitFlag || Thread.currentThread().isInterrupted()) return;
+				if (isInterrupted()) return;
 			}
 		}
 	}
-	
+
 	/**
 	 * Processing key pressing
 	 * 
@@ -804,7 +821,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 		keys.add(key);
 	}
-	
+
 	/**
 	 * Processing key releasing
 	 * 
@@ -825,46 +842,46 @@ public abstract class Game implements Callable<Game>, Serializable {
 			keys.remove(key);
 		}
 	}
-	
+
 	/**
 	 * Pause
 	 */
 	public void pause() {
-        //stop sound on games and splash screen
-        if (getStatus() == Status.Running || this instanceof SplashScreen ) {
-            stopAllSounds();
-        }
+		// stop sound on games and splash screen
+		if (getStatus() == Status.Running || this instanceof SplashScreen) {
+			stopAllSounds();
+		}
 		if (getStatus() == Status.Running) {
 			// send score
 			fireInfoChanged(String.valueOf(score));
 			// send high score
 			fireInfoChanged(String.valueOf("HI" + setHiScore()));
-			
+
 			setStatus(Status.Paused);
 		}
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */
 	void processKeys() {
 		// decrease CPU loading
 		sleep(30);
-		
+
 		if (keys.isEmpty() || getStatus() == Status.None) return;
-		
+
 		if (keys.contains(KeyPressed.KeyShutdown)) {
 			keys.remove(KeyPressed.KeyShutdown);
 			quit();
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyReset)) {
 			keys.remove(KeyPressed.KeyReset);
 			exitToMainMenu();
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
 			if (getStatus() != Status.Paused) {
@@ -874,56 +891,64 @@ public abstract class Game implements Callable<Game>, Serializable {
 			}
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
-            if (!isMuted()){
-                mute();
-            }else{
-                unmute();
-            }
+			if (!isMuted()) {
+				mute();
+			} else {
+				unmute();
+			}
 			return;
 		}
-		
-		if (getStatus() == Status.Paused) if (keys.contains(KeyPressed.KeyRotate)) {
-			keys.remove(KeyPressed.KeyRotate);
-			changeRotation();
-		}
+
+		if (getStatus() == Status.Paused)
+			if (keys.contains(KeyPressed.KeyRotate)) {
+				keys.remove(KeyPressed.KeyRotate);
+				changeRotation();
+			}
 	}
 
-    /**
-     * Sets mute status as {@code true} - game's sounds don't playing
-     */
-    void mute() {
-        setMuted(true);
-        stopAllSounds();
-    }
+	/**
+	 * Sets mute status as {@code true} - game's sounds don't playing
+	 */
+	void mute() {
+		setMuted(true);
+		stopAllSounds();
+	}
 
-    /**
-     * Sets mute status as {@code false} - game's sounds are playing
-     */
-    @SuppressWarnings("static-method")
+	/**
+	 * Sets mute status as {@code false} - game's sounds are playing
+	 */
+	@SuppressWarnings("static-method")
 	void unmute() {
-        setMuted(false);
-    }
-	
+		setMuted(false);
+	}
+
 	/**
 	 * Quit from the game
 	 */
 	void quit() {
-        stopAllSounds();
-		if (!saveState()) {
-			GameLoader.deleteSavedGame();
+		if (getStatus() == Status.DoSomeWork
+				&& !(this instanceof SplashScreen || this instanceof GameSelector)) {
+			readyToQuitFlag = true;
+		} else {
+			readyToQuitFlag = false;
+			stopAllSounds();
+			if (!saveState()) {
+				GameLoader.deleteSavedGame();
+			}
+			fireInfoChanged(String.valueOf("HI" + setHiScore()));
+			fireExit();
 		}
-		fireInfoChanged(String.valueOf("HI" + setHiScore()));
-		fireExit();
 	}
-	
-	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+
+	private void readObject(ObjectInputStream in) throws IOException,
+			ClassNotFoundException {
 		in.defaultReadObject();
 		desirialized = true;
 	}
-	
+
 	/**
 	 * Resume
 	 */
@@ -932,7 +957,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 			setStatus(Status.Running);
 		}
 	}
-	
+
 	/**
 	 * Save state of the current game
 	 * 
@@ -940,13 +965,13 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	public boolean saveState() {
 		if (!(this instanceof GameSelector || this instanceof SplashScreen)
-		        && (getStatus() == Status.Running || getStatus() == Status.Paused)) {
+				&& (getStatus() == Status.Running || getStatus() == Status.Paused)) {
 			setStatus(Status.Paused);
 			return GameLoader.saveGame(this);
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Set the main board and fire the {@link #fireBoardChanged(Board)} event
 	 * 
@@ -957,7 +982,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		this.board = board;
 		fireBoardChanged(board);
 	}
-	
+
 	/**
 	 * Set the flag for the drawing the board invertedly
 	 * 
@@ -967,11 +992,12 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void setDrawInvertedBoard(boolean drawInvertedBoard) {
 		this.drawInvertedBoard = drawInvertedBoard;
 	}
-	
+
 	int setHiScore() {
-		return getScoresManager().setHiScore(this.getClass().getCanonicalName(), getScore());
+		return getScoresManager().setHiScore(
+				this.getClass().getCanonicalName(), getScore());
 	}
-	
+
 	/**
 	 * Set level and fire the {@link #fireLevelChanged(int)} event
 	 * 
@@ -988,7 +1014,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 		fireLevelChanged(this.level);
 	}
-	
+
 	/**
 	 * Set the main preview and fire the {@link #firePreviewChanged(Board)}
 	 * event
@@ -1000,7 +1026,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		this.preview = preview;
 		firePreviewChanged(preview);
 	}
-	
+
 	/**
 	 * Set the direction of rotation and fire the
 	 * {@link #fireRotationChanged(Rotation)} event
@@ -1012,7 +1038,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		this.rotation = rotation;
 		fireRotationChanged(rotation);
 	}
-	
+
 	/**
 	 * Set the score and fire the {@link #fireInfoChanged(String)} event
 	 * 
@@ -1029,7 +1055,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		}
 		fireInfoChanged(String.valueOf(score));
 	}
-	
+
 	/**
 	 * Set speed level and fire the {@link #fireSpeedChanged(int)} event
 	 * 
@@ -1047,7 +1073,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 		cachedGenuineSpeed = -1;
 		fireSpeedChanged(this.speed);
 	}
-	
+
 	/**
 	 * Set the status of game and fire the {@link #fireStatusChanged(Status)}
 	 * event
@@ -1059,5 +1085,5 @@ public abstract class Game implements Callable<Game>, Serializable {
 		this.status = status;
 		fireStatusChanged(status);
 	}
-	
+
 }
