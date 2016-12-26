@@ -37,22 +37,26 @@ public class DanceGame extends Game {
 		 * Has taken the dance position?
 		 */
 		private boolean caught;
+        /**
+         * How many a {@code DancerShape}s in this position
+         */
+        private final int complexity;
 		/**
 		 * {@code DancerShape} leftward
 		 */
-		public final DancerShape leftShape;
+		final DancerShape leftShape;
 		/**
 		 * {@code DancerShape} upward
 		 */
-		public final DancerShape upShape;
+		final DancerShape upShape;
 		/**
 		 * {@code DancerShape} downward
 		 */
-		public final DancerShape downShape;
+		final DancerShape downShape;
 		/**
 		 * {@code DancerShape} rightward
 		 */
-		public final DancerShape rightShape;
+		final DancerShape rightShape;
 		
 		/**
 		 * Dance position
@@ -68,7 +72,7 @@ public class DanceGame extends Game {
 		 * @param right
 		 *            whether is a {@code DancerShape} rightward?
 		 */
-		public DancePosition(int y, boolean left, boolean up, boolean down, boolean right) {
+		DancePosition(int y, boolean left, boolean up, boolean down, boolean right) {
 			caught = false;
 			
 			this.y = y;
@@ -76,6 +80,8 @@ public class DanceGame extends Game {
 			upShape = up ? new DancerShape(UP) : null;
 			downShape = down ? new DancerShape(DOWN) : null;
 			rightShape = right ? new DancerShape(RIGHT) : null;
+
+            complexity = (left ? 1 : 0) + (up ? 1 : 0)+(down ? 1 : 0)+(right ? 1 : 0);
 		}
 		
 		/**
@@ -108,6 +114,15 @@ public class DanceGame extends Game {
 		boolean isCaught() {
 			return caught;
 		}
+
+        /**
+         * How many a {@code DancerShape}s in this position
+         *
+         * @return complexity of this position (number from 1 to 3)
+         */
+        int getComplexity() {
+            return complexity;
+        }
 	}
 	
 	private static final long serialVersionUID = 1329642134274377275L;
@@ -246,8 +261,7 @@ public class DanceGame extends Game {
 	 * @return {@code true} if is the coincidence
 	 */
 	private boolean checkDanceStep(DancerShape dancer) {
-		if (dancer == null) return true;
-		return containsKey(keysToRotate.get(dancer.getRotationAngle()));
+        return dancer != null && containsKey(keysToRotate.get(dancer.getRotationAngle()));
 	}
 	
 	/**
@@ -256,8 +270,12 @@ public class DanceGame extends Game {
 	 * @return a new dance position
 	 */
 	private DancePosition createPosition() {
+		//pre-establishing intervals
+		int speed = getSpeed() + 1;
+		if (speed > 10) speed = 1;
+		
 		// interval between positions from 3 to 1
-		int interval = 3 - getSpeed() / 3;
+		int interval = 3 - speed / 3;
 		if (interval <= 0) {
 			interval = 1;
 		}
@@ -266,8 +284,8 @@ public class DanceGame extends Game {
 		int upperBorder = boardHeight - getLevel();
 		
 		byte pos;
-		// 1 chance from 20 to create a triple position
-		if (r.nextInt(20) == 0) {
+		// 1 chance from 50 to create a triple position
+		if (r.nextInt(50) == 0) {
 			switch (r.nextInt(4)) {
 			case 0:
 				pos = 7;// 0111 in binary system
@@ -372,12 +390,12 @@ public class DanceGame extends Game {
 	
 	@Override
 	protected int getSpeedOfFirstLevel() {
-		return 300;
+		return 270;
 	}
 	
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 80;
+		return 120;
 	}
 	
 	/**
@@ -439,11 +457,24 @@ public class DanceGame extends Game {
 		if (getStatus() == Status.Running) {
 			DancePosition position = getPosition();
 			if (position != null) {
-				// checking the coincidence of the all DancerShape in the
-				// position and pressing keys
-				if (!checkDanceStep(position.leftShape) || !checkDanceStep(position.upShape)
-						|| !checkDanceStep(position.downShape)
-						|| !checkDanceStep(position.rightShape)) return;
+                int caughtNum = 0;
+
+                // checking the coincidence of the all DancerShape in the
+                // position and pressing keys
+                if (checkDanceStep(position.leftShape)) caughtNum++;
+                if (checkDanceStep(position.upShape)) caughtNum++;
+                if (checkDanceStep(position.downShape)) caughtNum++;
+                if (checkDanceStep(position.rightShape)) caughtNum++;
+
+                if (caughtNum == 0) return;
+
+                int complexity = position.getComplexity();
+
+                //allow to replace the capture of any one position on KeyRotate pressure
+                if (complexity >= 3 && containsKey(KeyPressed.KeyRotate)) caughtNum++;
+
+                if (caughtNum < complexity) return;
+
 				int score = 0;
 				position.caught();
 				
