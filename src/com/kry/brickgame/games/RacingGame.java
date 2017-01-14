@@ -291,14 +291,12 @@ public class RacingGame extends GameWithLives {
 		while (!isStarted) {
 			sleep(START_MUSIC_DURATION / 10);
 		}
-		if (!Game.isMuted() && engineSound != null)
-			engineSound.play();
+        if (!Game.isMuted() && engineSound != null) engineSound.play(getSpeed());
 	}
 
 	@Override
 	void loss(int x, int y) {
-		if (engineSound != null)
-			engineSound.stop();
+        if (engineSound != null) engineSound.stop();
 		super.loss(x, y);
 	}
 
@@ -403,46 +401,45 @@ public class RacingGame extends GameWithLives {
 	 */
 	@Override
 	protected void processKeys() {
-		if (keys.isEmpty() || getStatus() == Status.None)
-			return;
+        if (keys.isEmpty() || getStatus() == Status.None) return;
 
-		super.processKeys();
+        super.processKeys();
 
-		if (getStatus() == Status.Running) {
-			if (containsKey(KeyPressed.KeyLeft)) {
-				if (moveCar(curPosition - 1)) {
-					GameSound.playEffect(Effects.move);
-				}
-				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
-			}
-			if (containsKey(KeyPressed.KeyRight)) {
-				if (moveCar(curPosition + 1)) {
-					GameSound.playEffect(Effects.move);
-				}
-				setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
-			}
-			if (containsKey(KeyPressed.KeyUp)) {
-				moveOn(oddMove = !oddMove);
-				setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY);
-			}
-			if (containsKey(KeyPressed.KeyRotate)) {
-				moveOn(oddMove = !oddMove);
-				setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY);
-			}
-		}
+        if (getStatus() == Status.Running && !exitFlag) {
+            if (containsKey(KeyPressed.KeyLeft)) {
+                if (moveCar(curPosition - 1)) {
+                    GameSound.playEffect(Effects.move);
+                }
+                setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);
+            }
+            if (containsKey(KeyPressed.KeyRight)) {
+                if (moveCar(curPosition + 1)) {
+                    GameSound.playEffect(Effects.move);
+                }
+                setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
+            }
+            if (containsKey(KeyPressed.KeyRotate) || containsKey(KeyPressed.KeyUp)) {
+                if (!Game.isMuted() && engineSound != null) engineSound.play(0);
+                moveOn(oddMove = !oddMove);
+                setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY);
+                setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY);
+            }else{
+                if (!Game.isMuted() && engineSound != null) engineSound.play(getSpeed());
+            }
+        }
 	}
 
 	@Override
 	void unmute() {
 		super.unmute();
-		if (getStatus() == Status.Running && engineSound != null) engineSound.play();
+        if (getStatus() == Status.Running && engineSound != null) engineSound.play(getSpeed());
 	}
 	
 	@Override
 	void resume() {
         if (getStatus() == Status.Paused) {
-            if (!Game.isMuted() && engineSound != null) engineSound.play();
-        }
+            if (!Game.isMuted() && engineSound != null) engineSound.play(getSpeed());
+                   }
 		super.resume();
 	}
 
@@ -464,15 +461,13 @@ public class RacingGame extends GameWithLives {
 
 	@Override
 	void stopAllSounds() {
-		if (engineSound != null)
-			engineSound.stop();
+        if (engineSound != null) engineSound.stop();
 		super.stopAllSounds();
 	}
 
 	@Override
 	void win() {
-		if (engineSound != null)
-			engineSound.stop();
+        if (engineSound != null) engineSound.stop();
 		super.win();
 	}
 
