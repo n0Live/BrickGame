@@ -421,7 +421,7 @@ public class SnakeGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running && isStarted) {
+		if (getStatus() == Status.Running && !exitFlag && isStarted) {
 			if (containsKey(KeyPressed.KeyLeft)) if (move(LEFT)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);

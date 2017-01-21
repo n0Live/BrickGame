@@ -385,9 +385,8 @@ public class Shape implements Cloneable, Serializable {
 		int min_y = minY();
 		int max_y = maxY();
 		
-		for (int y = max_y; y >= min_y; y--) {
-			char line[] = new char[max_x - min_x + 1];
-			
+		char line[] = new char[max_x - min_x + 1];
+		for (int y = max_y; y >= min_y; y--) {			
 			for (int x = min_x; x <= max_x; x++) {
 				// [x - min_x]: because x can be less than 0, then x is
 				// shifted to 0

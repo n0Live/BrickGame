@@ -598,7 +598,7 @@ public class ArkanoidGame extends GameWithLives {
 
 		super.processKeys();
 
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (movePlatform(curX - 1)) {
 					GameSound.playEffect(Effects.move);

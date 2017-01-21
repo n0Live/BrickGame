@@ -719,7 +719,7 @@ public class TetrisGameI extends Game {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running && !isFallingFinished) {
+		if (getStatus() == Status.Running && !exitFlag && !isFallingFinished) {
 			if (containsKey(KeyPressed.KeyRotate)) {
 				// if we have the super gun
 				if (curPiece.getShape() == Figures.SuperGun) {

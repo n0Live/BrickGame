@@ -1,6 +1,6 @@
 package com.kry.brickgame.games;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -22,7 +22,7 @@ public enum GameUtils {
 	 * {@code Long} <b>value</b> - time to which the processing of a key is
 	 * suspended.
 	 */
-	static final Map<KeyPressed, Long> suspendedKeys = new HashMap<>(KeyPressed.values().length);
+	static final Map<KeyPressed, Long> suspendedKeys = new EnumMap<>(KeyPressed.class);
 	
 	/**
 	 * Add randomly generated lines on the board
@@ -409,8 +409,8 @@ public enum GameUtils {
 		if (board == null) return null;
 		
 		Board resultBoard = board.clone();
+		Cell[] reversed = new Cell[board.getHeight()];
 		for (int i = 0; i < resultBoard.getWidth(); i++) {
-			Cell[] reversed = new Cell[board.getHeight()];
 			for (int j = 0; j < reversed.length; j++) {
 				reversed[j] = board.getCell(i, reversed.length - j - 1);
 			}

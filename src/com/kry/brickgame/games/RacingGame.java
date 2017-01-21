@@ -128,13 +128,13 @@ public class RacingGame extends GameWithLives {
 			return false;
 
 		int positionX;
-		int coordX, coordY;
+        int[] coords = new int[2]; //{x , y}
 
 		// adding opponents until the board has a place
 		do {
 			positionX = r.nextInt(positions.length);
-			coordX = positions[positionX];
-			coordY = lastOpponentY + distance - car.minY();
+			coords[0] = positions[positionX]; //x
+			coords[1] = lastOpponentY + distance - car.minY(); //y
 
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
@@ -142,27 +142,27 @@ public class RacingGame extends GameWithLives {
 					&& r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
-					opponents.add(new int[] { coordX, coordY });
+					opponents.add(coords);
 					// calculate position of the second one
 					int anotherPositionX;
 					do {
 						anotherPositionX = r.nextInt(positions.length);
 					} while (anotherPositionX == positionX);
 					// create the second one
-					coordX = positions[anotherPositionX];
-					opponents.add(new int[] { coordX, coordY });
+					coords[0] = positions[anotherPositionX];
+					opponents.add(coords);
 				} else { // or set position with shift
 					if (positionX == 0) {
-						coordX += 1;// shift to right
+						coords[0] += 1;// shift to right
 					} else if (positionX == positions.length - 1) {
-						coordX -= 1;// shift to left
+						coords[0] -= 1;// shift to left
 					} else {
-						coordX += r.nextBoolean() ? 1 : -1;// random
+						coords[0] += r.nextBoolean() ? 1 : -1;// random
 					}
-					opponents.add(new int[] { coordX, coordY });
+					opponents.add(coords);
 				}
 			} else {
-				opponents.add(new int[] { coordX, coordY });
+				opponents.add(coords);
 			}
 
 			lastOpponentY = opponents.getLast()[1] + car.maxY();

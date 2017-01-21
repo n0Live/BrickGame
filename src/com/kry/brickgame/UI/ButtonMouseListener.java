@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -61,7 +61,7 @@ class ButtonMouseListener extends MouseAdapter {
 	private final Map<KeyPressed, ScheduledFuture<?>> pressedKeys;
 	
 	public ButtonMouseListener() {
-		pressedKeys = new HashMap<>();
+		pressedKeys = new EnumMap<>(KeyPressed.class);
 	}
 	
 	@Override

@@ -2,7 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.Game.scheduledExecutors;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +45,7 @@ public enum GameSound {
 	 */
 	static final Map<Effects, Integer> effectsPriority;
 	static {
-		effectsPriority = new HashMap<>(Effects.values().length);
+		effectsPriority = new EnumMap<>(Effects.class);
 		effectsPriority.put(Effects.select, Thread.MAX_PRIORITY);
 		effectsPriority.put(Effects.move, Thread.MIN_PRIORITY);
 		effectsPriority.put(Effects.turn, Thread.NORM_PRIORITY);

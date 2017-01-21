@@ -545,31 +545,31 @@ public class TanksGame extends GameWithLives {
 		Bullet[] bullets = isPlayerBullet ? playerBullets : enemyBullets;
 		
 		synchronized (lock) {
+			int bulletX = tank.x();
+			int bulletY = tank.y();
+			
+			switch (tank.getDirection()) {
+			case d0:
+				bulletY += 1;
+				break;
+			case d90:
+				bulletX += 1;
+				break;
+			case d180:
+				bulletY -= 1;
+				break;
+			case d270:
+				bulletX -= 1;
+				break;
+			}
+			
+            Bullet bullet = new Bullet(bulletX, bulletY, tank.getDirection());
 			for (int i = 0; i < bullets.length; i++) {
-				if (bullets[i] == null) {
-					int bulletX = tank.x();
-					int bulletY = tank.y();
-					
-					switch (tank.getDirection()) {
-					case d0:
-						bulletY += 1;
-						break;
-					case d90:
-						bulletX += 1;
-						break;
-					case d180:
-						bulletY -= 1;
-						break;
-					case d270:
-						bulletX -= 1;
-						break;
-					}
-					
+				if (bullets[i] == null) {					
 					if (!isInterrupted()) {
-						bullets[i] = new Bullet(bulletX, bulletY, tank.getDirection());
+						bullets[i] = bullet;
 						flightOfBullet(isPlayerBullet, i);
-					}
-					
+					}					
 					return true;
 				}
 			}
@@ -964,7 +964,7 @@ public class TanksGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			RotationAngle movementDirection = null;
 			KeyPressed key = null;
 			

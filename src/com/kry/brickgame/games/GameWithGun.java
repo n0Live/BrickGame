@@ -223,11 +223,13 @@ public abstract class GameWithGun extends GameWithLives {
 	void initBullets(AtomicReferenceArray<AtomicIntegerArray> bullets) {
 		int bulletsArrayHeight = boardHeight - gun.getHeight();
 		int[] array = new int[bulletsArrayHeight];
-		
-		for (int i = 0; i < bullets.length(); i++) {
-			Arrays.fill(array, 0);
-			bullets.set(i, new AtomicIntegerArray(array));
-		}
+
+        Arrays.fill(array, 0);
+        AtomicIntegerArray newValue = new AtomicIntegerArray(array);
+
+        for (int i = 0; i < bullets.length(); i++) {
+            bullets.set(i, newValue);
+        }
 	}
 	
 	@Override

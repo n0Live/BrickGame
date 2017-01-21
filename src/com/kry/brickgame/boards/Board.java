@@ -241,8 +241,8 @@ public class Board implements Cloneable, Serializable {
 		
 		result.append("Board [").append(width).append("x").append(height).append("]\n");
 		// Going through the board (the board is filled from the bottom up)
+		char line[] = new char[width];
 		for (int i = height - 1; i >= 0; i--) {
-			char line[] = new char[width];
 			for (int j = 0; j < width; j++) {
 				switch (board[j][i]) {
 				case Full:

@@ -179,11 +179,7 @@ public class SplashScreen extends Game {
 	 */
 	private void insertNumbers() {
 		Board board = getBoard();
-		
-		BoardNumbers[] boardNumbers = new BoardNumbers[4];
-		for (int i = 0; i < boardNumbers.length; i++) {
-			boardNumbers[i] = new BoardNumbers();
-		}
+        BoardNumbers boardNumbers = new BoardNumbers();
 		
 		/* Easter (New Year) egg */
 		int year = 0;
@@ -204,29 +200,25 @@ public class SplashScreen extends Game {
 		} else {
 			numbers = "9999".toCharArray();
 		}
-		for (int i = 0; i < boardNumbers.length; i++) {
-			boardNumbers[i].setNumber(BoardNumbers.charToNumbers(numbers[i]));
-		}
-		
-		int k;
-		// upper left
-		k = 0;
-		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1, board.getHeight()
-				- boardNumbers[k].getHeight() - 1);
-		// upper right
-		k = 1;
-		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
-				- boardNumbers[k].getWidth() - 1, board.getHeight() - boardNumbers[k].getHeight()
-				* 2);
-		// lower left
-		k = 2;
-		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), 1,
-				boardNumbers[k].getHeight());
-		// lower right
-		k = 3;
-		board = insertCellsToBoard(board, boardNumbers[k].getBoard(), board.getWidth()
-				- boardNumbers[k].getWidth() - 1, 1);
-		
+
+        int k = 0;
+        // upper left
+        boardNumbers.setNumber(BoardNumbers.charToNumbers(numbers[k++]));
+        board = insertCellsToBoard(board, boardNumbers.getBoard(), 1,
+                board.getHeight() - boardNumbers.getHeight() - 1);
+        // upper right
+        boardNumbers.setNumber(BoardNumbers.charToNumbers(numbers[k++]));
+        board = insertCellsToBoard(board, boardNumbers.getBoard(),
+                board.getWidth() - boardNumbers.getWidth() - 1,
+                board.getHeight() - boardNumbers.getHeight() * 2);
+        // lower left
+        boardNumbers.setNumber(BoardNumbers.charToNumbers(numbers[k++]));
+        board = insertCellsToBoard(board, boardNumbers.getBoard(), 1, boardNumbers.getHeight());
+        // lower right
+        boardNumbers.setNumber(BoardNumbers.charToNumbers(numbers[k]));
+        board = insertCellsToBoard(board, boardNumbers.getBoard(),
+                board.getWidth() - boardNumbers.getWidth() - 1, 1);
+
 		if (!isInterrupted()) {
 			setBoard(board);
 		}

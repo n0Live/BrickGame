@@ -463,7 +463,7 @@ public class InvadersGame extends GameWithGun {
 	 */
 	private Board initBall(Board board) {
 		isFlyingBall = false;
-		Board result = board;
+		Board result;
 		synchronized (lock) {
 			result = drawBall(board, -1, -1);
 			setBoard(result);
@@ -593,7 +593,7 @@ public class InvadersGame extends GameWithGun {
 
 		super.processKeys();
 
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			int newX = curX, newY = curY;
 			boolean move = false;
 

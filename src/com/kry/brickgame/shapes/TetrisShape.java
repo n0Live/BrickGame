@@ -1,7 +1,7 @@
 package com.kry.brickgame.shapes;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -36,6 +36,7 @@ public class TetrisShape extends Shape {
 	}
 	
 	private static final long serialVersionUID = -4165024906477016657L;
+	private static final int[] emptySuperShapes = new int[0];
 	
 	/**
 	 * A set of coordinates of a points of the figures:
@@ -297,11 +298,8 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random Polyominoes figure or super figure
 	 */
 	public static TetrisShape getRandomShapeAndSuper(int[] superShapes) {
-		Set<Polyominoes> polyominoes = new HashSet<>();
-		polyominoes.add(Polyominoes.Trominoes);
-		polyominoes.add(Polyominoes.Tetraminoes);
-		polyominoes.add(Polyominoes.Pentominoes);
-		
+		final Set<Polyominoes> polyominoes = EnumSet.of(Polyominoes.Trominoes, Polyominoes
+				.Tetraminoes, Polyominoes.Pentominoes);
 		return getRandomPolyominoesAndSuper(polyominoes, superShapes);
 	}
 	
@@ -309,12 +307,9 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random figure
 	 */
 	public static TetrisShape getRandomShapeInstance() {
-		Set<Polyominoes> polyominoes = new HashSet<>();
-		polyominoes.add(Polyominoes.Trominoes);
-		polyominoes.add(Polyominoes.Tetraminoes);
-		polyominoes.add(Polyominoes.Pentominoes);
-		
-		return getRandomPolyominoesAndSuper(polyominoes, new int[0]);
+		final Set<Polyominoes> polyominoes = EnumSet.of(Polyominoes.Trominoes, Polyominoes
+				.Tetraminoes, Polyominoes.Pentominoes);
+		return getRandomPolyominoesAndSuper(polyominoes, emptySuperShapes);
 	}
 	
 	/**
@@ -364,10 +359,8 @@ public class TetrisShape extends Shape {
 	 * Get instance of a random Tetraminoes figure
 	 */
 	public static TetrisShape getRandomTetraminoes() {
-		Set<Polyominoes> polyominoes = new HashSet<>();
-		polyominoes.add(Polyominoes.Tetraminoes);
-		
-		return getRandomPolyominoesAndSuper(polyominoes, new int[0]);
+		final Set<Polyominoes> polyominoes = EnumSet.of(Polyominoes.Tetraminoes);
+		return getRandomPolyominoesAndSuper(polyominoes, emptySuperShapes);
 	}
 	
 	/**
@@ -377,9 +370,7 @@ public class TetrisShape extends Shape {
 	 *            the array of numbered super figures (from 0 to 4)
 	 */
 	public static TetrisShape getRandomTetraminoesAndSuper(int[] superShapes) {
-		Set<Polyominoes> polyominoes = new HashSet<>();
-		polyominoes.add(Polyominoes.Tetraminoes);
-		
+		final Set<Polyominoes> polyominoes = EnumSet.of(Polyominoes.Tetraminoes);
 		return getRandomPolyominoesAndSuper(polyominoes, superShapes);
 	}
 	

@@ -252,7 +252,7 @@ public class GunGame extends GameWithGun {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (moveGun(curX - 1, curY)) {
 					GameSound.playEffect(Effects.move);

@@ -8,7 +8,7 @@ import static com.kry.brickgame.games.GameUtils.drawShape;
 import static com.kry.brickgame.games.GameUtils.insertCellsToBoard;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import com.kry.brickgame.boards.Board;
@@ -145,7 +145,7 @@ public class DanceGame extends Game {
 	final private static Map<RotationAngle, KeyPressed> keysToRotate;
 	
 	static {
-		keysToRotate = new HashMap<>();
+		keysToRotate = new EnumMap<>(RotationAngle.class);
 		keysToRotate.put(LEFT, KeyPressed.KeyLeft);
 		keysToRotate.put(RIGHT, KeyPressed.KeyRight);
 		keysToRotate.put(UP, KeyPressed.KeyUp);
@@ -454,7 +454,7 @@ public class DanceGame extends Game {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			DancePosition position = getPosition();
 			if (position != null) {
                 int caughtNum = 0;

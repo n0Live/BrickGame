@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -54,7 +54,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Set of the pressed keys
 	 */
-	final Set<KeyPressed> keys = new HashSet<>();
+	final Set<KeyPressed> keys = EnumSet.allOf(KeyPressed.class);
 
 	/**
 	 * Speed

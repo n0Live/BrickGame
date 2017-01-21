@@ -459,7 +459,7 @@ public class FroggerGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running) {
+		if (getStatus() == Status.Running && !exitFlag) {
 			int newX = curX, newY = curY;
 			boolean move = false;
 			
