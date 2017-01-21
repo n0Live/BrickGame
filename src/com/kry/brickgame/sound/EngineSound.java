@@ -12,16 +12,15 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
 public class EngineSound {
-	private final double freqOfTone = 370; // hz
+	private final static double freqOfTone = 370; // hz
+	private final static float duration = 0.1f; // seconds
+	private final static float sampleRate = 8000;
+	private final static int numSamples = (int) (duration * sampleRate);
+	private final static int frameSize = 2; // bytes per frame
+	private final static float frameRate = sampleRate / frameSize;
 
-	private final float duration = 0.1f; // seconds
-	private final float sampleRate = 8000;
-	private final int numSamples = (int) (duration * sampleRate);
+	private final static int tonesCount = 11;
 	private final double sample[] = new double[numSamples];
-	private final int frameSize = 2; // bytes per frame
-	private final float frameRate = sampleRate / frameSize;
-
-	private final int tonesCount = 11;
 	private final byte generatedSnd[][] = new byte[tonesCount][frameSize * numSamples];
 
 	private final ExecutorService mSoundThread;
