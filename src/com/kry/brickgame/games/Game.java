@@ -54,7 +54,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	/**
 	 * Set of the pressed keys
 	 */
-	final Set<KeyPressed> keys = EnumSet.allOf(KeyPressed.class);
+	final Set<KeyPressed> keys = EnumSet.noneOf(KeyPressed.class);
 
 	/**
 	 * Speed

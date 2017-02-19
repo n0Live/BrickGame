@@ -419,12 +419,12 @@ public class RacingGame extends GameWithLives {
                 setKeyDelay(KeyPressed.KeyRight, ANIMATION_DELAY * 3);
             }
             if (containsKey(KeyPressed.KeyRotate) || containsKey(KeyPressed.KeyUp)) {
-                if (!Game.isMuted() && engineSound != null) engineSound.play(0);
+                if (!Game.isMuted() && engineSound != null && !exitFlag) engineSound.play(0);
                 moveOn(oddMove = !oddMove);
                 setKeyDelay(KeyPressed.KeyRotate, ANIMATION_DELAY);
                 setKeyDelay(KeyPressed.KeyUp, ANIMATION_DELAY);
             }else{
-                if (!Game.isMuted() && engineSound != null) engineSound.play(getSpeed());
+                if (!Game.isMuted() && engineSound != null && !exitFlag) engineSound.play(getSpeed());
             }
         }
 	}
