@@ -66,9 +66,7 @@ public class Board implements Cloneable, Serializable {
 		lock.writeLock().lock();
 		try {
 			for (int i = 0; i < width; i++) {
-				for (int j = 0; j < height; j++) {
-					board[i][j] = E;
-				}
+                Arrays.fill(board[i], E);
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -130,11 +128,7 @@ public class Board implements Cloneable, Serializable {
 	public Cell[] getColumn(int x) {
 		lock.readLock().lock();
 		try {
-			Cell column[] = new Cell[getHeight()];
-
-            System.arraycopy(board[x], 0, column, 0, column.length);
-			
-			return column;
+            return Arrays.copyOf(board[x], getHeight());
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -207,8 +201,7 @@ public class Board implements Cloneable, Serializable {
         if (x < 0 || x >= board.length) return;
 		lock.writeLock().lock();
 		try {
-            int columnLength = Math.min(column.length, board[x].length);
-            System.arraycopy(column, 0, board[x], 0, columnLength);
+            board[x] = Arrays.copyOf(column, board[x].length);
 		} finally {
 			lock.writeLock().unlock();
 		}
