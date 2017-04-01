@@ -497,8 +497,7 @@ public class TetrisGameI extends Game {
 	protected void firePreviewChanged(Board board) {
 		// draws the inverted board
 		if (isInvertedBoard()
-		        && !nextPiece.containsIn(new Figures[] { Figures.SuperPoint, Figures.SuperGun,
-		                Figures.SuperMudGun, Figures.SuperBomb })) {
+		        && nextPiece != null && !nextPiece.isSuperShape()) {
 			super.firePreviewChanged(getInvertedVerticalBoard(board));
 		} else {
 			super.firePreviewChanged(board);
