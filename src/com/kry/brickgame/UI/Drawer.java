@@ -949,8 +949,7 @@ public final class Drawer {
 		// calculate size of a one square
 		squareSideLength = d.height / (newProperties.board.getHeight() + 1);
 		
-		// when false - it becomes too aggressive optimization
-		boolean updateBoard = true;// <=|
+		boolean updateBoard = false;
 		boolean updatePreview = false;
 		boolean updateLabels = false;
 		boolean updateMainCanvas = false;
@@ -964,15 +963,11 @@ public final class Drawer {
 				updateBoard = newProperties.board.hasBlinkedCell();
 				updatePreview = newProperties.preview.hasBlinkedCell();
 			}
-			if (!updateBoard && !prevProperties.board.equals(newProperties.board)) {
-				updateBoard = true;
-			}
-			if (!updatePreview && !prevProperties.preview.equals(newProperties.preview)) {
-				updatePreview = true;
-			}
-			if (!prevProperties.isLabelsEquals(newProperties)) {
-				updateLabels = true;
-			}
+            updateBoard = updateBoard || boardCanvas == null ||
+                    !prevProperties.board.equals(newProperties.board);
+            updatePreview = updatePreview || previewCanvas == null ||
+                    !prevProperties.preview.equals(newProperties.preview);
+            updateLabels = updateLabels || !prevProperties.isLabelsEquals(newProperties);
 		}
 		
 		if (updateMainCanvas) {
@@ -1009,9 +1004,9 @@ public final class Drawer {
 				labelsCanvas = initCanvas(labelsCanvas, newWidth, newHeight, needToClearCanvas);
 				// append labels and icons
 				drawLabelsAndIcons(labelsCanvas, newProperties, needToClearCanvas);
-				// add label canvas
-				appendCanvas(canvas, labelsCanvas, labelX, labelY);
 			}
+			// add label canvas
+			appendCanvas(canvas, labelsCanvas, labelX, labelY);
 			
 			int previewX = labelX
 			// center of the label canvas
@@ -1021,18 +1016,16 @@ public final class Drawer {
 			if (updatePreview) {
 				updateCanvas(previewCanvas, newProperties.preview, borderLineWidth);
 			}
-			if (updatePreview || updateLabels) {
-				// add preview canvas
-				appendCanvas(canvas, previewCanvas, previewX, previewY);
-			}
+			// add preview canvas
+			appendCanvas(canvas, previewCanvas, previewX, previewY);
 			
 			if (updateBoard) {
 				updateCanvas(boardCanvas, newProperties.board, borderLineWidth);
 				canvasSetBorder(boardCanvas, borderLineWidth);
 				drawComingSoonStatus(boardCanvas, newProperties.status);
-				// add main board canvas
-				appendCanvas(canvas, boardCanvas, boardX, boardY);
 			}
+			// add main board canvas
+			appendCanvas(canvas, boardCanvas, boardX, boardY);
 			
 		}
 		
