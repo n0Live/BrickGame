@@ -318,8 +318,7 @@ public class ArkanoidGame extends GameWithLives {
 					new Runnable() {
 						@Override
 						public void run() {
-							if (!(exitFlag || Thread.currentThread()
-									.isInterrupted())
+							if (!isInterrupted()
 									&& getStatus() == Status.Running) {
 								shiftBricks();
 							}
@@ -330,22 +329,26 @@ public class ArkanoidGame extends GameWithLives {
 		final float slowestSpeed = 1.20f;
 		final float speedStep = 0.20f;
 
-		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
+		while (!isInterrupted() && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
-				// change the speed in depending of the platform size
-				// (slower when used small platform)
-				float speedFactor = slowestSpeed - platform.getType()
-						* speedStep;
-				int currentSpeed = Math.round(getSpeed(true) * speedFactor);
+				// deferred pause
+				if (deferredPauseFlag) pause();
 
-				// decrease game speed if use double sided platform
-				if (useDoubleSidedPlatform) {
-					currentSpeed += ANIMATION_DELAY;
-				}
+				if (getStatus() == Status.Running) {
+					// change the speed in depending of the platform size
+					// (slower when used small platform)
+					float speedFactor = slowestSpeed - platform.getType()
+							* speedStep;
+					int currentSpeed = Math.round(getSpeed(true) * speedFactor);
 
-				if (elapsedTime(currentSpeed)) {
-					moveBall();
+					// decrease game speed if use double sided platform
+					if (useDoubleSidedPlatform) {
+						currentSpeed += ANIMATION_DELAY;
+					}
+
+					if (elapsedTime(currentSpeed)) {
+						moveBall();
+					}
 				}
 			}
 			// processing of key presses
@@ -598,7 +601,7 @@ public class ArkanoidGame extends GameWithLives {
 
 		super.processKeys();
 
-		if (getStatus() == Status.Running && !exitFlag) {
+		if (getStatus() == Status.Running && !isInterrupted()) {
 			if (containsKey(KeyPressed.KeyLeft)) {
 				if (movePlatform(curX - 1)) {
 					GameSound.playEffect(Effects.move);

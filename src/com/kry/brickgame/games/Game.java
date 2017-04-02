@@ -134,14 +134,17 @@ public abstract class Game implements Callable<Game>, Serializable {
 	private Board preview;
 
 	/**
-	 * If true than game will interrupted
+	 * If true than game will exit to selector menu
 	 */
-	volatile boolean exitFlag;
-
+	volatile transient boolean exitToMainMenuFlag;
 	/**
 	 * If true than game will quit (with or without save)
 	 */
-	volatile boolean readyToQuitFlag;
+	volatile transient boolean quitFlag;
+	/**
+	 * If true then game will paused as soon as it would possible
+	 */
+	volatile transient boolean deferredPauseFlag;
 
 	/**
 	 * Scheduled thread pool
@@ -220,8 +223,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 		status = Status.None;
 		rotation = Rotation.NONE;
 
-		exitFlag = false;
-		readyToQuitFlag = false;
+		exitToMainMenuFlag = false;
+		quitFlag = false;
+		deferredPauseFlag = false;
 
 		setDrawInvertedBoard(false);
 
@@ -296,9 +300,24 @@ public abstract class Game implements Callable<Game>, Serializable {
 		this.type = type;
 	}
 
+	/**
+	 * Returns {@code true} if this game has been interrupted.
+	 * 
+	 * @return <code>true</code> if this game has been interrupted;
+	 *         <code>false</code> otherwise.
+	 */
 	protected boolean isInterrupted() {
-		return (exitFlag || readyToQuitFlag || Thread.currentThread()
-				.isInterrupted());
+		return exitToMainMenuFlag || Thread.currentThread().isInterrupted();
+	}
+
+	/**
+	 * Returns {@code true} if this game's animation has been skipped.
+	 * 
+	 * @return <code>true</code> if animation has been skipped;
+	 *         <code>false</code> otherwise.
+	 */
+	protected boolean isSkipAnimation() {
+		return (quitFlag || deferredPauseFlag || isInterrupted());
 	}
 
 	/**
@@ -325,16 +344,15 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 *            duration of the animation in milliseconds
 	 */
 	void animatedClearBoard(int millis) {
-		// delay between animation frames
-		int delay = millis / (boardHeight * 2);
-
-		CLEAR:
 		// label for exit from both for-loops
-		{
+		CLEAR: if (!isSkipAnimation()) {
+			// delay between animation frames
+			int delay = millis / (boardHeight * 2);
+
 			// the board is filled upwards
 			for (int y = 0; y < boardHeight; y++) {
 				processKeys();
-				if (isInterrupted()) break CLEAR;
+				if (isSkipAnimation()) break CLEAR;
 				for (int x = 0; x < boardWidth; x++) {
 					board.setCell(Cell.Full, x, y);
 				}
@@ -344,7 +362,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 			// and is cleaned downwards
 			for (int y = boardHeight - 1; y >= 0; y--) {
 				processKeys();
-				if (isInterrupted()) break CLEAR;
+				if (isSkipAnimation()) break CLEAR;
 				for (int x = 0; x < boardWidth; x++) {
 					board.setCell(Cell.Empty, x, y);
 				}
@@ -352,9 +370,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 				sleep(delay);
 			}
 		}
-
 		// immediately clear board when animation interrupted
-		if (isInterrupted()) {
+		if (isSkipAnimation()) {
 			board.clearBoard();
 			fireBoardChanged(board);
 		}
@@ -377,21 +394,22 @@ public abstract class Game implements Callable<Game>, Serializable {
 		Status prevStatus = getStatus();
 		setStatus(Status.DoSomeWork);
 
-		GameSound.playEffect(Effects.remove_line);
+		if (!isSkipAnimation()) {
+			GameSound.playEffect(Effects.remove_line);
 
-		while (x1 >= 0 || x2 < board.getWidth()) {
-			if (x1 >= 0) {
-				board.setCell(Cell.Empty, x1--, y);
-			}
-			if (x2 < board.getWidth()) {
-				board.setCell(Cell.Empty, x2++, y);
-			}
+			while (x1 >= 0 || x2 < board.getWidth()) {
+				if (x1 >= 0) {
+					board.setCell(Cell.Empty, x1--, y);
+				}
+				if (x2 < board.getWidth()) {
+					board.setCell(Cell.Empty, x2++, y);
+				}
 
-			fireBoardChanged(board);
-			sleep(ANIMATION_DELAY * 2);
-			if (isInterrupted()) break;
+				fireBoardChanged(board);
+				sleep(ANIMATION_DELAY * 2);
+				if (isSkipAnimation()) break;
+			}
 		}
-
 		// restore previous status
 		setStatus(prevStatus);
 	}
@@ -457,10 +475,10 @@ public abstract class Game implements Callable<Game>, Serializable {
 
 		setHiScore();
 
-		if (!exitFlag) {
+		if (!exitToMainMenuFlag) {
 			nextGame = new GameSelector(speed, level, this.getClass()
 					.getCanonicalName(), getType());
-			exitFlag = true;
+			exitToMainMenuFlag = true;
 		}
 	}
 
@@ -690,6 +708,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 *            y-coordinate of the epicenter
 	 */
 	void kaboom(int x, int y) {
+		if (isSkipAnimation()) return;
 		/**
 		 * Nested (inner) class to draw an explosion
 		 */
@@ -796,7 +815,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 			for (int k = 0; k < kaboom.waves.length; k++) {
 				kaboom.blast(newX, newY, k);
 				processKeys();
-				if (isInterrupted()) return;
+				if (isSkipAnimation()) return;
 			}
 		}
 	}
@@ -847,11 +866,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 * Pause
 	 */
 	public void pause() {
-		// stop sound on games and splash screen
-		if (getStatus() == Status.Running || this instanceof SplashScreen) {
-			stopAllSounds();
-		}
 		if (getStatus() == Status.Running) {
+			// stop sound on games
+			stopAllSounds();
 			// send score
 			fireInfoChanged(String.valueOf(score));
 			// send high score
@@ -859,6 +876,14 @@ public abstract class Game implements Callable<Game>, Serializable {
 
 			setStatus(Status.Paused);
 		}
+	}
+
+	/**
+	 * Pause that game immediately
+	 */
+	public void pause(boolean immediately) {
+		if (immediately) deferredPauseFlag = true;
+		pause();
 	}
 
 	/**
@@ -931,9 +956,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void quit() {
 		if (getStatus() == Status.DoSomeWork
 				&& !(this instanceof SplashScreen || this instanceof GameSelector)) {
-			readyToQuitFlag = true;
+			quitFlag = true;
 		} else {
-			readyToQuitFlag = false;
+			quitFlag = false;
 			stopAllSounds();
 			if (!saveState()) {
 				GameLoader.deleteSavedGame();
@@ -955,6 +980,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void resume() {
 		if (getStatus() == Status.Paused) {
 			setStatus(Status.Running);
+			deferredPauseFlag = false;
 		}
 	}
 

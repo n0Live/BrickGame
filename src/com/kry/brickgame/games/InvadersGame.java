@@ -244,9 +244,7 @@ public class InvadersGame extends GameWithGun {
 				.scheduleWithFixedDelay(new Runnable() {
 					@Override
 					public void run() {
-						if (!(exitFlag || Thread.currentThread()
-								.isInterrupted())
-								&& getStatus() == Status.Running) {
+						if (!isInterrupted() && getStatus() == Status.Running) {
 							flightOfBullets();
 						}
 					}
@@ -254,15 +252,20 @@ public class InvadersGame extends GameWithGun {
 				}, 0, ANIMATION_DELAY / (hasTwoSmokingBarrels ? 1 : 2),
 						TimeUnit.MILLISECONDS);
 
-		while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+		while (!isInterrupted() && getStatus() != Status.GameOver) {
 			if (getStatus() == Status.Running && isStarted) {
-				if (isDead) {
-					// must be in the main thread
-					loss(curX, curY);
-					// check the number of remaining bricks
-				} else if (bricks.getBricksCount() <= 0
-						|| bricksY <= -bricks.getHeight()) {
-					win();
+				// deferred pause
+				if (deferredPauseFlag) pause();
+
+				if (getStatus() == Status.Running) {
+					if (isDead) {
+						// must be in the main thread
+						loss(curX, curY);
+						// check the number of remaining bricks
+					} else if (bricks.getBricksCount() <= 0
+							|| bricksY <= -bricks.getHeight()) {
+						win();
+					}
 				}
 			}
 			// processing of key presses
@@ -593,7 +596,7 @@ public class InvadersGame extends GameWithGun {
 
 		super.processKeys();
 
-		if (getStatus() == Status.Running && !exitFlag) {
+		if (getStatus() == Status.Running && !isInterrupted()) {
 			int newX = curX, newY = curY;
 			boolean move = false;
 

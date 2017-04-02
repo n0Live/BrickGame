@@ -105,14 +105,14 @@ public abstract class GameWithLives extends Game {
 			setLives(getLives() - 1);
 			if (getLives() > 0) {
 				animatedClearBoard(CB_LOSE);
-				if (!(exitFlag || Thread.currentThread().isInterrupted())) {
+				if (!isInterrupted()) {
 					reloadLevel();
 				}
 			} else {
 				gameOver();
 			}
 		}
-		if (readyToQuitFlag) quit();
+		if (quitFlag) quit();
 	}
 
 	/**
@@ -120,7 +120,7 @@ public abstract class GameWithLives extends Game {
 	 * seconds
 	 */
 	private void playAndWaitMusic() {
-		if (!readyToQuitFlag) {
+		if (!isSkipAnimation()) {
 			if (!isMuted()) {
 				GameSound.playMusic(Music.start);
 			}
@@ -182,11 +182,11 @@ public abstract class GameWithLives extends Game {
 				setSpeed(getSpeed() + 1);
 			}
 
-			if (!(exitFlag || Thread.currentThread().isInterrupted())) {
+			if (!isInterrupted()) {
 				loadNewLevel();
 			}
 		}
-		if (readyToQuitFlag) quit();
+		if (quitFlag) quit();
 	}
 
 }

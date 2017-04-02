@@ -62,7 +62,7 @@ public class GameSelector extends Game {
 		gamesList.put('Y', "com.kry.brickgame.games.???");
 		gamesList.put('Z', "com.kry.brickgame.games.???");
 	}
-	
+
 	/**
 	 * Letter - kind of game
 	 */
@@ -71,61 +71,61 @@ public class GameSelector extends Game {
 	 * Number - subtypes of game
 	 */
 	private int number;
-	
+
 	/**
 	 * Number of subtypes for the current game
 	 */
 	private int maxNumber;
-	
+
 	/**
 	 * Class of the current game
 	 */
 	private Class<Game> c;
-	
+
 	/**
 	 * Animated splash for a game
 	 */
 	private Splash splash;
-	
+
 	/**
 	 * Timer for the splash screen of the game
 	 */
 	transient private ScheduledFuture<?> splashTimer;
-	
+
 	public GameSelector() {
 		super();
 		setRotation(getSettingsManager().getRotation());
-		
+
 		splash = null;
 		restart();
 	}
-	
+
 	public GameSelector(int speed, int level, String gameClassName, int type) {
 		super(speed, level, getSettingsManager().getRotation(), type);
 		setGameAndType(gameClassName, type);
 	}
-	
+
 	@Override
 	public Game call() {
 		super.init();
-		
+
 		if (drawAll()) {
 			setStatus(Status.DoSomeWork);
 		} else {
 			setStatus(Status.ComingSoon);
 		}
-		
-		while (!(exitFlag || Thread.currentThread().isInterrupted())) {
+
+		while (!isInterrupted()) {
 			processKeys();
 		}
 		// stop the splash animation timer
 		if (splashTimer != null) {
 			splashTimer.cancel(true);
 		}
-		
+
 		return getNextGame();
 	}
-	
+
 	/**
 	 * Launching a game depending on the chosen letters and numbers
 	 */
@@ -136,13 +136,15 @@ public class GameSelector extends Game {
 				Class[] paramTypes;
 				Constructor<Game> constructor;
 				Object[] args;
-				
+
 				try {
 					// gets constructor(speed, level, rotation, type)
-					paramTypes = new Class[] { int.class, int.class, Rotation.class, int.class };
+					paramTypes = new Class[] { int.class, int.class,
+							Rotation.class, int.class };
 					constructor = c.getConstructor(paramTypes);
 					// gets parameters
-					args = new Object[] { getSpeed(), getLevel(), getRotation(), number };
+					args = new Object[] { getSpeed(), getLevel(),
+							getRotation(), number };
 				} catch (NoSuchMethodException e) {
 					// if constructor with rotation is not exist,
 					// gets constructor(speed, level, type)
@@ -154,7 +156,7 @@ public class GameSelector extends Game {
 				// creates an instance of the game
 				nextGame = constructor.newInstance(args);
 				// starts the selected game
-				exitFlag = true;
+				exitToMainMenuFlag = true;
 			} catch (RuntimeException e) {
 				throw e;
 			} catch (Exception e) {
@@ -163,7 +165,7 @@ public class GameSelector extends Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Displays all the necessary information on the game: letter, number,
 	 * splash screen
@@ -174,71 +176,74 @@ public class GameSelector extends Game {
 		if (splashTimer != null) {
 			splashTimer.cancel(true);
 		}
-		
+
 		Board board = getBoard();
-		
+
 		board = drawLetter(board, letter);
-		
+
 		try {
 			c = (Class<Game>) Class.forName(gamesList.get(letter));
-			
+
 			// trying to get number of subtypes from the class of the game
 			try {
 				maxNumber = c.getField("subtypesNumber").getInt(c);
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-					| SecurityException e) {
+			} catch (IllegalArgumentException | IllegalAccessException
+					| NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
 				// if unable - sets 1
 				maxNumber = 1;
 			}
-			
+
 			// trying to get the splash screen instance from the class of
 			// the game
 			try {
 				String splashClassName = (String) c.getField("splash").get(c);
-				Class<Splash> splashClass = (Class<Splash>) Class.forName(splashClassName);
+				Class<Splash> splashClass = (Class<Splash>) Class
+						.forName(splashClassName);
 				splash = splashClass.newInstance();
-			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-					| SecurityException | InstantiationException e) {
+			} catch (IllegalArgumentException | IllegalAccessException
+					| NoSuchFieldException | SecurityException
+					| InstantiationException e) {
 				e.printStackTrace();
 				splash = null;
 			}
-			
+
 			// show high scores
 			fireInfoChanged(String.valueOf("HI"
 					+ getScoresManager().getHiScore(c.getCanonicalName())));
-			
+
 		} catch (ClassNotFoundException e) {
 			c = null;
 			splash = null;
 			maxNumber = 1;
 		}
-		
+
 		// checks that the current number does not exceed the maximum number
 		if (number > maxNumber) {
 			number = 1;
 		}
 		board = drawNumber(board, number);
 		setBoard(board);
-		
+
 		// draw splash
 		if (splash != null) {
 			// starts the timer to show splash screen of the game
 			final Splash localSplash = splash;
-			splashTimer = scheduledExecutors.scheduleWithFixedDelay(new Runnable() {
-				@Override
-				public void run() {
-					drawGameSplash(localSplash);
-				}
-			}, 0, localSplash.getDelay(), TimeUnit.MILLISECONDS);
+			splashTimer = scheduledExecutors.scheduleWithFixedDelay(
+					new Runnable() {
+						@Override
+						public void run() {
+							drawGameSplash(localSplash);
+						}
+					}, 0, localSplash.getDelay(), TimeUnit.MILLISECONDS);
 		} else {
 			// if unable - clears the rectangle of the splash screen
 			drawGameSplash(null);
 		}
-		
+
 		return c != null;
 	}
-	
+
 	/**
 	 * Displays one frame of the splash screen of the game
 	 * <p>
@@ -250,15 +255,16 @@ public class GameSelector extends Game {
 	void drawGameSplash(Splash splash) {
 		Board board = getBoard();
 		if (splash != null) {
-			board = insertCellsToBoard(board, splash.getNextFrame().getBoard(), 0,
-					BoardNumbers.height + 1);
+			board = insertCellsToBoard(board, splash.getNextFrame().getBoard(),
+					0, BoardNumbers.height + 1);
 		} else {
 			Board clear = new Board(Splash.width, Splash.height);
-			board = insertCellsToBoard(board, clear.getBoard(), 0, BoardNumbers.height + 1);
+			board = insertCellsToBoard(board, clear.getBoard(), 0,
+					BoardNumbers.height + 1);
 		}
 		setBoard(board);
 	}
-	
+
 	/**
 	 * Displays a letter at the top of the basic board
 	 * 
@@ -271,11 +277,12 @@ public class GameSelector extends Game {
 	private Board drawLetter(Board board, char letter) {
 		BoardLetters boardLetter = new BoardLetters();
 		boardLetter.setLetter(BoardLetters.charToLetters(letter));
-		Board result = insertCellsToBoard(board, boardLetter.getBoard(), boardWidth / 2
-				- BoardLetters.width / 2 - 1, boardHeight - BoardLetters.height);
+		Board result = insertCellsToBoard(board, boardLetter.getBoard(),
+				boardWidth / 2 - BoardLetters.width / 2 - 1, boardHeight
+						- BoardLetters.height);
 		return result;
 	}
-	
+
 	/**
 	 * Displays a two numbers at the bottom of the basic board
 	 * 
@@ -288,7 +295,7 @@ public class GameSelector extends Game {
 	private Board drawNumber(Board board, int number) {
 		int number_1;
 		int number_2;
-		
+
 		if (number < 10) {
 			number_1 = 0;
 			number_2 = number;
@@ -296,33 +303,34 @@ public class GameSelector extends Game {
 			number_1 = number / 10;
 			number_2 = number % 10;
 		}
-		
+
 		BoardNumbers boardNumber = new BoardNumbers();
 		Board result = board;
-		
+
 		// 1st number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_1));
-		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2
-				- BoardNumbers.width - 1,// x
+		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth
+				/ 2 - BoardNumbers.width - 1,// x
 				0);
 		// 2nd number
 		boardNumber.setNumber(BoardNumbers.intToNumbers(number_2));
-		result = insertCellsToBoard(result, boardNumber.getBoard(), boardWidth / 2,// x
+		result = insertCellsToBoard(result, boardNumber.getBoard(),
+				boardWidth / 2,// x
 				0);
-		
+
 		return result;
 	}
-	
+
 	@Override
 	protected int getSpeedOfFirstLevel() {
 		return 0;
 	}
-	
+
 	@Override
 	protected int getSpeedOfTenthLevel() {
 		return 0;
 	}
-	
+
 	/**
 	 * Next allowable letter
 	 */
@@ -338,7 +346,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Next allowable number
 	 */
@@ -346,7 +354,7 @@ public class GameSelector extends Game {
 		number = number < maxNumber ? number + 1 : 1;
 		setBoard(drawNumber(getBoard(), number));
 	}
-	
+
 	/**
 	 * Previous allowable letter
 	 */
@@ -362,7 +370,7 @@ public class GameSelector extends Game {
 			setStatus(Status.ComingSoon);
 		}
 	}
-	
+
 	/**
 	 * Previous allowable number
 	 */
@@ -370,7 +378,7 @@ public class GameSelector extends Game {
 		number = number > 1 ? number - 1 : maxNumber;
 		setBoard(drawNumber(getBoard(), number));
 	}
-	
+
 	/**
 	 * Processing of key presses
 	 */
@@ -378,60 +386,60 @@ public class GameSelector extends Game {
 	protected void processKeys() {
 		// decrease CPU loading
 		sleep(30);
-		
+
 		if (keys.isEmpty()) return;
-		
+
 		if (keys.contains(KeyPressed.KeyShutdown)) {
 			keys.remove(KeyPressed.KeyShutdown);
 			quit();
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyReset)) {
 			keys.remove(KeyPressed.KeyReset);
 			returnToSplashScreen();
 			return;
 		}
-		
+
 		// if keys contains any other key
 		GameSound.playEffect(Effects.select);
-		
+
 		if (keys.contains(KeyPressed.KeyMute)) {
 			keys.remove(KeyPressed.KeyMute);
-            if (!isMuted()){
-                mute();
-            }else{
-                unmute();
-            }
+			if (!isMuted()) {
+				mute();
+			} else {
+				unmute();
+			}
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyStart)) {
 			keys.remove(KeyPressed.KeyStart);
 			changeGame();
 			return;
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyLeft)) {
 			keys.remove(KeyPressed.KeyLeft);
 			setSpeed(getSpeed() + 1);
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyRight)) {
 			keys.remove(KeyPressed.KeyRight);
 			setLevel(getLevel() + 1);
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyUp)) {
 			keys.remove(KeyPressed.KeyUp);
 			nextNumber();
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyDown)) {
 			keys.remove(KeyPressed.KeyDown);
 			prevNumber();
 		}
-		
+
 		if (keys.contains(KeyPressed.KeyRotate)) {
 			keys.remove(KeyPressed.KeyRotate);
 			if (getRotation() == Rotation.COUNTERCLOCKWISE) {
@@ -441,7 +449,7 @@ public class GameSelector extends Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns {@code GameSelector} with displayed first letter and number.
 	 * 
@@ -452,7 +460,7 @@ public class GameSelector extends Game {
 		number = 1;
 		return this;
 	}
-	
+
 	/**
 	 * Close game selector and start splash screen
 	 */
@@ -461,10 +469,10 @@ public class GameSelector extends Game {
 		// show actual speed and level
 		nextGame.setLevel(getLevel());
 		nextGame.setSpeed(getSpeed());
-		
-		exitFlag = true;
+
+		exitToMainMenuFlag = true;
 	}
-	
+
 	/**
 	 * Sets displaying letter and number related to specified game class name
 	 * and game type.

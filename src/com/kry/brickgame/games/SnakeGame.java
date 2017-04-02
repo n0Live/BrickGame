@@ -131,26 +131,30 @@ public class SnakeGame extends GameWithLives {
 			loadNewLevel();
 		}
 		
-		while (!(exitFlag || Thread.currentThread().isInterrupted())
-				&& getStatus() != Status.GameOver) {
-			if (getStatus() == Status.Running && isStarted) {
-				int currentSpeed = getSpeed(true);
-				if (!usePreloadedLevels && getLevel() > 5) {
-					currentSpeed += ANIMATION_DELAY;
-				}
-				if (isToroidalField) {
-					currentSpeed += ANIMATION_DELAY / 2;
-				}
-				
-				// moving of the snake
-				if (elapsedTime(currentSpeed) && !move(snake.getDirection())) {
-					loss(curX, curY);
-				}
-				// when the snake has reached the maximum length
-				if (snake.getLength() >= SnakeShape.getMaxLength()) {
-					win();
-				}
-			}
+		while (!isInterrupted() && getStatus() != Status.GameOver) {
+            if (getStatus() == Status.Running && isStarted) {
+                // deferred pause
+                if (deferredPauseFlag) pause();
+
+                if (getStatus() == Status.Running) {
+                    int currentSpeed = getSpeed(true);
+                    if (!usePreloadedLevels && getLevel() > 5) {
+                        currentSpeed += ANIMATION_DELAY;
+                    }
+                    if (isToroidalField) {
+                        currentSpeed += ANIMATION_DELAY / 2;
+                    }
+
+                    // moving of the snake
+                    if (elapsedTime(currentSpeed) && !move(snake.getDirection())) {
+                        loss(curX, curY);
+                    }
+                    // when the snake has reached the maximum length
+                    if (snake.getLength() >= SnakeShape.getMaxLength()) {
+                        win();
+                    }
+                }
+            }
 			// processing of key presses
 			processKeys();
 		}
@@ -421,7 +425,7 @@ public class SnakeGame extends GameWithLives {
 		
 		super.processKeys();
 		
-		if (getStatus() == Status.Running && !exitFlag && isStarted) {
+		if (getStatus() == Status.Running && !isInterrupted() && isStarted) {
 			if (containsKey(KeyPressed.KeyLeft)) if (move(LEFT)) {
 				GameSound.playEffect(Effects.move);
 				setKeyDelay(KeyPressed.KeyLeft, ANIMATION_DELAY * 3);

@@ -238,6 +238,7 @@ public class SplashScreen extends Game {
             }else{
                 unmute();
             }
+            return;
 		}
 		
 		if (containsKey(KeyPressed.KeyReset)) {
@@ -252,6 +253,11 @@ public class SplashScreen extends Game {
 			quit();
 		}
 		
+	}
+	
+	@Override
+	public void pause() {
+		stopAllSounds();
 	}
 	
 	/**
