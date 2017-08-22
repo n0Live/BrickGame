@@ -398,7 +398,7 @@ public final class Drawer {
 	 * {@code foregroundText}.
 	 * <p>
 	 * It's equivalent of
-	 * {@code drawTextOnCanvas(canvas, backgroundText, foregroundText, font,  x, y, false)}
+	 * {@code drawTextOnCanvas(canvas, backgroundText, foregroundText, font,  x, y, true)}
 	 * 
 	 * @param canvas
 	 *            the target canvas
@@ -561,16 +561,22 @@ public final class Drawer {
 		fontManager = FontManager.getManager();
 	}
 	
-	/**
-	 * Calculate optimal line width for a border line, depending of the size of
-	 * a square. The line width can't be more than 4.
-	 * 
-	 * @return line width for a border line
-	 */
-	private float calcBorderLineWidth() {
-		// return squareSideLength/4 if then less than 4 or 4 otherwise
-		return Math.min(squareSideLength / 4, 4);
-	}
+    /**
+     * Calculate optimal line width for a border line, depending of the size of a square. The line
+     * width can't be more than {@code MAX_BORDER_WIDTH} and less than 1..
+     *
+     * @return line width for a border line
+     */
+    private float calcBorderLineWidth() {
+        final float MAX_BORDER_WIDTH = 4f;
+
+        // return minimal from squareSideLength/4 or MAX_BORDER_WIDTH
+        float result = Math.min(squareSideLength / 4f, MAX_BORDER_WIDTH);
+        // not less than 1
+        result = Math.max(result, 1);
+
+        return result;
+    }
 	
 	/**
 	 * Draws the contents of the board to the canvas
@@ -672,21 +678,20 @@ public final class Drawer {
 		int x, y;
 		int maxWidth;
 		
-		GameProperties oldProperties = prevProperties != null ? prevProperties : properties;
-		
+        boolean forceUpdate = cleared || prevProperties == null;
+        
 		// set scores string
 		String scoresInfo = showHiScores ? properties.hiScores : properties.info;
-		if (scoresInfo == null) {
-			scoresInfo = "";
-		}
-		String oldScoresInfo = oldProperties.showHiScores ? oldProperties.hiScores
-		        : oldProperties.info;
-		if (oldScoresInfo == null) {
-			oldScoresInfo = "";
-		}
+		if (scoresInfo == null) scoresInfo = "";
+		String oldScoresInfo = null;
+        if (prevProperties != null) {
+            oldScoresInfo =
+                    prevProperties.showHiScores ? prevProperties.hiScores : prevProperties.info;
+        }
 		
-		if (cleared || !scoresInfo.equals(oldScoresInfo)
-		        || showHiScores != oldProperties.showHiScores) {
+		boolean updateScores = forceUpdate || !scoresInfo.equals(oldScoresInfo) ||
+                showHiScores != prevProperties.showHiScores;
+		if (updateScores) {
 			/* Scores */
 			maxWidth = canvas.getWidth();
 			fontManager.setOptimalDigitalFont(g, SCORE_SUBSTRATE, maxWidth);
@@ -710,14 +715,14 @@ public final class Drawer {
 			y = Math.max(2 * squareSideLength, fontManager.digitalFont.getSize())
 			        + fontManager.textFont.getSize();
 			
-			drawTextOnCanvas(canvas, HI, showHiScores && !"".equals(scoresInfo) ? HI : "",
+			drawTextOnCanvas(canvas, HI, showHiScores && !scoresInfo.isEmpty() ? HI : "",
 			        fontManager.textFont.deriveFont(Font.PLAIN), x, y);
-			drawTextOnCanvas(canvas, SCORE, !"".equals(scoresInfo) ? SCORE : "",
+			drawTextOnCanvas(canvas, SCORE, !scoresInfo.isEmpty() ? SCORE : "",
 			        fontManager.textFont.deriveFont(Font.PLAIN), x + fm.stringWidth(HI), y);
 			/* --- */
 		}
 		
-		if (cleared || properties.mute != oldProperties.mute) {
+		if (updateScores || properties.mute != prevProperties.mute) {
 			/* Music icon */
 			if (fontManager.iconFont != null) {
 				fontManager.setOptimalIconFont(g, ICON_MUSIC, squareSideLength);
@@ -736,8 +741,8 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || properties.showNext != oldProperties.showNext
-		        || properties.showLives != oldProperties.showLives) {
+		if (forceUpdate || properties.showNext != prevProperties.showNext
+		        || properties.showLives != prevProperties.showLives) {
 			/* Next/Lives labels */
 			maxWidth = canvas.getWidth() - squareSideLength;
 			fontManager.setOptimalTextFont(g, NEXT + " " + LIVES, maxWidth);
@@ -755,8 +760,11 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || properties.speed != oldProperties.speed
-		        || properties.level != oldProperties.level) {
+
+        boolean updateSpeedAndLevel = forceUpdate || properties.speed != prevProperties.speed ||
+                properties.level != prevProperties.level;
+
+        if (updateSpeedAndLevel) {
 			/* Speed and Level */
 			fm = g.getFontMetrics(fontManager.digitalFont);
 			// set the same distance to the labels from both sides
@@ -764,11 +772,11 @@ public final class Drawer {
 			// height is 9.5 of a squares
 			y = 9 * squareSideLength + squareSideLength / 2 + fontManager.digitalFont.getSize();
 			
-			if (cleared || properties.speed != oldProperties.speed) {
+			if (forceUpdate || properties.speed != prevProperties.speed) {
 				drawTextOnCanvas(canvas, NUMBER_SUBSTRATE, String.valueOf(properties.speed),
 				        fontManager.digitalFont, x, y);
 			}
-			if (cleared || properties.level != oldProperties.level) {
+			if (forceUpdate || properties.level != prevProperties.level) {
 				drawTextOnCanvas(canvas, NUMBER_SUBSTRATE, String.valueOf(properties.level),
 				        fontManager.digitalFont,
 				        x + squareSideLength / 2 + fm.stringWidth(NUMBER_SUBSTRATE), y);
@@ -776,7 +784,7 @@ public final class Drawer {
 			}
 		}
 		
-		if (cleared) {
+		if (updateSpeedAndLevel) {
 			/* Speed and Level labels */
 			maxWidth = canvas.getWidth() - squareSideLength;
 			fontManager.setOptimalTextFont(g, SPEED + LEVEL, maxWidth);
@@ -797,7 +805,7 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || properties.rotation != oldProperties.rotation) {
+		if (forceUpdate || !properties.rotation.equals(prevProperties.rotation)) {
 			/* Rotate label */
 			// minus width of the rotate icons and space between label and icons
 			maxWidth = canvas.getWidth() - (squareSideLength * 2 + squareSideLength / 4);
@@ -831,7 +839,7 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || !properties.status.equals(oldProperties.status)) {
+		if (forceUpdate || !properties.status.equals(prevProperties.status)) {
 			/* Pause label */
 			maxWidth = canvas.getWidth() / 2;
 			fontManager.setOptimalTextFont(g, PAUSE, maxWidth);
@@ -845,7 +853,7 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || properties.showPauseIcon != oldProperties.showPauseIcon) {
+		if (forceUpdate || properties.showPauseIcon != prevProperties.showPauseIcon) {
 			/* Pause icon */
 			if (fontManager.iconFont != null) {
 				fontManager.setOptimalIconFont(g, ICON_PAUSE, squareSideLength * 2);
@@ -865,7 +873,7 @@ public final class Drawer {
 			/* --- */
 		}
 		
-		if (cleared || !properties.status.equals(oldProperties.status)) {
+		if (forceUpdate || !properties.status.equals(prevProperties.status)) {
 			/* Game Over label */
 			maxWidth = canvas.getWidth() - squareSideLength / 2;
 			fontManager.setOptimalTextFont(g, GAME_OVER, maxWidth);
@@ -899,23 +907,38 @@ public final class Drawer {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		
 		clearCanvas(image, bgColor);
-		
+
+        float calcLineWidth;
+        //decrease thickness of the line on a small screen
+		if (lineWidth * 1.25f >= ((squareSideLength - lineWidth)  / 4f))
+			calcLineWidth = lineWidth * 0.7f;
+		else calcLineWidth= lineWidth;
+
 		g2d.setColor(color);
 		// set thickness of the line
-		g2d.setStroke(new BasicStroke(lineWidth));
+		g2d.setStroke(new BasicStroke(calcLineWidth));
 		
 		// separate the distances between a squares
-		int separator = Math.round(lineWidth * 1.75f);
+		int separator = Math.round(calcLineWidth * 1.75f);
+		
+		int left, top, width, height;
+		
+        //coordinates for the outer square
+        left = top = separator / 2;
+        width = height = squareSideLength - separator;
+        
 		// draw the frame
-		g2d.drawRect(separator / 2, separator / 2, squareSideLength - separator, squareSideLength
-		        - separator);
+		g2d.drawRect(left, top, width, height);
 		
 		// draw the inner square
 		int innerStart = Math.max(Math.round((squareSideLength - separator) * 0.25f),
-		        Math.round(lineWidth + 1));
-		int innerSquareSideLength = squareSideLength - separator - innerStart * 2 + 1;//
-		g2d.fillRect(separator / 2 + innerStart, separator / 2 + innerStart, innerSquareSideLength,
-		        innerSquareSideLength);
+		        Math.round(calcLineWidth + 1));
+		
+        //coordinates for the inner square
+        left = top = separator / 2 + innerStart;
+        width = height = squareSideLength - separator - innerStart * 2 + 1;
+        
+ 		g2d.fillRect(left, top, width, height);
 		
 		g2d.dispose();
 		
@@ -987,8 +1010,9 @@ public final class Drawer {
 		if (boardCanvas != null && previewCanvas != null) {
 			// draw the board and the preview
 			int space = squareSideLength / 2;	
-			int boardX = space;
-			int boardY = space;
+			int boardX = space / 2;
+			int boardY = (canvas.getHeight() - boardCanvas.getHeight()) / 2f > (space * 2) ?
+                    space : space / 2;
 			int labelX = boardX + boardCanvas.getWidth();
 			int labelY = boardY;
 			
