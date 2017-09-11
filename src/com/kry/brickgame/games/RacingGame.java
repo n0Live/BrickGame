@@ -30,6 +30,11 @@ public class RacingGame extends GameWithLives {
 	 * Number of subtypes
 	 */
 	public static final int subtypesNumber = 4;
+	 
+    /**
+     * Number of scores that need to be achieved before increase speed and level
+     */
+    private static final int LEVELUP_POINT = 50;
 	/**
 	 * Racing car
 	 */
@@ -141,7 +146,7 @@ public class RacingGame extends GameWithLives {
 					&& r.nextInt(10 - getLevel() / 2) == 0) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
-					opponents.add(coords);
+					opponents.add(coords.clone());
 					// calculate position of the second one
 					int anotherPositionX;
 					do {
@@ -149,7 +154,7 @@ public class RacingGame extends GameWithLives {
 					} while (anotherPositionX == positionX);
 					// create the second one
 					coords[0] = positions[anotherPositionX];
-					opponents.add(coords);
+					opponents.add(coords.clone());
 				} else { // or set position with shift
 					if (positionX == 0) {
 						coords[0] += 1;// shift to right
@@ -158,10 +163,10 @@ public class RacingGame extends GameWithLives {
 					} else {
 						coords[0] += r.nextBoolean() ? 1 : -1;// random
 					}
-					opponents.add(coords);
+					opponents.add(coords.clone());
 				}
 			} else {
-				opponents.add(coords);
+				opponents.add(coords.clone());
 			}
 
 			lastOpponentY = opponents.getLast()[1] + car.maxY();
@@ -253,12 +258,14 @@ public class RacingGame extends GameWithLives {
 
 	@Override
 	protected int getSpeedOfFirstLevel() {
-		return 200;
+        //the speed depends on the level: 195-150
+        return 200 - 5 * getLevel();
 	}
 
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 50;
+        //the speed depends on the level: 50-41
+        return 50 - getLevel() + 1;
 	}
 
 	@Override
@@ -451,21 +458,22 @@ public class RacingGame extends GameWithLives {
 		super.resume();
 	}
 
-	@Override
-	void setScore(int score) {
-		int oldHundreds = getScore() / 100;
+    @Override
+    void setScore(int score) {
+        int oldScores = getScore();
 
-		super.setScore(score);
+        super.setScore(score);
 
-		// when a sufficient number of points changes the speed and the level
-		if (getScore() / 100 > oldHundreds) {
-			setLevel(getLevel() + 1);
+        // when a sufficient number of points changes the speed and the level
+        if (getScore() / LEVELUP_POINT > oldScores / LEVELUP_POINT) {
+            setSpeed(getSpeed() + 1);
+            if (!Game.isMuted() && engineSound != null) engineSound.play(getSpeed());
 
-			if (getLevel() == 1) {
-				setSpeed(getSpeed() + 1);
-			}
-		}
-	}
+            if (getSpeed() == 1) {
+                setLevel(getLevel() + 1);
+            }
+        }
+    }
 
 	@Override
 	void stopAllSounds() {
