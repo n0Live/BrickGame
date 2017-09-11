@@ -33,7 +33,13 @@ public class GameSelector extends Game {
 	 * List of games with the letters associated with them
 	 */
 	private static final Map<Character, String> gamesList;
+    private static final char FIRST_GAME_LETTER = 'A';
+    private static final char LAST_GAME_LETTER = 'X';
+    
 	static {
+	       // Check letter constants
+        assert (LAST_GAME_LETTER <= FIRST_GAME_LETTER);
+        
 		gamesList = new HashMap<>();
 		gamesList.put('A', "com.kry.brickgame.games.DanceGame");
 		gamesList.put('B', "com.kry.brickgame.games.TanksGame");
@@ -59,8 +65,8 @@ public class GameSelector extends Game {
 		gamesList.put('V', "com.kry.brickgame.games.PentixGameV");
 		gamesList.put('W', "com.kry.brickgame.games.PentixGameW");
 		gamesList.put('X', "com.kry.brickgame.games.PentixGameX");
-		gamesList.put('Y', "com.kry.brickgame.games.???");
-		gamesList.put('Z', "com.kry.brickgame.games.???");
+		//gamesList.put('Y', "com.kry.brickgame.games.???");
+		//gamesList.put('Z', "com.kry.brickgame.games.???");
 	}
 
 	/**
@@ -335,16 +341,16 @@ public class GameSelector extends Game {
 	 * Next allowable letter
 	 */
 	private void nextLetter() {
-		if (letter < 'Z') {
-			letter++;
-		} else {
-			letter = 'A';
-		}
-		if (drawAll()) {
-			setStatus(Status.DoSomeWork);
-		} else {
-			setStatus(Status.ComingSoon);
-		}
+        if (letter < LAST_GAME_LETTER) {
+            letter++;
+        } else {
+            letter = FIRST_GAME_LETTER;
+        }
+        if (drawAll()) {
+            setStatus(Status.DoSomeWork);
+        } else {
+            setStatus(Status.ComingSoon);
+        }
 	}
 
 	/**
@@ -359,16 +365,16 @@ public class GameSelector extends Game {
 	 * Previous allowable letter
 	 */
 	private void prevLetter() {
-		if (letter > 'A') {
-			letter--;
-		} else {
-			letter = 'Z';
-		}
-		if (drawAll()) {
-			setStatus(Status.DoSomeWork);
-		} else {
-			setStatus(Status.ComingSoon);
-		}
+        if (letter > FIRST_GAME_LETTER) {
+            letter--;
+        } else {
+            letter = LAST_GAME_LETTER;
+        }
+        if (drawAll()) {
+            setStatus(Status.DoSomeWork);
+        } else {
+            setStatus(Status.ComingSoon);
+        }
 	}
 
 	/**
