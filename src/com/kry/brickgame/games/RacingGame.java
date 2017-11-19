@@ -143,7 +143,7 @@ public class RacingGame extends GameWithLives {
 			// for levels with 3 positions;
 			if (isThreelaneTraffic
 			// and chance from 1/10 - on level 1, to 1/5 - on level 10
-					&& r.nextInt(10 - getLevel() / 2) == 0) {
+					&& r.nextInt(100) < 10 + getLevel()) {
 				if (r.nextBoolean()) {// create two opponents
 					// create the first opponent
 					opponents.add(coords.clone());
