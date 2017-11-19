@@ -112,7 +112,7 @@ public class TetrisShape extends Shape {
 			shape = Figures.values()[aTetrisShape.getShape().ordinal() + 1];
 			rotationAngle = aTetrisShape.getRotationAngle();
 		} else {
-			shape = Figures.values()[1];
+			shape = Figures.values()[Figures.REF_TO_FIRST_TROMINOES];
 			rotationAngle = aTetrisShape.getRotationAngle().getRight();
 		}
 		
@@ -169,11 +169,11 @@ public class TetrisShape extends Shape {
 		int lastItem = includingSuperShapes ? Figures.values().length
 		        : Figures.REF_TO_FIRST_SUPER_SHAPE;
 		
-		if (aTetrisShape.getShape().ordinal() > 1) {
+		if (aTetrisShape.getShape().ordinal() > Figures.REF_TO_FIRST_TROMINOES) {
 			shape = Figures.values()[aTetrisShape.getShape().ordinal() - 1];
 			rotationAngle = aTetrisShape.getRotationAngle();
 		} else {
-			shape = Figures.values()[lastItem];
+			shape = Figures.values()[lastItem - 1];
 			rotationAngle = aTetrisShape.getRotationAngle().getLeft();
 		}
 		

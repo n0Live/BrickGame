@@ -405,9 +405,9 @@ public class ArkanoidGame extends GameWithLives {
 	 *         {@code false}
 	 */
 	private boolean isPlatform(int x, int y) {
-		return !(x < curX + platform.minX()//
-				|| x > curX + platform.maxX()//
-		|| y != curY && (!useDoubleSidedPlatform || y != secY));
+        return !((y != curY && (!useDoubleSidedPlatform || y != secY))//
+                || x < curX + platform.minX()//
+                || x > curX + platform.maxX());
 	}
 
 	/**
