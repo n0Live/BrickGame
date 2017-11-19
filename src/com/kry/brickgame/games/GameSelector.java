@@ -41,14 +41,14 @@ public class GameSelector extends Game {
         assert (LAST_GAME_LETTER <= FIRST_GAME_LETTER);
         
 		gamesList = new HashMap<>();
-		gamesList.put('A', "com.kry.brickgame.games.DanceGame");
-		gamesList.put('B', "com.kry.brickgame.games.TanksGame");
-		gamesList.put('C', "com.kry.brickgame.games.ArkanoidGame");
-		gamesList.put('D', "com.kry.brickgame.games.RacingGame");
-		gamesList.put('E', "com.kry.brickgame.games.GunGame");
-		gamesList.put('F', "com.kry.brickgame.games.SnakeGame");
-		gamesList.put('G', "com.kry.brickgame.games.FroggerGame");
-		gamesList.put('H', "com.kry.brickgame.games.InvadersGame");
+		gamesList.put('A', "com.kry.brickgame.games.TanksGame");
+		gamesList.put('B', "com.kry.brickgame.games.ArkanoidGame");
+		gamesList.put('C', "com.kry.brickgame.games.RacingGame");
+		gamesList.put('D', "com.kry.brickgame.games.GunGame");
+		gamesList.put('E', "com.kry.brickgame.games.SnakeGame");
+		gamesList.put('F', "com.kry.brickgame.games.FroggerGame");
+		gamesList.put('G', "com.kry.brickgame.games.InvadersGame");
+		gamesList.put('H', "com.kry.brickgame.games.DanceGame");
 		gamesList.put('I', "com.kry.brickgame.games.TetrisGameI");
 		gamesList.put('J', "com.kry.brickgame.games.TetrisGameJ");
 		gamesList.put('K', "com.kry.brickgame.games.TetrisGameK");
