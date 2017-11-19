@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="ext-lib/miglayout15-swing.jar" sourcepath="ext-lib/miglayout-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="ext-lib/jxinput-0.8.jar" sourcepath="ext-lib/JXInput-0.8-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

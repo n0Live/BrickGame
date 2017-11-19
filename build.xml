@@ -4,7 +4,8 @@
 	<property name="src" value="./src" />
 	<property name="dest" value="./bin" />
 	<property name="miglayout" value="./ext-lib/miglayout15-swing.jar" />
-  
+	<property name="jxinput" value="./ext-lib/jxinput-0.8" />
+	
 	<target name="init">
 		<mkdir dir="${dest}"/>
 		<copy todir="${dest}">
@@ -22,6 +23,7 @@
 				<pathelement path="."/>
 				<pathelement location="${miglayout}"/>
 				<pathelement path="${java.home}/lib/jfxrt.jar"/>
+				<pathelement location="${jxinput}"/>
 			</classpath>
 		</javac>
 	</target>
@@ -34,6 +36,7 @@
 			</manifest>
 			<fileset dir="${dest}"/>
 			<zipfileset excludes="META-INF/*.SF" src="${miglayout}"/>
+			<zipfileset excludes="META-INF/*.SF" src="${jxinput}"/>						
 		</jar>
 	</target>
 	
