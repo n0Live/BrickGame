@@ -1025,8 +1025,8 @@ public class TanksGame extends GameWithLives {
 			}
 
 			if (isStarted && containsKey(KeyPressed.KeyRotate)) {
-				GameSound.playEffect(Effects.move);
-				fire(playerTank);
+				if (fire(playerTank))
+					GameSound.playEffect(Effects.move);
 				keys.remove(KeyPressed.KeyRotate);
 			}
 		}
