@@ -76,8 +76,10 @@ class ButtonMouseListener extends MouseAdapter {
 			}
 		} else {
 			// process the pressing buttons as well as pressing a key
+            final long delay = 500;
+            final long period = 50;
 			ScheduledFuture<?> pressedKey = scheduledThreadPool.scheduleAtFixedRate(new Repeater(
-					key), 300, 40, TimeUnit.MILLISECONDS);
+					key), delay, period, TimeUnit.MILLISECONDS);
 			pressedKeys.put(key, pressedKey);
 			
 			Main.getGame().keyPressed(key);

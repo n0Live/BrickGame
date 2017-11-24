@@ -215,7 +215,10 @@ public class Window extends JFrame {
 			getSettingsManager().setSize(e.getWindow().getSize());
 			// set game paused
 			Game game = Main.getGame();
-			if (game != null) game.pause();
+			if (game != null) {
+				game.pause();// set game paused
+				game.saveState();// and save state
+			}
 			try {
 				if (!getSettingsManager().getExitConfirmation()
 						|| CloseOptionPane.show(e.getComponent()) == JOptionPane.YES_OPTION) {
