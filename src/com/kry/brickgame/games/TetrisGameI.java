@@ -44,6 +44,10 @@ public class TetrisGameI extends Game {
 	 */
 	private static final int ROTATION_SPEED = MOVEMENT_SPEED * 3;
 	/**
+	 * Delay of dropping down a line
+	 */
+	private static final int DROP_DOWN_DELAY = ANIMATION_DELAY * 10;
+	/**
 	 * Chance for the appearance of a super figure is 1 from {@value}
 	 */
 	private static final int CHANCE_FOR_SUPER_FIGURE = 7;
@@ -774,6 +778,7 @@ public class TetrisGameI extends Game {
 			}
 			if (containsKey(KeyPressed.KeyUp)) {
 				dropDown();
+				setKeyDelay(KeyPressed.KeyUp, DROP_DOWN_DELAY);
 				keys.remove(KeyPressed.KeyUp);
 			}
 		}
