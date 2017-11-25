@@ -9,6 +9,7 @@ import com.kry.brickgame.boards.Board.Cell;
 import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Music;
+import com.kry.brickgame.games.GameSound.Effects;
 
 /**
  * @author noLive
@@ -32,6 +33,10 @@ public abstract class GameWithLives extends Game {
 	 * Duration of playing the start music
 	 */
 	static final int START_MUSIC_DURATION = 1500;
+	/**
+	 * Number of scores to get an additional life
+	 */
+	private static final int SCORES_TO_ADDITIONAL_LIFE = 10000;
 
 	/**
 	 * The Game with lives without rotation
@@ -187,6 +192,30 @@ public abstract class GameWithLives extends Game {
 			}
 		}
 		if (quitFlag) quit();
+	}
+	
+	/**
+	 * Returns number of scores to get an additional life
+	 */
+	@SuppressWarnings("static-method")
+	int getScoresToAdditionalLife(){
+		return SCORES_TO_ADDITIONAL_LIFE;
+	}
+	
+	@Override
+	void setScore(int score) {
+		super.setScore(score);
+		
+		// adds additional life or bonus scores
+		if (getScore() >= getScoresToAdditionalLife()){
+			GameSound.playEffect(Effects.bonus);
+			if (getLives() < 4){
+				setLives(getLives() + 1);
+			}else{
+				int bonus = getScoresToAdditionalLife() / 1000;
+				super.setScore(getScore() + bonus);
+			}
+		}
 	}
 
 }
