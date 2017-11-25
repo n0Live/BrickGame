@@ -30,6 +30,8 @@ import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.games.GameSound.Music;
 
+import static com.kry.brickgame.games.GameConsts.*;
+
 /**
  * @author noLive
  */
@@ -812,8 +814,8 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected void setLevel(int level) {
 		if (level < 1) {
-			this.level = 10;
-		} else if (level > 10) {
+			this.level = MAX_GAME_LEVEL;
+		} else if (level > MAX_GAME_LEVEL) {
 			this.level = 1;
 		} else {
 			this.level = level;
@@ -852,8 +854,8 @@ public abstract class Game implements Runnable, Serializable {
 	 *            score 0 - 19999
 	 */
 	protected void setScore(int score) {
-		if (score > 19999) {
-			this.score = 19999;
+		if (score > MAX_VISIBLE_SCORES) {
+			this.score = MAX_VISIBLE_SCORES;
 		} else if (score < 0) {
 			this.score = 0;
 		} else {
@@ -870,8 +872,8 @@ public abstract class Game implements Runnable, Serializable {
 	 */
 	protected void setSpeed(int speed) {
 		if (speed < 1) {
-			this.speed = 10;
-		} else if (speed > 10) {
+			this.speed = MAX_GAME_SPEED;
+		} else if (speed > MAX_GAME_SPEED) {
 			this.speed = 1;
 		} else {
 			this.speed = speed;

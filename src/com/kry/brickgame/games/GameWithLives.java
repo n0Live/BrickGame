@@ -2,6 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
+import static com.kry.brickgame.games.GameConsts.MAX_GAME_LIVES;
 import static com.kry.brickgame.games.GameUtils.sleep;
 
 import com.kry.brickgame.boards.Board.Cell;
@@ -14,7 +15,7 @@ import com.kry.brickgame.games.GameSound.Music;
  */
 public abstract class GameWithLives extends Game {
 	private static final long serialVersionUID = -3573267355159195541L;
-	
+
 	/**
 	 * Play "start" music and wait for its ending or, if muted, just wait 1.5
 	 * seconds
@@ -26,16 +27,16 @@ public abstract class GameWithLives extends Game {
 			sleep(1500);
 		}
 	}
-	
+
 	/**
 	 * Count of lives
 	 * <p>
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
-	
+
 	protected boolean isStarted;
-	
+
 	/**
 	 * The Game with lives without rotation
 	 * 
@@ -49,7 +50,7 @@ public abstract class GameWithLives extends Game {
 	public GameWithLives(int speed, int level, int type) {
 		this(speed, level, Rotation.None, type);
 	}
-	
+
 	/**
 	 * The Game with lives
 	 * <p>
@@ -66,11 +67,11 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
-		
+
 		setLives(4);
 		isStarted = true;
 	}
-	
+
 	/**
 	 * Lives
 	 * 
@@ -79,7 +80,7 @@ public abstract class GameWithLives extends Game {
 	protected int getLives() {
 		return lives;
 	}
-	
+
 	/**
 	 * Loading the specified level
 	 */
@@ -90,7 +91,7 @@ public abstract class GameWithLives extends Game {
 		}
 		setStatus(Status.Running);
 	}
-	
+
 	/**
 	 * Drawing effect of the explosion and decreasing lives
 	 * 
@@ -115,14 +116,14 @@ public abstract class GameWithLives extends Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Reloading the specified level
 	 */
 	protected void reloadLevel() {
 		loadNewLevel();
 	}
-	
+
 	/**
 	 * Set lives
 	 * 
@@ -130,8 +131,8 @@ public abstract class GameWithLives extends Game {
 	 *            lives 0 - 4
 	 */
 	protected void setLives(int lives) {
-		if (lives > 4) {
-			this.lives = 4;
+		if (lives > MAX_GAME_LIVES) {
+			this.lives = MAX_GAME_LIVES;
 		} else if (lives < 0) {
 			this.lives = 0;
 		} else {
@@ -146,7 +147,7 @@ public abstract class GameWithLives extends Game {
 		}
 		firePreviewChanged(getPreview());
 	}
-	
+
 	/**
 	 * Increase the level and load it
 	 */
@@ -155,18 +156,18 @@ public abstract class GameWithLives extends Game {
 		synchronized (lock) {
 			GameSound.playMusic(Music.win);
 			animatedClearBoard(CB_WIN);
-			
+
 			setLevel(getLevel() + 1);
 			if (getLevel() == 1) {
 				setSpeed(getSpeed() + 1);
 			}
-			
+
 			if (!Thread.currentThread().isInterrupted()) {
 				loadNewLevel();
 			}
 		}
 	}
-	
+
 	@Override
 	public void run() {
 		super.run();
@@ -176,5 +177,5 @@ public abstract class GameWithLives extends Game {
 			playAndWaitMusic();
 		}
 	}
-	
+
 }

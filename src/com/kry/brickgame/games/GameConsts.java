@@ -65,4 +65,9 @@ public final class GameConsts {
 	public static final int CB_WIN = 5240;
 	public static final int CB_LOSE = 1200;
 	// **
+	
+	public static final int MAX_GAME_SPEED = 10;
+	public static final int MAX_GAME_LEVEL = 10;
+	public static final int MAX_GAME_LIVES = 4;
+	public static final int MAX_VISIBLE_SCORES = 19999;
 }
