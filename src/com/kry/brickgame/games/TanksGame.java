@@ -45,6 +45,18 @@ public class TanksGame extends GameWithLives {
 	 */
 	public static final int subtypesNumber = 8;
 	/**
+	 * Tank's movement speed
+	 */
+	private static final int MOVEMENT_SPEED = ANIMATION_DELAY * 3;
+	/**
+	 * Tank's rotation speed
+	 */
+	private static final int ROTATION_SPEED = MOVEMENT_SPEED * 4;
+	/**
+	 * Tank's shooting speed
+	 */
+	private static final int FIRE_SPEED = ANIMATION_DELAY * 8;
+	/**
 	 * Spawn point of enemy tanks
 	 */
 	final private static int[][] spawnPoints = new int[][] { { 0, 0 },
@@ -55,7 +67,7 @@ public class TanksGame extends GameWithLives {
 	/**
 	 * Quantity of destroyed tanks to enter to the next level
 	 */
-	final private static int KILLS_TO_NEXT_LEVEL = 20;
+	final private static int KILLS_TO_NEXT_LEVEL = 25;
 	/**
 	 * Maximum number of the simultaneous firing player's bullets
 	 */
@@ -833,7 +845,7 @@ public class TanksGame extends GameWithLives {
 
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 350;// 240
+		return 350;
 	}
 
 	/**
@@ -889,11 +901,24 @@ public class TanksGame extends GameWithLives {
 				newPlace.y));
 	}
 
-	/**
-	 * Loading or reloading the specified level
-	 */
 	@Override
 	void loadNewLevel() {
+		initLevel();
+		// reset number of killed enemies
+		enemiesKilled = 0;
+		super.loadNewLevel();
+	}
+
+	@Override
+	void reloadLevel() {
+		initLevel();
+		super.loadNewLevel();
+	}
+
+	/**
+	 * Initialize a new level
+	 */
+	private void initLevel() {
 		// reset isDead flag
 		isDead = false;
 
@@ -902,20 +927,16 @@ public class TanksGame extends GameWithLives {
 		resetEnemyTanks();
 
 		synchronized (lock) {
-			// draws the playerTank
-			setBoard(drawTank(getBoard(), playerTank));
-
 			if (usePreloadedLevels) {
 				loadPreparedObstacles();
 			} else {
 				loadRandomObstacles();
 			}
+			// draws the playerTank
+			setBoard(drawTank(getBoard(), playerTank));
 		}
 
-		enemiesKilled = 0;
 		enemiesOnBoard = 0;
-
-		super.loadNewLevel();
 	}
 
 	/**
@@ -943,8 +964,11 @@ public class TanksGame extends GameWithLives {
 	 * @param direction
 	 *            movement direction
 	 */
-	private void movePlayerTank(RotationAngle direction) {
-		playerTank = moveTank(playerTank, direction, false);
+	private boolean movePlayerTank(RotationAngle direction) {
+		TankShape tank = moveTank(playerTank, direction, false);
+		if (tank == playerTank) return false;
+		playerTank = tank;
+		return true;
 	}
 
 	/**
@@ -1016,18 +1040,24 @@ public class TanksGame extends GameWithLives {
 			}
 
 			if (movementDirection != null) {
-				if (playerTank.getDirection() == movementDirection) {
-					setKeyDelay(key, ANIMATION_DELAY * 2);
+				boolean sameDirection = playerTank.getDirection() == movementDirection;
+				if (sameDirection) {
+					setKeyDelay(key, MOVEMENT_SPEED);
 				} else {
-					keys.remove(key);
+					setKeyDelay(key, ROTATION_SPEED);
 				}
-				movePlayerTank(movementDirection);
-			}
 
-			if (isStarted && containsKey(KeyPressed.KeyRotate)) {
-				if (fire(playerTank))
+				// Fire only if tank don't move
+				if (movePlayerTank(movementDirection)) {
+					if (sameDirection)
+						setKeyDelay(KeyPressed.KeyRotate, FIRE_SPEED);
+					keys.remove(KeyPressed.KeyRotate);
+				}
+			} else if (isStarted && containsKey(KeyPressed.KeyRotate)) {
+				if (fire(playerTank)) {
 					GameSound.playEffect(Effects.move);
-				keys.remove(KeyPressed.KeyRotate);
+					setKeyDelay(KeyPressed.KeyRotate, FIRE_SPEED);
+				}
 			}
 		}
 	}
