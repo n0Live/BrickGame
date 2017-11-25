@@ -223,6 +223,8 @@ public class FroggerGame extends GameWithLives {
 	 * Checking the conditions of victory
 	 */
 	private void checkForWin() {
+        setScore(getScore() + 1);
+
 		boolean isVictory = true;
 		// victory when filled the entire upper row
 		for (Cell checkedFrog : frogs) {
@@ -232,10 +234,10 @@ public class FroggerGame extends GameWithLives {
 			}
 		}
 
-		setScore(getScore() + 1);
-
 		if (isVictory) {
 			animatedClearLine(getBoard(), curX, boardHeight - 1);
+            // set bonus score
+            setScore(getScore() + 10);
 			// wait while playing effect
 			sleep(ANIMATION_DELAY * 7);
 
