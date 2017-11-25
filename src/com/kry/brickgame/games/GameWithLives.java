@@ -2,6 +2,7 @@ package com.kry.brickgame.games;
 
 import static com.kry.brickgame.games.GameConsts.CB_LOSE;
 import static com.kry.brickgame.games.GameConsts.CB_WIN;
+import static com.kry.brickgame.games.GameConsts.MAX_GAME_LIVES;
 
 import java.util.concurrent.TimeUnit;
 
@@ -156,8 +157,8 @@ public abstract class GameWithLives extends Game {
 	 *            lives 0 - 4
 	 */
 	void setLives(int lives) {
-		if (lives > 4) {
-			this.lives = 4;
+		if (lives > MAX_GAME_LIVES) {
+			this.lives = MAX_GAME_LIVES;
 		} else if (lives < 0) {
 			this.lives = 0;
 		} else {

@@ -5,6 +5,9 @@ import static com.kry.brickgame.games.GameConsts.ANIMATION_DELAY;
 import static com.kry.brickgame.games.GameConsts.BOARD_HEIGHT;
 import static com.kry.brickgame.games.GameConsts.BOARD_WIDTH;
 import static com.kry.brickgame.games.GameConsts.CB_GAME_OVER;
+import static com.kry.brickgame.games.GameConsts.MAX_GAME_LEVEL;
+import static com.kry.brickgame.games.GameConsts.MAX_GAME_SPEED;
+import static com.kry.brickgame.games.GameConsts.MAX_VISIBLE_SCORES;
 import static com.kry.brickgame.games.GameConsts.PREVIEW_HEIGHT;
 import static com.kry.brickgame.games.GameConsts.PREVIEW_WIDTH;
 import static com.kry.brickgame.games.GameUtils.getInvertedVerticalBoard;
@@ -33,7 +36,6 @@ import com.kry.brickgame.games.GameConsts.Rotation;
 import com.kry.brickgame.games.GameConsts.Status;
 import com.kry.brickgame.games.GameSound.Effects;
 import com.kry.brickgame.games.GameSound.Music;
-
 /**
  * @author noLive
  */
@@ -1035,8 +1037,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	void setLevel(int level) {
 		if (level < 1) {
-			this.level = 10;
-		} else if (level > 10) {
+			this.level = MAX_GAME_LEVEL;
+		} else if (level > MAX_GAME_LEVEL) {
 			this.level = 1;
 		} else {
 			this.level = level;
@@ -1075,8 +1077,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 *            score 0 - 19999
 	 */
 	void setScore(int score) {
-		if (score > 19999) {
-			this.score = 19999;
+		if (score > MAX_VISIBLE_SCORES) {
+			this.score = MAX_VISIBLE_SCORES;
 		} else if (score < 0) {
 			this.score = 0;
 		} else {
@@ -1093,8 +1095,8 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	void setSpeed(int speed) {
 		if (speed < 1) {
-			this.speed = 10;
-		} else if (speed > 10) {
+			this.speed = MAX_GAME_SPEED;
+		} else if (speed > MAX_GAME_SPEED) {
 			this.speed = 1;
 		} else {
 			this.speed = speed;
