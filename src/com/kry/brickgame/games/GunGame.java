@@ -37,6 +37,10 @@ public class GunGame extends GameWithGun {
 	private static final int MOVEMENT_SPEED = Math
 			.round(ANIMATION_DELAY * 1.5f);
 	/**
+	 * Score you need get to move to the next level
+	 */
+	private static final int SCORE_TO_NEXT_LEVEL = 500;
+	/**
 	 * Fire speed of the gun
 	 */
 	private final int FIRE_SPEED;
@@ -48,6 +52,11 @@ public class GunGame extends GameWithGun {
 	 * destroys a cell
 	 */
 	final boolean isCreationMode;
+
+	/**
+	 * The flag is set at a win and initiates a call win()
+	 */
+	private volatile boolean isWin;
 
 	/**
 	 * Number of barrels
@@ -120,10 +129,10 @@ public class GunGame extends GameWithGun {
 	 *            count of added lines
 	 * @return the board after adding lines
 	 */
-	private Board addLines(Board board, int linesCount) {
+	private static Board addLines(Board board, int linesCount) {
 		// clear bullets
 		clearBullets(board);
-		return addLinesToBoard(board, boardHeight - 1, linesCount, false);
+		return addLinesToBoard(board, board.getHeight() - 1, linesCount, false);
 	}
 
 	/**
@@ -160,18 +169,22 @@ public class GunGame extends GameWithGun {
 				if (deferredPauseFlag) pause();
 
 				if (getStatus() == Status.Running) {
-					int currentSpeed = getSpeed(true);
-					// increase game speed when hasTwoSmokingBarrels
-					if (hasTwoSmokingBarrels) {
-						currentSpeed = isCreationMode ? currentSpeed * 2
-								: currentSpeed - ANIMATION_DELAY / 2;
-					}
+					if (isWin) {
+						win();
+					} else {
+						int currentSpeed = getSpeed(true);
+						// increase game speed when hasTwoSmokingBarrels
+						if (hasTwoSmokingBarrels) {
+							currentSpeed = isCreationMode ? currentSpeed * 2
+									: currentSpeed - ANIMATION_DELAY / 2;
+						}
 
-					// moving
-					if (elapsedTime(currentSpeed)) {
-						// try drop down lines
-						if (!droppingDown()) {
-							loss(curX, curY);
+						// moving
+						if (elapsedTime(currentSpeed)) {
+							// try drop down lines
+							if (!droppingDown()) {
+								loss(curX, curY);
+							}
 						}
 					}
 				}
@@ -182,6 +195,22 @@ public class GunGame extends GameWithGun {
 
 		bulletSwarm.cancel(true);
 		return getNextGame();
+	}
+
+	@Override
+	void win() {
+		setStatus(Status.DoSomeWork);
+		synchronized (lock) {
+			Board board = getBoard();
+			clearBullets(board);
+			setBoard(board);
+
+			GameSound.playMusic(Music.win);
+			animatedClearBoard(CB_WIN);
+
+			loadNewLevel();
+		}
+		if (quitFlag) quit();
 	}
 
 	/**
@@ -226,7 +255,7 @@ public class GunGame extends GameWithGun {
 
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return isCreationMode ? 2500 : 250;
+		return isCreationMode ? 2500 : 273;
 	}
 
 	/**
@@ -234,7 +263,10 @@ public class GunGame extends GameWithGun {
 	 */
 	@Override
 	void loadNewLevel() {
-		// starting position - the middle of the bottom border of the board
+		super.loadNewLevel();
+
+		isWin = false;
+		// set start position - the middle of the bottom border of the board
 		curX = boardWidth / 2 - 1;
 		curY = 0;
 
@@ -242,13 +274,19 @@ public class GunGame extends GameWithGun {
 		initBullets(bullets);
 
 		synchronized (lock) {
-			// draws a rows on the top of the border
-			setBoard(addLines(getBoard(), getLevel()));
-			// draws the gun
-			moveGun(curX, curY);
+			Board board = getBoard();
+			for (int i = 0; i < getLevel(); i++) {
+                // erase the gun
+                board = drawShape(board, curX, curY, gun, Cell.Empty);
+    			// add lines
+                board = addLines(board, 1);
+                // return the gun
+                board = drawShape(board, curX, curY, gun, Cell.Full);
+                setBoard(board);
+                
+				sleep(MOVEMENT_SPEED);
+			}
 		}
-
-		super.loadNewLevel();
 	}
 
 	/**
@@ -304,40 +342,17 @@ public class GunGame extends GameWithGun {
 
 	@Override
 	void setScore(int score) {
-		int oldThousands = getScore() / 1000;
+		int oldScore = getScore() / SCORE_TO_NEXT_LEVEL;
 
 		super.setScore(score);
 
 		// when a sufficient number of points changes the speed and the level
-		if (getScore() / 1000 > oldThousands) {
+		if (getScore() / SCORE_TO_NEXT_LEVEL > oldScore) {
 			setSpeed(getSpeed() + 1);
 			if (getSpeed() == 1) {
 				setLevel(getLevel() + 1);
-
-				setStatus(Status.DoSomeWork);
-				synchronized (lock) {
-					Board board = getBoard();
-					// delete flying bullets
-					clearBullets(board);
-					initBullets(bullets);
-					// erase the gun
-					board = drawShape(board, curX, curY, gun, Cell.Empty);
-
-					GameSound.playMusic(Music.win);
-					animatedClearBoard(CB_WIN);
-
-					// add lines
-					for (int i = 0; i < getLevel(); i++) {
-						board = addLines(getBoard(), 1);
-						setBoard(board);
-						sleep(ANIMATION_DELAY * 3);
-					}
-
-					// return the gun
-					board = drawShape(board, curX, curY, gun, Cell.Full);
-					setBoard(board);
-				}
-				setStatus(Status.Running);
+					
+				isWin = true;
 			}
 		}
 	}
@@ -359,5 +374,4 @@ public class GunGame extends GameWithGun {
 			setBoard(board);
 		}
 	}
-
 }

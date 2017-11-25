@@ -613,22 +613,25 @@ public abstract class Game implements Callable<Game>, Serializable {
 	}
 
 	/**
-	 * Speed
+	 * Returns genuine speed in millisecond or speed level. Lower value of the
+	 * genuine speed means a faster speed.
 	 * 
 	 * @param genuine
-	 *            return genuine speed (true) or speed level (false)
-	 * @return if genuine than return genuine speed in millisecond else return
-	 *         speed level 1-10
+	 *            return genuine speed (true) or speed level (false).
+	 * @return if {@code genuine} than return genuine speed in millisecond else
+	 *         return speed level 1-10
 	 */
 	int getSpeed(boolean genuine) {
 		if (genuine) {
 			// getting a uniform distribution from FIRST_LEVEL_SPEED to
 			// TENTH_LEVEL_SPEED
 			if (cachedGenuineSpeed <= 0) {
-				cachedGenuineSpeed = Math
-						.round(getSpeedOfFirstLevel()
-								- (float) (getSpeedOfFirstLevel() - getSpeedOfTenthLevel())
-								/ (10 - 1) * (speed - 1));
+				int speedOfFirstLevel = getSpeedOfFirstLevel();
+				int speedOfTenthLevel = getSpeedOfTenthLevel();
+				float speedIncrement = (float) (speedOfFirstLevel - speedOfTenthLevel)
+						/ (10 - 1);
+				cachedGenuineSpeed = Math.round(speedOfFirstLevel
+						- speedIncrement * (speed - 1));
 			}
 			return cachedGenuineSpeed;
 		}
