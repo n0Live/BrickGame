@@ -1078,7 +1078,7 @@ public abstract class Game implements Callable<Game>, Serializable {
 	 */
 	void setScore(int score) {
 		if (score > MAX_VISIBLE_SCORES) {
-			this.score = MAX_VISIBLE_SCORES;
+			this.score = score - MAX_VISIBLE_SCORES;
 		} else if (score < 0) {
 			this.score = 0;
 		} else {
