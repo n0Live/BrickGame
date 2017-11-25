@@ -210,7 +210,7 @@ public abstract class GameWithLives extends Game {
 		// adds additional life or bonus scores
 		if (getScore() >= getScoresToAdditionalLife()){
 			GameSound.playEffect(Effects.bonus);
-			if (getLives() < 4){
+			if (getLives() < MAX_GAME_LIVES){
 				setLives(getLives() + 1);
 			}else{
 				int bonus = getScoresToAdditionalLife() / 1000;
