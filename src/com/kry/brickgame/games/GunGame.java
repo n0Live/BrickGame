@@ -374,4 +374,8 @@ public class GunGame extends GameWithGun {
 			setBoard(board);
 		}
 	}
+
+    @Override int getScoresToExtraLife() {
+        return 10000;
+    }
 }

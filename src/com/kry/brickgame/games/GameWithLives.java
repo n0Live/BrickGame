@@ -24,6 +24,10 @@ public abstract class GameWithLives extends Game {
 	 * Allowed values: 0-4
 	 */
 	private volatile int lives;
+	/**
+	 * Count of extra (bonus) lives
+	 */
+	private int numOfExtraLives;
 
 	/**
 	 * Whether the game is started?
@@ -34,10 +38,6 @@ public abstract class GameWithLives extends Game {
 	 * Duration of playing the start music
 	 */
 	static final int START_MUSIC_DURATION = 1500;
-	/**
-	 * Number of scores to get an additional life
-	 */
-	private static final int SCORES_TO_ADDITIONAL_LIFE = 10000;
 
 	/**
 	 * The Game with lives without rotation
@@ -69,6 +69,7 @@ public abstract class GameWithLives extends Game {
 	 */
 	public GameWithLives(int speed, int level, Rotation rotation, int type) {
 		super(speed, level, rotation, type);
+		numOfExtraLives = 0;
 	}
 
 	/**
@@ -194,29 +195,28 @@ public abstract class GameWithLives extends Game {
 		}
 		if (quitFlag) quit();
 	}
-	
+
 	/**
-	 * Returns number of scores to get an additional life
+	 * Returns number of scores to get an extra (bonus) life
 	 */
-	@SuppressWarnings("static-method")
-	int getScoresToAdditionalLife(){
-		return SCORES_TO_ADDITIONAL_LIFE;
-	}
-	
+	abstract int getScoresToExtraLife();
+
 	@Override
 	void setScore(int score) {
 		super.setScore(score);
-		
+
+		int newLife = getScore() / getScoresToExtraLife();
+
 		// adds additional life or bonus scores
-		if (getScore() >= getScoresToAdditionalLife()){
+		if (newLife >= numOfExtraLives + 1) {
+			numOfExtraLives++;
 			GameSound.playEffect(Effects.bonus);
-			if (getLives() < MAX_GAME_LIVES){
+			if (getLives() < MAX_GAME_LIVES) {
 				setLives(getLives() + 1);
-			}else{
-				int bonus = getScoresToAdditionalLife() / 1000;
+			} else {
+				int bonus = getScoresToExtraLife() / 10;
 				super.setScore(getScore() + bonus);
 			}
 		}
 	}
-
 }

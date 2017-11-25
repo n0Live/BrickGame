@@ -1134,4 +1134,8 @@ public class TanksGame extends GameWithLives {
 		return true;
 	}
 
+    @Override int getScoresToExtraLife() {
+        return 500;
+    }
+
 }

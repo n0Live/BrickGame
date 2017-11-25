@@ -646,4 +646,8 @@ public class ArkanoidGame extends GameWithLives {
 		}
 	}
 
+
+    @Override int getScoresToExtraLife() {
+        return 1000;
+    }
 }

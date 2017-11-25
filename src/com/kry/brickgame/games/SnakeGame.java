@@ -459,4 +459,7 @@ public class SnakeGame extends GameWithLives {
 		}
 	}
 	
+    @Override int getScoresToExtraLife() {
+        return 300;
+    }
 }

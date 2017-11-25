@@ -487,4 +487,7 @@ public class RacingGame extends GameWithLives {
 		super.win();
 	}
 
+    @Override int getScoresToExtraLife() {
+        return 2000;
+    }
 }

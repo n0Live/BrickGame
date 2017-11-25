@@ -602,4 +602,7 @@ public class FroggerGame extends GameWithLives {
 		}
 	}
 
+    @Override int getScoresToExtraLife() {
+        return 500;
+    }
 }

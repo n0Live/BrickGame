@@ -679,4 +679,8 @@ public class InvadersGame extends GameWithGun {
 		initBall(getBoard());
 		super.win();
 	}
+	
+    @Override int getScoresToExtraLife() {
+        return 1000;
+    }
 }
