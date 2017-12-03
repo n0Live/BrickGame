@@ -160,9 +160,13 @@ public abstract class GameWithGun extends GameWithLives {
 									board = removeCell(board, x, bullets.get(x)
 											.get(y));
 								} else {// flightOfMud
-									// stop the bullet before the cell
-									board = addCellAndCheckLine(board, x,
-											bullets.get(x).get(y) - 1);
+									// if previous cell is empty
+									if (board.getCell(x,
+											bullets.get(x).get(y) - 1) == Cell.Empty) {
+										// stop the bullet before the cell
+										board = addCellAndCheckLine(board, x,
+												bullets.get(x).get(y) - 1);
+									}
 								}
 								// remove the bullet
 								bullets.get(x).set(y, 0);
@@ -189,9 +193,13 @@ public abstract class GameWithGun extends GameWithLives {
 							} else {// flightOfMud
 								// if under the bullet is filled cell
 								if (board.getCell(x, bullets.get(x).get(y)) == Cell.Full) {
-									// stop the bullet before the cell
-									board = addCellAndCheckLine(board, x,
-											bullets.get(x).get(y) - 1);
+									// and previous cell is empty
+									if (board.getCell(x,
+											bullets.get(x).get(y) - 1) == Cell.Empty) {
+										// stop the bullet before the cell
+										board = addCellAndCheckLine(board, x,
+												bullets.get(x).get(y) - 1);
+									}
 								} else {
 									// stop the bullet on the border of the
 									// board
