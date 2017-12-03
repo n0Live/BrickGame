@@ -62,5 +62,13 @@ public class TetrisGameL extends TetrisGameJ {
 		}
 		return result;
 	}
+
+    @Override protected int getSpeedOfFirstLevel() {
+        return super.getSpeedOfFirstLevel() + 50;
+    }
+
+    @Override protected int getSpeedOfTenthLevel() {
+        return super.getSpeedOfTenthLevel() + 50;
+    }
 	
 }

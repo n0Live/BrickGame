@@ -587,12 +587,12 @@ public class TetrisGameI extends Game {
 
 	@Override
 	protected int getSpeedOfFirstLevel() {
-		return 450;
+		return 480;
 	}
 
 	@Override
 	protected int getSpeedOfTenthLevel() {
-		return 120;
+		return 180;
 	}
 
 	/**
@@ -709,8 +709,13 @@ public class TetrisGameI extends Game {
 			GameSound.playEffect(Effects.fall_super);
 			setBoard(eraseShape(getBoard(), curX, curY, curPiece));
 			curPiece = new TetrisShape(Figures.NoShape);
+			return;
 		} else if (curPiece.getShape() == Figures.SuperBomb) {// bomb
 			kaboom(curX + 1, curY); // shift to the center of the bomb
+			return;
+		} else if (curPiece.getShape() == Figures.SuperPoint) {// super point
+			GameSound.playEffect(Effects.fall_super);
+			setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 		} else { // figures which remain on the board
 			if (hasLiquidFigures // liquid figure
 					&& curPiece.getFill() == Cell.Blink) {
@@ -720,16 +725,16 @@ public class TetrisGameI extends Game {
 					&& curPiece.getFill() == Cell.Blink) {
 				GameSound.playEffect(Effects.fall_super);
 				flowDown(getBoard(), curX, curY, curPiece, true);
-			} else { // ordinal figure and SuperPoint
+			} else { // ordinal figure
 				GameSound.playEffect(Effects.fall);
 				setBoard(drawShape(getBoard(), curX, curY, curPiece, Cell.Full));
 			}
-			// check for filled lines
-			removeFullLines();
-			// check for game over
-			if (curY + curPiece.maxY() >= boardHeight) {
-				gameOver();
-			}
+		}
+		// check for filled lines
+		removeFullLines();
+		// check for game over
+		if (curY + curPiece.maxY() >= boardHeight) {
+			gameOver();
 		}
 	}
 
@@ -753,8 +758,8 @@ public class TetrisGameI extends Game {
 				} else if (curPiece.getShape() == Figures.SuperMudGun) {
 					GameSound.playEffect(Effects.add_cell);
 					mudShoot(curX, curY + curPiece.minY());
-					// if the super point, than do nothing
-				} else if (curPiece.getShape() != Figures.SuperPoint) {
+					// if the super point or super bomb, than do nothing
+				} else if (!curPiece.isSuperShape()) {
 					TetrisShape rotatedPiece = rotateFigure(curPiece);
 					if (tryMove(rotatedPiece, curX, curY)) {
 						GameSound.playEffect(Effects.turn);

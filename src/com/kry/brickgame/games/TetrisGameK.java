@@ -60,6 +60,13 @@ public class TetrisGameK extends TetrisGameI {
 			result = getNextFigure(figure);
 		}
 		return result;
-	}
-	
+	}	
+
+    @Override protected int getSpeedOfFirstLevel() {
+        return super.getSpeedOfFirstLevel() + 50;
+    }
+
+    @Override protected int getSpeedOfTenthLevel() {
+        return super.getSpeedOfTenthLevel() + 50;
+    }
 }

@@ -35,4 +35,12 @@ public class PentixGameV extends TetrisGameN {
 		return TetrisShape.getRandomShapeAndSuper(superShapes);
 	}
 	
+
+    @Override protected int getSpeedOfFirstLevel() {
+        return super.getSpeedOfFirstLevel() + 50;
+    }
+
+    @Override protected int getSpeedOfTenthLevel() {
+        return super.getSpeedOfTenthLevel() + 50;
+    }
 }
