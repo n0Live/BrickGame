@@ -4,7 +4,7 @@
 	<property name="src" value="./src" />
 	<property name="dest" value="./bin" />
 	<property name="miglayout" value="./ext-lib/miglayout15-swing.jar" />
-	<property name="jxinput" value="./ext-lib/jxinput-0.8" />
+	<property name="jxinput" value="./ext-lib/jxinput-0.8.jar" />
 	
 	<target name="init">
 		<mkdir dir="${dest}"/>
