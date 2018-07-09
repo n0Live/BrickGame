@@ -548,6 +548,9 @@ public abstract class Game implements Callable<Game>, Serializable {
 	void gameOver() {
 		setStatus(Status.GameOver);
 
+        // show score
+        fireInfoChanged(String.valueOf(score));
+
 		GameSound.playMusic(Music.game_over);
 
 		animatedClearBoard();
