@@ -21,6 +21,9 @@ This project - an attempt to recreate the "Brick Game" console on a modern PC as
 Due to the StrikerX3's JXInput library it's supported XInput devices under Windows 7 and above.
 The [Visual C++ Redistributable Packages for Visual Studio 2015](https://www.microsoft.com/en-us/download/details.aspx?id=48145) are required to use JXInput.
 
+## Dependences
+You will need [Eclipse](https://www.eclipse.org) to compile this project. You will also need to add [javafx.media](https://openjfx.io) to the build path of the project.
+
 ## Project Maintainers
 * noLive
 
